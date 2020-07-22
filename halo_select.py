@@ -29,21 +29,13 @@ vrPath=dataPath+"stf_swiftdm_3dfof_subhalo_0036/"
 haloPropFile=vrPath+"stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
 
 # Read in halo properties
-h5file=h5.File(haloPropFile,'r')
-h5dset=h5file['/Mass_200crit']
-M200c=h5dset[...]*1.e10 # Msun units
-h5dset=h5file['/R_200crit']
-R200c=h5dset[...]
-h5dset=h5file['/Structuretype']
-structType=h5dset[...]
-h5dset=h5file['/Xcminpot']
-xPotMin=h5dset[...]
-h5dset=h5file['/Ycminpot']
-yPotMin=h5dset[...]
-h5dset=h5file['/Zcminpot']
-zPotMin=h5dset[...]
-h5file.close()
-
+with h5.File(haloPropFile,'r') as f:
+    M200c=f['/Mass_200crit'][:]*1.e10 # Msun units
+    R200c=f['/R_200crit'][:]
+    structType=f['/Structuretype'][:]
+    xPotMin=f['/Xcminpot'][:]
+    yPotMin=f['/Ycminpot'][:]
+    zPotMin=f['/Zcminpot'][:]
 
 # Cut down main sample to field haloes above minimum mass
 index=np.where( (structType==10) & (M200c>(minMassFrac*minMassSelectMsun)) )[0]
@@ -53,7 +45,7 @@ R200c=R200c[index]
 xPotMin=xPotMin[index]
 yPotMin=yPotMin[index]
 zPotMin=zPotMin[index]
-print("Number of haloes in sample =",numHaloes)
+print("Number of haloes in sample =", numHaloes)
 
 # Select primary haloes with structure type 10 (field haloes) and within mass range
 index=np.where( (M200c>minMassSelectMsun) & (M200c<maxMassSelectMsun))[0]
