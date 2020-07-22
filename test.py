@@ -1,6 +1,7 @@
-import numpy as np
+import utils
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import h5py as h5
 import swiftsimio as sw
 import unyt
 
@@ -38,6 +39,5 @@ plt.figure()
 plt.plot(posDM[:,0]-xCen,posDM[:,1]-yCen,',')
 plt.xlim([-size,size])
 plt.ylim([-size,size])
-plt.show()
-
+utils.save_plot('particles.png', to_slack=True)
 
