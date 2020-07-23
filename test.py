@@ -4,7 +4,6 @@ import matplotlib
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-import utils
 
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
@@ -36,9 +35,41 @@ mask.constrain_spatial(region)
 data = sw.load(snapFile, mask=mask)
 posDM = data.dark_matter.coordinates
 
+print('Generating point particle map...')
 plt.figure()
+plt.figaspect('equal')
 plt.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
 plt.xlim([-size, size])
 plt.ylim([-size, size])
-# utils.save_plot('particles.png', to_slack=True)
+plt.savefig('particles.png')
+plt.show()
+plt.clf()
+
+
+# Generate smoothing lengths for the dark matter
+data.dark_matter.smoothing_lengths = sw.visualisation.smoothing_length_generation.generate_smoothing_lengths(
+    data.dark_matter.coordinates,
+    data.metadata.boxsize,
+    kernel_gamma=1.8,
+    neighbours=57,
+    speedup_fac=2,
+    dimension=3,
+)
+
+# Project the dark matter mass
+dm_mass = sw.visualisation.projection.project_pixel_grid(
+    # Note here that we pass in the dark matter dataset not the whole
+    # data object, to specify what particle type we wish to visualise
+    data=data.dark_matter,
+    boxsize=data.metadata.boxsize,
+    resolution=1024,
+    project="masses",
+    parallel=True,
+    region=None
+)
+
+print('Generating smoothed DMO map...')
+from matplotlib.pyplot import imsave
+from matplotlib.colors import LogNorm
+imsave("dm_mass_map.png", LogNorm()(dm_mass), cmap="inferno")
 plt.show()
