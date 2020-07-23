@@ -2,9 +2,8 @@ import swiftsimio as sw
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 import unyt
-import matplotlib
-
-matplotlib.use('Agg')
+# import matplotlib
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 # EAGLE-XL data path
@@ -30,21 +29,27 @@ size = unyt.unyt_quantity(1. * rad, unyt.Mpc)
 
 mask = sw.mask(snapFile)
 box = mask.metadata.boxsize
-region = [[xCen - size, xCen + size], [yCen - size, yCen + size], [zCen - size, zCen + size]]
+region = [
+    [xCen - size, xCen + size],
+    [yCen - size, yCen + size],
+    [zCen - size, zCen + size]
+]
 mask.constrain_spatial(region)
 # Load data using mask
 data = sw.load(snapFile, mask=mask)
 posDM = data.dark_matter.coordinates
+massDM = data.dark_matter.masses
+print(len(massDM))
 
 print('Generating point particle map...')
-plt.figure()
-plt.axes().set_aspect('equal')
-plt.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
-plt.xlim([-size, size])
-plt.ylim([-size, size])
-plt.savefig('particles.png')
-plt.show()
-plt.clf()
+# plt.figure()
+# plt.axes().set_aspect('equal')
+# plt.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
+# plt.xlim([-size, size])
+# plt.ylim([-size, size])
+# plt.savefig('particles.png')
+# plt.show()
+# plt.clf()
 
 
 # Generate smoothing lengths for the dark matter
