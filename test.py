@@ -30,7 +30,6 @@ size = unyt.unyt_quantity(1. * rad, unyt.Mpc)
 
 mask = sw.mask(snapFile)
 box = mask.metadata.boxsize
-# region=[[0.8*b,0.9*b] for b in box]
 region = [[xCen - size, xCen + size], [yCen - size, yCen + size], [zCen - size, zCen + size]]
 mask.constrain_spatial(region)
 # Load data using mask
@@ -39,7 +38,7 @@ posDM = data.dark_matter.coordinates
 
 print('Generating point particle map...')
 plt.figure()
-plt.axes().set_aspect('equal', 'datalim')
+plt.axes().set_aspect('equal')
 plt.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
 plt.xlim([-size, size])
 plt.ylim([-size, size])
@@ -53,7 +52,7 @@ data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
     data.dark_matter.coordinates,
     data.metadata.boxsize,
     kernel_gamma=1.8,
-    neighbours=57,
+    neighbours=60,
     speedup_fac=2,
     dimension=3,
 )
