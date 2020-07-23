@@ -66,7 +66,7 @@ dm_mass = project_pixel_grid(
     # data object, to specify what particle type we wish to visualise
     data=data.dark_matter,
     boxsize=data.metadata.boxsize,
-    resolution=1024,
+    resolution="masses",
     project=None,
     parallel=True,
     region=None
