@@ -69,7 +69,7 @@ dm_mass = project_pixel_grid(
     resolution=1024,
     project=None,
     parallel=True,
-    region=region
+    region=[xCen - size, xCen + size, yCen - size, yCen + size]
 )
 
 print('Generating smoothed DMO map...')
