@@ -39,7 +39,7 @@ mask.constrain_spatial(region)
 # Load data using mask
 data = sw.load(snapFile, mask=mask)
 posDM = data.dark_matter.coordinates
-data.dark_matter.masses = np.ones((len(posDM)), dtype=np.float)
+data.dark_matter.masses.value = np.ones((len(posDM)), dtype=np.float)
 massDM = data.dark_matter.masses
 print(len(massDM))
 
