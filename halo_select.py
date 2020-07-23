@@ -1,5 +1,6 @@
 import numpy as np
 import h5py as h5
+from matplotlib import pyplot as plt
 
 
 def wrap(dx, box):
@@ -128,8 +129,8 @@ for i in np.arange(numHaloes_select):
     print(i, index.size, np.sqrt(dr2[index].min()), minDistFac * R200c_select[i])
 
 # Plot HMF for selected objects and total
-# plt.figure()
-# plt.yscale('log')
-# plt.hist(np.log10(M200c),bins=6,range=(13.,15.))
-# plt.hist(np.log10(M200c[selectFlag]),bins=6,range=(13.,15.))
-# plt.show()
+plt.figure()
+plt.yscale('log')
+plt.hist(np.log10(M200c), bins=6, range=(13., 15.))
+plt.hist(np.log10(M200c[selectFlag]), bins=6, range=(13., 15.))
+plt.show()
