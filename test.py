@@ -77,7 +77,7 @@ from matplotlib.pyplot import imsave
 from matplotlib.colors import LogNorm
 
 plt.figure()
-plt.imshow(dm_mass, aspect='equal', extent=[-size, size, -size, size], origin='lower', norm=LogNorm)
+plt.imshow(dm_mass, aspect='equal', extent=[-size, size, -size, size], origin='lower')
 plt.savefig('dm_map.png')
 plt.show()
 
