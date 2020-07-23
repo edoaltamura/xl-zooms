@@ -2,6 +2,7 @@ import swiftsimio as sw
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 import unyt
+import numpy as np
 # import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -38,6 +39,7 @@ mask.constrain_spatial(region)
 # Load data using mask
 data = sw.load(snapFile, mask=mask)
 posDM = data.dark_matter.coordinates
+data.dark_matter.masses = np.ones(len(posDM))
 massDM = data.dark_matter.masses
 print(len(massDM))
 
