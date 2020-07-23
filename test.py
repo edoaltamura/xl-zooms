@@ -37,7 +37,7 @@ posDM = data.dark_matter.coordinates
 
 print('Generating point particle map...')
 plt.figure()
-plt.figaspect('equal')
+plt.axes().set_aspect('equal', 'datalim')
 plt.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
 plt.xlim([-size, size])
 plt.ylim([-size, size])
