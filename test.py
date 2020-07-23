@@ -1,4 +1,6 @@
 import swiftsimio as sw
+from swiftsimio.visualisation.projection import project_pixel_grid
+from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 import unyt
 import matplotlib
 
@@ -47,7 +49,7 @@ plt.clf()
 
 
 # Generate smoothing lengths for the dark matter
-data.dark_matter.smoothing_lengths = sw.visualisation.smoothing_length_generation.generate_smoothing_lengths(
+data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
     data.dark_matter.coordinates,
     data.metadata.boxsize,
     kernel_gamma=1.8,
@@ -57,7 +59,7 @@ data.dark_matter.smoothing_lengths = sw.visualisation.smoothing_length_generatio
 )
 
 # Project the dark matter mass
-dm_mass = sw.visualisation.projection.project_pixel_grid(
+dm_mass = project_pixel_grid(
     # Note here that we pass in the dark matter dataset not the whole
     # data object, to specify what particle type we wish to visualise
     data=data.dark_matter,
