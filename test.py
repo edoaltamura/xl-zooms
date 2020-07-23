@@ -39,11 +39,8 @@ mask.constrain_spatial(region)
 # Load data using mask
 data = sw.load(snapFile, mask=mask)
 posDM = data.dark_matter.coordinates
-data.dark_matter.masses.value = np.ones((len(posDM)), dtype=np.float)
-massDM = data.dark_matter.masses
-print(len(massDM))
 
-print('Generating point particle map...')
+# print('Generating point particle map...')
 # plt.figure()
 # plt.axes().set_aspect('equal')
 # plt.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
@@ -71,7 +68,7 @@ dm_mass = project_pixel_grid(
     data=data.dark_matter,
     boxsize=data.metadata.boxsize,
     resolution=1024,
-    project="masses",
+    # project="masses",
     parallel=True,
     region=None
 )
