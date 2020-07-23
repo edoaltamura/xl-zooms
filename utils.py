@@ -1,10 +1,17 @@
 import os
-import warnings
-import slack
 import socket
+import warnings
 import matplotlib
+import slack
+
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+
+
+def _load_slack_token() -> str:
+    with open('~/slacktoken.txt', 'r') as f:
+        token = f.read()
+    return token
 
 
 def save_plot(filepath: str, to_slack: bool = False, **kwargs) -> None:
@@ -23,9 +30,9 @@ def save_plot(filepath: str, to_slack: bool = False, **kwargs) -> None:
             f"\tFile: {os.path.basename(filepath)}",
             sep='\n'
         )
-        slack_token = 'xoxp-452271173797-451476014913-1101193540773-57eb7b0d416e8764be6849fdeda52ce8'
-        slack_msg = f"Host: {socket.gethostname()}\nDir: {os.path.dirname(filepath)}\nFile: {os.path.basename(filepath)}"
         try:
+            slack_token = _load_slack_token()
+            slack_msg = f"Host: {socket.gethostname()}\nDir: {os.path.dirname(filepath)}\nFile: {os.path.basename(filepath)}"
             # Send files to Slack: init slack client with access token
             client = slack.WebClient(token=slack_token)
             client.files_upload(file=filepath, initial_comment=slack_msg, channels='#personal')
