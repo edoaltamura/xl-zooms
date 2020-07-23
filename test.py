@@ -1,11 +1,10 @@
-import swiftsimio as sw
-from swiftsimio.visualisation.projection import project_pixel_grid
-from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
-import unyt
-import numpy as np
 # import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+import swiftsimio as sw
+import unyt
+from swiftsimio.visualisation.projection import project_pixel_grid
+from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
 
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
@@ -68,7 +67,7 @@ dm_mass = project_pixel_grid(
     data=data.dark_matter,
     boxsize=data.metadata.boxsize,
     resolution=1024,
-    # project="masses",
+    project=None,
     parallel=True,
     region=None
 )
@@ -76,5 +75,6 @@ dm_mass = project_pixel_grid(
 print('Generating smoothed DMO map...')
 from matplotlib.pyplot import imsave
 from matplotlib.colors import LogNorm
+
 imsave("dm_mass_map.png", LogNorm()(dm_mass), cmap="inferno")
 plt.show()
