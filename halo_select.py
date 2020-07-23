@@ -71,7 +71,8 @@ for i in np.arange(numHaloesPrimary - 1):
     # print(dx.min(),dx.max(),dy.min(),dy.max(),dz.min(),dz.max())
     dr2 = (dx ** 2) + (dy ** 2) + (dz ** 2)
     index = np.where((M200c > minMassMsun) & (dr2 < minDistMpc ** 2))[0]
-    if (index.size == 1): selectFlag[i] = True
+    if index.size == 1:
+        selectFlag[i] = True
 
 # Subset of haloes that satisfy isolation criterion
 M200c_iso = M200c_primary[selectFlag]
@@ -132,5 +133,5 @@ for i in np.arange(numHaloes_select):
 plt.figure()
 plt.yscale('log')
 plt.hist(np.log10(M200c), bins=6, range=(13., 15.))
-plt.hist(np.log10(M200c[selectFlag]), bins=6, range=(13., 15.))
+plt.hist(np.log10(M200c[np.where(selectFlag == 1)[0]]), bins=6, range=(13., 15.))
 plt.show()
