@@ -76,5 +76,11 @@ print('Generating smoothed DMO map...')
 from matplotlib.pyplot import imsave
 from matplotlib.colors import LogNorm
 
-imsave("dm_mass_map.png", LogNorm()(dm_mass), cmap="inferno")
+plt.figure()
+plt.axes().set_aspect('equal')
+plt.imshow(dm_mass)
+plt.xlim([-size, size])
+plt.ylim([-size, size])
+plt.savefig('dm_map.png')
 plt.show()
+
