@@ -69,15 +69,26 @@ dm_mass = project_pixel_grid(
     resolution=1024,
     project="masses",
     parallel=True,
-    region=None
+    region=region
 )
 
 print('Generating smoothed DMO map...')
 from matplotlib.pyplot import imsave
 from matplotlib.colors import LogNorm
 
-plt.figure()
-plt.imshow(dm_mass, aspect='equal', extent=[-size, size, -size, size], origin='lower')
-plt.savefig('dm_map.png')
-plt.show()
+fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+fig.subplots_adjust(0, 0, 1, 1)
+ax.axis("off")
 
+ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
+ax.text(
+    0.975,
+    0.975,
+    f"$z={data.metadata.z:3.3f}$",
+    color="white",
+    ha="right",
+    va="top",
+    transform=ax.transAxes,
+)
+
+fig.savefig(f"DM_map.png")
