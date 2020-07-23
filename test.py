@@ -67,7 +67,7 @@ dm_mass = project_pixel_grid(
     data=data.dark_matter,
     boxsize=data.metadata.boxsize,
     resolution=1024,
-    project="masses",
+    project=None,
     parallel=True,
     region=region
 )
