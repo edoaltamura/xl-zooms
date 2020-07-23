@@ -1,6 +1,8 @@
 # import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from matplotlib.colors import LogNorm
+
 import swiftsimio as sw
 import unyt
 from swiftsimio.visualisation.projection import project_pixel_grid
@@ -49,14 +51,14 @@ posDM = data.dark_matter.coordinates
 # plt.show()
 # plt.clf()
 
-
+print('Generating DMO particle count map')
 # Generate smoothing lengths for the dark matter
 data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
     data.dark_matter.coordinates,
     data.metadata.boxsize,
     kernel_gamma=1.8,
-    neighbours=60,
-    speedup_fac=2,
+    neighbours=57,
+    speedup_fac=1,
     dimension=3,
 )
 
@@ -72,14 +74,9 @@ dm_mass = project_pixel_grid(
     region=[xCen - size, xCen + size, yCen - size, yCen + size]
 )
 
-print('Generating smoothed DMO map...')
-from matplotlib.pyplot import imsave
-from matplotlib.colors import LogNorm
-
 fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
 fig.subplots_adjust(0, 0, 1, 1)
 ax.axis("off")
-
 ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
 ax.text(
     0.975,
@@ -90,5 +87,4 @@ ax.text(
     va="top",
     transform=ax.transAxes,
 )
-
 fig.savefig(f"DM_map.png")
