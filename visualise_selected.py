@@ -50,24 +50,24 @@ print("\nRendering snapshot volume...")
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-data = sw.load(snapFile)
-
-dm_mass = dm_render(data)
-fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
-fig.subplots_adjust(0, 0, 1, 1)
-ax.axis("off")
-ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
-ax.text(
-    0.975,
-    0.975,
-    f"$z={data.metadata.z:3.3f}$",
-    color="white",
-    ha="right",
-    va="top",
-    transform=ax.transAxes,
-)
-fig.savefig(f"volume_DMmap.png")
-plt.close(fig)
+# data = sw.load(snapFile)
+#
+# dm_mass = dm_render(data)
+# fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+# fig.subplots_adjust(0, 0, 1, 1)
+# ax.axis("off")
+# ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
+# ax.text(
+#     0.975,
+#     0.975,
+#     f"$z={data.metadata.z:3.3f}$",
+#     color="white",
+#     ha="right",
+#     va="top",
+#     transform=ax.transAxes,
+# )
+# fig.savefig(f"volume_DMmap.png")
+# plt.close(fig)
 
 
 for i in range(3):
@@ -87,7 +87,7 @@ for i in range(3):
     data = sw.load(snapFile, mask=mask)
 
     print(f"Rendering halo {i}...")
-    dm_mass = dm_render(data, region=region)
+    dm_mass = dm_render(data, region=(region[0]+region[1]))
 
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
