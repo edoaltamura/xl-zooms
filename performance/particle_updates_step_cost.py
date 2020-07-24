@@ -39,8 +39,7 @@ number_of_updates = unyt.unyt_array(data[7], units="dimensionless")
 wallclock_time = unyt.unyt_array(data[-2], units="ms")
 
 fig, ax = plt.subplots()
-
-ax.loglog()
+# ax.loglog()
 
 # Simulation data plotting
 H, updates_edges, wallclock_edges = np.histogram2d(
@@ -60,10 +59,7 @@ ax.text(2e7, 0.5e3, "$\\propto n$", color="grey", ha="left", va="top")
 
 ax.set_ylabel("Wallclock time for step [ms]")
 ax.set_xlabel("Number of particle updates in step")
-
 ax.set_xlim(updates_edges[0], updates_edges[-1])
 ax.set_ylim(wallclock_edges[0], wallclock_edges[-1])
-
 fig.tight_layout()
-
 fig.savefig(f"{output_path}/particle_updates_step_cost.png")
