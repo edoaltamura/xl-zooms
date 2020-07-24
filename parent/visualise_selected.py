@@ -6,7 +6,7 @@ from swiftsimio.visualisation.smoothing_length_generation import generate_smooth
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-from utils import (
+from parent.utils import (
     latex_float
 )
 
@@ -74,7 +74,7 @@ snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 # fig.savefig(f"outfiles/volume_DMmap.png")
 # plt.close(fig)
 
-for i in range(3):
+for i in range(1):
     print(f"Rendering halo {i}...")
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)

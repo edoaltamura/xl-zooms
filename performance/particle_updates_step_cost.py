@@ -1,15 +1,10 @@
 """
 Plots wallclock v.s. simulation time.
 """
-
 import unyt
-
 import matplotlib.pyplot as plt
 import numpy as np
-
 from matplotlib.colors import LogNorm
-from swiftsimio import load
-
 try:
     plt.style.use("mnras.mplstyle")
 except:
@@ -29,7 +24,6 @@ snapshot_filename = f"{run_directory}/{snapshot_name}"
 
 number_of_updates_bins = unyt.unyt_array(np.logspace(0, 10, 512), units="dimensionless")
 wallclock_time_bins = unyt.unyt_array(np.logspace(0, 6, 512), units="ms")
-
 
 data = np.genfromtxt(
     timesteps_filename, skip_footer=5, loose=True, invalid_raise=False
@@ -56,7 +50,6 @@ x_values = np.logspace(5, 9, 512)
 y_values = np.logspace(1, 5, 512)
 ax.plot(x_values, y_values, color="grey", linestyle="dashed")
 ax.text(2e7, 0.5e3, "$\\propto n$", color="grey", ha="left", va="top")
-
 ax.set_ylabel("Wallclock time for step [ms]")
 ax.set_xlabel("Number of particle updates in step")
 ax.set_xlim(updates_edges[0], updates_edges[-1])
