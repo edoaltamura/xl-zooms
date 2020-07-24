@@ -60,7 +60,7 @@ dm_mass = dm_render(data, resolution=1024)
 fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
 fig.subplots_adjust(0, 0, 1, 1)
 ax.axis("off")
-ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower", extent=[0, data.metadata.boxsize, 0, data.metadata.boxsize])
+ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")#, extent=[0, data.metadata.boxsize, 0, data.metadata.boxsize])
 ax.text(
     0.975,
     0.975,
@@ -112,6 +112,7 @@ for i in range(3):
         0.975,
         0.025,
         (
+            f"Halo {i:d} DMO\n",
             f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
         ),
         color="white",
