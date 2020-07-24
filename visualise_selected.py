@@ -95,7 +95,7 @@ for i in range(3):
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
-    # ax.axis("off")
+    ax.axis("off")
     ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
     ax.text(
         0.975,
@@ -117,8 +117,8 @@ for i in range(3):
         va="bottom",
         transform=ax.transAxes,
     )
-    circle_r200 = plt.Circle((x[i], y[i]), R200c[i], color="white", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((x[i], y[i]), 5*R200c[i], color="white", fill=False, linestyle='-')
+    circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((xCen, yCen), 5*R200c[i], color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
     fig.savefig(f"outfiles/halo{i}_DMmap.png")
