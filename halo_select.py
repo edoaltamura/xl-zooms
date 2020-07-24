@@ -11,7 +11,9 @@ def wrap(dx, box):
     result[index] += box
     return result
 
+# GLOBAL PARAMETERS ##########################################################
 
+np.random.seed(0)
 boxMpc = 300.
 # Range of M200c masses to select haloes in
 minMassSelectMsun = 1.e13
@@ -22,6 +24,8 @@ numBins_select = 3
 # Isolation criteria (distance and mass limit)
 minDistFac = 10.  # isolation distance criterion (multiples of R200c)
 minMassFrac = 0.1  # isolation mass criterion (fraction of M200c)
+
+#############################################################################
 
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
@@ -90,7 +94,7 @@ maxMass = np.log10(maxMassSelectMsun)
 dlogM = (maxMass - minMass) / float(numBins_select)
 
 print("Number of halo mass bins =", numBins_select)
-print("Mass bins: log(Mmin) log(Mmax) dlogM =", minMass, maxMass, dlogM)
+print(f"Mass bins: log(Mmin) = {minMass:2.2f} log(Mmax) = {maxMass:2.2f} dlogM = {dlogM:2.2f}")
 print("Number of haloes to select within each mass bin =", numHaloesPerBin)
 
 M200c_select = np.zeros(numHaloes_select)
@@ -100,7 +104,7 @@ yPotMin_select = np.zeros(numHaloes_select)
 zPotMin_select = np.zeros(numHaloes_select)
 
 haloCounter = 0
-print("\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
+print("Sample halos randomly\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
 for i in np.arange(numBins_select):
     bin1 = minMass + float(i) * dlogM
     bin2 = bin1 + dlogM
@@ -117,13 +121,13 @@ for i in np.arange(numBins_select):
     haloCounter += numHaloesPerBin
 
 # Print out sample
-print("\ni, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i]")
+print("\ni, M200c / 1.e13, R200c, xPotMin, yPotMin, zPotMin")
 for i in np.arange(numHaloes_select):
     print(i, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i])
 
 # Sanity check - find the closest halo that is more massive
 print('\nSanity check: 2nd last column should always be more than last column')
-print("i, index.size, np.sqrt(dr2[index].min()), minDistFac * R200c_select[i]")
+print("i, index.size, Distance to nearest halo, minDistFac * R200c")
 for i in np.arange(numHaloes_select):
     dx = wrap(xPotMin - xPotMin_select[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_select[i], boxMpc)
