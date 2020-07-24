@@ -74,7 +74,7 @@ for i in range(3):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(10. * R200c[i], unyt.Mpc)
 
     mask = sw.mask(snapFile)
     region = [
@@ -106,7 +106,7 @@ for i in range(3):
         0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c)}$ ${(unyt.Msun).units.latex_repr}$"
+            f"$M_{{200c}}={latex_float(M200c[i])}$ ${(unyt.Msun).units.latex_repr}$"
         ),
         color="white",
         ha="right",
