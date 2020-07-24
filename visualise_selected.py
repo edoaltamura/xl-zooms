@@ -53,7 +53,7 @@ snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 data = sw.load(snapFile)
 
 dm_mass = dm_render(data, resolution=4096)
-fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+fig, ax = plt.subplots(figsize=(8, 8), dpi=4096 // 8)
 fig.subplots_adjust(0, 0, 1, 1)
 ax.axis("off")
 ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
