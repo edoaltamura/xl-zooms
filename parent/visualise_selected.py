@@ -54,29 +54,29 @@ print("\nRendering snapshot volume...")
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-# data = sw.load(snapFile)
-#
-# dm_mass = dm_render(data, resolution=4096)
-# fig, ax = plt.subplots(figsize=(8, 8), dpi=4096 // 8)
-# fig.subplots_adjust(0, 0, 1, 1)
-# ax.axis("off")
-# ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
-# ax.text(
-#     0.975,
-#     0.975,
-#     f"$z={data.metadata.z:3.3f}$",
-#     color="white",
-#     ha="right",
-#     va="top",
-#     transform=ax.transAxes,
-# )
-# for i in range(3):
-#     circle_10r200 = plt.Circle((x[i], y[i]), 10 * R200c[i], color="white", fill=False, linestyle='-')
-#     ax.add_artist(circle_10r200)
-# fig.savefig(f"outfiles/volume_DMmap.png")
-# plt.close(fig)
+data = sw.load(snapFile)
 
-for i in range(1):
+dm_mass = dm_render(data, resolution=1024)
+fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+fig.subplots_adjust(0, 0, 1, 1)
+ax.axis("off")
+ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower", extent=[0, data.metadata.boxsize, 0, data.metadata.boxsize])
+ax.text(
+    0.975,
+    0.975,
+    f"$z={data.metadata.z:3.3f}$",
+    color="white",
+    ha="right",
+    va="top",
+    transform=ax.transAxes,
+)
+for i in range(3):
+    circle_10r200 = plt.Circle((x[i], y[i]), 10 * R200c[i], color="white", fill=False, linestyle='-')
+    ax.add_artist(circle_10r200)
+fig.savefig(f"outfiles/volume_DMmap.png")
+plt.close(fig)
+
+for i in range(3):
     print(f"Rendering halo {i}...")
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
@@ -119,8 +119,24 @@ for i in range(1):
         va="bottom",
         transform=ax.transAxes,
     )
+    ax.text(
+        xCen.value,
+        yCen.value + 1.05 * R200c[i],
+        r"$R_{200c}$",
+        color="white",
+        ha="center",
+        va="bottom"
+    )
+    ax.text(
+        xCen.value,
+        yCen.value + 1.05 * 5*R200c[i],
+        r"$5 \times R_{200c}$",
+        color="grey",
+        ha="center",
+        va="bottom"
+    )
     circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((xCen, yCen), 5*R200c[i], color="white", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((xCen, yCen), 5*R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
     fig.savefig(f"outfiles/halo{i}_DMmap.png")
