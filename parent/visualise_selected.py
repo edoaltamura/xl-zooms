@@ -98,7 +98,7 @@ for i in range(1):
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
-    ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
+    ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
     ax.text(
         0.975,
         0.975,
