@@ -6,6 +6,10 @@ from swiftsimio.visualisation.smoothing_length_generation import generate_smooth
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
+from utils import (
+    latex_float
+)
+
 print("Loading halos selected...")
 lines = np.loadtxt("halo_selected.txt", comments="#", delimiter=",", unpack=False).T
 print("log10(M200c / Msun): ", np.log10(lines[1]*1e13))
@@ -13,6 +17,11 @@ print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
 for i in range(3):
     print(f"\tHalo {i:d}:\t({lines[3,i]:2.1f}, {lines[4,i]:2.1f}, {lines[5,i]:2.1f})")
+M200c = lines[1]*1e13
+R200c = lines[2]
+x = lines[3]
+y = lines[4]
+z = lines[5]
 
 def dm_render(swio_data, region: list = None):
     # Generate smoothing lengths for the dark matter
@@ -57,5 +66,53 @@ ax.text(
     va="top",
     transform=ax.transAxes,
 )
-plt.savefig(f"volume_DMmap.png")
+fig.savefig(f"volume_DMmap.png")
+plt.close(fig)
+
+
+for i in range(3):
+    xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
+    yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
+    zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
+    size = unyt.unyt_quantity(R200c[i], unyt.Mpc)
+
+    mask = sw.mask(snapFile)
+    region = [
+        [xCen - size, xCen + size],
+        [yCen - size, yCen + size],
+        [zCen - size, zCen + size]
+    ]
+    mask.constrain_spatial(region)
+    # Load data using mask
+    data = sw.load(snapFile, mask=mask)
+
+    print(f"Rendering halo {i}...")
+    dm_mass = dm_render(data, region=region)
+
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    fig.subplots_adjust(0, 0, 1, 1)
+    ax.axis("off")
+    ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
+    ax.text(
+        0.975,
+        0.975,
+        f"$z={data.metadata.z:3.3f}$",
+        color="white",
+        ha="right",
+        va="top",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0.975,
+        0.025,
+        (
+            f"$M_{200c}={latex_float(M200c)}$ ${(unyt.Msun).units.latex_repr}$"
+        ),
+        color="white",
+        ha="right",
+        va="bottom",
+        transform=ax.transAxes,
+    )
+    fig.savefig(f"halo{i}_DMmap.png")
+    plt.close(fig)
 
