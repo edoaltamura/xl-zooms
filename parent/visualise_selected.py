@@ -100,6 +100,15 @@ for i in range(3):
     ax.axis("off")
     ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
     ax.text(
+        0.025,
+        0.975,
+        f"Halo {i:d} DMO\n",
+        color="white",
+        ha="left",
+        va="top",
+        transform=ax.transAxes,
+    )
+    ax.text(
         0.975,
         0.975,
         f"$z={data.metadata.z:3.3f}$",
@@ -112,7 +121,6 @@ for i in range(3):
         0.975,
         0.025,
         (
-            f"Halo {i:d} DMO\n",
             f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
         ),
         color="white",
