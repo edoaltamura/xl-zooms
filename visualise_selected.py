@@ -117,8 +117,8 @@ for i in range(3):
         va="bottom",
         transform=ax.transAxes,
     )
-    circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((xCen, yCen), 5*R200c[i], color="white", fill=False, linestyle='-')
+    circle_r200 = plt.Circle((x[i], y[i]), R200c[i], color="white", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((x[i], y[i]), 5*R200c[i], color="white", fill=False, linestyle='-')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
     fig.savefig(f"outfiles/halo{i}_DMmap.png")
