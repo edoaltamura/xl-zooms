@@ -43,6 +43,7 @@ with h5.File(haloPropFile, 'r') as f:
     yPotMin = f['/Ycminpot'][:]
     zPotMin = f['/Zcminpot'][:]
 
+print("Set-up search parameters")
 # Cut down main sample to field haloes above minimum mass
 index = np.where((structType == 10) & (M200c > (minMassFrac * minMassSelectMsun)))[0]
 numHaloes = index.size
@@ -68,11 +69,9 @@ selectFlag = np.zeros(numHaloesPrimary, dtype=np.bool)
 for i in np.arange(numHaloesPrimary - 1):
     minDistMpc = minDistFac * R200c_primary[i]  # Halo pair separation should be no smaller than this
     minMassMsun = minMassFrac * M200c_primary[i]  # Neighbour masses must not be larger than this
-    # print(minDistMpc,minMassMsun)
     dx = wrap(xPotMin - xPotMin_primary[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_primary[i], boxMpc)
     dz = wrap(zPotMin - zPotMin_primary[i], boxMpc)
-    # print(dx.min(),dx.max(),dy.min(),dy.max(),dz.min(),dz.max())
     dr2 = (dx ** 2) + (dy ** 2) + (dz ** 2)
     index = np.where((M200c > minMassMsun) & (dr2 < minDistMpc ** 2))[0]
     if index.size == 1:
@@ -104,14 +103,13 @@ yPotMin_select = np.zeros(numHaloes_select)
 zPotMin_select = np.zeros(numHaloes_select)
 
 haloCounter = 0
-print("Sample halos randomly\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
+print("\nSample halos randomly\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
 for i in np.arange(numBins_select):
     bin1 = minMass + float(i) * dlogM
     bin2 = bin1 + dlogM
     index = np.where((np.log10(M200c_iso) > bin1) & (np.log10(M200c_iso) <= bin2))[0]
     # Select haloes at random without replacement
     selectedHaloes = index[np.random.choice(index.size, size=numHaloesPerBin, replace=False)]
-
     M200c_select[haloCounter:haloCounter + numHaloesPerBin] = M200c_iso[selectedHaloes]
     R200c_select[haloCounter:haloCounter + numHaloesPerBin] = R200c_iso[selectedHaloes]
     xPotMin_select[haloCounter:haloCounter + numHaloesPerBin] = xPotMin_iso[selectedHaloes]

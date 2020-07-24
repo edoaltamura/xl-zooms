@@ -87,4 +87,4 @@ ax.text(
     va="top",
     transform=ax.transAxes,
 )
-fig.savefig(f"DM_map.png")
+plt.savefig(f"DM_map.png")
