@@ -73,6 +73,14 @@ ax.text(
 for i in range(3):
     circle_10r200 = plt.Circle((x[i], y[i]), 10 * R200c[i], color="white", fill=False, linestyle='-')
     ax.add_artist(circle_10r200)
+    ax.text(
+        x[i],
+        y[i] + 1.05 * 10 * R200c[i],
+        f"{i}",
+        color="white",
+        ha="center",
+        va="bottom"
+    )
 fig.savefig(f"outfiles/volume_DMmap.png")
 plt.close(fig)
 
