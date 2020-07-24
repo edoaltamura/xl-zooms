@@ -30,4 +30,5 @@ python3 performance / wallclock_simulation_time.py \
     {snapshot_name} \
     {output_path}
 """
-system(performance_scripts)
+if __name__ == '__main__':
+    system(performance_scripts)
