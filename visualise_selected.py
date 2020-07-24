@@ -68,6 +68,9 @@ snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 #     va="top",
 #     transform=ax.transAxes,
 # )
+# for i in range(3):
+#     circle_10r200 = plt.Circle((x[i], y[i]), 10 * R200c[i], color="white", fill=False, linestyle='-')
+#     ax.add_artist(circle_10r200)
 # fig.savefig(f"outfiles/volume_DMmap.png")
 # plt.close(fig)
 
@@ -108,7 +111,7 @@ for i in range(3):
         0.025,
         (
             f"Halo {i:d}\n",
-            f"Projected Dark Matter",
+            f"Projected Dark Matter\n",
             f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
         ),
         color="white",
