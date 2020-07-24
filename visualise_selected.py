@@ -106,7 +106,7 @@ for i in range(3):
         0.975,
         0.025,
         (
-            f"$M_{200c}={latex_float(M200c)}$ ${(unyt.Msun).units.latex_repr}$"
+            f"$M_{{200c}}={latex_float(M200c)}$ ${(unyt.Msun).units.latex_repr}$"
         ),
         color="white",
         ha="right",
