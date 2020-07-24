@@ -110,8 +110,6 @@ for i in range(3):
         0.975,
         0.025,
         (
-            f"Halo {i:d}\n",
-            f"Projected Dark Matter\n",
             f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
         ),
         color="white",
