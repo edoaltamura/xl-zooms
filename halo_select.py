@@ -100,6 +100,7 @@ yPotMin_select = np.zeros(numHaloes_select)
 zPotMin_select = np.zeros(numHaloes_select)
 
 haloCounter = 0
+print("\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
 for i in np.arange(numBins_select):
     bin1 = minMass + float(i) * dlogM
     bin2 = bin1 + dlogM
@@ -116,11 +117,13 @@ for i in np.arange(numBins_select):
     haloCounter += numHaloesPerBin
 
 # Print out sample
+print("\ni, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i]")
 for i in np.arange(numHaloes_select):
     print(i, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i])
 
 # Sanity check - find the closest halo that is more massive
-print('Sanity check: 2nd last column should always be more than last column')
+print('\nSanity check: 2nd last column should always be more than last column')
+print("i, index.size, np.sqrt(dr2[index].min()), minDistFac * R200c_select[i]")
 for i in np.arange(numHaloes_select):
     dx = wrap(xPotMin - xPotMin_select[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_select[i], boxMpc)
