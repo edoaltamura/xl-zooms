@@ -11,19 +11,20 @@ from utils import (
 )
 
 print("Loading halos selected...")
-lines = np.loadtxt("halo_selected.txt", comments="#", delimiter=",", unpack=False).T
-print("log10(M200c / Msun): ", np.log10(lines[1]*1e13))
+lines = np.loadtxt("outfiles/halo_selected.txt", comments="#", delimiter=",", unpack=False).T
+print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
 print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
 for i in range(3):
-    print(f"\tHalo {i:d}:\t({lines[3,i]:2.1f}, {lines[4,i]:2.1f}, {lines[5,i]:2.1f})")
-M200c = lines[1]*1e13
+    print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
+M200c = lines[1] * 1e13
 R200c = lines[2]
 x = lines[3]
 y = lines[4]
 z = lines[5]
 
-def dm_render(swio_data, region: list = None, resolution:int = 1024):
+
+def dm_render(swio_data, region: list = None, resolution: int = 1024):
     # Generate smoothing lengths for the dark matter
     swio_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
         swio_data.dark_matter.coordinates,
@@ -46,28 +47,29 @@ def dm_render(swio_data, region: list = None, resolution:int = 1024):
     )
     return dm_map
 
+
 print("\nRendering snapshot volume...")
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-data = sw.load(snapFile)
-
-dm_mass = dm_render(data, resolution=4096)
-fig, ax = plt.subplots(figsize=(8, 8), dpi=4096 // 8)
-fig.subplots_adjust(0, 0, 1, 1)
-ax.axis("off")
-ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
-ax.text(
-    0.975,
-    0.975,
-    f"$z={data.metadata.z:3.3f}$",
-    color="white",
-    ha="right",
-    va="top",
-    transform=ax.transAxes,
-)
-fig.savefig(f"volume_DMmap.png")
-plt.close(fig)
+# data = sw.load(snapFile)
+#
+# dm_mass = dm_render(data, resolution=4096)
+# fig, ax = plt.subplots(figsize=(8, 8), dpi=4096 // 8)
+# fig.subplots_adjust(0, 0, 1, 1)
+# ax.axis("off")
+# ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
+# ax.text(
+#     0.975,
+#     0.975,
+#     f"$z={data.metadata.z:3.3f}$",
+#     color="white",
+#     ha="right",
+#     va="top",
+#     transform=ax.transAxes,
+# )
+# fig.savefig(f"outfiles/volume_DMmap.png")
+# plt.close(fig)
 
 for i in range(3):
     print(f"Rendering halo {i}...")
@@ -85,12 +87,12 @@ for i in range(3):
 
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
-    dm_mass = dm_render(data, region=(region[0]+region[1]))
+    dm_mass = dm_render(data, region=(region[0] + region[1]))
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
-    ax.axis("off")
+    # ax.axis("off")
     ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
     ax.text(
         0.975,
@@ -105,6 +107,8 @@ for i in range(3):
         0.975,
         0.025,
         (
+            f"Halo {i:d}\n",
+            f"Projected Dark Matter",
             f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
         ),
         color="white",
@@ -112,6 +116,9 @@ for i in range(3):
         va="bottom",
         transform=ax.transAxes,
     )
-    fig.savefig(f"halo{i}_DMmap.png")
+    circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((xCen, yCen), 5*R200c[i], color="white", fill=False, linestyle='-')
+    ax.add_artist(circle_r200)
+    ax.add_artist(circle_5r200)
+    fig.savefig(f"outfiles/halo{i}_DMmap.png")
     plt.close(fig)
-

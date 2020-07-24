@@ -124,7 +124,7 @@ for i in np.arange(numHaloes_select):
     print(i, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i])
 
 # Print to txt file
-with open("halo_selected.txt", "w") as text_file:
+with open("outfiles/halo_selected.txt", "w") as text_file:
     print("# Halo counter, M200c/1.e13 [Msun], R200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]", file = text_file)
     for i in np.arange(numHaloes_select):
         print(f"{i}, {M200c_select[i] / 1.e13}, {R200c_select[i]}, {xPotMin_select[i]}, {yPotMin_select[i]}, {zPotMin_select[i]}", file = text_file)
