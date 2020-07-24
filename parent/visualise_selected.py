@@ -6,23 +6,13 @@ from swiftsimio.visualisation.smoothing_length_generation import generate_smooth
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
-from parent.utils import (
-    latex_float
-)
-
-print("Loading halos selected...")
-lines = np.loadtxt("outfiles/halo_selected.txt", comments="#", delimiter=",", unpack=False).T
-print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
-print("R200c: ", lines[2])
-print("Centre of potential coordinates: (xC, yC, zC)")
-for i in range(3):
-    print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
-M200c = lines[1] * 1e13
-R200c = lines[2]
-x = lines[3]
-y = lines[4]
-z = lines[5]
-
+def latex_float(f):
+    float_str = "{0:.2g}".format(f)
+    if "e" in float_str:
+        base, exponent = float_str.split("e")
+        return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
+    else:
+        return float_str
 
 def dm_render(swio_data, region: list = None, resolution: int = 1024):
     # Generate smoothing lengths for the dark matter
@@ -47,6 +37,18 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
     )
     return dm_map
 
+print("Loading halos selected...")
+lines = np.loadtxt("outfiles/halo_selected.txt", comments="#", delimiter=",", unpack=False).T
+print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
+print("R200c: ", lines[2])
+print("Centre of potential coordinates: (xC, yC, zC)")
+for i in range(3):
+    print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
+M200c = lines[1] * 1e13
+R200c = lines[2]
+x = lines[3]
+y = lines[4]
+z = lines[5]
 
 print("\nRendering snapshot volume...")
 # EAGLE-XL data path
