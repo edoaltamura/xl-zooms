@@ -23,7 +23,7 @@ x = lines[3]
 y = lines[4]
 z = lines[5]
 
-def dm_render(swio_data, region: list = None):
+def dm_render(swio_data, region: list = None, resolution:int = 1024):
     # Generate smoothing lengths for the dark matter
     swio_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
         swio_data.dark_matter.coordinates,
@@ -39,7 +39,7 @@ def dm_render(swio_data, region: list = None):
         # data object, to specify what particle type we wish to visualise
         data=swio_data.dark_matter,
         boxsize=swio_data.metadata.boxsize,
-        resolution=1024,
+        resolution=resolution,
         project=None,
         parallel=True,
         region=region
@@ -50,32 +50,31 @@ print("\nRendering snapshot volume...")
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-# data = sw.load(snapFile)
-#
-# dm_mass = dm_render(data)
-# fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
-# fig.subplots_adjust(0, 0, 1, 1)
-# ax.axis("off")
-# ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
-# ax.text(
-#     0.975,
-#     0.975,
-#     f"$z={data.metadata.z:3.3f}$",
-#     color="white",
-#     ha="right",
-#     va="top",
-#     transform=ax.transAxes,
-# )
-# fig.savefig(f"volume_DMmap.png")
-# plt.close(fig)
+data = sw.load(snapFile)
 
+dm_mass = dm_render(data, resolution=4096)
+fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+fig.subplots_adjust(0, 0, 1, 1)
+ax.axis("off")
+ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
+ax.text(
+    0.975,
+    0.975,
+    f"$z={data.metadata.z:3.3f}$",
+    color="white",
+    ha="right",
+    va="top",
+    transform=ax.transAxes,
+)
+fig.savefig(f"volume_DMmap.png")
+plt.close(fig)
 
 for i in range(3):
+    print(f"Rendering halo {i}...")
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
     size = unyt.unyt_quantity(10. * R200c[i], unyt.Mpc)
-
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
@@ -83,12 +82,12 @@ for i in range(3):
         [zCen - size, zCen + size]
     ]
     mask.constrain_spatial(region)
+
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
-
-    print(f"Rendering halo {i}...")
     dm_mass = dm_render(data, region=(region[0]+region[1]))
 
+    # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
@@ -106,7 +105,7 @@ for i in range(3):
         0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c[i])}$ ${(unyt.Msun).units.latex_repr}$"
+            f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
         ),
         color="white",
         ha="right",
