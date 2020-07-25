@@ -103,7 +103,7 @@ yPotMin_select = np.zeros(numHaloes_select)
 zPotMin_select = np.zeros(numHaloes_select)
 
 haloCounter = 0
-print("\nSample halos randomly\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
+print("\nSample halos in mass bins\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
 for i in np.arange(numBins_select):
     bin1 = minMass + float(i) * dlogM
     bin2 = bin1 + dlogM
@@ -119,7 +119,7 @@ for i in np.arange(numBins_select):
     haloCounter += numHaloesPerBin
 
 # Print out sample
-print("\ni, M200c / 1.e13, R200c, xPotMin, yPotMin, zPotMin")
+print("\nPick halos randomly in mass bins\ni, M200c / 1.e13, R200c, xPotMin, yPotMin, zPotMin")
 for i in np.arange(numHaloes_select):
     print(i, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i])
 
