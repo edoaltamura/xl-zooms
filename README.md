@@ -15,7 +15,7 @@ are currently selected within the mass range   10<sup>13</sup> &leq; M<sub>200</
 
 Computing architecture
 ------------
-Zooms are run with a single-node configuration, preferably on the `cosma7` computer cluster, equipped with 
+Zooms are run with a single-node configuration and preferably on the `cosma7` computer cluster, equipped with 
 452 compute nodes, each with 512GB RAM and 28 cores (2x Intel Xeon Gold 5120 CPU @ 2.20GHz). Visit the [COSMA-DiRAC pages](https://www.dur.ac.uk/icc/cosma/)
 for more info.
 
