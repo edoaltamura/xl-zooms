@@ -1,6 +1,6 @@
 Eagle-XL Zooms
 ==========
-![EAGLE-XL Logo](./xl-logo-light.png)
+![EAGLE-XL Logo](./xl-logo-light-crop.png)
 
 EAGLE-XL is the next generation of cosmological simulations of periodic cubic volumes, created with the [SWIFT](https://github.com/SWIFTSIM) 
 hydrodynamical code and its derivatives: [Velociraptor](https://github.com/SWIFTSIM/velociraptor-python) for halo finding 
