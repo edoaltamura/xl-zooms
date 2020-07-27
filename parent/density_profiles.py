@@ -44,7 +44,11 @@ for i in range(3):
     mask.constrain_spatial(region)
     data = sw.load(snapFile, mask=mask)
     posDM = data.dark_matter.coordinates / data.metadata.a
-    r = np.sqrt(posDM[:, 0] ** 2 + posDM[:, 1] ** 2 + posDM[:, 2] ** 2) #/ R200c[i]
+    r = np.sqrt(
+        (posDM[:, 0] - xCen) ** 2 +
+        (posDM[:, 1] - yCen) ** 2 +
+        (posDM[:, 2] - zCen) ** 2
+    ) / R200c[i]
     masses = np.ones_like(r)
 
     # constuct bins for the histogram
