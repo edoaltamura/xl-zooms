@@ -51,6 +51,7 @@ for i in range(3):
     lbins = np.logspace(-3, 1, 5)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
+    print(lbins, hist)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
     # compute radial density distribution
     volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
