@@ -56,14 +56,14 @@ for i in range(3):
     # compute radial density distribution
     volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edge[1:]) ** 3 - (bin_edge[:-1]) ** 3)
     rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
-    densities = stat / volume_shell / rho_crit
+    densities = stat * masses / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
     ax.scatter(bin_centre, densities, color="C0", marker=".")
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_ylabel("Density/rho_crit")
-    ax.set_xlabel("Radius/R200c")
+    ax.set_ylabel(r"$\rho_{DM}/\rho_c$")
+    ax.set_xlabel(r"$R/R_{200c}$")
     fig.tight_layout()
     fig.savefig(f"outfiles/halo{i}_density_profile_allparts.png")
     plt.close(fig)
