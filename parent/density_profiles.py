@@ -45,7 +45,7 @@ for i in range(3):
     mask.constrain_spatial(region)
     data = sw.load(snapFile, mask=mask)
     posDM = data.dark_matter.coordinates / data.metadata.a
-    r = np.sqrt(posDM[:, 0] ** 2 + posDM[:, 1] ** 2 + posDM[:, 2] ** 2) / R200c
+    r = np.sqrt(posDM[:, 0] ** 2 + posDM[:, 1] ** 2 + posDM[:, 2] ** 2) / R200c[i]
     masses = np.ones_like(r)
 
     # constuct bins for the histogram
@@ -54,7 +54,7 @@ for i in range(3):
     [stat, bin_edge, binnumber] = binned_statistic(r, masses, 'sum', lbins)
     bin_centre = np.sqrt(bin_edge[1:] * bin_edge[:-1])
     # compute radial density distribution
-    volume_shell = (4. * np.pi * (R200c ** 3) / 3.) * ((bin_edge[1:]) ** 3 - (bin_edge[:-1]) ** 3)
+    volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edge[1:]) ** 3 - (bin_edge[:-1]) ** 3)
     rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
     densities = stat / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
