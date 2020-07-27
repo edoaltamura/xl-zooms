@@ -1,6 +1,5 @@
 import numpy as np
 import unyt
-from scipy.stats import binned_statistic
 import swiftsimio as sw
 from velociraptor.swift.swift import to_swiftsimio_dataset
 from velociraptor.particles import load_groups
@@ -51,12 +50,12 @@ for i in range(3):
     # constuct bins for the histogram
     lbins = np.logspace(-3, 1, 40, base=10.0)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
-    [stat, bin_edge, binnumber] = binned_statistic(r, masses, 'sum', lbins)
-    bin_centre = np.sqrt(bin_edge[1:] * bin_edge[:-1])
+    hist, bin_edges = np.histogram(r, bins=lbins)
+    bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
     # compute radial density distribution
-    volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edge[1:]) ** 3 - (bin_edge[:-1]) ** 3)
+    volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
     rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
-    densities = stat * masses / volume_shell / rho_crit
+    densities = hist / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
     ax.scatter(bin_centre, densities, color="C0", marker=".")
