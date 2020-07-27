@@ -62,11 +62,11 @@ for i in range(3):
     densities = hist / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
-    ax.scatter(bin_centre, densities, color="C0", marker=".")
+    ax.plot(bin_centre, densities, c="C0", linestyle=".")
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_ylabel(r"$\rho_{DM}/\rho_c$")
-    ax.set_xlabel(r"$R/R_{200c}$")
+    ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
+    ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
     fig.savefig(f"outfiles/halo{i}_density_profile_allparts.png")
     plt.close(fig)
