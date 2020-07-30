@@ -107,5 +107,5 @@ for i in range(3):
     circle_5r200 = plt.Circle((0, 0), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
-    fig.savefig(f"outfiles/halo{i}_particlemap_zoom.png")
+    fig.savefig(f"outfiles/halo{i}_particlemap_parent.png")
     plt.close(fig)
