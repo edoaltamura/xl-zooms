@@ -21,3 +21,5 @@ for more info.
 
 An important task of this project is to assess the possibility to run high-resolution zooms with SWIFT on one single node,
 first with dark matter only, then with baryonic physics integrated.
+
+<sup>Logo design by Edo Altamura &copy; 2020</sup>

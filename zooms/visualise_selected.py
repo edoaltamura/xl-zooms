@@ -3,6 +3,8 @@ import unyt
 import swiftsimio as sw
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib.colors import LogNorm
 
