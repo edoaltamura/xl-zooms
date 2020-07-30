@@ -57,7 +57,7 @@ for i in range(3):
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     ax.set_aspect('equal')
-    ax.plot(x, y, ',', c="C0", alpha=0.5)
+    ax.plot(x, y, ',', c="C0", alpha=1)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     ax.set_ylabel(r"$x$ [Mpc]")
