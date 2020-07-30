@@ -123,9 +123,9 @@ for i in range(3):
         ha="center",
         va="bottom"
     )
-    circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
-    ax.add_artist(circle_r200)
-    ax.add_artist(circle_5r200)
+    # circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
+    # circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
+    # ax.add_artist(circle_r200)
+    # ax.add_artist(circle_5r200)
     fig.savefig(f"outfiles/halo{i}zoom_DMmap.png")
     plt.close(fig)
