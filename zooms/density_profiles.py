@@ -71,5 +71,5 @@ for i in range(3):
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
-    fig.savefig(f"outfiles/halo{i}_density_profile_allparts.png")
+    fig.savefig(f"outfiles/halo{i}_density_profile_zooms.png")
     plt.close(fig)
