@@ -126,5 +126,5 @@ for i in range(3):
     circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
-    fig.savefig(f"outfiles/halo{i}zoom_DMmap.png")
+    fig.savefig(f"outfiles/halo{i}_DMmap_zoom.png")
     plt.close(fig)
