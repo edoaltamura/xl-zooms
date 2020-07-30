@@ -28,10 +28,11 @@ z = lines[5]
 
 ############################################################
 # DENSITY PROFILE FROM SNAPSHOT - ALL PARTICLES
-dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
-snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 
 for i in range(3):
+    dataPath = f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/"
+    snapFile = dataPath + f"EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
+
     print(f"Profiling halo {i}...")
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
