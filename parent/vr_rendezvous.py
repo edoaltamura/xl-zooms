@@ -34,7 +34,7 @@ with h5.File(haloPropFile, 'r') as f:
 
 print("Set-up search parameters")
 # Cut down main sample to field haloes above minimum mass
-index = np.where((structType == 10) & (M200c > 1e13))[0]
+index = np.where((structType == 10) & (M200c > 1e12))[0]
 numHaloes = index.size
 M200c = M200c[index]
 R200c = R200c[index]
