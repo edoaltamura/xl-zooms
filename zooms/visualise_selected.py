@@ -59,7 +59,7 @@ for i in range(3):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(10. * R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(5.5 * R200c[i], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],

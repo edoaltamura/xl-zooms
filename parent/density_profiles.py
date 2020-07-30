@@ -3,9 +3,9 @@ import unyt
 import matplotlib
 matplotlib.use('Agg')
 import swiftsimio as sw
-from velociraptor.swift.swift import to_swiftsimio_dataset
-from velociraptor.particles import load_groups
-from velociraptor import load
+# from velociraptor.swift.swift import to_swiftsimio_dataset
+# from velociraptor.particles import load_groups
+# from velociraptor import load
 from matplotlib import pyplot as plt
 
 try:
@@ -36,7 +36,7 @@ for i in range(3):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(12. * R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(6. * R200c[i], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
@@ -54,7 +54,7 @@ for i in range(3):
     masses = np.ones_like(r)
 
     # constuct bins for the histogram
-    lbins = np.logspace(-2, 1, 40)
+    lbins = np.logspace(-2, np.log10(5.), 40)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])

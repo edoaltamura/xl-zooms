@@ -58,39 +58,41 @@ x = np.asarray([134.688, 90.671, 71.962])
 y = np.asarray([169.921, 289.822, 69.291])
 z = np.asarray([289.233, 98.227, 240.338])
 
-print("\nRendering snapshot volume...")
-# EAGLE-XL data path
-dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
-snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-data = sw.load(snapFile)
+render_volume = False
+if render_volume:
+    print("\nRendering snapshot volume...")
+    # EAGLE-XL data path
+    dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
+    snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
+    data = sw.load(snapFile)
 
-dm_mass = dm_render(data, resolution=1024)
-fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
-fig.subplots_adjust(0, 0, 1, 1)
-ax.axis("off")
-ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")#, extent=[0, data.metadata.boxsize, 0, data.metadata.boxsize])
-ax.text(
-    0.975,
-    0.975,
-    f"$z={data.metadata.z:3.3f}$",
-    color="white",
-    ha="right",
-    va="top",
-    transform=ax.transAxes,
-)
-for i in range(3):
-    circle_10r200 = plt.Circle((x[i], y[i]), 10 * R200c[i], color="white", fill=False, linestyle='-')
-    ax.add_artist(circle_10r200)
+    dm_mass = dm_render(data, resolution=1024)
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    fig.subplots_adjust(0, 0, 1, 1)
+    ax.axis("off")
+    ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower")
     ax.text(
-        x[i],
-        y[i] + 1.05 * 10 * R200c[i],
-        f"{i}",
+        0.975,
+        0.975,
+        f"$z={data.metadata.z:3.3f}$",
         color="white",
-        ha="center",
-        va="bottom"
+        ha="right",
+        va="top",
+        transform=ax.transAxes,
     )
-fig.savefig(f"outfiles/volume_DMmap.png")
-plt.close(fig)
+    for i in range(3):
+        circle_10r200 = plt.Circle((x[i], y[i]), 10 * R200c[i], color="white", fill=False, linestyle='-')
+        ax.add_artist(circle_10r200)
+        ax.text(
+            x[i],
+            y[i] + 1.05 * 10 * R200c[i],
+            f"{i}",
+            color="white",
+            ha="center",
+            va="bottom"
+        )
+    fig.savefig(f"outfiles/volume_DMmap.png")
+    plt.close(fig)
 
 for i in range(3):
     print(f"Rendering halo {i}...")
