@@ -43,12 +43,16 @@ for i in range(3):
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
     posDM = data.dark_matter.coordinates / data.metadata.a
+    x = posDM[:, 0] - xCen
+    y = posDM[:, 1] - yCen
+    z = posDM[:, 2] - zCen
+    del posDM
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.set_aspect('equal')
-    ax.plot(posDM[:, 0] - xCen, posDM[:, 1] - yCen, ',')
+    ax.plot(x, y, ',')
 
     ax.text(
         0.025,
@@ -80,23 +84,23 @@ for i in range(3):
         transform=ax.transAxes,
     )
     ax.text(
-        xCen.value,
-        yCen.value + 1.05 * R200c[i],
+        0,
+        0 + 1.05 * R200c[i],
         r"$R_{200c}$",
         color="black",
         ha="center",
         va="bottom"
     )
     ax.text(
-        xCen.value,
-        yCen.value + 1.05 * 5 * R200c[i],
+        0,
+        0 + 1.05 * 5 * R200c[i],
         r"$5 \times R_{200c}$",
         color="grey",
         ha="center",
         va="bottom"
     )
-    circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="black", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
+    circle_r200 = plt.Circle((0, 0), R200c[i], color="black", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((0, 0), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
     fig.savefig(f"outfiles/halo{i}_particlemap_zoom.png")
