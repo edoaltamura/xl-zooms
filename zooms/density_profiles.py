@@ -14,7 +14,7 @@ except:
     pass
 
 print("Loading halos selected...")
-lines = np.loadtxt("outfiles/halo_selected.txt", comments="#", delimiter=",", unpack=False).T
+lines = np.loadtxt("outfiles/halo_selected_SK.txt", comments="#", delimiter=",", unpack=False).T
 print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
 print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")

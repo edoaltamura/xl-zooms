@@ -43,11 +43,17 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
 
 
 print("Loading halos selected...")
-M200c = np.asarray([1.487, 3.033, 6.959]) * 1e13
-R200c = np.asarray([0.519, 0.658, 0.868])
-x = np.asarray([134.688, 90.671, 71.962])
-y = np.asarray([169.921, 289.822, 69.291])
-z = np.asarray([289.233, 98.227, 240.338])
+lines = np.loadtxt("outfiles/halo_selected_SK.txt", comments="#", delimiter=",", unpack=False).T
+print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
+print("R200c: ", lines[2])
+print("Centre of potential coordinates: (xC, yC, zC)")
+for i in range(3):
+    print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
+M200c = lines[1] * 1e13
+R200c = lines[2]
+x = lines[3]
+y = lines[4]
+z = lines[5]
 
 for i in range(3):
     # EAGLE-XL data path
