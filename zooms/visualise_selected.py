@@ -71,7 +71,6 @@ for i in range(3):
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
     dm_mass = dm_render(data, region=(region[0] + region[1]))
-    dm_mass = dm_render(data)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
@@ -123,9 +122,9 @@ for i in range(3):
         ha="center",
         va="bottom"
     )
-    # circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
-    # circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
-    # ax.add_artist(circle_r200)
-    # ax.add_artist(circle_5r200)
+    circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
+    ax.add_artist(circle_r200)
+    ax.add_artist(circle_5r200)
     fig.savefig(f"outfiles/halo{i}zoom_DMmap.png")
     plt.close(fig)
