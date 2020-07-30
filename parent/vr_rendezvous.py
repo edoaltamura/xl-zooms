@@ -71,3 +71,5 @@ for i in range(3):
             print(
                 f"{i}, {M200c[idx_found] / 1.e13}, {R200c[idx_found]}, {xPotMin[idx_found]}, {yPotMin[idx_found]}, {zPotMin[idx_found]}",
                 file=text_file)
+    else:
+        print("Something went wrong with the search. Remember the input values need to have enough precision.\nIndices: ", result)
