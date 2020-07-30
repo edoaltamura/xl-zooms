@@ -49,27 +49,13 @@ with open("outfiles/halo_selected_SK.txt", "w") as text_file:
 
 for i in range(3):
     print(f"Finding properties of halo {i:d}...")
-    idx_find_M200c = find_nearest(M200c, sample_M200c[i])
-    idx_find_R200c = find_nearest(R200c, sample_R200c[i])
-    idx_find_x = find_nearest(xPotMin, sample_x[i])
-    idx_find_y = find_nearest(yPotMin, sample_y[i])
-    idx_find_z = find_nearest(zPotMin, sample_z[i])
+    find_M200c = find_nearest(M200c, sample_M200c[i])
+    find_R200c = find_nearest(R200c, sample_R200c[i])
+    find_x = find_nearest(xPotMin, sample_x[i])
+    find_y = find_nearest(yPotMin, sample_y[i])
+    find_z = find_nearest(zPotMin, sample_z[i])
 
-    # Check if all search results are the same
-    result = np.array([idx_find_M200c,
-                       idx_find_R200c,
-                       idx_find_x,
-                       idx_find_y,
-                       idx_find_z], dtype=np.int)
-
-    if np.all(result == result[0]):
-        idx_found = result[0]
-        print(i, M200c[idx_found] / 1.e13, R200c[idx_found], xPotMin[idx_found], yPotMin[idx_found], zPotMin[idx_found])
-
-        # Print to txt file
-        with open("outfiles/halo_selected_SK.txt", "w") as text_file:
-            print(
-                f"{i}, {M200c[idx_found] / 1.e13}, {R200c[idx_found]}, {xPotMin[idx_found]}, {yPotMin[idx_found]}, {zPotMin[idx_found]}",
-                file=text_file)
-    else:
-        print("Something went wrong with the search. Remember the input values need to have enough precision.\nIndices: ", result)
+    # Print to txt file
+    print(i, find_M200c / 1.e13, find_R200c, find_x, find_y, find_z)
+    with open("outfiles/halo_selected_SK.txt", "w") as text_file:
+        print(f"{i}, {find_M200c / 1.e13}, {find_R200c}, {find_x}, {find_y}, {find_z}", file=text_file)
