@@ -26,8 +26,6 @@ dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 
 for i in range(3):
-
-
     print(f"Rendering halo {i}...")
     # Load data using mask
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
@@ -53,7 +51,7 @@ for i in range(3):
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     ax.set_aspect('equal')
-    ax.plot(x, y, ',', c="C0", alpha=0.1)
+    ax.plot(x, y, ',', c="C0", alpha=0.5)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     ax.set_ylabel(r"$x$ [Mpc]")
