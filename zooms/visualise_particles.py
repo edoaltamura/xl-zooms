@@ -50,7 +50,6 @@ for i in range(3):
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
-    fig.subplots_adjust(0, 0, 1, 1)
     ax.set_aspect('equal')
     ax.plot(x, y, ',', c="C0", alpha=0.1)
     ax.set_xlim([-size.value, size.value])
@@ -94,7 +93,7 @@ for i in range(3):
     )
     ax.text(
         0,
-        0 + 1.05 * 5 * R200c[i],
+        0 + 1.002 * 5 * R200c[i],
         r"$5 \times R_{200c}$",
         color="grey",
         ha="center",
