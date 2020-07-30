@@ -21,10 +21,12 @@ x = np.asarray([134.688, 90.671, 71.962])
 y = np.asarray([169.921, 289.822, 69.291])
 z = np.asarray([289.233, 98.227, 240.338])
 
+# EAGLE-XL data path
+dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
+snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
+
 for i in range(3):
-    # EAGLE-XL data path
-    dataPath = f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/"
-    snapFile = dataPath + f"EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
+
 
     print(f"Rendering halo {i}...")
     # Load data using mask
