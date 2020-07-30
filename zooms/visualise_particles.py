@@ -52,8 +52,9 @@ for i in range(3):
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.set_aspect('equal')
-    ax.plot(x, y, ',')
-
+    ax.plot(x, y, ',', c="C0", alpha=0.1)
+    ax.set_xlim([-size, size])
+    ax.set_ylim([-size, size])
     ax.text(
         0.025,
         0.975,
