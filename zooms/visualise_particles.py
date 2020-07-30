@@ -49,15 +49,15 @@ for i in range(3):
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
     posDM = data.dark_matter.coordinates / data.metadata.a
-    x = posDM[:, 0] - xCen
-    y = posDM[:, 1] - yCen
-    z = posDM[:, 2] - zCen
+    coord_x = posDM[:, 0] - xCen
+    coord_y = posDM[:, 1] - yCen
+    coord_z = posDM[:, 2] - zCen
     del posDM
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     ax.set_aspect('equal')
-    ax.plot(x, y, ',', c="C0", alpha=0.1)
+    ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.1)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     ax.set_ylabel(r"$x$ [Mpc]")
