@@ -53,8 +53,8 @@ for i in range(3):
     fig.subplots_adjust(0, 0, 1, 1)
     ax.set_aspect('equal')
     ax.plot(x, y, ',', c="C0", alpha=0.1)
-    ax.set_xlim([-size, size])
-    ax.set_ylim([-size, size])
+    ax.set_xlim([-size.value, size.value])
+    ax.set_ylim([-size.value, size.value])
     ax.text(
         0.025,
         0.975,
