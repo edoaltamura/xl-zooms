@@ -55,7 +55,7 @@ for i in range(3):
     masses = np.ones_like(r)
 
     # constuct bins for the histogram
-    lbins = np.logspace(-2, np.log10(5.), 4)
+    lbins = np.logspace(-2, np.log10(5.), 40)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
