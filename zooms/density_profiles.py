@@ -13,8 +13,21 @@ try:
 except:
     pass
 
-print("Loading halos selected...")
-lines = np.loadtxt("outfiles/halo_selected_SK.txt", comments="#", delimiter=",", unpack=False).T
+# INPUTS
+
+metadata_filepath = "outfiles/halo_selected_SK.txt"
+simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
+snap_relative_filepaths = [
+    f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
+    for i in range(3)
+]
+output_directory = "outfiles/"
+
+
+#############################################
+
+print(f"Loading halos metadata from {metadata_filepath}...")
+lines = np.loadtxt(metadata_filepath, comments="#", delimiter=",", unpack=False).T
 print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
 print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
@@ -29,11 +42,10 @@ z = lines[5]
 ############################################################
 # DENSITY PROFILE FROM SNAPSHOT - ALL PARTICLES
 
-for i in range(3):
-    dataPath = f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/"
-    snapFile = dataPath + f"EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
-
-    print(f"Profiling halo {i}...")
+for i in range(len(snap_relative_filepaths)):
+    # EAGLE-XL data path
+    snapFile = simdata_dirpath + snap_relative_filepaths[i]
+    print(f"Profiling {snap_relative_filepaths[i]}...")
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
@@ -72,5 +84,5 @@ for i in range(3):
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
-    fig.savefig(f"outfiles/halo{i}_density_profile_zoom.png")
+    fig.savefig(f"{output_directory}halo{i}_density_profile_zoom.png")
     plt.close(fig)

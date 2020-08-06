@@ -13,9 +13,21 @@ def latex_float(f):
     else:
         return float_str
 
+# INPUTS
 
-print("Loading halos selected...")
-lines = np.loadtxt("outfiles/halo_selected_SK.txt", comments="#", delimiter=",", unpack=False).T
+metadata_filepath = "outfiles/halo_selected_SK.txt"
+simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
+snap_relative_filepaths = [
+    f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
+    for i in range(3)
+]
+output_directory = "outfiles/"
+
+
+#############################################
+
+print(f"Loading halos metadata from {metadata_filepath}...")
+lines = np.loadtxt(metadata_filepath, comments="#", delimiter=",", unpack=False).T
 print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
 print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
@@ -27,12 +39,10 @@ x = lines[3]
 y = lines[4]
 z = lines[5]
 
-for i in range(3):
+for i in range(len(snap_relative_filepaths)):
     # EAGLE-XL data path
-    dataPath = f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/"
-    snapFile = dataPath + f"EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
-
-    print(f"Rendering halo {i}...")
+    snapFile = simdata_dirpath + snap_relative_filepaths[i]
+    print(f"Rendering {snap_relative_filepaths[i]}...")
     # Load data using mask
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
@@ -111,5 +121,5 @@ for i in range(3):
     circle_5r200 = plt.Circle((0, 0), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
-    fig.savefig(f"outfiles/halo{i}_particlemap_zoom.png")
+    fig.savefig(f"{output_directory}halo{i}_particlemap_zoom.png")
     plt.close(fig)
