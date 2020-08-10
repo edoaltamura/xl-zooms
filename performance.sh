@@ -1,6 +1,6 @@
 run_name="Zooms"
-run_directory="/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK2_DMO"
-snapshot_name="snapshots/EAGLE-XL_ClusterSK2_DMO_0001.hdf5"
+run_directory="/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK1_DMO"
+snapshot_name="snapshots/EAGLE-XL_ClusterSK1_DMO_0001.hdf5"
 output_path="outfiles"
 
 python3 performance/number_of_steps_simulation_time.py \
