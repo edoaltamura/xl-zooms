@@ -14,7 +14,7 @@ except:
     pass
 
 # INPUTS
-
+author = "SK"
 metadata_filepath = "outfiles/halo_selected_SK.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
 snap_relative_filepaths = [
@@ -84,5 +84,5 @@ for i in range(len(snap_relative_filepaths)):
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
-    fig.savefig(f"{output_directory}halo{i}_density_profile_zoom.png")
+    fig.savefig(f"{output_directory}halo{i}{author}_density_profile_zoom.png")
     plt.close(fig)

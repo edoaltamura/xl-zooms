@@ -13,8 +13,11 @@ try:
 except:
     pass
 
+author = "SK"
+
+
 print("Loading halos selected...")
-lines = np.loadtxt("outfiles/halo_selected_SK.txt", comments="#", delimiter=",", unpack=False).T
+lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
 print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
 print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
@@ -71,5 +74,5 @@ for i in range(3):
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
-    fig.savefig(f"outfiles/halo{i}_density_profile_parent.png")
+    fig.savefig(f"outfiles/halo{i}{author}_density_profile_parent.png")
     plt.close(fig)
