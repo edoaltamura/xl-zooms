@@ -13,7 +13,7 @@ def latex_float(f):
     else:
         return float_str
 
-author = "SK"
+author = "EA"
 
 print("Loading halos selected...")
 lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
