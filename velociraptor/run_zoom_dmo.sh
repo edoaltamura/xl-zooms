@@ -7,7 +7,7 @@ source ./modules.sh
 export OMP_NUM_THREADS=16
 
 out_name="halo_SK0_0001_z000p000"
-vr_loc="./stf"
+vr_loc="~/xl-zooms/velociraptor/stf"
 config_file="config_zoom_dmo.cfg"
 stdout_name="vr_output_${out_name}.stdout"
 stderr_name="vr_output_${out_name}.stderr"
