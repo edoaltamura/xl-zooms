@@ -2,7 +2,7 @@
 
 # Bash script that configures and compiles VELOCIRAPTOR-STF.
 
-source modules.sh
+source ./modules.sh
 
 old_directory=$(pwd)
 
