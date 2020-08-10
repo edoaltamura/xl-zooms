@@ -17,7 +17,7 @@ cd ~/VELOCIraptor-STF
 git fetch
 
 # Configure makefile. Compile into executable ./stf
-cmake . -DVR_ZOOM_SIM=ON -DCMAKE_BUILD_TYPE=Release
+cmake . -DVR_ZOOM_SIM=ON -DCMAKE_BUILD_TYPE=Release -DVR_USE_HYDRO=OFF -DVR_USE_SWIFT_INTERFACE=OFF
 make -j
 
 # Copy executable into xl-zooms directory
