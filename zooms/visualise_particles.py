@@ -14,11 +14,12 @@ def latex_float(f):
         return float_str
 
 # INPUTS
+author = "SK"
 
-metadata_filepath = "outfiles/halo_selected_SK.txt"
+metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
 snap_relative_filepaths = [
-    f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
+    f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_Cluster{author}{i}_DMO_0001.hdf5"
     for i in range(3)
 ]
 output_directory = "outfiles/"
@@ -121,5 +122,5 @@ for i in range(len(snap_relative_filepaths)):
     circle_5r200 = plt.Circle((0, 0), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
-    fig.savefig(f"{output_directory}halo{i}_particlemap_zoom.png")
+    fig.savefig(f"{output_directory}halo{i}{author}_particlemap_zoom.png")
     plt.close(fig)

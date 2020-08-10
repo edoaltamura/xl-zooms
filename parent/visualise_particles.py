@@ -13,9 +13,10 @@ def latex_float(f):
     else:
         return float_str
 
+author = "SK"
 
 print("Loading halos selected...")
-lines = np.loadtxt("outfiles/halo_selected_SK.txt", comments="#", delimiter=",", unpack=False).T
+lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
 print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
 print("R200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
@@ -111,5 +112,5 @@ for i in range(3):
     circle_5r200 = plt.Circle((0, 0), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
-    fig.savefig(f"outfiles/halo{i}_particlemap_parent.png")
+    fig.savefig(f"outfiles/halo{i}{author}_particlemap_parent.png")
     plt.close(fig)
