@@ -28,4 +28,7 @@ mkdir $outpath
 cp ./$config_file $outpath
 sed 's/SNAP/0001/' $outpath/$config_file
 
-./stf -i $snap_path -I 2 -o $outpath -C $outpath/$config_file > $stdout_path/$out_name 2>$stderr_path
+./stf -i $snap_path -I 2 -o $outpath -C $outpath/$config_file > $stdout_path 2>$stderr_path
+
+# Move outputs inside directory
+mv /cosma6/data/dp004/dc-alta2/xl-zooms/$out_name* $outpath
