@@ -19,7 +19,7 @@ stdout_path="${outpath}/${stdout_name}"
 stderr_path="${outpath}/${stderr_name}"
 
 echo "Running VR for ${out_name}"
-if [ -d ~/VELOCIraptor-STF ]; then
+if [ -d $outpath ]; then
   rm -rf $outpath
 fi
 mkdir $outpath
