@@ -36,27 +36,26 @@ output_directory = "outfiles/"
 
 #############################################
 
-print(f"Loading halos metadata from {metadata_filepath}...")
-lines = np.loadtxt(metadata_filepath, comments="#", delimiter=",", unpack=False).T
-print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
-print("R200c: ", lines[2])
-print("Centre of potential coordinates: (xC, yC, zC)")
-for i in range(3):
-    print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
-M200c = lines[1] * 1e13
-R200c = lines[2]
-x = lines[3]
-y = lines[4]
-z = lines[5]
+print("Loading halos selected...")
+# lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
+# print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
+# print("R200c: ", lines[2])
+# print("Centre of potential coordinates: (xC, yC, zC)")
+# for i in range(3):
+#     print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
+M200c = []
+R200c = []
+x = []
+y = []
+z = []
 
-# Override parent info and replace with Velociraptor data
 for vr_path in velociraptor_properties:
     with h5py.File(vr_path, 'r') as vr_file:
-        M200c[i] = vr_file['/Mass_200crit'][0] * 1e10
-        R200c[i] = vr_file['/R_200crit'][0]
-        x[i] = vr_file['/Xcminpot'][0]
-        y[i] = vr_file['/Ycminpot'][0]
-        z[i] = vr_file['/Zcminpot'][0]
+        M200c.append(vr_file['/Mass_200crit'][0] * 1e10)
+        R200c.append(vr_file['/R_200crit'][0])
+        x.append(vr_file['/Xcminpot'][0])
+        y.append(vr_file['/Ycminpot'][0])
+        z.append(vr_file['/Zcminpot'][0])
 
 
 for i in range(len(snap_relative_filepaths)):
