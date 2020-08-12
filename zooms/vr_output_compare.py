@@ -46,8 +46,8 @@ for halo_id in range(3):
     print(f"\n\nComparison halo {author} - {halo_id}")
     for key in data['parent']:
         difference = (1 - data['zoom'][key][halo_id]/data['parent'][key][halo_id])*100
-        sign = '+' if difference >= 0 else '-'
-        warning = '!'*int(difference*2)
-        print(f"{key:<10s}\t{sign}{difference:<2.3f}{warning:>10s}")
+        sign = '+' if difference >= 0 else ''
+        warning = '!'*int(difference*1.5)
+        print(f"{key:<10s}\t{sign}{difference:<2.3f}%\t{warning:>30s}")
 
 
