@@ -45,11 +45,12 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
     return dm_map
 
 # INPUTS
+author = "SK"
 
-metadata_filepath = "outfiles/halo_selected_SK.txt"
+metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
 snap_relative_filepaths = [
-    f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
+    f"EAGLE-XL_Cluster{author}{i}_DMO/snapshots/EAGLE-XL_Cluster{author}{i}_DMO_0001.hdf5"
     for i in range(3)
 ]
 
