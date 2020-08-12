@@ -79,11 +79,13 @@ for i in range(len(snap_relative_filepaths)):
 
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
-    posDM = data.dark_matter.coordinates / data.metadata.a
+    posDM = data.boundary.coordinates / data.metadata.a
     coord_x = posDM[:, 0] - xCen
     coord_y = posDM[:, 1] - yCen
     coord_z = posDM[:, 2] - zCen
     del posDM
+
+    # Flag contamination particles within 5 R200
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
