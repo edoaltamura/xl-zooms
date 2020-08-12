@@ -153,5 +153,5 @@ for i in range(len(snap_relative_filepaths)):
     circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
-    fig.savefig(f"{output_directory}halo{i}_DMmap_zoom.png")
+    fig.savefig(f"{output_directory}halo{author}{i}_DMmap{out_to_radius}r200_zoom.png")
     plt.close(fig)
