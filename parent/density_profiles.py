@@ -4,9 +4,6 @@ import h5py
 import matplotlib
 matplotlib.use('Agg')
 import swiftsimio as sw
-# from velociraptor.swift.swift import to_swiftsimio_dataset
-# from velociraptor.particles import load_groups
-# from velociraptor import load
 from matplotlib import pyplot as plt
 
 try:
