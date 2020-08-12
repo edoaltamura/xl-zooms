@@ -42,6 +42,8 @@ data['zoom']['Xcminpot'] = x_zoom
 data['zoom']['Ycminpot'] = y_zoom
 data['zoom']['Zcminpot'] = z_zoom
 
+print("CALCULATION DETAILS:\n\t (prop_parent - prop_zoom)/prop_parent * 100\n")
+
 for halo_id in range(3):
     print(f"\n\nComparison halo {author} - {halo_id}")
     for key in data['parent']:
