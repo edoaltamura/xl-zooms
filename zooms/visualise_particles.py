@@ -1,9 +1,12 @@
-import numpy as np
-import unyt
 import matplotlib
 matplotlib.use('Agg')
-import swiftsimio as sw
+
+import numpy as np
+import unyt
+import h5py
 import matplotlib.pyplot as plt
+import swiftsimio as sw
+
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -13,13 +16,19 @@ def latex_float(f):
     else:
         return float_str
 
+#############################################
 # INPUTS
 author = "SK"
-
 metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
+
 snap_relative_filepaths = [
-    f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_Cluster{author}{i}_DMO_0001.hdf5"
+    f"EAGLE-XL_Cluster{author}{i}_DMO/snapshots/EAGLE-XL_Cluster{author}{i}_DMO_0001.hdf5"
+    for i in range(3)
+]
+
+velociraptor_properties = [
+    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001_z000p000/halo_{author}{i}_0001_z000p000.properties.0"
     for i in range(3)
 ]
 output_directory = "outfiles/"
@@ -39,6 +48,16 @@ R200c = lines[2]
 x = lines[3]
 y = lines[4]
 z = lines[5]
+
+# Override parent info and replace with Velociraptor data
+for i in range(len(snap_relative_filepaths)):
+    with h5py.File(velociraptor_properties[i], 'r') as vr_file:
+        M200c[i] = vr_file['/Mass_200crit'][0] * 1e10
+        R200c[i] = vr_file['/R_200crit'][0]
+        x[i] = vr_file['/Xcminpot'][0]
+        y[i] = vr_file['/Ycminpot'][0]
+        z[i] = vr_file['/Zcminpot'][0]
+
 
 for i in range(len(snap_relative_filepaths)):
     # EAGLE-XL data path

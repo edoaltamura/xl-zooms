@@ -4,31 +4,39 @@
 
 source ./modules.sh
 
-export OMP_NUM_THREADS=16
+export OMP_NUM_THREADS=20
 
-out_name="halo_SK0_0001_z000p000"
-config_file="config_zoom_dmo.cfg"
-stdout_name="vr_output_${out_name}.stdout"
-stderr_name="vr_output_${out_name}.stderr"
+author="SK"
 
-# Specify the path to the snapshot (without the final .hdf5 extension)
-snap_path="/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK0_DMO/snapshots/EAGLE-XL_ClusterSK0_DMO_0001"
+for i in 0 1 2
+do
 
-outpath="/cosma6/data/dp004/dc-alta2/xl-zooms/${out_name}"
-stdout_path="${outpath}/${stdout_name}"
-stderr_path="${outpath}/${stderr_name}"
+  out_name="halo_${author}${i}_0001"
+  config_file="config_zoom_dmo.cfg"
+  stdout_name="vr_output_${out_name}.stdout"
+  stderr_name="vr_output_${out_name}.stderr"
 
-echo "Running VR for ${out_name}"
-if [ -d $outpath ]; then
-  rm -rf $outpath
-fi
-mkdir $outpath
+  # Specify the path to the snapshot (without the final .hdf5 extension)
+  snap_path="/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_Cluster${author}${i}_DMO/snapshots/EAGLE-XL_Cluster${author}${i}_DMO_0001"
 
-# Change the config file for the output number
-cp ./$config_file $outpath
-sed 's/SNAP/0001/' $outpath/$config_file
+  outpath="/cosma6/data/dp004/dc-alta2/xl-zooms/${out_name}"
+  stdout_path="${outpath}/${stdout_name}"
+  stderr_path="${outpath}/${stderr_name}"
 
-./stf -i $snap_path -I 2 -o $outpath -C $outpath/$config_file > $stdout_path 2>$stderr_path
+  echo "Running VR for ${out_name}"
+  if [ -d $outpath ]; then
+    rm -rf $outpath
+  fi
+  mkdir $outpath
 
-# Move outputs inside directory
-mv /cosma6/data/dp004/dc-alta2/xl-zooms/$out_name* $outpath
+  # Change the config file for the output number
+  cp ./$config_file $outpath
+  sed 's/SNAP/0001/' $outpath/$config_file
+
+  ./stf -i $snap_path -I 2 -o $outpath -C $outpath/$config_file > $stdout_path 2>$stderr_path
+
+  # Move outputs inside directory
+  mv /cosma6/data/dp004/dc-alta2/xl-zooms/$out_name.* $outpath
+
+done
+
