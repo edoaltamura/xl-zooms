@@ -111,7 +111,7 @@ for i in range(len(snap_relative_filepaths)):
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
-    ax.imshow(dm_mass, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
+    ax.imshow(dm_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
     ax.text(
         0.025,
         0.975,
