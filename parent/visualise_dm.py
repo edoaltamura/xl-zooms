@@ -40,6 +40,7 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
     return dm_map
 
 author = "SK"
+out_to_radius = 5
 
 print("Loading halos selected...")
 lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
@@ -96,7 +97,7 @@ for i in range(3):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(1. * R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(out_to_radius * R200c[i], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],

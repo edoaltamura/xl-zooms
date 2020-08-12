@@ -47,7 +47,7 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
 #############################################
 # INPUTS
 author = "SK"
-
+out_to_radius = 5
 metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
 snap_relative_filepaths = [
@@ -86,7 +86,7 @@ for i in range(len(snap_relative_filepaths)):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(1. * R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(out_to_radius * R200c[i], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
