@@ -28,7 +28,7 @@ snap_relative_filepaths = [
 ]
 
 velociraptor_properties = [
-    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001_z000p000/halo_{author}{i}_0001_z000p000.properties.0"
+    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001/halo_{author}{i}_0001.properties.0"
     for i in range(3)
 ]
 output_directory = "outfiles/"
@@ -50,8 +50,8 @@ y = lines[4]
 z = lines[5]
 
 # Override parent info and replace with Velociraptor data
-for i in range(len(snap_relative_filepaths)):
-    with h5py.File(velociraptor_properties[i], 'r') as vr_file:
+for vr_path in velociraptor_properties:
+    with h5py.File(vr_path, 'r') as vr_file:
         M200c[i] = vr_file['/Mass_200crit'][0] * 1e10
         R200c[i] = vr_file['/R_200crit'][0]
         x[i] = vr_file['/Xcminpot'][0]

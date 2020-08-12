@@ -1,7 +1,10 @@
-import numpy as np
-import unyt
 import matplotlib
 matplotlib.use('Agg')
+
+import numpy as np
+import unyt
+import h5py
+
 import swiftsimio as sw
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
@@ -49,6 +52,12 @@ snap_relative_filepaths = [
     f"EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"
     for i in range(3)
 ]
+
+velociraptor_properties = [
+    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001/halo_{author}{i}_0001.properties.0"
+    for i in range(3)
+]
+
 output_directory = "outfiles/"
 
 
@@ -67,6 +76,15 @@ R200c = lines[2]
 x = lines[3]
 y = lines[4]
 z = lines[5]
+
+# Override parent info and replace with Velociraptor data
+for vr_path in velociraptor_properties:
+    with h5py.File(vr_path, 'r') as vr_file:
+        M200c[i] = vr_file['/Mass_200crit'][0] * 1e10
+        R200c[i] = vr_file['/R_200crit'][0]
+        x[i] = vr_file['/Xcminpot'][0]
+        y[i] = vr_file['/Ycminpot'][0]
+        z[i] = vr_file['/Zcminpot'][0]
 
 for i in range(len(snap_relative_filepaths)):
     # EAGLE-XL data path
