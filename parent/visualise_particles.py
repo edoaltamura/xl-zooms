@@ -61,8 +61,8 @@ for i in range(3):
     ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.5)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
-    ax.set_ylabel(r"$x$ [Mpc]")
-    ax.set_xlabel(r"$y$ [Mpc]")
+    ax.set_ylabel(r"$y$ [Mpc]")
+    ax.set_xlabel(r"$x$ [Mpc]")
     ax.text(
         0.025,
         0.975,

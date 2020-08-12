@@ -1,8 +1,8 @@
-import numpy as np
-import unyt
-import h5py
 import matplotlib
 matplotlib.use('Agg')
+
+import numpy as np
+import unyt
 import swiftsimio as sw
 from matplotlib import pyplot as plt
 
@@ -11,39 +11,30 @@ try:
 except:
     pass
 
+##########################################################
+# INPUTS
+
 author = "SK"
-
-velociraptor_properties = [
-    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001/halo_{author}{i}_0001.properties.0"
-    for i in range(3)
-]
-
-print("Loading halos selected...")
-# lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
-# print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
-# print("R200c: ", lines[2])
-# print("Centre of potential coordinates: (xC, yC, zC)")
-# for i in range(3):
-#     print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
-M200c = []
-R200c = []
-x = []
-y = []
-z = []
-
-for vr_path in velociraptor_properties:
-    with h5py.File(vr_path, 'r') as vr_file:
-        M200c.append(vr_file['/Mass_200crit'][0] * 1e10)
-        R200c.append(vr_file['/R_200crit'][0])
-        x.append(vr_file['/Xcminpot'][0])
-        y.append(vr_file['/Ycminpot'][0])
-        z.append(vr_file['/Zcminpot'][0])
-
-############################################################
-# DENSITY PROFILE FROM SNAPSHOT - ALL PARTICLES
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 
+##########################################################
+
+print("Loading halos selected...")
+lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
+print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
+print("R200c: ", lines[2])
+print("Centre of potential coordinates: (xC, yC, zC)")
+for i in range(3):
+    print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
+M200c = lines[1] * 1e13
+R200c = lines[2]
+x = lines[3]
+y = lines[4]
+z = lines[5]
+
+############################################################
+# DENSITY PROFILE FROM SNAPSHOT - ALL PARTICLES
 for i in range(3):
     print(f"Profiling halo {i}...")
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
