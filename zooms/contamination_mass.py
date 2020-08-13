@@ -190,7 +190,10 @@ for i in range(len(snap_relative_filepaths)):
 
     # Flag contamination particles within 5 R200
     contaminated_idx = np.where(lowres_coordinates['r'] < 5. * R200c[i])[0]
+    contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c[i])[0]
+    print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
     print(f"Contaminating low-res DM (< 5 R200c): {len(contaminated_idx)} particles detected")
+    print(f"Contaminating low-res DM (< 1 R200c): {len(contaminated_r200_idx)} particles detected")
 
     # Make particle maps
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
@@ -229,7 +232,7 @@ for i in range(len(snap_relative_filepaths)):
     ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_clean'], where='mid', color='green', label='Lowres clean')
     ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_clean'], where='mid', color='grey', label='Highres')
 
-    ax.set_xlim([0, out_to_radius * R200c[i]e])
+    ax.set_xlim([0, out_to_radius * R200c[i]])
     plt.legend()
     fig.tight_layout()
     fig.savefig(f"{output_directory}halo{i}{author}_contamination_hist_{out_to_radius}r200_zoom.png")
