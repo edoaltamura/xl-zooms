@@ -101,8 +101,7 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
         0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$",
-            f"$R_{{200c}}={latex_float(R200c)}$ Mpc"
+            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
         ),
         color="black",
         ha="right",
