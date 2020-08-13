@@ -221,14 +221,14 @@ for i in range(len(snap_relative_filepaths)):
 
     # Histograms
     bins = np.linspace(0, out_to_radius * R200c[i], 40)
-    hist, bin_edges = np.histogram(lowres_coordinates['x'][contaminated_idx], bins=bins)
+    hist, bin_edges = np.histogram(lowres_coordinates['r'][contaminated_idx], bins=bins)
     lowres_coordinates['r_bins'] = (bin_edges[1:] + bin_edges[:-1]) / 2 / R200c[i]
     lowres_coordinates['hist_contaminating'] = hist
     del hist, bin_edges
-    hist, _ = np.histogram(lowres_coordinates['x'], bins=bins)
+    hist, _ = np.histogram(lowres_coordinates['r'], bins=bins)
     lowres_coordinates['hist_all'] = hist
     del hist
-    hist, _ = np.histogram(highres_coordinates['x'], bins=bins)
+    hist, _ = np.histogram(highres_coordinates['r'], bins=bins)
     highres_coordinates['r_bins'] = lowres_coordinates['r_bins']
     highres_coordinates['hist_all'] = hist
     del bins, hist
