@@ -153,8 +153,8 @@ for i in range(len(snap_relative_filepaths)):
     del posDM
 
     # Flag contamination particles within 5 R200
-    contaminated_idx = np.where(lowres_coordinates['r'] < 5. * R200c[i])[0]
-    print(f"Contaminating low-res DM (< 5 R200c): {len(contaminated_idx)} particles detected")
+    contaminated_idx = np.where(lowres_coordinates['r'] < 1. * R200c[i])[0]
+    print(f"Contaminating low-res DM (< 1 R200c): {len(contaminated_idx)} particles detected")
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
