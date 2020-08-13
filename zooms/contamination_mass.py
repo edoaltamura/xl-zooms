@@ -78,7 +78,7 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
     ax.set_yscale('log')
     ax.set_ylabel("Number of particles")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
-    ax.axvline(R200c, color="black", linestyle='--')
+    ax.axvline(1, color="black", linestyle='--')
     ax.text(
         0.025,
         0.975,
@@ -101,7 +101,8 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
         0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
+            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$",
+            f"$R_{{200c}}={latex_float(R200c)}$ Mpc"
         ),
         color="black",
         ha="right",
@@ -209,7 +210,7 @@ for i in range(len(snap_relative_filepaths)):
     # Histograms
     bins = np.linspace(0, 7. * R200c[i], 40)
     hist, bin_edges = np.histogram(lowres_coordinates['x'][contaminated_idx], bins=bins)
-    lowres_coordinates['r_bins'] = (bin_edges[1:] - bin_edges[:-1]) / R200c[i]
+    lowres_coordinates['r_bins'] = (bin_edges[1:] + bin_edges[:-1]) / 2 / R200c[i]
     lowres_coordinates['hist_contaminating'] = hist
     del hist, bin_edges
     hist, _ = np.histogram(lowres_coordinates['x'][~contaminated_idx], bins=bins)
