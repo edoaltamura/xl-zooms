@@ -74,6 +74,42 @@ def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R2
 
     return
 
+def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R200c: float) -> None:
+    ax.set_yscale('log')
+    ax.set_ylabel("Number of particles")
+    ax.set_xlabel(r"$R\ /\ R_{200c}$")
+    ax.axvline(R200c, color="black", linestyle='--')
+    ax.text(
+        0.025,
+        0.975,
+        f"Halo {halo_id:d} DMO\n",
+        color="black",
+        ha="left",
+        va="top",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0.975,
+        0.975,
+        f"$z={redshift:3.3f}$",
+        color="black",
+        ha="right",
+        va="top",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0.975,
+        0.025,
+        (
+            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
+        ),
+        color="black",
+        ha="right",
+        va="bottom",
+        transform=ax.transAxes,
+    )
+    return
+
 
 #############################################
 # INPUTS
@@ -156,16 +192,44 @@ for i in range(len(snap_relative_filepaths)):
     contaminated_idx = np.where(lowres_coordinates['r'] < 1. * R200c[i])[0]
     print(f"Contaminating low-res DM (< 1 R200c): {len(contaminated_idx)} particles detected")
 
-    # Make figure
+    # Make particle maps
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    map_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
 
     ax.plot(highres_coordinates['x'], highres_coordinates['y'], ',', c="C0", alpha=0.2, label='Highres')
     ax.plot(lowres_coordinates['x'][contaminated_idx], lowres_coordinates['y'][contaminated_idx], 'x', c="red", alpha=1, label='Lowres contaminating')
-    ax.plot(lowres_coordinates['x'][~contaminated_idx], lowres_coordinates['y'][~contaminated_idx], ',', c="green", alpha=1, label='Lowres clean')
+    ax.plot(lowres_coordinates['x'][~contaminated_idx], lowres_coordinates['y'][~contaminated_idx], '.', c="green", alpha=0.2, label='Lowres clean')
 
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
-    map_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
     plt.legend()
     fig.savefig(f"{output_directory}halo{i}{author}_contaminationmap{out_to_radius}r200_zoom.png")
+    plt.close(fig)
+
+    # Histograms
+    bins = np.linspace(0, 7. * R200c[i], 40)
+    hist, bin_edges = np.histogram(lowres_coordinates['x'][contaminated_idx], bins=bins)
+    lowres_coordinates['r_bins'] = bin_edges / R200c[i]
+    lowres_coordinates['hist_contaminating'] = hist
+    del hist, bin_edges
+    hist, _ = np.histogram(lowres_coordinates['x'][~contaminated_idx], bins=bins)
+    lowres_coordinates['hist_clean'] = hist
+    del hist
+    hist, _ = np.histogram(highres_coordinates['x'], bins=bins)
+    highres_coordinates['r_bins'] = lowres_coordinates['r_bins']
+    highres_coordinates['hist_clean'] = hist
+    del bins, hist
+
+
+    # Make radial distribution plot
+    fig, ax = plt.subplots()
+    hist_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
+
+    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], color='red', label='Lowres contaminating')
+    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_clean'], color='green', label='Lowres clean')
+    ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_clean'], color='grey', label='Highres')
+
+    fig.tight_layout()
+    plt.legend()
+    fig.savefig(f"{output_directory}halo{i}{author}_contamination_hist_{out_to_radius}r200_zoom.png")
     plt.close(fig)
