@@ -207,7 +207,7 @@ for i in range(len(snap_relative_filepaths)):
     plt.close(fig)
 
     # Histograms
-    bins = np.linspace(0, 7. * R200c[i], 40)
+    bins = np.linspace(0, out_to_radius * R200c[i], 40)
     hist, bin_edges = np.histogram(lowres_coordinates['x'][contaminated_idx], bins=bins)
     lowres_coordinates['r_bins'] = (bin_edges[1:] + bin_edges[:-1]) / 2 / R200c[i]
     lowres_coordinates['hist_contaminating'] = hist
@@ -225,11 +225,12 @@ for i in range(len(snap_relative_filepaths)):
     fig, ax = plt.subplots()
     hist_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
 
-    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], color='red', label='Lowres contaminating')
-    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_clean'], color='green', label='Lowres clean')
-    ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_clean'], color='grey', label='Highres')
+    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], where='mid', color='red', label='Lowres contaminating')
+    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_clean'], where='mid', color='green', label='Lowres clean')
+    ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_clean'], where='mid', color='grey', label='Highres')
 
-    fig.tight_layout()
+    ax.set_xlim([0, out_to_radius * R200c[i]e])
     plt.legend()
+    fig.tight_layout()
     fig.savefig(f"{output_directory}halo{i}{author}_contamination_hist_{out_to_radius}r200_zoom.png")
     plt.close(fig)
