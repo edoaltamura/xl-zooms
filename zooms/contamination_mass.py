@@ -87,7 +87,8 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
     ax.set_yscale('log')
     ax.set_ylabel("Number of particles")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
-    ax.axvline(1, color="black", linestyle='--')
+    ax.axvline(1, color="grey", linestyle='--')
+    ax.axvline(5, color="grey", linestyle='--')
     ax.text(
         0.025,
         0.975,
@@ -238,9 +239,9 @@ for i in range(len(snap_relative_filepaths)):
     fig, ax = plt.subplots()
     hist_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
 
-    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], where='mid', color='red', label='Lowres contaminating')
-    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_all'], where='mid', color='green', label='Lowres all')
     ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_all'], where='mid', color='grey', label='Highres all')
+    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_all'], where='mid', color='green', label='Lowres all')
+    ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], where='mid', color='red', label='Lowres contaminating')
 
     ax.set_xlim([0, out_to_radius])
     plt.legend()
