@@ -9,6 +9,15 @@ import matplotlib.pyplot as plt
 import swiftsimio as sw
 
 
+def wrap(dx, box):
+    result = dx
+    index = np.where(dx > (0.5 * box))[0]
+    result[index] -= box
+    index = np.where(dx < (-0.5 * box))[0]
+    result[index] += box
+    return result
+
+
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
     if "e" in float_str:
@@ -115,6 +124,7 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
 # INPUTS
 author = "SK"
 out_to_radius = 7
+boxMpc = 300.
 
 metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
@@ -169,22 +179,22 @@ for i in range(len(snap_relative_filepaths)):
     data = sw.load(snapFile, mask=mask)
     posDM = data.dark_matter.coordinates / data.metadata.a
     highres_coordinates = {
-        'x': posDM[:, 0] - xCen,
-        'y': posDM[:, 1] - yCen,
-        'z': posDM[:, 2] - zCen,
-        'r': np.sqrt((posDM[:, 0] - xCen) ** 2 +
-                     (posDM[:, 1] - yCen) ** 2 +
-                     (posDM[:, 2] - zCen) ** 2)
+        'x': wrap(posDM[:, 0] - xCen, boxMpc),
+        'y': wrap(posDM[:, 1] - yCen, boxMpc),
+        'z': wrap(posDM[:, 2] - zCen, boxMpc),
+        'r': np.sqrt(wrap(posDM[:, 0] - xCen, boxMpc) ** 2 +
+                     wrap(posDM[:, 1] - yCen, boxMpc) ** 2 +
+                     wrap(posDM[:, 2] - zCen, boxMpc) ** 2)
     }
     del posDM
     posDM = data.boundary.coordinates / data.metadata.a
     lowres_coordinates = {
-        'x': posDM[:, 0] - xCen,
-        'y': posDM[:, 1] - yCen,
-        'z': posDM[:, 2] - zCen,
-        'r': np.sqrt((posDM[:, 0] - xCen) ** 2 +
-                     (posDM[:, 1] - yCen) ** 2 +
-                     (posDM[:, 2] - zCen) ** 2)
+        'x': wrap(posDM[:, 0] - xCen, boxMpc),
+        'y': wrap(posDM[:, 1] - yCen, boxMpc),
+        'z': wrap(posDM[:, 2] - zCen, boxMpc),
+        'r': np.sqrt(wrap(posDM[:, 0] - xCen, boxMpc) ** 2 +
+                     wrap(posDM[:, 1] - yCen, boxMpc) ** 2 +
+                     wrap(posDM[:, 2] - zCen, boxMpc) ** 2)
     }
     del posDM
 
