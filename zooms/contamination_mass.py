@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')
 
 import numpy as np
@@ -16,10 +17,68 @@ def latex_float(f):
     else:
         return float_str
 
+
+def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R200c: float) -> None:
+    ax.set_aspect('equal')
+    ax.set_ylabel(r"$y$ [Mpc]")
+    ax.set_xlabel(r"$x$ [Mpc]")
+    ax.text(
+        0.025,
+        0.975,
+        f"Halo {halo_id:d} DMO\n",
+        color="black",
+        ha="left",
+        va="top",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0.975,
+        0.975,
+        f"$z={redshift:3.3f}$",
+        color="black",
+        ha="right",
+        va="top",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0.975,
+        0.025,
+        (
+            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
+        ),
+        color="black",
+        ha="right",
+        va="bottom",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0,
+        0 + 1.05 * R200c,
+        r"$R_{200c}$",
+        color="black",
+        ha="center",
+        va="bottom"
+    )
+    ax.text(
+        0,
+        0 + 1.002 * 5 * R200c,
+        r"$5 \times R_{200c}$",
+        color="grey",
+        ha="center",
+        va="bottom"
+    )
+    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
+    ax.add_artist(circle_r200)
+    ax.add_artist(circle_5r200)
+
+    return
+
+
 #############################################
 # INPUTS
 author = "SK"
-out_to_radius = 5
+out_to_radius = 7
 
 metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
@@ -33,18 +92,12 @@ velociraptor_properties = [
     f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001/halo_{author}{i}_0001.properties.0"
     for i in range(3)
 ]
-output_directory = "outfiles/"
 
+output_directory = "outfiles/"
 
 #############################################
 
 print("Loading halos selected...")
-# lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
-# print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
-# print("R200c: ", lines[2])
-# print("Centre of potential coordinates: (xC, yC, zC)")
-# for i in range(3):
-#     print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
 M200c = []
 R200c = []
 x = []
@@ -58,7 +111,6 @@ for vr_path in velociraptor_properties:
         x.append(vr_file['/Xcminpot'][0])
         y.append(vr_file['/Ycminpot'][0])
         z.append(vr_file['/Zcminpot'][0])
-
 
 for i in range(len(snap_relative_filepaths)):
     # EAGLE-XL data path
@@ -79,70 +131,41 @@ for i in range(len(snap_relative_filepaths)):
 
     # Load data using mask
     data = sw.load(snapFile, mask=mask)
+    posDM = data.dark_matter.coordinates / data.metadata.a
+    highres_coordinates = {
+        'x': posDM[:, 0] - xCen,
+        'y': posDM[:, 1] - yCen,
+        'z': posDM[:, 2] - zCen,
+        'r': np.sqrt((posDM[:, 0] - xCen) ** 2 +
+                     (posDM[:, 1] - yCen) ** 2 +
+                     (posDM[:, 2] - zCen) ** 2)
+    }
+    del posDM
     posDM = data.boundary.coordinates / data.metadata.a
-    coord_x = posDM[:, 0] - xCen
-    coord_y = posDM[:, 1] - yCen
-    coord_z = posDM[:, 2] - zCen
+    lowres_coordinates = {
+        'x': posDM[:, 0] - xCen,
+        'y': posDM[:, 1] - yCen,
+        'z': posDM[:, 2] - zCen,
+        'r': np.sqrt((posDM[:, 0] - xCen) ** 2 +
+                     (posDM[:, 1] - yCen) ** 2 +
+                     (posDM[:, 2] - zCen) ** 2)
+    }
     del posDM
 
     # Flag contamination particles within 5 R200
+    contaminated_idx = np.where(lowres_coordinates['r'] < 5. * R200c[i])[0]
+    print(f"Contaminating low-res DM (< 5 R200c): {len(contaminated_idx)} particles detected")
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
-    ax.set_aspect('equal')
-    ax.plot(coord_x, coord_y, ',', c="C0", alpha=0.1)
+
+    ax.plot(highres_coordinates['x'], highres_coordinates['y'], ',', c="C0", alpha=0.2, label='Highres')
+    ax.plot(lowres_coordinates['x'][contaminated_idx], lowres_coordinates['y'][contaminated_idx], 'x', c="red", alpha=1, label='Lowres contaminating')
+    ax.plot(lowres_coordinates['x'][~contaminated_idx], lowres_coordinates['y'][~contaminated_idx], ',', c="green", alpha=1, label='Lowres clean')
+
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
-    ax.set_ylabel(r"$y$ [Mpc]")
-    ax.set_xlabel(r"$x$ [Mpc]")
-    ax.text(
-        0.025,
-        0.975,
-        f"Halo {i:d} DMO\n",
-        color="black",
-        ha="left",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
-        0.975,
-        f"$z={data.metadata.z:3.3f}$",
-        color="black",
-        ha="right",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
-        0.025,
-        (
-            f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
-        ),
-        color="black",
-        ha="right",
-        va="bottom",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0,
-        0 + 1.05 * R200c[i],
-        r"$R_{200c}$",
-        color="black",
-        ha="center",
-        va="bottom"
-    )
-    ax.text(
-        0,
-        0 + 1.002 * 5 * R200c[i],
-        r"$5 \times R_{200c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
-    )
-    circle_r200 = plt.Circle((0, 0), R200c[i], color="black", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((0, 0), 5 * R200c[i], color="grey", fill=False, linestyle='--')
-    ax.add_artist(circle_r200)
-    ax.add_artist(circle_5r200)
-    fig.savefig(f"{output_directory}halo{i}{author}_particlemap{out_to_radius}r200_zoom.png")
+    map_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
+    plt.legend()
+    fig.savefig(f"{output_directory}halo{i}{author}_contaminationmap{out_to_radius}r200_zoom.png")
     plt.close(fig)
