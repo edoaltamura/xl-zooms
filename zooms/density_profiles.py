@@ -1,9 +1,9 @@
-import numpy as np
-import unyt
-import h5py
 import matplotlib
 
 matplotlib.use('Agg')
+import numpy as np
+import unyt
+import h5py
 import swiftsimio as sw
 from matplotlib import pyplot as plt
 
@@ -108,6 +108,7 @@ def density_profile(halo_id: int, outfig: bool = False):
     else:
         plt.close(fig)
         return
+
 
 for i in range(len(snap_relative_filepaths)):
     density_profile(i)
