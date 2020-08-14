@@ -37,12 +37,14 @@ z = lines[5]
 
 ############################################################
 # DENSITY PROFILE FROM SNAPSHOT - ALL PARTICLES
-for i in range(3):
-    print(f"Profiling halo {i}...")
-    xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
-    yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
-    zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(out_to_radius * R200c[i], unyt.Mpc)
+
+def density_profile(halo_id: int, outfig: bool = False):
+
+    print(f"Profiling halo {halo_id}...")
+    xCen = unyt.unyt_quantity(x[halo_id], unyt.Mpc)
+    yCen = unyt.unyt_quantity(y[halo_id], unyt.Mpc)
+    zCen = unyt.unyt_quantity(z[halo_id], unyt.Mpc)
+    size = unyt.unyt_quantity(out_to_radius * R200c[halo_id], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
@@ -56,16 +58,28 @@ for i in range(3):
         (posDM[:, 0] - xCen) ** 2 +
         (posDM[:, 1] - yCen) ** 2 +
         (posDM[:, 2] - zCen) ** 2
-    ) / R200c[i]
+    ) / R200c[halo_id]
+
+    # Calculate particle mass and rho_crit
+    unitLength = data.metadata.units.length
+    unitMass = data.metadata.units.mass
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology['Critical density [internal units]'],
+        unitMass / unitLength ** 3
+    )
+    rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
+    vol = data.metadata.boxsize[0] ** 3
+    numPart = data.metadata.n_dark_matter
+    particleMass = rhoMean * vol / numPart
 
     # constuct bins for the histogram
     lbins = np.logspace(-2, np.log10(out_to_radius), 40)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-    volume_shell = (4. * np.pi / 3.) * (R200c[i] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-    rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
+    volume_shell = (4. * np.pi / 3.) * (R200c[halo_id] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
     densities = hist / volume_shell / rho_crit
+
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
     ax.plot(bin_centre, densities, c="C0", linestyle="-")
@@ -75,5 +89,10 @@ for i in range(3):
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
-    fig.savefig(f"outfiles/halo{i}{author}_density_profile_parent.png")
+    fig.savefig(f"outfiles/halo{halo_id}{author}_density_profile_parent.png")
+    if outfig:
+        return fig, ax
     plt.close(fig)
+
+for i in range(3):
+    density_profile(i)

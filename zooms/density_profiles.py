@@ -2,6 +2,7 @@ import numpy as np
 import unyt
 import h5py
 import matplotlib
+
 matplotlib.use('Agg')
 import swiftsimio as sw
 from matplotlib import pyplot as plt
@@ -29,7 +30,6 @@ velociraptor_properties = [
 
 output_directory = "outfiles/"
 
-
 #############################################
 
 print("Loading halos selected...")
@@ -47,17 +47,18 @@ for vr_path in velociraptor_properties:
         y.append(vr_file['/Ycminpot'][0])
         z.append(vr_file['/Zcminpot'][0])
 
+
 ############################################################
 # DENSITY PROFILE FROM SNAPSHOT - ALL PARTICLES
 
-for i in range(len(snap_relative_filepaths)):
+def density_profile(halo_id: int, outfig: bool = False):
     # EAGLE-XL data path
-    snapFile = simdata_dirpath + snap_relative_filepaths[i]
-    print(f"Profiling {snap_relative_filepaths[i]}...")
-    xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
-    yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
-    zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(out_to_radius * R200c[i], unyt.Mpc)
+    snapFile = simdata_dirpath + snap_relative_filepaths[halo_id]
+    print(f"Profiling {snap_relative_filepaths[halo_id]}...")
+    xCen = unyt.unyt_quantity(x[halo_id], unyt.Mpc)
+    yCen = unyt.unyt_quantity(y[halo_id], unyt.Mpc)
+    zCen = unyt.unyt_quantity(z[halo_id], unyt.Mpc)
+    size = unyt.unyt_quantity(out_to_radius * R200c[halo_id], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
@@ -71,16 +72,26 @@ for i in range(len(snap_relative_filepaths)):
         (posDM[:, 0] - xCen) ** 2 +
         (posDM[:, 1] - yCen) ** 2 +
         (posDM[:, 2] - zCen) ** 2
-    ) / R200c[i]
-    masses = np.ones_like(r)
+    ) / R200c[halo_id]
+
+    # Calculate particle mass and rho_crit
+    unitLength = data.metadata.units.length
+    unitMass = data.metadata.units.mass
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology['Critical density [internal units]'],
+        unitMass / unitLength ** 3
+    )
+    rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
+    vol = data.metadata.boxsize[0] ** 3
+    numPart = data.metadata.n_dark_matter
+    particleMass = rhoMean * vol / numPart
 
     # constuct bins for the histogram
     lbins = np.logspace(-2, np.log10(out_to_radius), 40)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-    volume_shell = (4. * np.pi / 3.) * (R200c[i] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-    rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
+    volume_shell = (4. * np.pi / 3.) * (R200c[halo_id] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
     densities = hist / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
@@ -91,5 +102,11 @@ for i in range(len(snap_relative_filepaths)):
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     fig.tight_layout()
-    fig.savefig(f"{output_directory}halo{i}{author}_density_profile_zoom.png")
+    fig.savefig(f"{output_directory}halo{halo_id}{author}_density_profile_zoom.png")
+    if outfig:
+        return fig, ax
     plt.close(fig)
+
+
+for i in range(len(snap_relative_filepaths)):
+    density_profile(i)
