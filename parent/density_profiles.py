@@ -92,7 +92,9 @@ def density_profile(halo_id: int, outfig: bool = False):
     fig.savefig(f"outfiles/halo{halo_id}{author}_density_profile_parent.png")
     if outfig:
         return fig, ax
-    plt.close(fig)
+    else:
+        plt.close(fig)
+        return
 
 for i in range(3):
     density_profile(i)

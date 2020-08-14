@@ -105,8 +105,9 @@ def density_profile(halo_id: int, outfig: bool = False):
     fig.savefig(f"{output_directory}halo{halo_id}{author}_density_profile_zoom.png")
     if outfig:
         return fig, ax
-    plt.close(fig)
-
+    else:
+        plt.close(fig)
+        return
 
 for i in range(len(snap_relative_filepaths)):
     density_profile(i)
