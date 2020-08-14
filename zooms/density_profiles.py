@@ -13,6 +13,8 @@ except:
 
 # INPUTS
 author = "SK"
+out_to_radius = 3
+
 metadata_filepath = "outfiles/halo_selected_SK.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
 snap_relative_filepaths = [
@@ -31,12 +33,6 @@ output_directory = "outfiles/"
 #############################################
 
 print("Loading halos selected...")
-# lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
-# print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
-# print("R200c: ", lines[2])
-# print("Centre of potential coordinates: (xC, yC, zC)")
-# for i in range(3):
-#     print(f"\tHalo {i:d}:\t({lines[3, i]:2.1f}, {lines[4, i]:2.1f}, {lines[5, i]:2.1f})")
 M200c = []
 R200c = []
 x = []
@@ -61,7 +57,7 @@ for i in range(len(snap_relative_filepaths)):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(6. * R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(out_to_radius * R200c[i], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
@@ -79,18 +75,17 @@ for i in range(len(snap_relative_filepaths)):
     masses = np.ones_like(r)
 
     # constuct bins for the histogram
-    lbins = np.logspace(-2, np.log10(5.), 40)
+    lbins = np.logspace(-2, np.log10(out_to_radius), 40)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-    # compute radial density distribution
-    volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
+    volume_shell = (4. * np.pi / 3.) * (R200c[i] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
     rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
     densities = hist / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
     ax.plot(bin_centre, densities, c="C0", linestyle="-")
-    ax.set_xlim(1e-2, 6)
+    ax.set_xlim(1e-2, out_to_radius)
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")

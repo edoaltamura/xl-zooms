@@ -15,6 +15,8 @@ except:
 # INPUTS
 
 author = "SK"
+out_to_radius = 5
+
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 snapFile = dataPath + "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
 
@@ -40,7 +42,7 @@ for i in range(3):
     xCen = unyt.unyt_quantity(x[i], unyt.Mpc)
     yCen = unyt.unyt_quantity(y[i], unyt.Mpc)
     zCen = unyt.unyt_quantity(z[i], unyt.Mpc)
-    size = unyt.unyt_quantity(6. * R200c[i], unyt.Mpc)
+    size = unyt.unyt_quantity(out_to_radius * R200c[i], unyt.Mpc)
     mask = sw.mask(snapFile)
     region = [
         [xCen - size, xCen + size],
@@ -55,21 +57,19 @@ for i in range(3):
         (posDM[:, 1] - yCen) ** 2 +
         (posDM[:, 2] - zCen) ** 2
     ) / R200c[i]
-    masses = np.ones_like(r)
 
     # constuct bins for the histogram
-    lbins = np.logspace(-2, np.log10(5.), 40)
+    lbins = np.logspace(-2, np.log10(out_to_radius), 40)
     # compute statistics - each bin has Y value of the sum of the masses of points within the bin X
     hist, bin_edges = np.histogram(r, bins=lbins)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-    # compute radial density distribution
-    volume_shell = (4. * np.pi * (R200c[i] ** 3) / 3.) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
+    volume_shell = (4. * np.pi / 3.) * (R200c[i] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
     rho_crit = data.metadata.cosmology['Critical density [internal units]'][0]
     densities = hist / volume_shell / rho_crit
     # Plot density profile for each selected halo in volume
     fig, ax = plt.subplots()
     ax.plot(bin_centre, densities, c="C0", linestyle="-")
-    ax.set_xlim(1e-2, 6)
+    ax.set_xlim(1e-2, out_to_radius)
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
