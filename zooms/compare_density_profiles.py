@@ -11,7 +11,7 @@ except:
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
 from . import density_profiles as zoom
-from .. import parent.density_profiles as parent
+from parent import density_profiles as parentbox
 
 author = "SK"
 out_to_radius = 3
@@ -19,7 +19,7 @@ output_directory = "outfiles/"
 
 
 for i in range(3):
-    fig, ax = parent.density_profile(i, outfig=True)
+    fig, ax = parentbox.density_profile(i, outfig=True)
     zoom.density_profile(i, outfig=True)
     fig.tight_layout()
     fig.savefig(f"{output_directory}halo{i}{author}_density_profile_compare_zoom.png")
