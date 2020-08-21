@@ -10,7 +10,7 @@ except:
 
 import sys
 sys.path.append("..") # Adds higher directory to python modules path.
-from . import density_profiles as zoom
+from zooms import density_profiles as zoom
 from parent import density_profiles as parentbox
 
 author = "SK"
