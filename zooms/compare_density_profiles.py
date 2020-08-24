@@ -182,24 +182,26 @@ def density_profile_compare_plot(
 if __name__ == "__main__":
     # import sys
 
-    # run_name = sys.argv[1]
-    # run_directory = sys.argv[2]
-    # snapshot_name = sys.argv[3]
-    # output_path = sys.argv[4]
+    # snap_filepath_parent = sys.argv[1]
+    # snap_filepath_zoom = sys.argv[2]
+    # velociraptor_properties_zoom = sys.argv[3]
+    # output_directory = sys.argv[4]
 
-    # Manual inputs
-    halo_id = 0
-    author = "SK"
-    snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-    snap_filepath_zoom = f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{halo_id}_DMO/snapshots/EAGLE-XL_ClusterSK{halo_id}_DMO_0001.hdf5"
-    velociraptor_properties_zoom = f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{halo_id}_0001/halo_{author}{halo_id}_0001.properties.0"
-    output_directory = "outfiles"
+    for i in range(3):
 
-    density_profile_compare_plot(
-        halo_id,
-        author,
-        snap_filepath_parent=snap_filepath_parent,
-        snap_filepath_zoom=snap_filepath_zoom,
-        velociraptor_properties_zoom=velociraptor_properties_zoom,
-        output_directory=output_directory
-    )
+        # Manual inputs
+        halo_id = i
+        author = "SK"
+        snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
+        snap_filepath_zoom = f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{halo_id}_DMO/snapshots/EAGLE-XL_ClusterSK{halo_id}_DMO_0001.hdf5"
+        velociraptor_properties_zoom = f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{halo_id}_0001/halo_{author}{halo_id}_0001.properties.0"
+        output_directory = "outfiles"
+
+        density_profile_compare_plot(
+            i,
+            author,
+            snap_filepath_parent=snap_filepath_parent,
+            snap_filepath_zoom=snap_filepath_zoom,
+            velociraptor_properties_zoom=velociraptor_properties_zoom,
+            output_directory=output_directory
+        )
