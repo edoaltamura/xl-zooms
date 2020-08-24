@@ -40,17 +40,17 @@ output_directory = "outfiles/"
 lines = np.loadtxt(f"{output_directory}halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
 M200c = lines[1] * 1e13
 R200c = lines[2]
-M200c = unyt.unyt_quantity(M200c[halo_id], unyt.Msun)
-R200c = unyt.unyt_quantity(R200c[halo_id], unyt.Mpc)
 Xcminpot = lines[3]
 Ycminpot = lines[4]
 Zcminpot = lines[5]
 xCen = unyt.unyt_quantity(Xcminpot[halo_id], unyt.Mpc)
 yCen = unyt.unyt_quantity(Ycminpot[halo_id], unyt.Mpc)
 zCen = unyt.unyt_quantity(Zcminpot[halo_id], unyt.Mpc)
+size = unyt.unyt_quantity(out_to_radius * R200c[halo_id], unyt.Mpc)
+M200c = unyt.unyt_quantity(M200c[halo_id], unyt.Msun)
+R200c = unyt.unyt_quantity(R200c[halo_id], unyt.Mpc)
 
 # Construct spatial mask to feed into swiftsimio
-size = unyt.unyt_quantity(out_to_radius * R200c[halo_id], unyt.Mpc)
 mask = sw.mask(snapFile)
 region = [
     [xCen - size, xCen + size],
@@ -107,14 +107,14 @@ with h5py.File(velociraptor_properties, 'r') as vr_file:
     Ycminpot = vr_file['/Ycminpot'][0]
     Zcminpot = vr_file['/Zcminpot'][0]
 
-M200c = unyt.unyt_quantity(M200c, unyt.Msun)
-R200c = unyt.unyt_quantity(R200c, unyt.Mpc)
 xCen = unyt.unyt_quantity(Xcminpot, unyt.Mpc)
 yCen = unyt.unyt_quantity(Ycminpot, unyt.Mpc)
 zCen = unyt.unyt_quantity(Zcminpot, unyt.Mpc)
+size = unyt.unyt_quantity(out_to_radius * R200c, unyt.Mpc)
+M200c = unyt.unyt_quantity(M200c, unyt.Msun)
+R200c = unyt.unyt_quantity(R200c, unyt.Mpc)
 
 # Construct spatial mask to feed into swiftsimio
-size = unyt.unyt_quantity(out_to_radius * R200c, unyt.Mpc)
 mask = sw.mask(snap_filepath)
 region = [
     [xCen - size, xCen + size],
