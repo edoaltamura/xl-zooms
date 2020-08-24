@@ -154,12 +154,12 @@ zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value
 ax.plot(bin_centre, densities, c="orange", linestyle="-", label=zoom_label)
 
 ax.text(
-    0.975,
-    0.975,
+    0.025,
+    0.025,
     (
-        f"Halo {halo_id:d} DMO\n",
-        f"$z={data.metadata.z:3.3f}$\n",
-        f"$M_{{200c}}={latex_float(M200c.value)}$ {M200c.units.latex_repr}\n",
+        f"Halo {halo_id:d} DMO\n"
+        f"$z={data.metadata.z:3.3f}$\n"
+        f"$M_{{200c}}={latex_float(M200c.value)}$ {M200c.units.latex_repr}\n"
         f"$R_{{200c}}={latex_float(R200c.value)}$ {R200c.units.latex_repr}$"
     ),
     color="black",
