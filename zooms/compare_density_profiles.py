@@ -159,6 +159,7 @@ ax.text(
     (
         f"Halo {halo_id:d} DMO\n"
         f"$z={data.metadata.z:3.3f}$\n"
+        "Zoom VR output:\n"
         f"$M_{{200c}}={latex_float(M200c.value)}\\ {M200c.units.latex_repr}$\n"
         f"$R_{{200c}}={latex_float(R200c.value)}\\ {R200c.units.latex_repr}$"
     ),
