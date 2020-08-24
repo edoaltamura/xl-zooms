@@ -40,8 +40,8 @@ output_directory = "outfiles/"
 lines = np.loadtxt(f"{output_directory}halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
 M200c = lines[1] * 1e13
 R200c = lines[2]
-M200c = unyt.unyt_quantity(M200c, unyt.Msun)
-R200c = unyt.unyt_quantity(R200c, unyt.Mpc)
+M200c = unyt.unyt_quantity(M200c[halo_id], unyt.Msun)
+R200c = unyt.unyt_quantity(R200c[halo_id], unyt.Mpc)
 Xcminpot = lines[3]
 Ycminpot = lines[4]
 Zcminpot = lines[5]
