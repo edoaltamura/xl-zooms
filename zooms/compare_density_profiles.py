@@ -18,7 +18,7 @@ except:
 # INPUTS
 
 author = "SK"
-halo_id = 0
+halo_id = 1
 out_to_radius = 5
 
 snapFile = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
