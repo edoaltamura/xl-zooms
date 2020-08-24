@@ -93,7 +93,7 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
         0.025,
         0.025,
         (
-            f"Halo {halo_id:s} DMO\n"
+            f"Halo {halo_id:d} DMO\n"
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c)}$ Mpc"
