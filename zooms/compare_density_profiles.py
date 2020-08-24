@@ -180,12 +180,12 @@ def density_profile_compare_plot(
 
 
 if __name__ == "__main__":
-    import sys
+    # import sys
 
-    run_name = sys.argv[1]
-    run_directory = sys.argv[2]
-    snapshot_name = sys.argv[3]
-    output_path = sys.argv[4]
+    # run_name = sys.argv[1]
+    # run_directory = sys.argv[2]
+    # snapshot_name = sys.argv[3]
+    # output_path = sys.argv[4]
 
     # Manual inputs
     halo_id = 0
