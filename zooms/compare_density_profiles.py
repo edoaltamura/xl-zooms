@@ -88,7 +88,7 @@ densities = hist * particleMass / volume_shell / rho_crit
 
 # Plot density profile for each selected halo in volume
 fig, ax = plt.subplots()
-parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution)}{parent_mass_resolution.units.latex_repr}$'
+parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value)}{parent_mass_resolution.units.latex_repr}$'
 ax.plot(bin_centre, densities, c="lime", linestyle="-", label=parent_label)
 
 ##########################################################
@@ -146,7 +146,7 @@ volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_e
 densities = hist / volume_shell / rho_crit
 
 # Plot density profile for each selected halo in volume
-zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution)}{zoom_mass_resolution.units.latex_repr}$'
+zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}{zoom_mass_resolution.units.latex_repr}$'
 ax.plot(bin_centre, densities, c="orange", linestyle="-", label=zoom_label)
 
 ax.text(
@@ -155,8 +155,8 @@ ax.text(
     (
         f"Halo {halo_id:d} DMO\n",
         f"$z={data.metadata.z:3.3f}$\n",
-        f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n",
-        f"$R_{{200c}}={latex_float(R200c)}$ Mpc$"
+        f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n",
+        f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc$"
     ),
     color="black",
     ha="right",
