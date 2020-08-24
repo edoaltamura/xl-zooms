@@ -123,10 +123,7 @@ rho_crit = unyt.unyt_quantity(
     data.metadata.cosmology['Critical density [internal units]'],
     unitMass / unitLength ** 3
 )
-rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
-vol = data.metadata.boxsize[0] ** 3
-numPart = data.metadata.n_dark_matter
-particleMass = rhoMean * vol / numPart
+particleMass = data.dark_matter.masses
 
 # Construct bins and compute density profile
 lbins = np.logspace(-2, np.log10(out_to_radius), 40)
