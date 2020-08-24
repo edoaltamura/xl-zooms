@@ -88,33 +88,18 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
     ax.set_ylabel("Number of particles")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     ax.axvline(1, color="grey", linestyle='--')
-    ax.axvline(5, color="grey", linestyle='--')
+
     ax.text(
         0.025,
-        0.975,
-        f"Halo {halo_id:d} DMO\n",
-        color="black",
-        ha="left",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
-        0.975,
-        f"$z={redshift:3.3f}$",
-        color="black",
-        ha="right",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
+            f"Halo {halo_id:s} DMO\n"
+            f"$z={redshift:3.3f}$\n"
+            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c)}$ Mpc"
         ),
         color="black",
-        ha="right",
+        ha="left",
         va="bottom",
         transform=ax.transAxes,
     )
@@ -124,8 +109,9 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
 #############################################
 # INPUTS
 author = "SK"
-out_to_radius = 7
-boxMpc = 300.
+highres_radius = 3 # in Mpc
+out_to_radius = 7 # in R200crit units
+boxMpc = 300. # in Mpc
 
 metadata_filepath = f"outfiles/halo_selected_{author}.txt"
 simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
@@ -200,11 +186,11 @@ for i in range(len(snap_relative_filepaths)):
     del posDM
 
     # Flag contamination particles within 5 R200
-    contaminated_idx = np.where(lowres_coordinates['r'] < 5. * R200c[i])[0]
+    contaminated_idx = np.where(lowres_coordinates['r'] < highres_radius)[0]
     contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c[i])[0]
     print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
-    print(f"Contaminating low-res DM (< 5 R200c): {len(contaminated_idx)} particles detected")
-    print(f"Contaminating low-res DM (< 1 R200c): {len(contaminated_r200_idx)} particles detected")
+    print(f"Contaminating low-res DM (< R_clean): {len(contaminated_idx)} particles detected")
+    print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
 
     # Make particle maps
     fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
@@ -217,7 +203,7 @@ for i in range(len(snap_relative_filepaths)):
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     plt.legend()
-    fig.savefig(f"{output_directory}halo{i}{author}_contaminationmap{out_to_radius}r200_zoom.png")
+    fig.savefig(f"{output_directory}{author}{i}_contamination_map{out_to_radius}r200_zoom.png")
     plt.close(fig)
 
     # Histograms
@@ -234,7 +220,6 @@ for i in range(len(snap_relative_filepaths)):
     highres_coordinates['hist_all'] = hist
     del bins, hist
 
-
     # Make radial distribution plot
     fig, ax = plt.subplots()
     hist_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
@@ -242,9 +227,9 @@ for i in range(len(snap_relative_filepaths)):
     ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_all'], where='mid', color='grey', label='Highres all')
     ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_all'], where='mid', color='green', label='Lowres all')
     ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], where='mid', color='red', label='Lowres contaminating')
-
+    ax.axvline(highres_radius / R200c[i], color="grey", linestyle='--')
     ax.set_xlim([0, out_to_radius])
     plt.legend()
     fig.tight_layout()
-    fig.savefig(f"{output_directory}halo{i}{author}_contamination_hist_{out_to_radius}r200_zoom.png")
+    fig.savefig(f"{output_directory}{author}{i}_contamination_hist_{out_to_radius}r200_zoom.png")
     plt.close(fig)
