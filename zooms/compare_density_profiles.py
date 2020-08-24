@@ -43,7 +43,7 @@ R200c = lines[2]
 Xcminpot = lines[3]
 Ycminpot = lines[4]
 Zcminpot = lines[5]
-M200c = unyt.unyt_quantity(M200c[halo_id], unyt.Msun)
+M200c = unyt.unyt_quantity(M200c[halo_id], unyt.Solar_Mass )
 R200c = unyt.unyt_quantity(R200c[halo_id], unyt.Mpc)
 xCen = unyt.unyt_quantity(Xcminpot[halo_id], unyt.Mpc)
 yCen = unyt.unyt_quantity(Ycminpot[halo_id], unyt.Mpc)
@@ -107,7 +107,7 @@ with h5py.File(velociraptor_properties, 'r') as vr_file:
     Ycminpot = vr_file['/Ycminpot'][0]
     Zcminpot = vr_file['/Zcminpot'][0]
 
-M200c = unyt.unyt_quantity(M200c, unyt.Msun)
+M200c = unyt.unyt_quantity(M200c, unyt.Solar_Mass )
 R200c = unyt.unyt_quantity(R200c, unyt.Mpc)
 xCen = unyt.unyt_quantity(Xcminpot, unyt.Mpc)
 yCen = unyt.unyt_quantity(Ycminpot, unyt.Mpc)
@@ -159,8 +159,8 @@ ax.text(
     (
         f"Halo {halo_id:d} DMO\n"
         f"$z={data.metadata.z:3.3f}$\n"
-        f"$M_{{200c}}={latex_float(M200c.value)} {M200c.units.latex_repr}$\n"
-        f"$R_{{200c}}={latex_float(R200c.value)} {R200c.units.latex_repr}$"
+        f"$M_{{200c}}={latex_float(M200c.value)}\\ {M200c.units.latex_repr}$\n"
+        f"$R_{{200c}}={latex_float(R200c.value)}\\ {R200c.units.latex_repr}$"
     ),
     color="black",
     ha="left",
