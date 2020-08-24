@@ -91,10 +91,20 @@ def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R2
         ha="center",
         va="bottom"
     )
+    ax.text(
+        0,
+        0 + 1.02 * highres_radius,
+        r"$R_\mathrm{clean}$",
+        color="red",
+        ha="center",
+        va="bottom"
+    )
     circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
     circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
+    circle_clean = plt.Circle((0, 0), highres_radius, color="red", fill=False, linestyle='.')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
+    ax.add_artist(circle_clean)
 
     return
 
