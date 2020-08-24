@@ -72,6 +72,7 @@ def density_profile_compare_plot(
     halo_id = None
     if match:
         author, halo_id = match.groups()
+    halo_id = int(halo_id)
 
 
     # PARENT #
