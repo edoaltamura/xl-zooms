@@ -32,13 +32,48 @@ def latex_float(f):
 
 
 def density_profile_compare_plot(
-        halo_id: int,
-        author: str,
+        run_name: str,
         snap_filepath_parent: str = None,
         snap_filepath_zoom: List[str] = None,
         velociraptor_properties_zoom: List[str] = None,
         output_directory: str = None
 ) -> None:
+    """
+    This function compares the density profiles of DMO zooms to their
+    corresponding parent halo. It also allows to assess numerical
+    convergence by overlapping multiple profiles from zooms with different
+    resolutions. The density profiles are then listed in the legend,
+    where the DM particle mass is quoted.
+    The zoom inputs are in the form of arrays of strings, to allow
+    for multiple entries. Each entry is a zoom snap/VR output resolution.
+
+    :param run_name: str
+        A custom and identifiable name for the run.
+    :param snap_filepath_parent: str
+        The complete path to the snapshot of the parent box.
+    :param snap_filepath_zoom: list(str)
+        The list of complete paths to the snapshots of the zooms
+        at different resolution. Note: the order must match that of
+        the `velociraptor_properties_zoom` parameter.
+    :param velociraptor_properties_zoom: list(str)
+        The list of complete paths to the VR outputs (properties) of the
+        zooms at different resolution. Note: the order must match that of
+        the `snap_filepath_zoom` parameter.
+    :param output_directory: str
+        The output directory where to save the plot.
+    :return: None
+    """
+
+    # TEMPORARY
+    # Split the run_name into author and halo_id to make everything work fine for now
+    import re
+    match = re.match(r"([a-z]+)([0-9]+)", run_name, re.I)
+    author = None
+    halo_id = None
+    if match:
+        author, halo_id = match.groups()
+
+
     # PARENT #
     # Load VR output gathered from the halo selection process
     lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
@@ -164,7 +199,7 @@ def density_profile_compare_plot(
         0.025,
         0.025,
         (
-            f"Halo {halo_id:d} DMO\n"
+            f"Halo {run_name:s} DMO\n"
             f"$z={data.metadata.z:3.3f}$\n"
             "Zoom VR output:\n"
             f"$M_{{200c}}={latex_float(M200c.value)}\\ {M200c.units.latex_repr}$\n"
@@ -183,7 +218,7 @@ def density_profile_compare_plot(
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     plt.legend()
     fig.tight_layout()
-    fig.savefig(f"{output_directory}/halo{halo_id}{author}_density_profile_compare.png")
+    fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.png")
     plt.close(fig)
 
     return
@@ -192,24 +227,34 @@ def density_profile_compare_plot(
 if __name__ == "__main__":
     # import sys
 
-    # snap_filepath_parent = sys.argv[1]
-    # snap_filepath_zoom = sys.argv[2]
-    # velociraptor_properties_zoom = sys.argv[3]
-    # output_directory = sys.argv[4]
+    # Argval inputs #
+    # NOTE: The `snap_filepath_zoom` and `velociraptor_properties_zoom` options should be given
+    # as long strings formed by the complete file-paths separated by a single comma and no spaces.
+    # eg: path1,path2,path3 PATH1,PATH2,PATH3
+
+    # run_name = sys.argv[1]
+    # snap_filepath_parent = sys.argv[2]
+    # snap_filepath_zoom = sys.argv[3].split(',')
+    # velociraptor_properties_zoom = sys.argv[4].split(',')
+    # output_directory = sys.argv[5]
+
+    # Manual inputs #
+    # NOTE: in loops, use one iteration per halo, i.e. one plot
+    # produced per iteration. Gather snaps of the same cluster
+    # at different resolutions in the same arrays, as they are
+    # overplotted in the same figure.
 
     for i in range(3):
 
-        # Manual inputs
         halo_id = i
-        author = "SK"
+        run_name = f"SK{i}"
         snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-        snap_filepath_zoom = [f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{halo_id}_DMO/snapshots/EAGLE-XL_ClusterSK{halo_id}_DMO_0001.hdf5"]
-        velociraptor_properties_zoom = [f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{halo_id}_0001/halo_{author}{halo_id}_0001.properties.0"]
+        snap_filepath_zoom = [f"/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"]
+        velociraptor_properties_zoom = [f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_SK{i}_0001/halo_SK{i}_0001.properties.0"]
         output_directory = "outfiles"
 
         density_profile_compare_plot(
-            i,
-            author,
+            run_name,
             snap_filepath_parent=snap_filepath_parent,
             snap_filepath_zoom=snap_filepath_zoom,
             velociraptor_properties_zoom=velociraptor_properties_zoom,
