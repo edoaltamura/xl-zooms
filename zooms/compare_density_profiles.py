@@ -19,7 +19,7 @@ except:
 # Constants
 bins = 40
 radius_bounds = [1e-2, 3]  # In units of R200crit
-cmap_name = 'BuPu_r'
+cmap_name = 'BuPu'
 
 
 def latex_float(f):
