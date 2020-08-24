@@ -66,7 +66,7 @@ r = np.sqrt(
     (posDM[:, 0] - xCen) ** 2 +
     (posDM[:, 1] - yCen) ** 2 +
     (posDM[:, 2] - zCen) ** 2
-) / R200c[halo_id]
+) / R200c
 
 # Calculate particle mass and rho_crit
 unitLength = data.metadata.units.length
@@ -85,7 +85,7 @@ parent_mass_resolution = particleMass
 lbins = np.logspace(-2, np.log10(out_to_radius), 40)
 hist, bin_edges = np.histogram(r, bins=lbins)
 bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-volume_shell = (4. * np.pi / 3.) * (R200c[halo_id] ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
+volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
 densities = hist * particleMass / volume_shell / rho_crit
 
 # Plot density profile for each selected halo in volume
