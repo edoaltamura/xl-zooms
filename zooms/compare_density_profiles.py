@@ -132,6 +132,7 @@ hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
 bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
 densities = hist / volume_shell / rho_crit
+print(densities[0])
 
 # Plot density profile for each selected halo in volume
 ax.plot(bin_centre, densities, c="orange", linestyle="-", label='Zoom')
