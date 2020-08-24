@@ -163,8 +163,8 @@ ax.text(
         f"$R_{{200c}}={latex_float(R200c.value)}$ {R200c.units.latex_repr}$"
     ),
     color="black",
-    ha="right",
-    va="top",
+    ha="left",
+    va="bottom",
     transform=ax.transAxes,
 )
 
