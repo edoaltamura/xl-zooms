@@ -88,7 +88,7 @@ densities = hist * particleMass / volume_shell / rho_crit
 
 # Plot density profile for each selected halo in volume
 fig, ax = plt.subplots()
-parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value)}{parent_mass_resolution.units.latex_repr}$'
+parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}{parent_mass_resolution.units.latex_repr}$'
 ax.plot(bin_centre, densities, c="lime", linestyle="-", label=parent_label)
 
 ##########################################################
