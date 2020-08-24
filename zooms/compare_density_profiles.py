@@ -15,6 +15,16 @@ try:
 except:
     pass
 
+
+def latex_float(f):
+    float_str = "{0:.2g}".format(f)
+    if "e" in float_str:
+        base, exponent = float_str.split("e")
+        return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
+    else:
+        return float_str
+
+
 # INPUTS
 
 author = "SK"
@@ -67,6 +77,7 @@ rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
 vol = data.metadata.boxsize[0] ** 3
 numPart = data.metadata.n_dark_matter
 particleMass = rhoMean * vol / numPart
+parent_mass_resolution = particleMass
 
 # Construct bins and compute density profile
 lbins = np.logspace(-2, np.log10(out_to_radius), 40)
@@ -77,7 +88,8 @@ densities = hist * particleMass / volume_shell / rho_crit
 
 # Plot density profile for each selected halo in volume
 fig, ax = plt.subplots()
-ax.plot(bin_centre, densities, c="lime", linestyle="-", label='Parent')
+parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution)}{parent_mass_resolution.units.latex_repr}$'
+ax.plot(bin_centre, densities, c="lime", linestyle="-", label=parent_label)
 
 ##########################################################
 # ZOOM
@@ -124,7 +136,7 @@ rho_crit = unyt.unyt_quantity(
     unitMass / unitLength ** 3
 )
 particleMasses = data.dark_matter.masses.to('Msun')
-print(particleMasses)
+zoom_mass_resolution = particleMasses
 
 # Construct bins and compute density profile
 lbins = np.logspace(-2, np.log10(out_to_radius), 40)
@@ -132,10 +144,25 @@ hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
 bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
 densities = hist / volume_shell / rho_crit
-print(densities[0])
 
 # Plot density profile for each selected halo in volume
-ax.plot(bin_centre, densities, c="orange", linestyle="-", label='Zoom')
+zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution)}{zoom_mass_resolution.units.latex_repr}$'
+ax.plot(bin_centre, densities, c="orange", linestyle="-", label=zoom_label)
+
+ax.text(
+    0.975,
+    0.975,
+    (
+        f"Halo {halo_id:d} DMO\n",
+        f"$z={data.metadata.z:3.3f}$\n",
+        f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n",
+        f"$R_{{200c}}={latex_float(R200c)}$ Mpc$"
+    ),
+    color="black",
+    ha="right",
+    va="top",
+    transform=ax.transAxes,
+)
 
 ax.set_xlim(1e-2, out_to_radius)
 ax.set_xscale('log')
