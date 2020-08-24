@@ -39,7 +39,7 @@ def density_profile_compare_plot(
 ) -> None:
     # PARENT #
     # Load VR output gathered from the halo selection process
-    lines = np.loadtxt(f"{output_directory}halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
+    lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
     M200c = lines[1] * 1e13
     R200c = lines[2]
     Xcminpot = lines[3]
