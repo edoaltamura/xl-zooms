@@ -183,7 +183,7 @@ for i in range(len(snap_relative_filepaths)):
     print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
 
     # Make particle maps
-    fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
     map_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
 
     ax.plot(highres_coordinates['x'], highres_coordinates['y'], ',', c="C0", alpha=0.2, label='Highres')
