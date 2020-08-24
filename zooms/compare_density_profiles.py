@@ -127,7 +127,7 @@ particleMasses = data.dark_matter.masses
 
 # Construct bins and compute density profile
 lbins = np.logspace(-2, np.log10(out_to_radius), 40)
-hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
+hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses, density=False)
 bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
 densities = hist / volume_shell / rho_crit
