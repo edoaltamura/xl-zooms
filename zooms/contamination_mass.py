@@ -8,6 +8,11 @@ import h5py
 import matplotlib.pyplot as plt
 import swiftsimio as sw
 
+try:
+    plt.style.use("mnras.mplstyle")
+except:
+    pass
+
 #############################################
 # INPUTS
 author = "SK"
