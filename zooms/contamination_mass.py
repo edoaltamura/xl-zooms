@@ -8,6 +8,30 @@ import h5py
 import matplotlib.pyplot as plt
 import swiftsimio as sw
 
+#############################################
+# INPUTS
+author = "SK"
+highres_radius = 3 # in Mpc
+out_to_radius = 7 # in R200crit units
+boxMpc = 300. # in Mpc
+
+metadata_filepath = f"outfiles/halo_selected_{author}.txt"
+simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
+
+snap_relative_filepaths = [
+    f"EAGLE-XL_Cluster{author}{i}_DMO/snapshots/EAGLE-XL_Cluster{author}{i}_DMO_0001.hdf5"
+    for i in range(3)
+]
+
+velociraptor_properties = [
+    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001/halo_{author}{i}_0001.properties.0"
+    for i in range(3)
+]
+
+output_directory = "outfiles/"
+
+#############################################
+
 
 def wrap(dx, box):
     result = dx
@@ -33,30 +57,16 @@ def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R2
     ax.set_xlabel(r"$x$ [Mpc]")
     ax.text(
         0.025,
-        0.975,
-        f"Halo {halo_id:d} DMO\n",
-        color="black",
-        ha="left",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
-        0.975,
-        f"$z={redshift:3.3f}$",
-        color="black",
-        ha="right",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$"
+            f"Halo {halo_id:d} DMO\n"
+            f"$z={redshift:3.3f}$\n"
+            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c)}$ Mpc"
+            f"$R_{{\\rm clean}}={latex_float(highres_radius)}$ Mpc"
         ),
         color="black",
-        ha="right",
+        ha="left",
         va="bottom",
         transform=ax.transAxes,
     )
@@ -88,7 +98,6 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
     ax.set_ylabel("Number of particles")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     ax.axvline(1, color="grey", linestyle='--')
-
     ax.text(
         0.025,
         0.025,
@@ -97,6 +106,7 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c)}$ Mpc"
+            f"$R_{{\\rm clean}}={latex_float(highres_radius)}$ Mpc"
         ),
         color="black",
         ha="left",
@@ -104,31 +114,6 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
         transform=ax.transAxes,
     )
     return
-
-
-#############################################
-# INPUTS
-author = "SK"
-highres_radius = 3 # in Mpc
-out_to_radius = 7 # in R200crit units
-boxMpc = 300. # in Mpc
-
-metadata_filepath = f"outfiles/halo_selected_{author}.txt"
-simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
-
-snap_relative_filepaths = [
-    f"EAGLE-XL_Cluster{author}{i}_DMO/snapshots/EAGLE-XL_Cluster{author}{i}_DMO_0001.hdf5"
-    for i in range(3)
-]
-
-velociraptor_properties = [
-    f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_{author}{i}_0001/halo_{author}{i}_0001.properties.0"
-    for i in range(3)
-]
-
-output_directory = "outfiles/"
-
-#############################################
 
 print("Loading halos selected...")
 M200c = []
