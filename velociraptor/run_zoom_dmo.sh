@@ -4,20 +4,20 @@
 
 source ./modules.sh
 
-export OMP_NUM_THREADS=20
+export OMP_NUM_THREADS=24
 
 author="SK"
 
-for i in 0
+for i in 0 1 2
 do
 
-  out_name="halo_${author}${i}_High_0001"
+  out_name="halo_${author}${i}_0001"
   config_file="config_zoom_dmo.cfg"
   stdout_name="vr_output_${out_name}.stdout"
   stderr_name="vr_output_${out_name}.stderr"
 
   # Specify the path to the snapshot (without the final .hdf5 extension)
-  snap_path="/cosma7/data/dp004/rttw52/swift_runs/runs/EAGLE-XL/EAGLE-XL_Cluster${author}${i}_High/snapshots/EAGLE-XL_Cluster${author}${i}_High_0001"
+  snap_path="/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_Cluster${author}${i}_DMO/snapshots/EAGLE-XL_Cluster${author}${i}_DMO_0001"
 
   outpath="/cosma6/data/dp004/dc-alta2/xl-zooms/${out_name}"
   stdout_path="${outpath}/${stdout_name}"
