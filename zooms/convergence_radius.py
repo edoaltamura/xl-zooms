@@ -1,8 +1,7 @@
-from typing import Tuple
 import numpy as np
-from scipy import interpolate, optimize
 import unyt
 
+alpha = 1
 
 def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> unyt.array.unyt_array:
     """
@@ -29,10 +28,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
             - \\alpha = 1
     """
 
-    # Set-up
-    alphas = [0.6, 1.]
     assert len(radial_distances) == len(particle_masses)
-    convergence_root = []
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
@@ -48,8 +44,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * (mean_rho / rho_crit) ** (-0.5)
 
     # Find solutions by minimising the root function
-    for alpha in alphas:
-        root_idx = (result - alpha).argmin()
-        convergence_root.append(radial_distances_sorted[root_idx])
+    root_idx = (result - alpha).argmin()
+    convergence_root = (radial_distances_sorted[root_idx])
 
-    return np.asarray(convergence_root) * unyt.Mpc
+    return convergence_root * unyt.Mpc
