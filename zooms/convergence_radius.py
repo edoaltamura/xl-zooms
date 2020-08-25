@@ -1,5 +1,6 @@
 from typing import Tuple
 import numpy as np
+from scipy import interpolate
 
 
 def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, r200c: float, rho_crit: float) -> Tuple[float, float]:
@@ -41,15 +42,18 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     particle_masses_sorted = particle_masses[sort_rule][1:]
     number_particles = np.linspace(1, len(particle_masses), len(particle_masses), dtype=np.int)[1:]
 
+    # Compute the RHS of the equation
     sphere_volume = 3 / 4 * np.pi * radial_distances_sorted ** 3
     mean_rho = np.cumsum(particle_masses_sorted) / sphere_volume
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * (mean_rho / rho_crit) ** (-0.5)
 
+    # Find solutions by interpolation
     for alpha in alphas:
         solution_idx = np.where(np.abs(result - alpha) < numerical_tolerance)[0]
-        print(result[solution_idx], radial_distances_sorted[solution_idx])
+        smooth_function = interpolate.interp1d(result[solution_idx], radial_distances_sorted[solution_idx])
+        inner_radii.append(smooth_function(alpha))
 
         # elif mean_rho / rho_crit < 200:
         #     raise RuntimeError("Convergence might be outside the virial radius.")
 
-    return 0,0
+    return tuple(inner_radii)
