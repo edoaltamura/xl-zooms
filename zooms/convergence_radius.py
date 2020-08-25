@@ -37,21 +37,19 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
-    radial_distances_sorted = radial_distances[sort_rule] / r200c
-    particle_masses_sorted = particle_masses[sort_rule]
-    number_particles = np.linspace(1, len(particle_masses) + 1, len(particle_masses) + 1, dtype=np.int)
+    radial_distances_sorted = radial_distances[sort_rule][1:] / r200c
+    particle_masses_sorted = particle_masses[sort_rule][1:]
+    number_particles = np.linspace(1, len(particle_masses) + 1, len(particle_masses) + 1, dtype=np.int)[1:]
+
+    sphere_volume = 3 / 4 * np.pi * radial_distances_sorted ** 3
+    mean_rho = np.cumsum(particle_masses_sorted) / sphere_volume
+    result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * (mean_rho / rho_crit) ** (-0.5)
+
     for alpha in alphas:
-        sphere_volume = 3 / 4 * np.pi * radial_distances_sorted[2:] ** 3
-        mean_rho = np.cumsum(particle_masses_sorted[2:]) / sphere_volume
-        result = np.sqrt(200) / 8 * number_particles[2:] / np.log(number_particles[2:]) * (mean_rho / rho_crit) ** (-0.5)
         solution_idx = np.where(np.abs(result - alpha) < numerical_tolerance)[0]
-        print(result[solution_idx], radial_distances_sorted[solution_idx+2])
+        print(result[solution_idx], radial_distances_sorted[solution_idx])
 
         # elif mean_rho / rho_crit < 200:
         #     raise RuntimeError("Convergence might be outside the virial radius.")
 
-
-
-        inner_radii.append(radial_distances_sorted[solution_idx+2])
-
-    return tuple(inner_radii)
+    return 0,0
