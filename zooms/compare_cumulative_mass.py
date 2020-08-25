@@ -296,8 +296,14 @@ if __name__ == "__main__":
         halo_id = i
         run_name = f"SK{i}"
         snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-        snap_filepath_zoom = [f"/cosma7/data/dp004/rttw52/swift_runs/runs/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5"]
-        velociraptor_properties_zoom = [f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_SK{i}_0001/halo_SK{i}_0001.properties.0"]
+        snap_filepath_zoom = [
+            f"/cosma7/data/dp004/rttw52/swift_runs/runs/EAGLE-XL/EAGLE-XL_ClusterSK{i}_DMO/snapshots/EAGLE-XL_ClusterSK{i}_DMO_0001.hdf5",
+            f"/cosma7/data/dp004/rttw52/swift_runs/runs/EAGLE-XL/EAGLE-XL_ClusterSK{i}_High/snapshots/EAGLE-XL_ClusterSK{i}_High_0001.hdf5"
+        ]
+        velociraptor_properties_zoom = [
+            f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_SK{i}_0001/halo_SK{i}_0001.properties.0",
+            f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_SK{i}_High_0001/halo_SK{i}_High_0001.properties.0",
+        ]
         output_directory = "outfiles"
 
         cumulative_mass_compare_plot(
