@@ -1,9 +1,9 @@
-from typing import Tuple, Union
+from typing import Tuple
 import numpy as np
 import math
 
 
-def convergence_radius(radial_distances: np.ndarray, particle_masses: Union[float, np.ndarray], rho_crit: float) -> Tuple[float, float]:
+def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> Tuple[float, float]:
     """
     Function that computes the inner numerical convergence radius for point particles.
     Calculation based on Power at al. (2003).
@@ -33,11 +33,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: Union[floa
     alphas = [0.6, 1.]
     inner_radii = []
 
-    if (
-            (type(particle_masses) is float) or
-            (type(particle_masses) is np.ndarray and len(particle_masses) == 1)
-    ):
-        particle_masses = np.ones_like(radial_distances) * particle_masses
+    assert len(radial_distances) == len(particle_masses)
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
