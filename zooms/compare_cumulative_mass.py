@@ -221,7 +221,7 @@ def cumulative_mass_compare_plot(
             ax.plot(bin_centre, cumulative_mass, c=color, linestyle="-", label=zoom_label)
 
     ax.text(
-        0.025,
+        0.975,
         0.025,
         (
             f"Halo {run_name:s} DMO\n"
@@ -231,7 +231,7 @@ def cumulative_mass_compare_plot(
             f"$R_{{200c}}={latex_float(R200c.value)}\\ {R200c.units.latex_repr}$"
         ),
         color="black",
-        ha="left",
+        ha="right",
         va="bottom",
         transform=ax.transAxes,
     )
