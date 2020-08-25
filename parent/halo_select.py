@@ -22,7 +22,7 @@ maxMassSelectMsun = 1.e14
 numHaloesPerBin = 1
 numBins_select = 3
 # Isolation criteria (distance and mass limit)
-minDistFac = 10.  # isolation distance criterion (multiples of R200c)
+minDistFac = 10.  # isolation distance criterion (multiples of r200c)
 minMassFrac = 0.1  # isolation mass criterion (fraction of M200c)
 
 #############################################################################
@@ -119,19 +119,19 @@ for i in np.arange(numBins_select):
     haloCounter += numHaloesPerBin
 
 # Print out sample
-print("\nPick halos randomly in mass bins\ni, M200c / 1.e13, R200c, xPotMin, yPotMin, zPotMin")
+print("\nPick halos randomly in mass bins\ni, M200c / 1.e13, r200c, xPotMin, yPotMin, zPotMin")
 for i in np.arange(numHaloes_select):
     print(i, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i])
 
 # Print to txt file
 with open("outfiles/halo_selected_EA.txt", "w") as text_file:
-    print("# Halo counter, M200c/1.e13 [Msun], R200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]", file = text_file)
+    print("# Halo counter, M200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]", file = text_file)
     for i in np.arange(numHaloes_select):
         print(f"{i}, {M200c_select[i] / 1.e13}, {R200c_select[i]}, {xPotMin_select[i]}, {yPotMin_select[i]}, {zPotMin_select[i]}", file = text_file)
 
 # Sanity check - find the closest halo that is more massive
 print('\nSanity check: 2nd last column should always be more than last column')
-print("i, index.size, Distance to nearest halo, minDistFac * R200c")
+print("i, index.size, Distance to nearest halo, minDistFac * r200c")
 for i in np.arange(numHaloes_select):
     dx = wrap(xPotMin - xPotMin_select[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_select[i], boxMpc)

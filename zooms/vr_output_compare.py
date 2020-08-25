@@ -11,7 +11,7 @@ data['zoom'] = {}
 # PARENT DATA
 lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
 data['parent']['M200c'] = lines[1] * 1e13
-data['parent']['R200c'] = lines[2]
+data['parent']['r200c'] = lines[2]
 data['parent']['Xcminpot'] = lines[3]
 data['parent']['Ycminpot'] = lines[4]
 data['parent']['Zcminpot'] = lines[5]
@@ -37,7 +37,7 @@ for vr_path in velociraptor_properties:
         z_zoom.append(vr_file['/Zcminpot'][0])
 
 data['zoom']['M200c'] = M200c_zoom
-data['zoom']['R200c'] = R200c_zoom
+data['zoom']['r200c'] = R200c_zoom
 data['zoom']['Xcminpot'] = x_zoom
 data['zoom']['Ycminpot'] = y_zoom
 data['zoom']['Zcminpot'] = z_zoom

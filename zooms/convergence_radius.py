@@ -2,7 +2,7 @@ from typing import Tuple
 import numpy as np
 
 
-def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> Tuple[float, float]:
+def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, r200c: float, rho_crit: float) -> Tuple[float, float]:
     """
     Function that computes the inner numerical convergence radius for point particles.
     Calculation based on Power at al. (2003).
@@ -15,6 +15,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     N is the number of particles enclosed within the sphere
     \\rho(r) is the mean mass density within the enclosed sphere of radius r
 
+    :param r200c: 
     :param radial_distances: np.ndarray
         The radial distances array of the particles (not necessarily sorted).
     :param particle_masses: float or np.ndarray
@@ -36,7 +37,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
-    radial_distances_sorted = radial_distances[sort_rule]
+    radial_distances_sorted = radial_distances[sort_rule] / r200c
     particle_masses_sorted = particle_masses[sort_rule]
     counter = 2
     for alpha in alphas:
