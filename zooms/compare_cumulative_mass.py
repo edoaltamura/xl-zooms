@@ -153,7 +153,7 @@ def cumulative_mass_compare_plot(
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         hist, bin_edges = np.histogram(r, bins=lbins)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-        cumulative_mass_parent = np.cumsum(hist) * particleMass * unyt.Solar_Mass
+        cumulative_mass_parent = np.cumsum(hist) * particleMass
 
         # Plot density profile for each selected halo in volume
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
@@ -214,7 +214,7 @@ def cumulative_mass_compare_plot(
             lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
             hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-            cumulative_mass_zoom = np.cumsum(hist)
+            cumulative_mass_zoom = np.cumsum(hist) * unyt.Solar_Mass
 
             # Plot density profile for each selected halo in volume
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
