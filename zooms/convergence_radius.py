@@ -29,7 +29,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     """
 
     # Set-up
-    numerical_tolerance = 1e-2
+    numerical_tolerance = 1e-4
     alphas = [0.6, 1.]
     inner_radii = []
 
