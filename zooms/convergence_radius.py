@@ -37,7 +37,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: Union[floa
         particle_masses = np.ones_like(radial_distances) * particle_masses
 
     # Sort particle radial distance from the centre of the halo
-    sort_rule = np.argsort(radial_distances)
+    sort_rule = radial_distances.argsort()
     radial_distances = radial_distances[sort_rule]
     particle_masses = particle_masses[sort_rule]
     counter = 2
