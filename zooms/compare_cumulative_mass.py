@@ -223,12 +223,11 @@ def cumulative_mass_compare_plot(
             # Compute convergence radius
             conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
             ax.axvline(conv_radius[0], color=color, linestyle='--')
-            ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
-                    backgroundcolor='white')
-            print(conv_radius)
+            ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', backgroundcolor='white')
 
         # RESIDUALS #
         if snap_filepath_parent and snap_filepath_zoom:
+            print(cumulative_mass_zoom, cumulative_mass_parent)
             residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
             ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
 
