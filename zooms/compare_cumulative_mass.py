@@ -162,7 +162,6 @@ def cumulative_mass_compare_plot(
         # Compute convergence radius
         particleMasses = np.ones_like(r) * particleMass
         conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
-        print(np.log10(conv_radius))
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
@@ -232,7 +231,6 @@ def cumulative_mass_compare_plot(
 
             # Compute convergence radius
             conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
-            print(np.log10(conv_radius))
             ax.axvline(conv_radius, color=color, linestyle='--')
             t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
                         alpha=0.6)
