@@ -160,8 +160,8 @@ def cumulative_mass_compare_plot(
         ax.plot(bin_centre, cumulative_mass, c="grey", linestyle="-", label=parent_label)
 
         # Compute convergence radius
-        print(r.value, particleMass.value, rho_crit.value)
-        conv_radius = convergence_radius(r.value, particleMass.value, rho_crit.value)
+        print(r.value, particleMass.value[0], rho_crit.value[0])
+        conv_radius = convergence_radius(r.value, particleMass.value[0], rho_crit.value[0])
         print(conv_radius)
 
 
