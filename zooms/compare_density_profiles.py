@@ -218,7 +218,7 @@ def density_profile_compare_plot(
             hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-            densities_zoom = hist / volume_shell / rho_crit
+            densities_zoom = hist / volume_shell / rho_crit * unyt.Solar_Mass
 
             # Plot density profile for each selected halo in volume
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
