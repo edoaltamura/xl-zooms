@@ -231,6 +231,7 @@ def density_profile_compare_plot(
 
             # RESIDUALS #
             if snap_filepath_parent and snap_filepath_zoom:
+                print(densities_zoom, densities_parent)
                 residual = (densities_zoom - densities_parent) / densities_parent
                 ax_residual.axhline(0, color='grey', linestyle='-')
                 ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
