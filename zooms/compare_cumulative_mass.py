@@ -99,7 +99,7 @@ def cumulative_mass_compare_plot(
         author, halo_id = match.groups()
     halo_id = int(halo_id)
 
-    fig, ax = plt.subplots()
+    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 5), sharex=True)
 
     # PARENT #
     if snap_filepath_parent:
@@ -153,11 +153,11 @@ def cumulative_mass_compare_plot(
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         hist, bin_edges = np.histogram(r, bins=lbins)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-        cumulative_mass = np.cumsum(hist) * particleMass
+        cumulative_mass_parent = np.cumsum(hist) * particleMass
 
         # Plot density profile for each selected halo in volume
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
-        ax.plot(bin_centre, cumulative_mass, c="grey", linestyle="-", label=parent_label)
+        ax.plot(bin_centre, cumulative_mass_parent, c="grey", linestyle="-", label=parent_label)
 
     # ZOOMS #
     if snap_filepath_zoom:
@@ -214,11 +214,11 @@ def cumulative_mass_compare_plot(
             lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
             hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-            cumulative_mass = np.cumsum(hist)
+            cumulative_mass_zoom = np.cumsum(hist)
 
             # Plot density profile for each selected halo in volume
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
-            ax.plot(bin_centre, cumulative_mass, c=color, linestyle="-", label=zoom_label)
+            ax.plot(bin_centre, cumulative_mass_zoom, c=color, linestyle="-", label=zoom_label)
 
             # Compute convergence radius
             conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
@@ -226,6 +226,11 @@ def cumulative_mass_compare_plot(
             ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
                     backgroundcolor='white')
             print(conv_radius)
+
+        # RESIDUALS #
+        if snap_filepath_parent and snap_filepath_zoom:
+            residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
+            ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
 
     ax.text(
         0.975,
