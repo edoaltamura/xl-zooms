@@ -103,9 +103,9 @@ def cumulative_mass_compare_plot(
 
     # PARENT #
     if snap_filepath_parent:
-
         # Load VR output gathered from the halo selection process
-        lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
+        lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",",
+                           unpack=False).T
         M200c = lines[1] * 1e13
         R200c = lines[2]
         Xcminpot = lines[3]
@@ -159,7 +159,6 @@ def cumulative_mass_compare_plot(
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
         ax.plot(bin_centre, cumulative_mass, c="grey", linestyle="-", label=parent_label)
 
-
     # ZOOMS #
     if snap_filepath_zoom:
 
@@ -168,7 +167,6 @@ def cumulative_mass_compare_plot(
         cmaplist = [cmap_discrete(i) for i in range(cmap_discrete.N)]
 
         for snap_path, vrprop_path, color in zip(snap_filepath_zoom, velociraptor_properties_zoom, cmaplist):
-
             # Load velociraptor data
             with h5py.File(vrprop_path, 'r') as vr_file:
                 M200c = vr_file['/Mass_200crit'][0] * 1e10
@@ -225,7 +223,8 @@ def cumulative_mass_compare_plot(
             # Compute convergence radius
             conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
             ax.axvline(conv_radius[0], color=color, linestyle='--')
-            ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', backgroundcolor='white')
+            ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
+                    backgroundcolor='white')
             print(conv_radius)
 
     ax.text(
@@ -241,6 +240,7 @@ def cumulative_mass_compare_plot(
         color="black",
         ha="right",
         va="bottom",
+        backgroundcolor='white',
         transform=ax.transAxes,
     )
 
@@ -250,7 +250,7 @@ def cumulative_mass_compare_plot(
     ax.set_yscale('log')
     ax.set_ylabel(f"$M_{{\\rm DM}} (< R)\\ [{M200c.units.latex_repr}]$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
-    plt.legend()
+    plt.legend(loc="upper right")
     fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_cumulative_mass_compare.png")
     plt.close(fig)
@@ -285,7 +285,6 @@ if __name__ == "__main__":
     # overplotted in the same figure.
 
     for i in range(3):
-
         halo_id = i
         run_name = f"SK{i}"
         snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
