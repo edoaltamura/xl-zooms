@@ -16,6 +16,8 @@ try:
 except:
     pass
 
+from convergence_radius import convergence_radius
+
 # Constants
 bins = 40
 radius_bounds = [1e-2, 3]  # In units of R200crit
@@ -157,6 +159,10 @@ def cumulative_mass_compare_plot(
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
         ax.plot(bin_centre, cumulative_mass, c="grey", linestyle="-", label=parent_label)
 
+        # Compute convergence radius
+        conv_radius = convergence_radius(r, particleMass, rho_crit)
+        print(conv_radius)
+
 
     # ZOOMS #
     if snap_filepath_zoom:
@@ -219,6 +225,10 @@ def cumulative_mass_compare_plot(
             # Plot density profile for each selected halo in volume
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
             ax.plot(bin_centre, cumulative_mass, c=color, linestyle="-", label=zoom_label)
+
+            # Compute convergence radius
+            conv_radius = convergence_radius(r, particleMasses, rho_crit)
+            print(conv_radius)
 
     ax.text(
         0.975,
