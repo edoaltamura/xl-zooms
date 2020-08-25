@@ -163,7 +163,7 @@ def cumulative_mass_compare_plot(
     if snap_filepath_zoom:
 
         # Set-up colors
-        cmap_discrete = plt.cm.get_cmap(cmap_name, len(velociraptor_properties_zoom)+10)
+        cmap_discrete = plt.cm.get_cmap(cmap_name, len(velociraptor_properties_zoom)+4)
         cmaplist = [cmap_discrete(i) for i in range(cmap_discrete.N)]
 
         for snap_path, vrprop_path, color in zip(snap_filepath_zoom, velociraptor_properties_zoom, cmaplist):
@@ -225,12 +225,12 @@ def cumulative_mass_compare_plot(
             ax.axvline(conv_radius[0], color=color, linestyle='--')
             ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', backgroundcolor='white')
 
-        # RESIDUALS #
-        if snap_filepath_parent and snap_filepath_zoom:
-            residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
-            ax_residual.axhline(0, color='grey', linestyle='-')
-            ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
-            ax_residual.axvline(conv_radius[0], color=color, linestyle='--')
+            # RESIDUALS #
+            if snap_filepath_parent and snap_filepath_zoom:
+                residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
+                ax_residual.axhline(0, color='grey', linestyle='-')
+                ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
+                ax_residual.axvline(conv_radius[0], color=color, linestyle='--')
 
 
     ax.text(
