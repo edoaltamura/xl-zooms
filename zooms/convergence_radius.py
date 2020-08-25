@@ -51,7 +51,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     for alpha in alphas:
         solution_idx = np.where(np.abs(result - alpha) < numerical_tolerance)[0]
         smooth_function = interpolate.interp1d(result[solution_idx], radial_distances_sorted[solution_idx])
-        inner_radii.append(smooth_function(alpha))
+        inner_radii.append(smooth_function(alpha)[0])
 
         # elif mean_rho / rho_crit < 200:
         #     raise RuntimeError("Convergence might be outside the virial radius.")
