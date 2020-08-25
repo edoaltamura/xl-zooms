@@ -1,9 +1,10 @@
 from typing import Tuple
 import numpy as np
 from scipy import interpolate
+import unyt
 
 
-def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> np.ndarray:
+def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> unyt.array.unyt_array:
     """
     Function that computes the inner numerical convergence radius for point particles.
     Calculation based on Power at al. (2003).
@@ -22,7 +23,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
         The radial distances array of the particles (not necessarily sorted).
     :param rho_crit: float
         The critical density of the Universe, as reported in the simulation.
-    :return: np.ndarray
+    :return: unyt.array.unyt_array
         Returns the inner convergence radius for the values of:
             - \\alpha = 0.6
             - \\alpha = 1
@@ -45,4 +46,4 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Find solutions by interpolation
     smooth_function = interpolate.interp1d(radial_distances_sorted, result)
-    return smooth_function(alphas)
+    return smooth_function(alphas) * unyt.Mpc
