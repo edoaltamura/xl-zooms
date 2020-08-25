@@ -32,6 +32,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     # Set-up
     alphas = [0.6, 1.]
     assert len(radial_distances) == len(particle_masses)
+    convergence_root = []
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
@@ -46,11 +47,9 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     mean_rho = np.cumsum(particle_masses_sorted) / sphere_volume
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * (mean_rho / rho_crit) ** (-0.5)
 
-    # Find solutions by interpolation
+    # Find solutions by minimising the root function
     for alpha in alphas:
         root_idx = (result - alpha).argmin()
-        convergence_root = radial_distances_sorted[root_idx]
-        # smooth_function = interpolate.interp1d(radial_distances_sorted, result, 'cubic')
-        # convergence_root = optimize.newton(smooth_function, 1e-3)
-        print(convergence_root * unyt.Mpc)
-    return convergence_root * unyt.Mpc
+        convergence_root.append(radial_distances_sorted[root_idx])
+
+    return np.asarray(convergence_root) * unyt.Mpc
