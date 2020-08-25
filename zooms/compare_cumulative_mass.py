@@ -258,7 +258,7 @@ def cumulative_mass_compare_plot(
     ax_residual.set_ylabel(f"$\\Delta M\\ /\\ M_{{\\rm parent}}\\ (< R)$")
     ax_residual.set_xlabel(r"$R\ /\ R_{200c}$")
     ax.legend(loc="upper right")
-    fig.tight_layout()
+    # fig.tight_layout()
     plt.subplots_adjust(wspace=0, hspace=0)
     fig.savefig(f"{output_directory}/{run_name}_cumulative_mass_compare.png")
     plt.close(fig)
