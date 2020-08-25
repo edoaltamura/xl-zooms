@@ -228,9 +228,9 @@ def cumulative_mass_compare_plot(
         # RESIDUALS #
         if snap_filepath_parent and snap_filepath_zoom:
             residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
+            ax_residual.axhline(0, color='grey', linestyle='-')
             ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
             ax_residual.axvline(conv_radius[0], color=color, linestyle='--')
-            ax_residual.axhline(0, color='grey', linestyle='-')
 
 
     ax.text(

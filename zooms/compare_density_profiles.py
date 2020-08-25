@@ -16,6 +16,8 @@ try:
 except:
     pass
 
+from convergence_radius import convergence_radius
+
 # Constants
 bins = 40
 radius_bounds = [1e-2, 3]  # In units of R200crit
@@ -97,7 +99,7 @@ def density_profile_compare_plot(
         author, halo_id = match.groups()
     halo_id = int(halo_id)
 
-    fig, ax = plt.subplots()
+    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 4.1), sharex=True, gridspec_kw={'height_ratios': [3, 1]})
 
     # PARENT #
     if snap_filepath_parent:
@@ -152,11 +154,11 @@ def density_profile_compare_plot(
         hist, bin_edges = np.histogram(r, bins=lbins)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-        densities = hist * particleMass / volume_shell / rho_crit
+        densities_parent = hist * particleMass / volume_shell / rho_crit
 
         # Plot density profile for each selected halo in volume
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
-        ax.plot(bin_centre, densities, c="grey", linestyle="-", label=parent_label)
+        ax.plot(bin_centre, densities_parent, c="grey", linestyle="-", label=parent_label)
 
 
     # ZOOMS #
@@ -216,11 +218,23 @@ def density_profile_compare_plot(
             hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-            densities = hist / volume_shell / rho_crit
+            densities_zoom = hist / volume_shell / rho_crit
 
             # Plot density profile for each selected halo in volume
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
-            ax.plot(bin_centre, densities, c=color, linestyle="-", label=zoom_label)
+            ax.plot(bin_centre, densities_zoom, c=color, linestyle="-", label=zoom_label)
+
+            # Compute convergence radius
+            conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
+            ax.axvline(conv_radius[0], color=color, linestyle='--')
+            ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', backgroundcolor='white')
+
+            # RESIDUALS #
+            if snap_filepath_parent and snap_filepath_zoom:
+                residual = (densities_zoom - densities_parent) / densities_parent
+                ax_residual.axhline(0, color='grey', linestyle='-')
+                ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
+                ax_residual.axvline(conv_radius[0], color=color, linestyle='--')
 
     ax.text(
         0.025,
@@ -238,12 +252,15 @@ def density_profile_compare_plot(
         transform=ax.transAxes,
     )
 
+    ax.axvline(1, color="grey", linestyle='--')
+    ax_residual.axvline(1, color="grey", linestyle='--')
     ax.set_xlim(radius_bounds[0], radius_bounds[1])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")
-    ax.set_xlabel(r"$R\ /\ R_{200c}$")
-    plt.legend()
+    ax_residual.set_ylabel(f"$\\Delta \\rho\\ /\\ \\rho_{{\\rm parent}}$")
+    ax_residual.set_xlabel(r"$R\ /\ R_{200c}$")
+    ax.legend(loc="upper right")
     fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.png")
     plt.close(fig)
