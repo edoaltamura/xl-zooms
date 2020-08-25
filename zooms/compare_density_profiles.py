@@ -20,7 +20,7 @@ from convergence_radius import convergence_radius
 
 # Constants
 bins = 40
-radius_bounds = [1e-2, 3]  # In units of R200crit
+radius_bounds = [1e-4, 3]  # In units of R200crit
 cmap_name = 'BuPu_r'
 
 
