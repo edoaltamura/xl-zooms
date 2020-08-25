@@ -48,5 +48,5 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * (mean_rho / rho_crit) ** (-0.5)
 
     # Find solutions by interpolation
-    smooth_function = interpolate.interp1d(result, radial_distances_sorted)
+    smooth_function = interpolate.interp1d(radial_distances_sorted, result)
     return smooth_function(alphas)
