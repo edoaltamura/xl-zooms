@@ -39,7 +39,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     sort_rule = radial_distances.argsort()
     radial_distances_sorted = radial_distances[sort_rule] / r200c
     particle_masses_sorted = particle_masses[sort_rule]
-    number_particles = np.linspace(0, len(particle_masses), len(particle_masses) + 1, dtype=np.int) + 1
+    number_particles = np.linspace(1, len(particle_masses) + 1, len(particle_masses) + 1, dtype=np.int)
     for alpha in alphas:
         sphere_volume = 3 / 4 * np.pi * radial_distances_sorted[2:] ** 3
         mean_rho = np.cumsum(particle_masses_sorted[2:]) / sphere_volume
