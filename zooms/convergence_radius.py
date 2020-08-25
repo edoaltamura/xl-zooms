@@ -43,7 +43,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
         while True:
 
             sphere_volume = 3/4 * np.pi * radial_distances_sorted[counter-1] ** 3
-            mean_rho = np.cumsum(particle_masses_sorted[:counter]) / sphere_volume
+            mean_rho = np.sum(particle_masses_sorted[:counter]) / sphere_volume
             result = np.sqrt(200)/8 * counter/np.log(counter) * (mean_rho/rho_crit) ** (-0.5)
             print(sphere_volume)
             print(mean_rho)
