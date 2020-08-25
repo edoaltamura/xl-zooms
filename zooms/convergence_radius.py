@@ -1,7 +1,7 @@
 import numpy as np
 import unyt
 
-alpha = 1
+alpha = 0.6
 
 def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> unyt.array.unyt_array:
     """
