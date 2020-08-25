@@ -159,14 +159,6 @@ def cumulative_mass_compare_plot(
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
         ax.plot(bin_centre, cumulative_mass, c="grey", linestyle="-", label=parent_label)
 
-        # Compute convergence radius
-        particleMasses = np.ones_like(r) * particleMass
-        conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
-        ax.axvline(conv_radius[1], color="grey", linestyle='--')
-        ax.text(conv_radius[1], ax.get_ylim()[0], 'Convergence radius', ha='center', va='bottom', rotation='vertical', backgroundcolor='white')
-
-        print(conv_radius)
-
 
     # ZOOMS #
     if snap_filepath_zoom:
@@ -233,7 +225,7 @@ def cumulative_mass_compare_plot(
             # Compute convergence radius
             conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
             ax.axvline(conv_radius[1], color=color, linestyle='--')
-            ax.text(conv_radius[1], ax.get_ylim()[1], 'Convergence radius', ha='center', va='bottom', rotation='vertical', backgroundcolor='white')
+            ax.text(conv_radius[1], ax.get_ylim()[0], 'Convergence radius', ha='center', va='bottom', rotation='vertical', backgroundcolor='white')
             print(conv_radius)
 
     ax.text(
