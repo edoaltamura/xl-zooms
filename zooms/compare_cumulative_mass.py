@@ -236,10 +236,11 @@ def cumulative_mass_compare_plot(
         transform=ax.transAxes,
     )
 
+    ax.axvline(1, color="grey", linestyle='--')
     ax.set_xlim(radius_bounds[0], radius_bounds[1])
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_ylabel(r"$M_\mathrm{DM} (< R)$")
+    ax.set_ylabel(f"$M_{{\\rm DM}} (< R)\\ [{M200c.units.latex_repr}]$")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
     plt.legend()
     fig.tight_layout()
