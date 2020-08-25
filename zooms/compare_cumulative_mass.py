@@ -99,7 +99,8 @@ def cumulative_mass_compare_plot(
         author, halo_id = match.groups()
     halo_id = int(halo_id)
 
-    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 5), sharex=True)
+    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 5), sharex=True, gridspec_kw={'height_ratios': [3, 1]})
+    plt.subplots_adjust(hspace=0)
 
     # PARENT #
     if snap_filepath_parent:
@@ -227,7 +228,6 @@ def cumulative_mass_compare_plot(
 
         # RESIDUALS #
         if snap_filepath_parent and snap_filepath_zoom:
-            print(cumulative_mass_zoom, cumulative_mass_parent)
             residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
             ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
 
@@ -253,7 +253,8 @@ def cumulative_mass_compare_plot(
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylabel(f"$M_{{\\rm DM}} (< R)\\ [{M200c.units.latex_repr}]$")
-    ax.set_xlabel(r"$R\ /\ R_{200c}$")
+    ax_residual.set_ylabel(f"$\\Delta M/M_{{\\rm parent}} (< R)$")
+    ax_residual.set_xlabel(r"$R\ /\ R_{200c}$")
     plt.legend(loc="upper right")
     fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_cumulative_mass_compare.png")
