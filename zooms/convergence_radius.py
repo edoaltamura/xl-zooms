@@ -33,7 +33,8 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: Union[floa
     alphas = [0.6, 1.]
     inner_radii = []
 
-    if type(particle_masses) is float:
+    if not type(particle_masses) is np.ndarray:
+        particle_masses = float(particle_masses)
         particle_masses = np.ones_like(radial_distances) * particle_masses
 
     # Sort particle radial distance from the centre of the halo
