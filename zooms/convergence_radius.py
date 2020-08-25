@@ -28,7 +28,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     """
 
     # Set-up
-    numerical_tolerance = 1e-5
+    numerical_tolerance = 1e-3
     alphas = [0.6, 1.]
     inner_radii = []
 
@@ -45,10 +45,6 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
             sphere_volume = 3/4 * np.pi * radial_distances_sorted[counter-1] ** 3
             mean_rho = np.sum(particle_masses_sorted[:counter]) / sphere_volume
             result = np.sqrt(200)/8 * counter/np.log(counter) * (mean_rho/rho_crit) ** (-0.5)
-            print(sphere_volume)
-            print(mean_rho)
-            print(result)
-            print(alpha)
 
             if np.abs(result-alpha) / np.max([result, alpha]) < numerical_tolerance:
                 break
