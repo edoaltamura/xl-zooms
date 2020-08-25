@@ -21,7 +21,7 @@ from convergence_radius import convergence_radius
 # Constants
 bins = 40
 radius_bounds = [1e-2, 3]  # In units of R200crit
-cmap_name = 'BuPu'
+cmap_name = 'BuPu_r'
 
 
 def latex_float(f):
@@ -165,7 +165,7 @@ def density_profile_compare_plot(
     if snap_filepath_zoom:
 
         # Set-up colors
-        cmap_discrete = plt.cm.get_cmap(cmap_name, len(velociraptor_properties_zoom))
+        cmap_discrete = plt.cm.get_cmap(cmap_name, len(velociraptor_properties_zoom)+3)
         cmaplist = [cmap_discrete(i) for i in range(cmap_discrete.N)]
 
         for snap_path, vrprop_path, color in zip(snap_filepath_zoom, velociraptor_properties_zoom, cmaplist):
