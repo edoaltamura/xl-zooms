@@ -235,7 +235,7 @@ def density_profile_compare_plot(
                 residual = (densities_zoom - densities_parent) / densities_parent
                 ax_residual.axhline(0, color='grey', linestyle='-')
                 ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
-                ax_residual.axvline(conv_radius[0], color=color, linestyle='--')
+                ax_residual.axvline(conv_radius, color=color, linestyle='--')
 
     ax.text(
         0.025,
