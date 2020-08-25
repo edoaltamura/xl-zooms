@@ -1,6 +1,5 @@
 from typing import Tuple
 import numpy as np
-import math
 
 
 def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> Tuple[float, float]:
@@ -47,7 +46,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
             mean_rho = np.cumsum(particle_masses[:counter]) / sphere_volume
             result = np.sqrt(200)/8 * counter/np.log(counter) * (mean_rho/rho_crit) ** (-0.5)
 
-            if math.isclose(result, alpha, rel_tol=numerical_tolerance):
+            if np.abs(result-alpha) / np.max([result, alpha]) < numerical_tolerance:
                 break
             elif mean_rho/rho_crit < 200:
                 raise RuntimeError("Convergence might be outside the virial radius.")
