@@ -230,6 +230,7 @@ def cumulative_mass_compare_plot(
             residual = (cumulative_mass_zoom-cumulative_mass_parent) / cumulative_mass_parent
             ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
             ax_residual.axvline(conv_radius[0], color=color, linestyle='--')
+            ax_residual.axvhine(0, color='grey', linestyle='-')
 
 
     ax.text(
@@ -258,8 +259,7 @@ def cumulative_mass_compare_plot(
     ax_residual.set_ylabel(f"$\\Delta M\\ /\\ M_{{\\rm parent}}\\ (< R)$")
     ax_residual.set_xlabel(r"$R\ /\ R_{200c}$")
     ax.legend(loc="upper right")
-    # fig.tight_layout()
-    plt.subplots_adjust(wspace=0, hspace=0)
+    fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_cumulative_mass_compare.png")
     plt.close(fig)
 
