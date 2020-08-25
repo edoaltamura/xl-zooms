@@ -50,6 +50,6 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     smooth_function = interpolate.interp1d(radial_distances_sorted, result)
     for alpha in alphas:
         offset_function = lambda x: smooth_function(x) - alpha
-        convergence_root = optimize.newton(offset_function, radial_distances_sorted[2])
+        convergence_root = optimize.newton(offset_function, 1e-3)
         print(convergence_root * unyt.Mpc)
     return convergence_root * unyt.Mpc
