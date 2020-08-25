@@ -3,7 +3,7 @@ import numpy as np
 from scipy import interpolate
 
 
-def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, r200c: float, rho_crit: float) -> Tuple[float, float]:
+def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> np.ndarray:
     """
     Function that computes the inner numerical convergence radius for point particles.
     Calculation based on Power at al. (2003).
@@ -16,31 +16,27 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     N is the number of particles enclosed within the sphere
     \\rho(r) is the mean mass density within the enclosed sphere of radius r
 
-    :param r200c: 
     :param radial_distances: np.ndarray
         The radial distances array of the particles (not necessarily sorted).
     :param particle_masses: float or np.ndarray
         The radial distances array of the particles (not necessarily sorted).
     :param rho_crit: float
         The critical density of the Universe, as reported in the simulation.
-    :return: tuple(float, float)
+    :return: np.ndarray
         Returns the inner convergence radius for the values of:
             - \\alpha = 0.6
             - \\alpha = 1
     """
 
     # Set-up
-    numerical_tolerance = 1e-3
     alphas = [0.6, 1.]
-    inner_radii = []
-
     assert len(radial_distances) == len(particle_masses)
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
-    radial_distances_sorted = radial_distances[sort_rule][1:]# / r200c
-    particle_masses_sorted = particle_masses[sort_rule][1:]
-    number_particles = np.linspace(1, len(particle_masses), len(particle_masses), dtype=np.int)[1:]
+    radial_distances_sorted = radial_distances[sort_rule][2:]
+    particle_masses_sorted = particle_masses[sort_rule][2:]
+    number_particles = np.linspace(1, len(particle_masses), len(particle_masses), dtype=np.int)[2:]
 
     # Compute the RHS of the equation
     sphere_volume = 3 / 4 * np.pi * radial_distances_sorted ** 3
