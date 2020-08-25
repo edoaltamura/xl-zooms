@@ -1,6 +1,6 @@
 from typing import Tuple
 import numpy as np
-from scipy import interpolate
+from scipy import interpolate, optimize
 import unyt
 
 
@@ -48,5 +48,8 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Find solutions by interpolation
     smooth_function = interpolate.interp1d(radial_distances_sorted, result)
-    print(smooth_function(alphas)* unyt.Mpc)
-    return smooth_function(alphas) * unyt.Mpc
+    for alpha in alphas:
+        offset_function = lambda x: smooth_function(x) - alpha
+        convergence_root = optimize.newton(offset_function, radial_distances_sorted[2])
+        print(convergence_root * unyt.Mpc)
+    return convergence_root * unyt.Mpc
