@@ -36,14 +36,14 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
-    radial_distances = radial_distances[sort_rule]
-    particle_masses = particle_masses[sort_rule]
+    radial_distances_sorted = radial_distances[sort_rule]
+    particle_masses_sorted = particle_masses[sort_rule]
     counter = 2
     for alpha in alphas:
         while True:
 
-            sphere_volume = 3/4 * np.pi * radial_distances[counter-1] ** 3
-            mean_rho = np.cumsum(particle_masses[:counter]) / sphere_volume
+            sphere_volume = 3/4 * np.pi * radial_distances_sorted[counter-1] ** 3
+            mean_rho = np.cumsum(particle_masses_sorted[:counter]) / sphere_volume
             result = np.sqrt(200)/8 * counter/np.log(counter) * (mean_rho/rho_crit) ** (-0.5)
 
             if np.abs(result-alpha) / np.max([result, alpha]) < numerical_tolerance:
@@ -54,6 +54,6 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
                 counter += 1
                 continue
 
-        inner_radii.append(radial_distances[counter])
+        inner_radii.append(radial_distances_sorted[counter])
 
     return tuple(inner_radii)
