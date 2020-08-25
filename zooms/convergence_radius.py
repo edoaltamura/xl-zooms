@@ -46,7 +46,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
             mean_rho = np.sum(particle_masses_sorted[:counter]) / sphere_volume
             result = np.sqrt(200)/8 * counter/np.log(counter) * (mean_rho/rho_crit) ** (-0.5)
 
-            if np.abs(result-alpha) / np.max([result, alpha]) < numerical_tolerance:
+            if np.abs(result-alpha) < numerical_tolerance:
                 break
             elif mean_rho/rho_crit < 200:
                 raise RuntimeError("Convergence might be outside the virial radius.")
