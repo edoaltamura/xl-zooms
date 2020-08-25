@@ -31,7 +31,7 @@ def latex_float(f):
         return float_str
 
 
-def density_profile_compare_plot(
+def cumulative_mass_compare_plot(
         run_name: str,
         snap_filepath_parent: str = None,
         snap_filepath_zoom: List[str] = None,
@@ -284,7 +284,7 @@ if __name__ == "__main__":
         velociraptor_properties_zoom = [f"/cosma6/data/dp004/dc-alta2/xl-zooms/halo_SK{i}_0001/halo_SK{i}_0001.properties.0"]
         output_directory = "outfiles"
 
-        density_profile_compare_plot(
+        cumulative_mass_compare_plot(
             run_name,
             snap_filepath_parent=snap_filepath_parent,
             snap_filepath_zoom=snap_filepath_zoom,
