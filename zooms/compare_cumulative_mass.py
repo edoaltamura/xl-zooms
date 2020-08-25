@@ -21,7 +21,7 @@ from convergence_radius import convergence_radius
 # Constants
 bins = 40
 radius_bounds = [1e-2, 3]  # In units of R200crit
-cmap_name = 'BuPu'
+cmap_name = 'BuPu_r'
 
 
 def latex_float(f):
