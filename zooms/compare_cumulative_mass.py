@@ -224,8 +224,8 @@ def cumulative_mass_compare_plot(
 
             # Compute convergence radius
             conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
-            ax.axvline(conv_radius[1], color=color, linestyle='--')
-            ax.text(conv_radius[1], ax.get_ylim()[0], 'Convergence radius', ha='center', va='bottom', rotation='vertical', backgroundcolor='white')
+            ax.axvline(conv_radius[0], color=color, linestyle='--')
+            ax.text(conv_radius[0], ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', backgroundcolor='white')
             print(conv_radius)
 
     ax.text(
