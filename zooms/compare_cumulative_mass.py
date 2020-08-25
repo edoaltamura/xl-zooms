@@ -292,7 +292,7 @@ if __name__ == "__main__":
     # at different resolutions in the same arrays, as they are
     # overplotted in the same figure.
 
-    for i in range(3):
+    for i in range(1):
         halo_id = i
         run_name = f"SK{i}"
         snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
