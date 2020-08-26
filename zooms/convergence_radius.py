@@ -38,7 +38,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Compute the RHS of the equation
     sphere_volume = 4 / 3 * np.pi * radial_distances_sorted ** 3
-    mean_rho = np.cumsum(particle_masses_sorted) / sphere_volume
+    mean_rho = number_particles * particle_masses_sorted[0] / sphere_volume
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * np.sqrt(rho_crit / mean_rho)
 
     # Find solutions by minimising the root function
