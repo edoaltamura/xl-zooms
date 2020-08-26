@@ -59,6 +59,6 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     convRatio = convRatio[2:]
     index = np.where(convRatio >= 1)[0][0]
     rConvParent = radSort[index]
-    print(convergence_root, rConvParent)
+    print(convergence_root/R200c, rConvParent/R200c)
 
     return convergence_root * unyt.Mpc
