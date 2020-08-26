@@ -88,7 +88,7 @@ for i in range(len(snap_relative_filepaths)):
     ax.text(
         0.025,
         0.975,
-        f"Halo {i:d} DMO\n",
+        f"Halo {i:d} High\n",
         color="black",
         ha="left",
         va="top",
