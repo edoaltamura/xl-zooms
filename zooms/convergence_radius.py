@@ -34,7 +34,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     sort_rule = radial_distances.argsort()
     radial_distances_sorted = radial_distances[sort_rule]
     particle_masses_sorted = particle_masses[sort_rule]
-    number_particles = np.arange(len(particle_masses))
+    number_particles = np.arange(len(particle_masses)) + 1
 
     # Compute the RHS of the equation
     sphere_volume = 4 / 3 * np.pi * radial_distances_sorted ** 3
