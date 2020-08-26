@@ -157,6 +157,7 @@ def density_profile_compare_plot(
         densities_parent = hist * particleMass / volume_shell / rho_crit
 
         # Plot density profile for each selected halo in volume
+        densities_parent[densities_parent == 0] = np.nan
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
         ax.plot(bin_centre, densities_parent, c="grey", linestyle="-", label=parent_label)
 
@@ -228,6 +229,7 @@ def density_profile_compare_plot(
             densities_zoom = hist / volume_shell / rho_crit * unyt.Solar_Mass
 
             # Plot density profile for each selected halo in volume
+            densities_zoom[densities_zoom == 0] = np.nan
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
             ax.plot(bin_centre, densities_zoom, c=color, linestyle="-", label=zoom_label)
 

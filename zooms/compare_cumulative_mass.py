@@ -156,6 +156,7 @@ def cumulative_mass_compare_plot(
         cumulative_mass_parent = np.cumsum(hist) * particleMass
 
         # Plot density profile for each selected halo in volume
+        cumulative_mass_parent[cumulative_mass_parent == 0] = np.nan
         parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
         ax.plot(bin_centre, cumulative_mass_parent, c="grey", linestyle="-", label=parent_label)
 
@@ -226,6 +227,7 @@ def cumulative_mass_compare_plot(
             cumulative_mass_zoom = np.cumsum(hist) * unyt.Solar_Mass
 
             # Plot density profile for each selected halo in volume
+            cumulative_mass_zoom[cumulative_mass_zoom == 0] = np.nan
             zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
             ax.plot(bin_centre, cumulative_mass_zoom, c=color, linestyle="-", label=zoom_label)
 
