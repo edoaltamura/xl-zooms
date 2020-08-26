@@ -56,9 +56,9 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     convRatio = (np.sqrt(200.) / 8.) * (intNumber / np.log(intNumber)) * np.sqrt(rho_crit / intRho)
     # Delete first two entries (entry 0 has zero mass, entry 1 has zero log(N))
     radSort = radSort[2:]
-    convergence_root = convRatio[2:]
-    index = np.where(convergence_root > 1)[0]
-    print(index[0])
+    convRatio = convRatio[2:]
+    index = np.where(convRatio > 1)[0]
     convergence_root = radSort[index[0]]
+    print(convergence_root)
 
     return convergence_root * unyt.Mpc
