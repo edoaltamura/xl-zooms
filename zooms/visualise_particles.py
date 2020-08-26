@@ -22,8 +22,7 @@ author = "SK"
 out_to_radius = 5
 
 metadata_filepath = f"outfiles/halo_selected_{author}.txt"
-simdata_dirpath = "/cosma6/data/dp004/rttw52/EAGLE-XL/"
-
+simdata_dirpath = "/cosma7/data/dp004/rttw52/swift_runs/runs/EAGLE-XL/"
 snap_relative_filepaths = ['EAGLE-XL_ClusterSK0_High/snapshots/EAGLE-XL_ClusterSK0_High_0001.hdf5']
 velociraptor_properties = ["/cosma6/data/dp004/dc-alta2/xl-zooms/halo_SK0_High_0001/halo_SK0_High_0001.properties.0"]
 output_directory = "outfiles/"
