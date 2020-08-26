@@ -32,11 +32,9 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
-    radial_distances_sorted = radial_distances[sort_rule][1:]
-    particle_masses_sorted = particle_masses[sort_rule][1:]
-
-    # Begin counting particles from 2 (2-body relaxation)
-    number_particles = np.linspace(2, len(particle_masses), len(particle_masses) - 1, dtype=np.int)
+    radial_distances_sorted = radial_distances[sort_rule][5:]
+    particle_masses_sorted = particle_masses[sort_rule][5:]
+    number_particles = np.arange(len(particle_masses))[5:]
 
     # Compute the RHS of the equation
     sphere_volume = 4 / 3 * np.pi * radial_distances_sorted ** 3
@@ -59,6 +57,6 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     convRatio = convRatio[2:]
     index = np.where(convRatio >= 1)[0][0]
     rConvParent = radSort[index]
-    print(convergence_root/R200c, rConvParent/R200c)
+    print(convergence_root, rConvParent, index)
 
     return convergence_root * unyt.Mpc
