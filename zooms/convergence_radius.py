@@ -41,7 +41,7 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     # Compute the RHS of the equation
     sphere_volume = 4 / 3 * np.pi * radial_distances_sorted ** 3
     mean_rho = np.cumsum(particle_masses_sorted) / sphere_volume
-    result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * (mean_rho / rho_crit) ** (-0.5)
+    result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * np.sqrt(rho_crit / mean_rho)
 
     # Find solutions by minimising the root function
     root_idx = (result - alpha).argmin()
@@ -57,8 +57,8 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     # Delete first two entries (entry 0 has zero mass, entry 1 has zero log(N))
     radSort = radSort[2:]
     convRatio = convRatio[2:]
-    index = np.where(convRatio > 1)[0]
-    rConvParent = radSort[index[0]]
+    index = np.where(convRatio >= 1)[0][0]
+    rConvParent = radSort[index]
     print(convergence_root, rConvParent)
 
     return convergence_root * unyt.Mpc
