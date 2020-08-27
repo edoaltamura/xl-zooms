@@ -151,7 +151,9 @@ def density_profile_compare_plot(
 
         # Construct bins and compute density profile
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
-        hist, bin_edges = np.histogram(r / R200c, bins=lbins)
+        r_scaled = r / R200c
+        print(r_scaled)
+        hist, bin_edges = np.histogram(r_scaled, bins=lbins)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         densities_parent = hist * particleMass / volume_shell / rho_crit
