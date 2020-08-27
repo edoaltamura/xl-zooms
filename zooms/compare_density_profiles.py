@@ -19,7 +19,7 @@ except:
 from convergence_radius import convergence_radius
 
 # Constants
-bins = 40
+bins = 60
 radius_bounds = [5e-3, 3]  # In units of R200crit
 residual_bounds = [-0.5, 0.5] # y-limits in the residual plot
 cmap_name = 'BuPu_r'
