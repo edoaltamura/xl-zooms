@@ -219,7 +219,7 @@ def density_profile_compare_plot(
                 data.metadata.cosmology['Critical density [internal units]'],
                 unitMass / unitLength ** 3
             )[0].to('Msun/Mpc**3')
-            particleMasses = data.dark_matter.masses#.to('Msun')
+            particleMasses = data.dark_matter.masses.to('Msun')
             zoom_mass_resolution = particleMasses
 
             # Construct bins and compute density profile
@@ -243,6 +243,7 @@ def density_profile_compare_plot(
 
             # RESIDUALS #
             if snap_filepath_parent and snap_filepath_zoom:
+                print(densities_zoom,densities_parent)
                 residual = (densities_zoom - densities_parent) / densities_parent
                 ax_residual.axhline(0, color='grey', linestyle='-')
                 ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
