@@ -6,7 +6,7 @@ alpha = unyt.unyt_quantity(1., unyt.dimensionless)
 def convergence_radius(
         radial_distances: unyt.array.unyt_array,
         particle_masses: unyt.array.unyt_array,
-        rho_crit: float
+        rho_crit: unyt.array.unyt_quantity
 ) -> unyt.array.unyt_array:
     """
     Function that computes the inner numerical convergence radius for point particles.
@@ -33,6 +33,9 @@ def convergence_radius(
     """
 
     assert len(radial_distances) == len(particle_masses)
+    assert radial_distances.units == unyt.Mpc
+    assert particle_masses.units == unyt.Solar_Mass
+    assert rho_crit.units == unyt.Solar_Mass / unyt.Mpc ** 3
 
     # Sort particle radial distance from the centre of the halo
     sort_rule = radial_distances.argsort()
