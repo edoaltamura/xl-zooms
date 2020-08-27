@@ -20,7 +20,7 @@ from convergence_radius import convergence_radius
 
 # Constants
 bins = 40
-radius_bounds = [1e-4, 3]  # In units of R200crit
+radius_bounds = [5e-3, 3]  # In units of R200crit
 cmap_name = 'BuPu_r'
 
 
@@ -148,11 +148,12 @@ def density_profile_compare_plot(
         numPart = data.metadata.n_dark_matter
         particleMass = rhoMean * vol / numPart
         parent_mass_resolution = particleMass
+        particleMasses = np.ones_like(r.value) * particleMass
 
         # Construct bins and compute density profile
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         r_scaled = r / R200c
-        hist, bin_edges = np.histogram(r_scaled, bins=lbins)
+        hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         densities_parent = hist * particleMass / volume_shell / rho_crit
@@ -163,9 +164,7 @@ def density_profile_compare_plot(
         ax.plot(bin_centre, densities_parent, c="grey", linestyle="-", label=parent_label)
 
         # Compute convergence radius
-        particleMasses = np.ones_like(r.value) * particleMass
         conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
-        print(conv_radius)
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
@@ -229,7 +228,7 @@ def density_profile_compare_plot(
             hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-            densities_zoom = hist / volume_shell / rho_crit * unyt.Solar_Mass
+            densities_zoom = hist / volume_shell / rho_crit
 
             # Plot density profile for each selected halo in volume
             densities_zoom[densities_zoom == 0] = np.nan

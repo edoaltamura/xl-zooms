@@ -20,7 +20,7 @@ from convergence_radius import convergence_radius
 
 # Constants
 bins = 40
-radius_bounds = [1e-4, 3]  # In units of R200crit
+radius_bounds = [5e-3, 3]  # In units of R200crit
 cmap_name = 'BuPu_r'
 
 
@@ -134,7 +134,7 @@ def cumulative_mass_compare_plot(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
             (posDM[:, 2] - zCen) ** 2
-        ) / R200c
+        )
 
         # Calculate particle mass and rho_crit
         unitLength = data.metadata.units.length
@@ -142,18 +142,20 @@ def cumulative_mass_compare_plot(
         rho_crit = unyt.unyt_quantity(
             data.metadata.cosmology['Critical density [internal units]'],
             unitMass / unitLength ** 3
-        )
+        )[0].to('Msun/Mpc**3')
         rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
         vol = data.metadata.boxsize[0] ** 3
         numPart = data.metadata.n_dark_matter
         particleMass = rhoMean * vol / numPart
         parent_mass_resolution = particleMass
+        particleMasses = np.ones_like(r.value) * particleMass
 
         # Construct bins and compute density profile
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
-        hist, bin_edges = np.histogram(r, bins=lbins)
+        r_scaled = r / R200c
+        hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-        cumulative_mass_parent = np.cumsum(hist) * particleMass
+        cumulative_mass_parent = np.cumsum(hist)
 
         # Plot density profile for each selected halo in volume
         cumulative_mass_parent[cumulative_mass_parent == 0] = np.nan
@@ -161,12 +163,10 @@ def cumulative_mass_compare_plot(
         ax.plot(bin_centre, cumulative_mass_parent, c="grey", linestyle="-", label=parent_label)
 
         # Compute convergence radius
-        particleMasses = np.ones_like(r) * particleMass
-        conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
+        conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
-        t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
-                    alpha=0.6)
+        t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
         t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
     # ZOOMS #
@@ -208,7 +208,7 @@ def cumulative_mass_compare_plot(
                 (posDM[:, 0] - xCen) ** 2 +
                 (posDM[:, 1] - yCen) ** 2 +
                 (posDM[:, 2] - zCen) ** 2
-            ) / R200c
+            )
 
             # Calculate particle mass and rho_crit
             unitLength = data.metadata.units.length
@@ -216,15 +216,16 @@ def cumulative_mass_compare_plot(
             rho_crit = unyt.unyt_quantity(
                 data.metadata.cosmology['Critical density [internal units]'],
                 unitMass / unitLength ** 3
-            )
+            )[0].to('Msun/Mpc**3')
             particleMasses = data.dark_matter.masses.to('Msun')
             zoom_mass_resolution = particleMasses
 
             # Construct bins and compute density profile
             lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
-            hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
+            r_scaled = r / R200c
+            hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-            cumulative_mass_zoom = np.cumsum(hist) * unyt.Solar_Mass
+            cumulative_mass_zoom = np.cumsum(hist)
 
             # Plot density profile for each selected halo in volume
             cumulative_mass_zoom[cumulative_mass_zoom == 0] = np.nan
@@ -232,10 +233,9 @@ def cumulative_mass_compare_plot(
             ax.plot(bin_centre, cumulative_mass_zoom, c=color, linestyle="-", label=zoom_label)
 
             # Compute convergence radius
-            conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
+            conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
             ax.axvline(conv_radius, color=color, linestyle='--')
-            t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
-                        alpha=0.6)
+            t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
             t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
             # RESIDUALS #
