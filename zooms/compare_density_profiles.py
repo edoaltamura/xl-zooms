@@ -162,9 +162,22 @@ def density_profile_compare_plot(
         ax.plot(bin_centre, densities_parent, c="grey", linestyle="-", label=parent_label)
 
         # Compute convergence radius
-        particleMasses = np.ones_like(r.value) * particleMass.value
-        conv_radius = convergence_radius(r.value, particleMasses, rho_crit.value[0]) / R200c
-        print(conv_radius, particleMasses, np.sort(r.value))
+        # particleMasses = np.ones_like(r.value) * particleMass.value
+        # conv_radius = convergence_radius(r.value, particleMasses, rho_crit.value[0]) / R200c
+
+        radSort = np.sort(r.value)
+        volSort = (4. * np.pi / 3.) * (radSort ** 3)
+        intNumber = np.arange(radSort.size)
+        intMass = particleMass * intNumber
+        intRho = intMass / volSort
+        convRatio = (np.sqrt(200.) / 8.) * (intNumber / np.log(intNumber)) * np.sqrt(rho_crit.value[0] / intRho)
+        radSort = radSort[2:]
+        convRatio = convRatio[2:]
+        index = np.where(convRatio > 1)[0]
+        print(index[0])
+        conv_radius = radSort[index[0]] / R200c
+
+        print(conv_radius, particleMass, np.sort(r.value))
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
@@ -219,7 +232,7 @@ def density_profile_compare_plot(
                 data.metadata.cosmology['Critical density [internal units]'],
                 unitMass / unitLength ** 3
             )
-            particleMasses = data.dark_matter.masses.to('Msun')
+            particleMasses = data.dark_matter.masses * unyt.Solar_Mass
             zoom_mass_resolution = particleMasses
 
             # Construct bins and compute density profile
