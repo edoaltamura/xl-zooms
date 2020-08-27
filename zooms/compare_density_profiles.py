@@ -220,7 +220,7 @@ def density_profile_compare_plot(
                 data.metadata.cosmology['Critical density [internal units]'],
                 unitMass / unitLength ** 3
             )
-            particleMasses = data.dark_matter.masses * unyt.Solar_Mass
+            particleMasses = data.dark_matter.masses
             zoom_mass_resolution = particleMasses
 
             # Construct bins and compute density profile
