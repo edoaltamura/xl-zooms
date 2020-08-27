@@ -154,10 +154,11 @@ def density_profile_compare_plot(
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         r_scaled = r / R200c
         hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
+        hist *= unyt.Solar_Mass
         print(hist)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-        densities_parent = hist * particleMass / volume_shell / rho_crit
+        densities_parent = hist / volume_shell / rho_crit
 
         # Plot density profile for each selected halo in volume
         densities_parent[densities_parent == 0] = np.nan
@@ -228,6 +229,7 @@ def density_profile_compare_plot(
             lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
             r_scaled = r / R200c
             hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
+            hist *= unyt.Solar_Mass
             print(hist)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
