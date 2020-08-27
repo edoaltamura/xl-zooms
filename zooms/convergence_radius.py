@@ -33,7 +33,7 @@ def convergence_radius(
     """
 
     assert len(radial_distances) == len(particle_masses)
-    assert unyt.Mpc in radial_distances.units
+    assert radial_distances.units == unyt.Mpc
     assert particle_masses.units == unyt.Solar_Mass
     assert rho_crit.units == unyt.Solar_Mass / unyt.Mpc ** 3
 
