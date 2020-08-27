@@ -3,7 +3,11 @@ import unyt
 
 alpha = 1.
 
-def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray, rho_crit: float) -> unyt.array.unyt_array:
+def convergence_radius(
+        radial_distances: unyt.array.unyt_array,
+        particle_masses: unyt.array.unyt_array,
+        rho_crit: float
+) -> unyt.array.unyt_array:
     """
     Function that computes the inner numerical convergence radius for point particles.
     Calculation based on Power at al. (2003).
@@ -47,4 +51,4 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
 
     # print(convergence_root, root_idx)
 
-    return convergence_root * unyt.Mpc
+    return convergence_root

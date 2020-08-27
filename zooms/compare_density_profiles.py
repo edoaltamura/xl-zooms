@@ -152,7 +152,6 @@ def density_profile_compare_plot(
         # Construct bins and compute density profile
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         r_scaled = r / R200c
-        print(np.sort(r_scaled))
         hist, bin_edges = np.histogram(r_scaled, bins=lbins)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
@@ -165,8 +164,8 @@ def density_profile_compare_plot(
 
         # Compute convergence radius
         particleMasses = np.ones_like(r.value) * particleMass.value
-        conv_radius = convergence_radius(r.value, particleMasses, rho_crit.value[0]) / R200c
-        print(conv_radius, particleMass.value[0], np.sort(r.value))
+        conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
+        print(conv_radius, particleMass, np.sort(r), sep='\\n')
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
