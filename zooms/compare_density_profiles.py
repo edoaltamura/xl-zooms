@@ -134,7 +134,7 @@ def density_profile_compare_plot(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
             (posDM[:, 2] - zCen) ** 2
-        ).to('Mpc')
+        ).value * unyt.Mpc
 
         # Calculate particle mass and rho_crit
         unitLength = data.metadata.units.length
