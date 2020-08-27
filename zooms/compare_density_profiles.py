@@ -142,7 +142,7 @@ def density_profile_compare_plot(
         rho_crit = unyt.unyt_quantity(
             data.metadata.cosmology['Critical density [internal units]'],
             unitMass / unitLength ** 3
-        )
+        )[0].to('Msun/Mpc**3')
         rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
         vol = data.metadata.boxsize[0] ** 3
         numPart = data.metadata.n_dark_matter
@@ -164,7 +164,7 @@ def density_profile_compare_plot(
 
         # Compute convergence radius
         particleMasses = np.ones_like(r.value) * particleMass
-        conv_radius = convergence_radius(r, particleMasses, rho_crit[0].to('Msun/Mpc**3')) / R200c
+        conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
         print(conv_radius)
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
@@ -219,7 +219,7 @@ def density_profile_compare_plot(
             rho_crit = unyt.unyt_quantity(
                 data.metadata.cosmology['Critical density [internal units]'],
                 unitMass / unitLength ** 3
-            )
+            )[0].to('Msun/Mpc**3')
             particleMasses = data.dark_matter.masses.to('Msun')
             zoom_mass_resolution = particleMasses
 
@@ -237,10 +237,7 @@ def density_profile_compare_plot(
             ax.plot(bin_centre, densities_zoom, c=color, linestyle="-", label=zoom_label)
 
             # Compute convergence radius
-            print(r)
-            print(particleMasses)
-            conv_radius = convergence_radius(r, particleMasses, rho_crit[0].to('Msun/Mpc**3')) / R200c
-            print(conv_radius)
+            conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
             ax.axvline(conv_radius, color=color, linestyle='--')
             t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
             t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
