@@ -1,7 +1,7 @@
 import numpy as np
 import unyt
 
-alpha = 1.
+alpha = unyt.unyt_quantity(1., unyt.dimensionless)
 
 def convergence_radius(
         radial_distances: unyt.array.unyt_array,
