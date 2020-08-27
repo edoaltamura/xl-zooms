@@ -42,9 +42,9 @@ def convergence_radius(radial_distances: np.ndarray, particle_masses: np.ndarray
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * np.sqrt(rho_crit / mean_rho)
 
     # Find solutions by minimising the root function
-    root_idx = np.where(result >= alpha)[0][0]
+    root_idx = np.abs(result - alpha).argmin()
     convergence_root = (radial_distances_sorted[root_idx])
 
-    print(convergence_root, root_idx)
+    # print(convergence_root, root_idx)
 
     return convergence_root * unyt.Mpc
