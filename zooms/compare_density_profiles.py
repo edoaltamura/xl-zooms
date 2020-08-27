@@ -168,7 +168,7 @@ def density_profile_compare_plot(
         radSort = np.sort(r.value)
         volSort = (4. * np.pi / 3.) * (radSort ** 3)
         intNumber = np.arange(radSort.size)
-        intMass = particleMass * intNumber
+        intMass = particleMass.value[0] * intNumber
         intRho = intMass / volSort
         convRatio = (np.sqrt(200.) / 8.) * (intNumber / np.log(intNumber)) * np.sqrt(rho_crit.value[0] / intRho)
         radSort = radSort[2:]
