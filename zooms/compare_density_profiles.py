@@ -134,7 +134,7 @@ def density_profile_compare_plot(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
             (posDM[:, 2] - zCen) ** 2
-        ) / R200c
+        )
 
         # Calculate particle mass and rho_crit
         unitLength = data.metadata.units.length
@@ -151,7 +151,7 @@ def density_profile_compare_plot(
 
         # Construct bins and compute density profile
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
-        hist, bin_edges = np.histogram(r, bins=lbins)
+        hist, bin_edges = np.histogram(r / R200c, bins=lbins)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         densities_parent = hist * particleMass / volume_shell / rho_crit
@@ -163,7 +163,7 @@ def density_profile_compare_plot(
 
         # Compute convergence radius
         particleMasses = np.ones_like(r.value) * particleMass.value
-        conv_radius = convergence_radius(r.value, particleMasses, rho_crit.value[0]) / R200c
+        conv_radius = convergence_radius(r, particleMasses, rho_crit.value[0]) / R200c
         print(conv_radius, particleMass.value[0], np.sort(r.value))
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
