@@ -175,9 +175,9 @@ def density_profile_compare_plot(
         convRatio = convRatio[2:]
         index = np.where(convRatio > 1)[0]
         print(index[0])
-        conv_radius = radSort[index[0]] / R200c
+        conv_radius = radSort[index[0]] * unyt.Mpc / R200c
 
-        print(conv_radius, particleMass, np.sort(r.value))
+        print(conv_radius, particleMass.value[0], np.sort(r.value))
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
