@@ -211,7 +211,7 @@ def density_profile_compare_plot(
                 (posDM[:, 0] - xCen) ** 2 +
                 (posDM[:, 1] - yCen) ** 2 +
                 (posDM[:, 2] - zCen) ** 2
-            ) / R200c
+            )
 
             # Calculate particle mass and rho_crit
             unitLength = data.metadata.units.length
@@ -225,7 +225,8 @@ def density_profile_compare_plot(
 
             # Construct bins and compute density profile
             lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
-            hist, bin_edges = np.histogram(r, bins=lbins, weights=particleMasses)
+            r_scaled = r / R200c
+            hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
             densities_zoom = hist / volume_shell / rho_crit * unyt.Solar_Mass
@@ -236,7 +237,8 @@ def density_profile_compare_plot(
             ax.plot(bin_centre, densities_zoom, c=color, linestyle="-", label=zoom_label)
 
             # Compute convergence radius
-            conv_radius = convergence_radius(r.value, particleMasses.value, rho_crit.value[0]) / R200c
+            conv_radius = convergence_radius(r, particleMasses, rho_crit[0].to('Msun/Mpc**3')) / R200c
+            print(conv_radius)
             ax.axvline(conv_radius, color=color, linestyle='--')
             t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
             t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))

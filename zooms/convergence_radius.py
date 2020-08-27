@@ -47,12 +47,11 @@ def convergence_radius(
     sphere_volume = 4 / 3 * np.pi * radial_distances_sorted ** 3
     rho_mean = np.cumsum(particle_masses_sorted) / sphere_volume
     result = np.sqrt(200) / 8 * number_particles / np.log(number_particles) * np.sqrt(rho_crit / rho_mean)
-    print(result.value)
 
     # Find solutions by minimising the root function
     root_idx = np.abs(result - alpha).argmin()
     convergence_root = (radial_distances_sorted[root_idx])
 
-    # print(convergence_root, root_idx)
+    print(convergence_root, root_idx)
 
     return convergence_root
