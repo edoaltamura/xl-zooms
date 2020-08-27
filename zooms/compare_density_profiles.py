@@ -154,6 +154,7 @@ def density_profile_compare_plot(
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         r_scaled = r / R200c
         hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
+        print(hist)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         densities_parent = hist * particleMass / volume_shell / rho_crit
@@ -223,9 +224,11 @@ def density_profile_compare_plot(
             zoom_mass_resolution = particleMasses
 
             # Construct bins and compute density profile
+            # NOTE: numpy.histogram does not preserve units, so restore them after.
             lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
             r_scaled = r / R200c
             hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
+            print(hist)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
             densities_zoom = hist / volume_shell / rho_crit
@@ -243,9 +246,6 @@ def density_profile_compare_plot(
 
             # RESIDUALS #
             if snap_filepath_parent and snap_filepath_zoom:
-                print(hist,bin_edges)
-                print(particleMasses)
-                print(densities_zoom)
                 residual = (densities_zoom - densities_parent) / densities_parent
                 ax_residual.axhline(0, color='grey', linestyle='-')
                 ax_residual.plot(bin_centre, residual, c=color, linestyle="-")
