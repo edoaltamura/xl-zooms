@@ -167,7 +167,7 @@ def density_profile_compare_plot(
         print(r)
         print(particleMasses)
         print(rho_crit[0].to('Msun/Mpc**3'))
-        conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
+        conv_radius = convergence_radius(r, particleMasses, rho_crit[0].to('Msun/Mpc**3')) / R200c
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
