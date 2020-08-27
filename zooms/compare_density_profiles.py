@@ -129,7 +129,7 @@ def density_profile_compare_plot(
         data = sw.load(snap_filepath_parent, mask=mask)
 
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
-        posDM = (data.dark_matter.coordinates / data.metadata.a).value * unyt.Mpc
+        posDM = data.dark_matter.coordinates / data.metadata.a
         r = np.sqrt(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
@@ -164,10 +164,8 @@ def density_profile_compare_plot(
 
         # Compute convergence radius
         particleMasses = np.ones_like(r.value) * particleMass
-        print(r)
-        print(particleMasses)
-        print(rho_crit[0].to('Msun/Mpc**3'))
         conv_radius = convergence_radius(r, particleMasses, rho_crit[0].to('Msun/Mpc**3')) / R200c
+        print(conv_radius)
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
