@@ -21,6 +21,7 @@ from convergence_radius import convergence_radius
 # Constants
 bins = 40
 radius_bounds = [5e-3, 3]  # In units of R200crit
+residual_bounds = [-0.5, 0.5] # y-limits in the residual plot
 cmap_name = 'BuPu_r'
 
 
@@ -151,11 +152,11 @@ def density_profile_compare_plot(
         particleMasses = np.ones_like(r.value) * particleMass
 
         # Construct bins and compute density profile
+        # NOTE: numpy.histogram does not preserve units, so restore them after.
         lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
         r_scaled = r / R200c
         hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
         hist *= unyt.Solar_Mass
-        print(hist)
         bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         densities_parent = hist / volume_shell / rho_crit
@@ -230,7 +231,6 @@ def density_profile_compare_plot(
             r_scaled = r / R200c
             hist, bin_edges = np.histogram(r_scaled, bins=lbins, weights=particleMasses)
             hist *= unyt.Solar_Mass
-            print(hist)
             bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
             volume_shell = (4. * np.pi / 3.) * (R200c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
             densities_zoom = hist / volume_shell / rho_crit
@@ -272,7 +272,8 @@ def density_profile_compare_plot(
 
     ax.axvline(1, color="grey", linestyle='--')
     ax_residual.axvline(1, color="grey", linestyle='--')
-    ax.set_xlim(radius_bounds[0], radius_bounds[1])
+    ax_residual.set_xlim(radius_bounds[0], radius_bounds[1])
+    ax_residual.set_ylim(residual_bounds[0], residual_bounds[1])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylabel(r"$\rho_{DM}\ /\ \rho_c$")

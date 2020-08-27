@@ -21,6 +21,7 @@ from convergence_radius import convergence_radius
 # Constants
 bins = 40
 radius_bounds = [5e-3, 3]  # In units of R200crit
+residual_bounds = [-0.5, 0.5] # y-limits in the residual plot
 cmap_name = 'BuPu_r'
 
 
@@ -265,7 +266,8 @@ def cumulative_mass_compare_plot(
 
     ax.axvline(1, color="grey", linestyle='--')
     ax_residual.axvline(1, color="grey", linestyle='--')
-    ax.set_xlim(radius_bounds[0], radius_bounds[1])
+    ax_residual.set_xlim(radius_bounds[0], radius_bounds[1])
+    ax_residual.set_ylim(residual_bounds[0], residual_bounds[1])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylabel(f"$M_{{\\rm DM}} (< R)\\ [{M200c.units.latex_repr}]$")
