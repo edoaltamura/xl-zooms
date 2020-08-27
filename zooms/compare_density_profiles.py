@@ -129,7 +129,7 @@ def density_profile_compare_plot(
         data = sw.load(snap_filepath_parent, mask=mask)
 
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
-        posDM = data.dark_matter.coordinates / data.metadata.a
+        posDM = data.dark_matter.coordinates.to_physical()
         r = np.sqrt(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
