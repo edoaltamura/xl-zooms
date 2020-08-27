@@ -164,8 +164,8 @@ def density_profile_compare_plot(
 
         # Compute convergence radius
         particleMasses = np.ones_like(r) * particleMass
+        print(particleMasses, rho_crit, np.sort(r), sep='\\n')
         conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
-        print(conv_radius, particleMass, np.sort(r), sep='\\n')
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
