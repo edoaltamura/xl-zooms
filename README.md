@@ -20,7 +20,7 @@ the properties of the computing clusters available to the Virgo Consortium. Visi
 for more info. 
 
 | Machine name       | Memory/node   | Cores/node  | CPU info                                       | Total nodes        |
-| ------------------ |:-------------:|:-----------:|:----------------------------------------------:|:------------------:|
+| ------------------ |:-------------:|:-----------:| ---------------------------------------------- |:------------------:|
 | Cosma 5            | 128 GB        |   16        |   2x Intel Xeon CPU E5-2670 0 @ 2.60GHz        |   675              |
 | Cosma 6            | 128 GB        |   16        |   2x Intel Xeon CPU E5-2670 0 @ 2.60GHz        |   675              |
 | Cosma 7            | 512 GB        |   28        |   2x Intel Xeon Gold 5120 @ 2.20GHz            |   452              |
