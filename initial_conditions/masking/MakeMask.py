@@ -1,0 +1,336 @@
+from read_swift import read_swift
+from read_eagle_groups import EagleGroupTab
+import sys
+import yaml
+import h5py
+import matplotlib.patches as patches
+import matplotlib.pyplot as plt
+from scipy.spatial import distance
+import numpy as np
+from read_eagle import EagleSnapshot
+from peano import *
+
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+comm_rank = comm.rank
+comm_size = comm.size
+
+
+class MakeMask:
+
+    def __init__(self, param_file):
+
+        self.read_param_file(param_file)
+        self.make_mask()
+
+    def read_param_file(self, param_file):
+        """ Read parameters from YAML file. """
+        if comm_rank == 0:
+            params = yaml.load(open(param_file))
+
+            # Defaults.
+            self.params = {}
+            self.params['GN'] = None
+            self.params['num_times_r200'] = 1.
+            self.params['data_type'] = 'gadget'
+            self.params['min_num_per_cell'] = 3
+            self.params['mpc_cell_size'] = 3.  # Cell size in Mpc/h
+
+            # Params that are required.
+            required_params = ['fname', 'snap_file', 'bits', 'shape', 'data_type',
+                               'divide_ids_by_two']
+            for att in required_params:
+                assert att in params.keys(), 'Need to have %s as a param' % att
+
+            # For the case of a single group.
+            if 'GN' in params.keys():
+                assert 'sub_file' in params.keys(), 'Need to provide a sub_file'
+            # The manual case.
+            else:
+                assert 'shape' in params.keys(), 'Need to provide a shape of region.'
+                assert 'coords' in params.keys(), 'Need to provide coords of region.'
+                if params['shape'] == 'cuboid' or params['shape'] == 'slab':
+                    assert 'dim' in params.keys(), 'Need to provide dimensions of region.'
+                elif params['shape'] == 'sphere':
+                    assert 'radius' in params.keys(), 'Need to provide radius of sphere.'
+
+            for att in params.keys():
+                self.params[att] = params[att]
+        else:
+            self.params = None
+        self.params = comm.bcast(self.params)
+
+        # Find the group we want to resimulate (if selected).
+        if self.params['GN'] is not None:
+            self.params['coords,'], self.params['radius'] = self.find_group()
+            self.params['shape'] = 'sphere'
+        self.params['coords'] = np.array(self.params['coords'], dtype='f8')
+        if 'dim' in self.params.keys(): self.params['dim'] = np.array(self.params['dim'])
+
+    def compute_ic_positions(self, ids):
+        """ Compute the positions at ICs. """
+        print('[Rank %i] Computing initial positions of dark matter particles...' \
+              % comm_rank)
+        X, Y, Z = peano_hilbert_key_inverses(ids, self.params['bits'])
+        ic_coords = np.vstack((X, Y, Z)).T
+        assert np.all(ic_coords) >= 0 and np.all(ic_coords) < 2 ** self.params['bits'], \
+            'Initial coords out of range'
+        return np.array(ic_coords, dtype='f8')
+
+    def find_group(self):
+        """ Find COP of chosen group. """
+        sys.exit('find group not tested')
+        e = EagleGroupTab(self.params['sub_file'])
+
+        sub_data = e.read_sub(['CentreOfPotential', 'GroupNumber', 'SubGroupNumber'])
+        fof_data = e.read_fof(['Group_R_Crit200'])
+
+        mask = np.where(np.logical_and(sub_data['GroupNumber'] == self.params['GN'],
+                                       sub_data['SubGroupNumber'] == 0))
+        assert len(mask[0]) == 1, 'Could not find selected GN %i' % self.params['GN']
+        cop = sub_data['CentreOfPotential'][mask][0]
+        r200 = fof_data['Group_R_Crit200'][self.GN - 1]
+
+        return cop, self.num_times_r200 * r200
+
+    def load_particles(self):
+        """ Load particles from chosen snapshot."""
+
+        if self.params['data_type'].lower() == 'gadget':
+            snap = EagleSnapshot(self.params['snap_file'])
+            self.params['bs'] = float(snap.HEADER['BoxSize'])
+            self.params['h_factor'] = 1.0
+            self.params['length_unit'] = 'Mph/h'
+        elif self.params['data_type'].lower() == 'swift':
+            snap = read_swift(self.params['snap_file'])
+            self.params['bs'] = float(snap.HEADER['BoxSize'])
+            self.params['h_factor'] = float(snap.COSMOLOGY['h'])
+            self.params['length_unit'] = 'Mpc'
+
+        # A sphere with radius R.
+        if self.params['shape'] == 'sphere':
+            region = [self.params['coords'][0] - self.params['radius'],
+                      self.params['coords'][0] + self.params['radius'],
+                      self.params['coords'][1] - self.params['radius'],
+                      self.params['coords'][1] + self.params['radius'],
+                      self.params['coords'][2] - self.params['radius'],
+                      self.params['coords'][2] + self.params['radius']]
+        # A cuboid with sides x,y,z.
+        elif self.params['shape'] == 'cuboid' or self.params['shape'] == 'slab':
+            region = [self.params['coords'][0] - self.params['dim'][0] / 2.,
+                      self.params['coords'][0] + self.params['dim'][0] / 2.,
+                      self.params['coords'][1] - self.params['dim'][1] / 2.,
+                      self.params['coords'][1] + self.params['dim'][1] / 2.,
+                      self.params['coords'][2] - self.params['dim'][2] / 2.,
+                      self.params['coords'][2] + self.params['dim'][2] / 2.]
+        if comm_rank == 0: print('Loading region %s...' % region)
+        if self.params['data_type'].lower() == 'gadget':
+            snap.select_region(*region)
+            snap.split_selection(comm_rank, comm_size)
+        elif self.params['data_type'].lower() == 'swift':
+            snap.select_region(1, *region)
+            snap.split_selection(comm)
+
+        # Load DM particle IDs.
+        if comm_rank == 0: print('Loading particle data ...')
+        ids = snap.read_dataset(1, 'ParticleIDs')
+        coords = snap.read_dataset(1, 'Coordinates')
+        print('[Rank %i] Loaded %i dark matter particles.' % (comm_rank, len(ids)))
+
+        # Wrap coordinates.
+        coords = np.mod(coords - self.params['coords'] + 0.5 * self.params['bs'],
+                        self.params['bs']) + self.params['coords'] - 0.5 * self.params['bs']
+
+        # Clip to desired shape.
+        if self.params['shape'] == 'sphere':
+            if comm_rank == 0: print('Clipping to sphere around %s, radius %.4f %s' \
+                                     % (self.params['coords'], self.params['radius'], self.params['length_unit']))
+            dists = distance.cdist(coords, self.params['coords'].reshape(1, 3),
+                                   metric='euclidean').reshape(len(coords), )
+
+            mask = np.where(dists <= self.params['radius'])
+        elif self.params['shape'] == 'cuboid' or self.params['shape'] == 'slab':
+            if comm_rank == 0:
+                print('Clipping to %s x=%.2f %s, y=%.2f %s, z=%.2f %s around %s %s' \
+                      % (self.params['shape'], self.params['dim'][0], self.params['length_unit'],
+                         self.params['dim'][1], self.params['length_unit'],
+                         self.params['dim'][2], self.params['length_unit'],
+                         self.params['coords'], self.params['length_unit']))
+
+            mask = np.where(np.logical_and(
+                coords[:, 0] >= (self.params['coords'][0] - self.params['dim'][0] / 2.),
+                np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
+                               np.logical_and(coords[:, 1] >= (self.params['coords'][1] - self.params['dim'][1] / 2.),
+                                              np.logical_and(coords[:, 1] <= (
+                                                          self.params['coords'][1] + self.params['dim'][1] / 2.),
+                                                             np.logical_and(coords[:, 2] >= (
+                                                                         self.params['coords'][2] - self.params['dim'][
+                                                                     2] / 2.),
+                                                                            coords[:, 2] <= (self.params['coords'][2] +
+                                                                                             self.params['dim'][
+                                                                                                 2] / 2.)))))))
+
+        ids = ids[mask]
+        print('[Rank %i] Clipped to %i dark matter particles.' % (comm_rank, len(ids)))
+
+        # Put back into original IDs.
+        if self.params['divide_ids_by_two'] == True: ids /= 2
+
+        return ids, coords
+
+    def convert_to_inverse_h(self, coords):
+        h = self.params['h_factor']
+        keys = self.params.keys()
+        if 'radius' in keys: self.params['radius'] *= h
+        if 'dim' in keys: self.params['dim'] *= h
+        if 'coords' in keys: self.params['coords'] *= h
+        if 'bs' in keys: self.params['bs'] *= h
+        return coords * h
+
+    def make_mask(self):
+        # Load particles.
+        ids, coords = self.load_particles()
+        if self.params['data_type'].lower() == 'swift':
+            coords = self.convert_to_inverse_h(coords)
+
+        # Find initial positions from IDs.
+        ic_coords = self.compute_ic_positions(ids)
+
+        # Rescale IC coords to 0-->boxsize.
+        ic_coords *= np.true_divide(self.params['bs'], 2 ** self.params['bits'] - 1)
+        ic_coords = np.mod(ic_coords - self.params['coords'] + 0.5 * self.params['bs'],
+                           self.params['bs']) + self.params['coords'] - 0.5 * self.params['bs']
+
+        # Find COM of the lagrangian region.
+        count = 0
+        last_com_coords = np.array([self.params['bs'] / 2.,
+                                    self.params['bs'] / 2., self.params['bs'] / 2.])
+        while True:
+            com_coords = self.get_com(ic_coords, self.params['bs'])
+            if comm_rank == 0: print('COM iteration %i c=%s Mpc/h' % (count, com_coords))
+            ic_coords = np.mod(ic_coords - com_coords + 0.5 * self.params['bs'],
+                               self.params['bs']) + com_coords - 0.5 * self.params['bs']
+            if np.sum(np.abs(com_coords - last_com_coords)) <= 1e-6:
+                break
+            last_com_coords = com_coords
+            count += 1
+            if (count > 10) or (self.params['shape'] == 'slab'): break
+        if comm_rank == 0:
+            print('COM of lagrangian region %s Mpc/h (compared to coords %s Mpc/h)' \
+                  % (com_coords, self.params['coords']))
+        ic_coords -= com_coords
+
+        # Compute outline.
+        num_bins = \
+            int(np.ceil(self.params['bs'] / (self.params['mpc_cell_size'])))
+        bins = np.linspace(-self.params['bs'] / 2., self.params['bs'] / 2., num_bins)
+        bin_width = bins[1] - bins[0]
+        H, edges = np.histogramdd(ic_coords, bins=(bins, bins, bins))
+        H = comm.allreduce(H)
+
+        # Computing bounding region.
+        m = np.where(H >= self.params['min_num_per_cell'])
+        lens = np.array([np.abs(np.min(edges[0][m[0]])),
+                         np.max(edges[0][m[0]]) + bin_width,
+                         np.abs(np.min(edges[1][m[1]])),
+                         np.max(edges[1][m[1]]) + bin_width,
+                         np.abs(np.min(edges[2][m[2]])),
+                         np.max(edges[2][m[2]]) + bin_width])
+
+        if comm_rank == 0:
+            print('Encompasing dimensions x=%.5f Mpc/h y=%.5f Mpc/h z=%.5f Mpc/h' % \
+                  (lens[0] + lens[1], lens[2] + lens[3], lens[4] + lens[5]))
+
+            tot_cells = len(H[0][m[0]]) + len(H[1][m[1]]) + len(H[2][m[2]])
+            print('There are %i total glass cells.' % tot_cells)
+        # Plot.
+        self.plot(H, edges, bin_width, ic_coords, lens)
+
+        # Save.
+        if comm_rank == 0:
+            self.save(H, edges, bin_width, lens, com_coords)
+
+    def plot(self, H, edges, bin_width, ic_coords, lens):
+        """ Plot the region outline. """
+
+        # Subsample.
+        idx = np.random.permutation(len(ic_coords))
+        if len(ic_coords) > 1e5:
+            idx = np.random.permutation(len(ic_coords))
+            plot_coords = ic_coords[idx][:100000]
+        else:
+            plot_coords = ic_coords[idx]
+
+        # Plot.
+        plot_coords = comm.gather(plot_coords)
+
+        if comm_rank == 0:
+            plot_coords = np.vstack(plot_coords)
+            f, axarr = plt.subplots(1, 3, figsize=(10, 4))
+            for count, (i, j) in enumerate(zip([0, 0, 1], [1, 2, 2])):
+                rect = patches.Rectangle((-lens[i * 2], -lens[j * 2]),
+                                         lens[i * 2 + 1] + lens[i * 2], lens[j * 2 + 1] + lens[j * 2], linewidth=1,
+                                         edgecolor='r', facecolor='none')
+                axarr[count].scatter(plot_coords[:, i], plot_coords[:, j],
+                                     s=1, c='blue')
+                axarr[count].add_patch(rect)
+                axarr[count].set_xlim(-lens[i * 2], lens[i * 2 + 1])
+                axarr[count].set_ylim(-lens[j * 2], lens[j * 2 + 1])
+
+                m = np.where(H >= self.params['min_num_per_cell'])
+                axarr[count].scatter(edges[i][m[i]] + bin_width / 2.,
+                                     edges[j][m[j]] + bin_width / 2.,
+                                     marker='^', color='red', s=3)
+                if len(m[i]) < 10000:
+                    for e_x, e_y in zip(edges[i][m[i]], edges[j][m[j]]):
+                        rect = patches.Rectangle((e_x, e_y), bin_width, bin_width,
+                                                 linewidth=1, edgecolor='r', facecolor='none')
+                        axarr[count].add_patch(rect)
+                axarr[count].set_xlabel('%i' % i)
+                axarr[count].set_ylabel('%i' % j)
+            plt.tight_layout(pad=0.1)
+            plt.show()
+
+    def save(self, H, edges, bin_width, lens, com_coords):
+        # Save (eveything needs to be saved in h inverse units, for the IC GEN).
+        f = h5py.File('./masks/%s.hdf5' % self.params['fname'], 'w')
+        m = np.where(H >= self.params['min_num_per_cell'])
+        coords = np.c_[edges[0][m[0]] + bin_width / 2.,
+                       edges[1][m[1]] + bin_width / 2.,
+                       edges[2][m[2]] + bin_width / 2.]
+        ds = f.create_dataset('Coordinates',
+                              data=np.array(coords, dtype='f8'))
+        ds.attrs.create('xlen_lo', lens[0])
+        ds.attrs.create('xlen_hi', lens[1])
+        ds.attrs.create('ylen_lo', lens[2])
+        ds.attrs.create('ylen_hi', lens[3])
+        ds.attrs.create('zlen_lo', lens[4])
+        ds.attrs.create('zlen_hi', lens[5])
+        ds.attrs.create('coords', self.params['coords'])
+        ds.attrs.create('com_coords', com_coords)
+        ds.attrs.create('grid_cell_width', bin_width)
+        if self.params['shape'] == 'cuboid' or self.params['shape'] == 'slab':
+            ds.attrs.create('high_res_volume',
+                            self.params['dim'][0] \
+                            * self.params['dim'][1] \
+                            * self.params['dim'][2])
+        else:
+            ds.attrs.create('high_res_volume', 4 / 3. * np.pi * self.params['radius'] ** 3.)
+        f.close()
+        print('Saved ./masks/%s.hdf5' % self.params['fname'])
+
+    def get_com(self, ic_coords, bs):
+        """ Find centre of mass for passed coordinates. """
+        if self.params['shape'] == 'slab':
+            com_x = bs / 2.
+            com_y = bs / 2.
+        else:
+            com_x = comm.allreduce(np.sum(ic_coords[:, 0])) / comm.allreduce(len(ic_coords[:, 0]))
+            com_y = comm.allreduce(np.sum(ic_coords[:, 1])) / comm.allreduce(len(ic_coords[:, 1]))
+        com_z = comm.allreduce(np.sum(ic_coords[:, 2])) / comm.allreduce(len(ic_coords[:, 2]))
+        return np.array([com_x, com_y, com_z])
+
+
+if __name__ == '__main__':
+    x = MakeMask(sys.argv[1])
