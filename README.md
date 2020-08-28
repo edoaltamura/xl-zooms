@@ -21,8 +21,8 @@ for more info.
 
 | Machine name       | Memory/node   | Cores/node  | CPU info                                       | Total nodes        |
 | ------------------ |:-------------:|:-----------:| ---------------------------------------------- |:------------------:|
-| Cosma 5            | 128 GB        |   16        |   2x Intel Xeon CPU E5-2670 0 @ 2.60GHz        |   302              |
-| Cosma 6            | 128 GB        |   16        |   2x Intel Xeon CPU E5-2670 0 @ 2.60GHz        |   675              |
+| Cosma 5            | 128 GB        |   16        |   2x Intel Xeon E5-2670 0 @ 2.60GHz            |   302              |
+| Cosma 6            | 128 GB        |   16        |   2x Intel Xeon E5-2670 0 @ 2.60GHz            |   675              |
 | Cosma 7            | 512 GB        |   28        |   2x Intel Xeon Gold 5120 @ 2.20GHz            |   452              |
 | Cosma 8 (compute)  | 1 TB          |   64        |   2x AMD EPYC 7H12 @ 2.6GHz                    |   32               |
 | Cosma 8 (monolith) | 4 TB          |   64        |   2x AMD EPYC 7702 @ 2.6GHz                    |   1                |
