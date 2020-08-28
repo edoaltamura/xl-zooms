@@ -31,19 +31,33 @@ An important task of this project is to assess the possibility to run high-resol
 first with dark matter only, then with baryonic physics integrated. Due to the intensive use of memory, the final version
 of the hydro simulations might make use of the `cosma8`'s large capacity nodes. 
 
-Zoom pipeline
+Zoom pipeline \& guidelines
 ------------
+The process of simulating useful zooms of a galaxy cluster (or group) comprises several stages, some of which are listed below.
+
+- Generate of the (dark matter-only) cosmological parent box and the relative structure-finder output 
+- Select of the (dark matter-only) halos from the parent box meeting specific criteria
+- Generate if the initial conditions for the zoom simulation
+    1. Particle load | Mask the high-resolution region
+    2. Particle load | Make the high-resolution grid
+    3. Particle load | Populate the high-resolution grid with particles using glass files
+    4. Particle load | Generate outer particles of low-resolution grid with growing skins
+    5. Construct the Panphasian parameter file (and submission script)
+    6. Run Panphasia on the particle load file to generate the Gaussian white noise field
+- Configure SWIFT and Velociraptor (dark matter-only)
+- Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (dark matter-only)
+- Analyse the dark matter-only snapshots and diagnose possible inconsistency between the parent and zoomed halos
+- Configure SWIFT and Velociraptor (hydrodynamics and subgrid)
+- Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (hydro and subgrid)
+- The full hydro version of the zoom simulation is complete and ready to be analysed
+
 
 The parent box
 ------------
-
-Initial conditions
-------------
-
-Redshift evolution
-------------
-
-Analysis tools
-------------
+Before running a high-resolution zoom simulation of a galaxy cluster (or group), we firstly need to select it from a cosmological environment.
+EAGLE-XL's testing program includes the production of medium-sized dark matter-only cosmological boxes (size 300 Mpc) and the first set of
+halos are selected from one of such boxes: `L0300N0564`.
+Dark matter field-halos are identified using Velociraptor. Then, we select those which are found to be in a relatively isolated region of 
+the box, defined by specific isolation criteria. 
 
 <sup>Logo design by Edo Altamura &copy; 2020</sup>
