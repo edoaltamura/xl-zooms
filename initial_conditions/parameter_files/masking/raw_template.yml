@@ -1,0 +1,21 @@
+# This lists all the avaliable options, not to be used as a param file.
+# All params, eg the coordinates, are expected to be in the native units of the snapshot.
+
+# Always required.
+fname: The save name for the mask file.
+snap_file: The location of the snapshot we are creating the mask from.
+bits: The number of bits used in the particle IDs for the PH indexing. (EAGLE runs were 14).
+shape: Shape of the region to reproduce, 'sphere', 'cubiod', 'slab'.
+data_type: Can be 'gadget' or 'swift'.
+divide_ids_by_two: True if you need to divide PIDs by two to get back to ICS (needed for eagle).
+
+# For resimulating a single group.
+GN: If you want to resimulate a halo (requires sub_file).
+sub_file: The location of the subfind group catalogue (to find coordinates of given GN).
+num_times_r200: How many times r200 of the passed group do you want to resim? Default is 1.0.
+
+# For a region around a manual set of coordinates.
+coords: Centre of region you want to resimulate (at the time of the passed snapsot). 
+radius: If shape is sphere, need to provide the radius.
+dim: If shape is a cubiod or slab, need to provide [x,y,z] array of the lengths.
+
