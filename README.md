@@ -35,21 +35,21 @@ Zoom pipeline \& guidelines
 ------------
 The process of simulating useful zooms of a galaxy cluster (or group) comprises several stages, some of which are listed below.
 
-- Generate of the (dark matter-only) cosmological parent box and the relative structure-finder output 
-- Select of the (dark matter-only) halos from the parent box meeting specific criteria
-- Generate if the initial conditions for the zoom simulation
-    1. Particle load | Mask the high-resolution region
-    2. Particle load | Make the high-resolution grid
-    3. Particle load | Populate the high-resolution grid with particles using glass files
-    4. Particle load | Generate outer particles of low-resolution grid with growing skins
+- Generate of the (dark matter-only) cosmological parent box and the relative structure-finder output.
+- Select of the (dark matter-only) halos from the parent box meeting specific criteria.
+- Generate if the initial conditions for the zoom simulation.
+    1. *Particle load:* Mask the high-resolution region
+    2. *Particle load:* Make the high-resolution grid
+    3. *Particle load:* Populate the high-resolution grid with particles using glass files
+    4. *Particle load:* Generate outer particles of low-resolution grid with growing skins
     5. Construct the Panphasian parameter file (and submission script)
     6. Run Panphasia on the particle load file to generate the Gaussian white noise field
-- Configure SWIFT and Velociraptor (dark matter-only)
-- Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (dark matter-only)
-- Analyse the dark matter-only snapshots and diagnose possible inconsistency between the parent and zoomed halos
-- Configure SWIFT and Velociraptor (hydrodynamics and subgrid)
-- Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (hydro and subgrid)
-- The full hydro version of the zoom simulation is complete and ready to be analysed
+- Configure SWIFT and Velociraptor (dark matter-only).
+- Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (dark matter-only).
+- Analyse the dark matter-only snapshots and diagnose possible inconsistency between the parent and zoomed halos.
+- Configure SWIFT and Velociraptor (hydrodynamics and subgrid).
+- Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (hydro and subgrid).
+- The full hydro version of the zoom simulation is complete and ready to be analysed.
 
 
 The parent box
