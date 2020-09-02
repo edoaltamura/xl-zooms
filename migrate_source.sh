@@ -1,14 +1,16 @@
 #!/bin/bash
-destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms
-subdirectory=HYDRO
+destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
 run_name=EAGLE-XL_ClusterSK0
 
-mkdir -p destination_directory/$subdirectory
-mkdir -p destination_directory/$subdirectory/$run_name
-mkdir -p destination_directory/$subdirectory/$run_name/logs
+mkdir -p /cosma7/data/dp004/dc-alta2/xl-zooms
+mkdir -p $destination_directory
+mkdir -p $destination_directory/$run_name
+mkdir -p $destination_directory/$run_name/logs
 
-cp ./swift/parameters_hydro.yml destination_directory/$subdirectory/$run_name
-cp ./swift/run_hydro.slurm destination_directory/$subdirectory/$run_name
-cp ./swift/snap_redshifts.txt destination_directory/$subdirectory/$run_name
+cp ./swift/parameters_hydro.yml $destination_directory/$run_name
+cp ./swift/run_hydro.slurm $destination_directory/$run_name
+cp ./swift/snap_redshifts.txt $destination_directory/$run_name
 
-sbatch destination_directory/$subdirectory/$run_name/run_hydro.slurm
+cd $destination_directory/$run_name
+sbatch ./run_hydro.slurm
+squeue -u dc-alta2
