@@ -27,13 +27,20 @@ TimeIntegration:
 # Parameters governing the snapshots
 Snapshots:
   basename:            EAGLE-XL_ClusterSK0_HYDRO # Common part of the name of output files
-  scale_factor_first:  0.05
   delta_time:          1.02
+  scale_factor_first:  0.02
+  output_list_on:      1
+  output_list:         ./snap_redshifts.txt
+  invoke_stf:          1
+  compression:         9
+  subdir:              snapshots
 
 # Parameters governing the conserved quantities statistics
 Statistics:
-  delta_time:           1.02
-  scale_factor_first:   0.05
+  delta_time: 1.02
+  scale_factor_first: 0.02
+  output_list_on: 1
+  output_list: ./snap_redshifts.txt
 
 # Parameters for the self-gravity scheme
 Gravity:
@@ -60,22 +67,34 @@ FOF:
   scale_factor_first:              0.01        # Scale-factor of first FoF black hole seeding calls.
   delta_time:                      1.005       # Scale-factor ratio between consecutive FoF black hole seeding calls.
 
+StructureFinding:
+ config_file_name:     vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
+ basename:             EAGLE-XL_ClusterSK0_HYDRO                         # Base name for VELOCIraptor output files
+ subdir_per_output:    stf                            # Make a stf_XXXX subdirectory for each output
+ scale_factor_first:   0.02                            # Scale-factor of the first output
+ delta_time:           1.02                            # Delta log-a between outputs
+ output_list_on:       1
+ output_list:          ./v_redshifts.txt
+
 Scheduler:
   max_top_level_cells:   32
   cell_split_size:       100
   tasks_per_cell:        5
 
 Restarts:
-  delta_hours:  1.0
+  enable: 1
+  delta_hours: 2.0
+  max_run_time: 71.5         # In hours
+  onexit: 1
 
 # Parameters related to the initial conditions
 InitialConditions:
-  file_name:  EAGLE_L0050N0752_ICs.hdf5
-  periodic:   1
-  cleanup_h_factors: 1               # Remove the h-factors inherited from Gadget
-  cleanup_velocity_factors: 1        # Remove the sqrt(a) factor in the velocities inherited from Gadget
-  generate_gas_in_ics: 1             # Generate gas particles from the DM-only ICs
-  cleanup_smoothing_lengths: 1       # Since we generate gas, make use of the (expensive) cleaning-up procedure.
+  file_name:                       /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5
+  periodic:                        1
+  cleanup_h_factors:               1        # Remove the h-factors inherited from Gadget
+  cleanup_velocity_factors:        1        # Remove the sqrt(a) factor in the velocities inherited from Gadget
+  generate_gas_in_ics:             1        # Generate gas particles from the DM-only ICs
+  cleanup_smoothing_lengths:       1        # Since we generate gas, make use of the (expensive) cleaning-up procedure.
 
 # Impose primoridal metallicity
 EAGLEChemistry:

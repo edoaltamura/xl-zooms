@@ -2,25 +2,17 @@
 
 # Bash script that configures and compiles VELOCIRAPTOR-STF.
 
-source ./modules.sh
+source ../../modules.sh
 
-old_directory=$(pwd)
-
-if [ ! -d ~/VELOCIraptor-STF ]; then
+if [ ! -d ./VELOCIraptor-STF-hydro ]; then
   echo VELOCIraptor-STF source code not found - cloning from GitLab...
-  cd ~
   git clone https://github.com/pelahi/VELOCIraptor-STF
-  cd $old_directory
+  mv ./VELOCIraptor-STF ./VELOCIraptor-STF-hydro
 fi
 
-cd ~/VELOCIraptor-STF
+cd ./VELOCIraptor-STF-hydro
 git fetch
 
 # Configure makefile. Compile into executable ./stf
-cmake . -DVR_ZOOM_SIM=ON -DCMAKE_BUILD_TYPE=Release -DVR_USE_HYDRO=OFF -DVR_USE_SWIFT_INTERFACE=OFF
+cmake . -DVR_USE_HYDRO=ON -DVR_USE_SWIFT_INTERFACE=ON -DCMAKE_CXX_FLAGS="-fPIC" -DCMAKE_BUILD_TYPE=Release -DVR_MPI=OFF -DVR_ZOOM_SIM=ON
 make -j
-
-# Copy executable into xl-zooms directory
-cd $old_directory
-rm ./stf
-cp ~/VELOCIraptor-STF/stf .

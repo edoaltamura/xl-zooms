@@ -13,6 +13,13 @@ fi
 # Configure makefile
 cd ./swiftsim-hydro
 sh ./autogen.sh
-sh ./configure --with-subgrid=EAGLE-XL --with-hydro=sphenix --with-kernel=wendland-C2 --with-tbbmalloc --enable-ipo
+sh ./configure \
+  --with-subgrid=EAGLE-XL \
+  --with-hydro=sphenix \
+  --with-kernel=wendland-C2 \
+  --with-tbbmalloc \
+  --enable-ipo \
+  --with-velociraptor=../velociraptor/interface-swift/VELOCIraptor-STF-hydro/src
+
 make -j
 cd ..

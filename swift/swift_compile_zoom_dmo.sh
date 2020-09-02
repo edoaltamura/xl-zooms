@@ -13,6 +13,10 @@ fi
 # Configure makefile
 cd ./swiftsim-dmo
 sh ./autogen.sh
-sh ./configure --with-tbbmalloc --enable-ipo
+sh ./configure \
+  --with-tbbmalloc \
+  --enable-ipo \
+  --with-velociraptor=../velociraptor/interface-swift/VELOCIraptor-STF-dmo/src
+
 make -j
 cd ..
