@@ -16,7 +16,7 @@ sh ./autogen.sh
 sh ./configure \
   --with-tbbmalloc \
   --enable-ipo \
-  --with-velociraptor=../velociraptor/interface-swift/VELOCIraptor-STF-dmo/src
+  --with-velociraptor=`pwd`/../velociraptor/interface-swift/VELOCIraptor-STF-dmo/src
 
 make -j
 cd ..
