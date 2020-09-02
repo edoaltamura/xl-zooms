@@ -2,30 +2,17 @@
 
 # Bash script that configures and compiles SWIFT.
 
-source ./modules.sh
+source ../modules.sh
 
-old_directory=$(pwd)
-
-if [ ! -d ~/swiftsim ]; then
+if [ ! -d ./swiftsim-hydro ]; then
   echo SWIFT source code not found - cloning from GitLab...
-  cd ~
   git clone https://gitlab.cosma.dur.ac.uk/swift/swiftsim.git
-  cd $old_directory
+  mv ./swiftsim ./swiftsim-hydro
 fi
 
-cd ~/swiftsim
+# Configure makefile
+cd ./swiftsim-hydro
 sh ./autogen.sh
-sh ./configure \
-  --with-hydro-dimension=2 \
-  --with-hydro=sphenix \
-  --with-kernel=quintic-spline \
-  --disable-hand-vec
-
-# Configure makefile. Compile into executable ./swift
-cmake . -DVR_ZOOM_SIM=ON -DCMAKE_BUILD_TYPE=Release -DVR_USE_HYDRO=OFF -DVR_USE_SWIFT_INTERFACE=OFF
+sh ./configure --with-subgrid=EAGLE-XL --with-hydro=sphenix --with-kernel=wendland-C2 --with-tbbmalloc --enable-ipo
 make -j
-
-# Copy executable into xl-zooms directory
-cd $old_directory
-rm ./swift
-cp ~/swiftsim/examples/swift .
+cd ..
