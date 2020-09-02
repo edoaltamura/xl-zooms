@@ -26,7 +26,7 @@ TimeIntegration:
   
 # Parameters governing the snapshots
 Snapshots:
-  basename:            eagle # Common part of the name of output files
+  basename:            EAGLE-XL_ClusterSK0_HYDRO # Common part of the name of output files
   scale_factor_first:  0.05
   delta_time:          1.02
 

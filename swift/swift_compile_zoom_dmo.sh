@@ -13,6 +13,6 @@ fi
 # Configure makefile
 cd ./swiftsim-dmo
 sh ./autogen.sh
-sh ./configure --with-tbbmalloc
+sh ./configure --with-tbbmalloc --enable-ipo
 make -j
 cd ..
