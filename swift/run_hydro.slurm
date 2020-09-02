@@ -11,11 +11,16 @@
 #SBATCH -t 10:00:00
 #
 
-source ../modules.sh
-
-if [ ! -d ./logs ]; then
-  mkdir logs
-fi
+module purge
+module load intel_comp/2020
+module load intel_mpi/2020
+module load parmetis/4.0.3
+module load parallel_hdf5/1.10.3
+module load gsl/2.4
+module load fftw/3.3.7
+module load cmake
+module load python/3.6.5
+module load ffmpeg/4.0.2
 
 # Start from ICs if we have a file 'begin'
 #restartflag="--restart"
@@ -28,8 +33,8 @@ fi
 
 # Run swift
 mpirun -np $SLURM_NTASKS \
-    ./swiftsim-hydro/examples/swift \
-    --verbose=1 --cosmology --eagle --pin --velociraptor\
+     ~/xl-zooms/swift/swiftsim-hydro/examples/swift \
+    --verbose=1 --cosmology --eagle --pin\
     --threads=$SLURM_CPUS_PER_TASK \
     ./parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
 

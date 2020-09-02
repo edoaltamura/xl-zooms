@@ -1,6 +1,6 @@
 # Define some meta-data about the simulation
 MetaData:
-  run_name:   EAGLE-L0050N0752-Ref
+  run_name:   EAGLE-XL_ClusterSK0_HYDRO
 
 # Define the system of units to use internally. 
 InternalUnitSystem:
@@ -31,7 +31,7 @@ Snapshots:
   scale_factor_first:  0.02
   output_list_on:      1
   output_list:         ./snap_redshifts.txt
-  invoke_stf:          1
+  invoke_stf:          0
   compression:         9
   subdir:              snapshots
 
@@ -67,14 +67,14 @@ FOF:
   scale_factor_first:              0.01        # Scale-factor of first FoF black hole seeding calls.
   delta_time:                      1.005       # Scale-factor ratio between consecutive FoF black hole seeding calls.
 
-StructureFinding:
- config_file_name:     ../velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
- basename:             EAGLE-XL_ClusterSK0_HYDRO                         # Base name for VELOCIraptor output files
- subdir_per_output:    stf                            # Make a stf_XXXX subdirectory for each output
- scale_factor_first:   0.02                            # Scale-factor of the first output
- delta_time:           1.02                            # Delta log-a between outputs
- output_list_on:       1
- output_list:          ./v_redshifts.txt
+#StructureFinding:
+# config_file_name:     ../velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
+# basename:             EAGLE-XL_ClusterSK0_HYDRO                         # Base name for VELOCIraptor output files
+# subdir_per_output:    stf                            # Make a stf_XXXX subdirectory for each output
+# scale_factor_first:   0.02                            # Scale-factor of the first output
+# delta_time:           1.02                            # Delta log-a between outputs
+# output_list_on:       1
+# output_list:          ./v_redshifts.txt
 
 Scheduler:
   max_top_level_cells:   32
@@ -111,7 +111,7 @@ EAGLEChemistry:
 
 # EAGLE cooling parameters
 EAGLECooling:
-  dir_name:                ./coolingtables/
+  dir_name:                ~/xl-zooms/swift/coolingtables/
   H_reion_z:               11.5 
   H_reion_eV_p_H:          2.0
   He_reion_z_centre:       3.5
@@ -152,7 +152,7 @@ EAGLEFeedback:
   use_AGB_enrichment:               1               # Global switch for enrichement from AGB stars.
   use_SNII_enrichment:              1               # Global switch for enrichement from SNII stars.
   use_SNIa_enrichment:              1               # Global switch for enrichement from SNIa stars.
-  filename:                         ./yieldtables/  # Path to the directory containing the EAGLE yield tables.
+  filename:                         ~/xl-zooms/swift/yieldtables/  # Path to the directory containing the EAGLE yield tables.
   IMF_min_mass_Msun:                0.1             # Minimal stellar mass considered for the Chabrier IMF in solar masses.
   IMF_max_mass_Msun:              100.0             # Maximal stellar mass considered for the Chabrier IMF in solar masses.
   SNII_min_mass_Msun:               6.0             # Minimal mass considered for SNII feedback (not SNII enrichment!) in solar masses.
