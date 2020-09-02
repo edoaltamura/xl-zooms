@@ -13,9 +13,9 @@
 
 source ../modules.sh
 
-# Stripe snapshots only
-lfs setstripe --stripe-count=1 --stripe-size=16M ./restart/
-lfs setstripe --stripe-count=2 --stripe-size=16M ./snapshots/
+if [ ! -d ./logs ]; then
+  mkdir logs
+fi
 
 # Start from ICs if we have a file 'begin'
 #restartflag="--restart"
