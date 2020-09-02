@@ -18,8 +18,8 @@ sh ./configure \
   --with-hydro=sphenix \
   --with-kernel=wendland-C2 \
   --with-tbbmalloc \
-  --enable-ipo \
-  --with-velociraptor=`pwd`/../velociraptor/interface-swift/VELOCIraptor-STF-hydro/src
+  --enable-ipo
+#  --with-velociraptor=`pwd`/../velociraptor/interface-swift/VELOCIraptor-STF-hydro/src
 
 make -j
 cd ..
