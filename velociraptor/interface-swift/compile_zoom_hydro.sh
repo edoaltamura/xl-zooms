@@ -2,7 +2,7 @@
 
 # Bash script that configures and compiles VELOCIRAPTOR-STF.
 
-source ../../modules.sh
+#source ../../modules.sh
 
 if [ ! -d ./VELOCIraptor-STF-hydro ]; then
   echo VELOCIraptor-STF source code not found - cloning from GitLab...

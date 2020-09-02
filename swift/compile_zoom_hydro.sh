@@ -5,7 +5,7 @@
 source ../modules.sh
 
 echo Preparing VELOCIraptor code...
-sh ../velociraptor/interface-swift/compile_zoom_hydro.sh
+source ../velociraptor/interface-swift/compile_zoom_hydro.sh
 
 if [ ! -d ./swiftsim-hydro ]; then
   echo SWIFT source code not found - cloning from GitLab...
