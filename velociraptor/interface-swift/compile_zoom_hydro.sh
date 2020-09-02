@@ -14,5 +14,5 @@ cd ./VELOCIraptor-STF-hydro
 git fetch
 
 # Configure makefile. Compile into executable ./stf
-cmake . -DVR_USE_HYDRO=ON -DVR_USE_SWIFT_INTERFACE=ON -DCMAKE_CXX_FLAGS="-fPIC" -DCMAKE_BUILD_TYPE=Release -DVR_MPI=OFF -DVR_ZOOM_SIM=ON
+cmake . -DVR_USE_HYDRO=ON -DVR_USE_SWIFT_INTERFACE=ON -DCMAKE_CXX_FLAGS="-fPIC" -DCMAKE_BUILD_TYPE=Release -DVR_ZOOM_SIM=ON
 make -j
