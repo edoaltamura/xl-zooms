@@ -68,7 +68,7 @@ FOF:
   delta_time:                      1.005       # Scale-factor ratio between consecutive FoF black hole seeding calls.
 
 StructureFinding:
- config_file_name:     vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
+ config_file_name:     ../velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
  basename:             EAGLE-XL_ClusterSK0_HYDRO                         # Base name for VELOCIraptor output files
  subdir_per_output:    stf                            # Make a stf_XXXX subdirectory for each output
  scale_factor_first:   0.02                            # Scale-factor of the first output
