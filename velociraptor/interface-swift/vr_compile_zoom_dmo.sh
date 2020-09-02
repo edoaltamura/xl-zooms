@@ -6,7 +6,7 @@ source ../../modules.sh
 
 if [ ! -d ./VELOCIraptor-STF-dmo ]; then
   echo VELOCIraptor-STF source code not found - cloning from GitLab...
-  git clone https://github.com/pelahi/VELOCIraptor-STF
+  git clone https://github.com/ICRAR/VELOCIraptor-STF
   mv ./VELOCIraptor-STF ./VELOCIraptor-STF-dmo
 fi
 
