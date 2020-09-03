@@ -1,4 +1,7 @@
 #!/bin/bash
+
+source modules.sh
+
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
 run_name=EAGLE-XL_ClusterSK0
 
