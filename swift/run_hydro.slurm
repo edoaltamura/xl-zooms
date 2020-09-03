@@ -1,5 +1,5 @@
 #!/bin/bash
-#
+
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=28
 #SBATCH --exclusive
@@ -8,8 +8,9 @@
 #SBATCH -e ./logs/%x.%J.err
 #SBATCH -p cosma7
 #SBATCH -A dp004
-#SBATCH -t 10:00:00
-#
+#SBATCH -t 90:00:00
+
+export OMP_NUM_THREADS=$SLURM_NTASKS
 
 module purge
 module load intel_comp/2020
@@ -23,20 +24,24 @@ module load python/3.6.5
 module load ffmpeg/4.0.2
 
 # Start from ICs if we have a file 'begin'
-#restartflag="--restart"
-#if [ -e begin ] ; then
-#  \rm -f begin
-#  restartflag=""
-#fi
+restartflag="--restart"
+if [ -e begin ] ; then
+  \rm -f begin
+  restartflag=""
+fi
 
-# Use ${restartflag}
+# Use
 
 # Run swift
-mpirun -np $SLURM_NTASKS \
-     ~/xl-zooms/swift/swiftsim-hydro/examples/swift \
-    --verbose=1 --cosmology --eagle --pin\
-    --threads=$SLURM_CPUS_PER_TASK \
-    ./parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
+./swiftsim-hydro/examples/swift \
+  ${restartflag} \
+  -v 1 \
+  --cosmology \
+  --eagle \
+  --velociraptor \
+  --pin \
+  --threads=$OMP_NUM_THREADS \
+  ./parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
 
 echo "Job done, info follows..."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
