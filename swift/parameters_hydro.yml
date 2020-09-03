@@ -30,7 +30,7 @@ Snapshots:
   delta_time:          1.02
   scale_factor_first:  0.02
   output_list_on:      1
-  output_list:         ./snap_redshifts.txt
+  output_list:         ./config/snap_redshifts.txt
   invoke_stf:          0
   compression:         9
   subdir:              snapshots
@@ -40,7 +40,7 @@ Statistics:
   delta_time: 1.02
   scale_factor_first: 0.02
   output_list_on: 1
-  output_list: ./snap_redshifts.txt
+  output_list: ./config/snap_redshifts.txt
 
 # Parameters for the self-gravity scheme
 Gravity:
@@ -68,13 +68,13 @@ FOF:
   delta_time:                      1.005       # Scale-factor ratio between consecutive FoF black hole seeding calls.
 
 StructureFinding:
- config_file_name:     ./vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
+ config_file_name:     ./config/vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
  basename:             EAGLE-XL_ClusterSK0_HYDRO                         # Base name for VELOCIraptor output files
  subdir_per_output:    stf                            # Make a stf_XXXX subdirectory for each output
  scale_factor_first:   0.02                            # Scale-factor of the first output
  delta_time:           1.02                            # Delta log-a between outputs
  output_list_on:       1
- output_list:          ./v_redshifts.txt
+ output_list:          ./config/v_redshifts.txt
 
 Scheduler:
   max_top_level_cells:   32
@@ -89,7 +89,7 @@ Restarts:
 
 # Parameters related to the initial conditions
 InitialConditions:
-  file_name:                       ./EAGLE-XL_ClusterSK0.hdf5
+  file_name:                       ./ics/EAGLE-XL_ClusterSK0.hdf5
   periodic:                        1
   cleanup_h_factors:               1        # Remove the h-factors inherited from Gadget
   cleanup_velocity_factors:        1        # Remove the sqrt(a) factor in the velocities inherited from Gadget

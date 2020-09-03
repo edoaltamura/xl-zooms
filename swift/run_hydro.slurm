@@ -8,7 +8,7 @@
 #SBATCH -e ./logs/%x.%J.err
 #SBATCH -p cosma7
 #SBATCH -A dp004
-#SBATCH -t 90:00:00
+#SBATCH -t 60:00:00
 
 export OMP_NUM_THREADS=$SLURM_NTASKS
 
@@ -38,10 +38,9 @@ fi
   -v 1 \
   --cosmology \
   --eagle \
-  --velociraptor \
   --pin \
   --threads=$OMP_NUM_THREADS \
-  ./parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
+  ./config/parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
 
 echo "Job done, info follows..."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode

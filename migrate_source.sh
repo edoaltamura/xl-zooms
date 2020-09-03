@@ -49,20 +49,22 @@ sh ./configure \
   --with-kernel=wendland-C2 \
   --with-tbbmalloc \
   --enable-ipo
-  --with-velociraptor=`pwd`/../VELOCIraptor-STF-hydro/src
+#  --with-velociraptor=`pwd`/../VELOCIraptor-STF-hydro/src
 make -j
 cd ..
 
 mkdir -p ./logs
+mkdir -p ./config
+mkdir -p ./ics
 
 cp $old_directory/swift/run_hydro.slurm .
-cp $old_directory/swift/parameters_hydro.yml .
-cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg .
-cp $old_directory/swift/snap_redshifts.txt .
-cp $old_directory/swift/vr_redshifts.txt .
+cp $old_directory/swift/parameters_hydro.yml ./config
+cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
+cp $old_directory/swift/snap_redshifts.txt ./config
+cp $old_directory/swift/vr_redshifts.txt ./config
+cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 ./ics
 cp -r $old_directory/swift/coolingtables .
 cp -r $old_directory/swift/yieldtables .
-cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 .
 
 #sbatch ./run_hydro.slurm
 squeue -u dc-alta2
