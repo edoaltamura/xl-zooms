@@ -14,7 +14,7 @@ mkdir -p $destination_directory/$run_name
 # WE are now in the run data directory
 cd $destination_directory/$run_name || exit
 
-# Prepare Velociraptor
+# Prepare Velociraptor standlone
 if [ ! -d ./VELOCIraptor-STF-hydro ]; then
   echo VELOCIraptor-STF source code not found - cloning from GitLab...
   git clone https://github.com/ICRAR/VELOCIraptor-STF
@@ -25,7 +25,7 @@ fi
 cd ./VELOCIraptor-STF-hydro || exit
 git fetch
 cmake . -DVR_USE_HYDRO=ON \
-  -DVR_USE_SWIFT_INTERFACE=ON \
+  -DVR_USE_SWIFT_INTERFACE=OFF \
   -DCMAKE_CXX_FLAGS="-fPIC" \
   -DCMAKE_BUILD_TYPE=Release \
   -DVR_ZOOM_SIM=ON \
