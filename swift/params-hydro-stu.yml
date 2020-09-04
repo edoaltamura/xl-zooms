@@ -1,10 +1,10 @@
 # Define some meta-data about the simulation
 MetaData:
-  run_name:   EAGLE-XL_ClusterSK0_HYDRO
+  run_name:   EAGLE-XL_Cluster100
 
 # Define the system of units to use internally. 
 InternalUnitSystem:
-  UnitMass_in_cgs:     1.98848e43    # 10^10 M_sun in grams
+  UnitMass_in_cgs:     1.98841e43    # 10^10 M_sun in grams
   UnitLength_in_cgs:   3.08567758e24 # Mpc in centimeters
   UnitVelocity_in_cgs: 1e5           # km/s in centimeters per second
   UnitCurrent_in_cgs:  1             # Amperes
@@ -12,12 +12,12 @@ InternalUnitSystem:
 
 # Cosmological parameters
 Cosmology:
-  h:              0.6777        # Reduced Hubble constant
-  a_begin:        0.0078125     # Initial scale-factor of the simulation
-  a_end:          1.0           # Final scale factor of the simulation
-  Omega_m:        0.307         # Matter density parameter
-  Omega_lambda:   0.693         # Dark-energy density parameter
-  Omega_b:        0.0455        # Baryon density parameter
+  h:              0.67660
+  a_begin:        0.00781250
+  a_end:          1.00000000
+  Omega_m:        0.31110000
+  Omega_lambda:   0.68890000
+  Omega_b:        0.04897000
 
 # Parameters governing the time integration
 TimeIntegration:
@@ -26,13 +26,9 @@ TimeIntegration:
   
 # Parameters governing the snapshots
 Snapshots:
-  basename:            EAGLE-XL_ClusterSK0_HYDRO # Common part of the name of output files
-  delta_time:          1.02
-  scale_factor_first:  0.02
+  basename:            eagle # Common part of the name of output files
   output_list_on:      1
-  output_list:         ./config/snap_redshifts.txt
-  invoke_stf:          0
-  compression:         9
+  output_list:         ../../stf_times_a_sam
   subdir:              snapshots
 
 # Parameters governing the conserved quantities statistics
@@ -54,7 +50,7 @@ Gravity:
   epsilon_fmm:                      0.001
   allow_truncation_in_MAC:          1
   use_tree_below_softening:         1
-  
+
 # Parameters for the hydrodynamics scheme
 SPH:
   resolution_eta:                    1.2348   # Target smoothing length in units of the mean inter-particle separation (1.2348 == 48Ngbs with the cubic spline kernel).
@@ -66,43 +62,46 @@ SPH:
   particle_splitting:                1        # Particle splitting is ON
   particle_splitting_mass_threshold: 7e-3     # (internal units, i.e. 7e6 Msun ~ 4x initial gas particle mass)
 
+# Parameters of the stars neighbour search
+Stars:
+  resolution_eta:        1.1642   # Target smoothing length in units of the mean inter-particle separation
+  h_tolerance:           7e-3
+
 # Parameters for the Friends-Of-Friends algorithm
 FOF:
   basename:                        fof_output  # Filename for the FOF outputs.
   min_group_size:                  256         # The minimum no. of particles required for a group.
   linking_length_ratio:            0.2         # Linking length in units of the main inter-particle separation.
   black_hole_seed_halo_mass_Msun:  1.5e10      # Minimal halo mass in which to seed a black hole (in solar masses).
-  scale_factor_first:              0.01        # Scale-factor of first FoF black hole seeding calls.
-  delta_time:                      1.005       # Scale-factor ratio between consecutive FoF black hole seeding calls.
-
-StructureFinding:
- config_file_name:     ./config/vrconfig_3dfof_subhalos_SO_hydro.cfg  # See the VELOCIraptor manual for the content of this file.
- basename:             EAGLE-XL_ClusterSK0_HYDRO                         # Base name for VELOCIraptor output files
- subdir_per_output:    stf                            # Make a stf_XXXX subdirectory for each output
- scale_factor_first:   0.02                            # Scale-factor of the first output
- delta_time:           1.02                            # Delta log-a between outputs
- output_list_on:       1
- output_list:          ./config/v_redshifts.txt
+  scale_factor_first:              0.05        # Scale-factor of first FoF black hole seeding calls.
+  delta_time:                      1.00751     # Scale-factor ratio between consecutive FoF black hole seeding calls.
 
 Scheduler:
   max_top_level_cells:   32
-  cell_split_size:       100
-  tasks_per_cell:        5
-
+  cell_split_size:       200
+  
 Restarts:
-  enable: 1
-  delta_hours: 2.0
-  max_run_time: 71.5         # In hours
-  onexit: 1
+  onexit:       1
+  delta_hours:  0.1
+  max_run_time: 71.5                 # Three days minus fergie time
 
 # Parameters related to the initial conditions
 InitialConditions:
-  file_name:                       ./ics/EAGLE-XL_ClusterSK0.hdf5
-  periodic:                        1
-  cleanup_h_factors:               1        # Remove the h-factors inherited from Gadget
-  cleanup_velocity_factors:        1        # Remove the sqrt(a) factor in the velocities inherited from Gadget
-  generate_gas_in_ics:             1        # Generate gas particles from the DM-only ICs
-  cleanup_smoothing_lengths:       1        # Since we generate gas, make use of the (expensive) cleaning-up procedure.
+  file_name:  /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_Cluster100.hdf5
+  periodic:   1
+  cleanup_h_factors: 1               # Remove the h-factors inherited from Gadget
+  cleanup_velocity_factors: 1        # Remove the sqrt(a) factor in the velocities inherited from Gadget
+  generate_gas_in_ics: 1             # Generate gas particles from the DM-only ICs
+  cleanup_smoothing_lengths: 1       # Since we generate gas, make use of the (expensive) cleaning-up procedure.
+
+# Parameters of the line-of-sight outputs
+LineOfSight:
+  basename:            eagle_los
+  num_along_x:         0
+  num_along_y:         0
+  num_along_z:         100
+  scale_factor_first:  0.1
+  delta_time:          1.1
 
 # Impose primoridal metallicity
 EAGLEChemistry:
@@ -119,7 +118,7 @@ EAGLEChemistry:
 
 # EAGLE cooling parameters
 EAGLECooling:
-  dir_name:                ./coolingtables/
+  dir_name:                ../../coolingtables/
   H_reion_z:               7.5                 # Planck 2018
   H_reion_eV_p_H:          2.0
   He_reion_z_centre:       3.5
@@ -136,7 +135,7 @@ EAGLEStarFormation:
   min_over_density:                  57.7      # The over-density above which star-formation is allowed.
   KS_high_density_threshold_H_p_cm3: 1e3       # Hydrogen number density above which the Kennicut-Schmidt law changes slope in Hydrogen atoms per cm^3.
   KS_high_density_exponent:          2.0       # Slope of the Kennicut-Schmidt law above the high-density threshold.
-  EOS_temperature_margin_dex:        0.5       # Logarithm base 10 of the maximal temperature difference above the EOS allowed to form stars.
+  EOS_entropy_margin_dex:            0.5       # Logarithm base 10 of the maximal entropy above the EOS at which stars can form.
   threshold_norm_H_p_cm3:            0.1       # Normalisation of the metal-dependant density threshold for star formation in Hydrogen atoms per cm^3.
   threshold_Z0:                      0.002     # Reference metallicity (metal mass fraction) for the metal-dependant threshold for star formation.
   threshold_slope:                   -0.64     # Slope of the metal-dependant star formation threshold
@@ -160,7 +159,7 @@ EAGLEFeedback:
   use_AGB_enrichment:               1               # Global switch for enrichement from AGB stars.
   use_SNII_enrichment:              1               # Global switch for enrichement from SNII stars.
   use_SNIa_enrichment:              1               # Global switch for enrichement from SNIa stars.
-  filename:                         ./yieldtables/  # Path to the directory containing the EAGLE yield tables.
+  filename:                         ../../yieldtables/  # Path to the directory containing the EAGLE yield tables.
   IMF_min_mass_Msun:                0.1             # Minimal stellar mass considered for the Chabrier IMF in solar masses.
   IMF_max_mass_Msun:              100.0             # Maximal stellar mass considered for the Chabrier IMF in solar masses.
   SNII_min_mass_Msun:               8.0             # Minimal mass considered for SNII stars in solar masses.
@@ -215,4 +214,9 @@ EAGLEAGN:
   merger_threshold_type:              2          # Type of velocity threshold for BH mergers (0: v_circ at kernel edge, 1: v_esc at actual distance, with softening, 2: v_esc at actual distance, no softening).
   merger_max_distance_ratio:          3.0        # Maximal distance over which two BHs can merge, in units of the softening length.
 
-  
+StructureFinding:
+  config_file_name:         ../../velociraptor_config.cfg
+  basename:                 grp
+  output_list_on:           0
+  output_list:              ../../stf_times_a_sam
+  subdir_per_output:        grp
