@@ -86,8 +86,7 @@ StructureFinding:
 
 Scheduler:
   max_top_level_cells:   32
-  cell_split_size:       100
-  tasks_per_cell:        5
+  cell_split_size:       200
 
 Restarts:
   enable: 1
