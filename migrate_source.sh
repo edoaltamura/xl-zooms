@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# USAGE
+# Run with: git pull; source migrate_source.sh
+
 source modules.sh
 
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
@@ -57,7 +60,8 @@ mkdir -p ./logs
 mkdir -p ./config
 mkdir -p ./ics
 
-cp $old_directory/swift/run_hydro.slurm .
+cp $old_directory/swift/run_swift.slurm .
+cp 
 cp $old_directory/swift/parameters_hydro.yml ./config
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
@@ -66,6 +70,7 @@ cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 ./
 cp -r $old_directory/swift/coolingtables .
 cp -r $old_directory/swift/yieldtables .
 
-#sbatch ./run_hydro.slurm
+sbatch ./run_swift.slurm
 squeue -u dc-alta2
 cd "$old_directory" || exit
+exit
