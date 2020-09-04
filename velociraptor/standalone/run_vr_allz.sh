@@ -1,42 +1,58 @@
 #!/bin/bash -l
 
-# Bash script that runs VELOCIRAPTOR-STF on a given snapshot.
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=28
+#SBATCH --exclusive
+#SBATCH -J VR-EAGLE-XL_ClusterSK0_HYDRO
+#SBATCH -o ./logs/%x.%J.out
+#SBATCH -e ./logs/%x.%J.err
+#SBATCH -p cosma7
+#SBATCH -A dp004
+#SBATCH -t 60:00:00
 
-source ./modules.sh
+export OMP_NUM_THREADS=$SLURM_NTASKS
 
-export OMP_NUM_THREADS=24
+module purge
+module load intel_comp/2020
+module load intel_mpi/2020
+module load parmetis/4.0.3
+module load parallel_hdf5/1.10.3
+module load gsl/2.4
+module load fftw/3.3.7
+module load cmake
+module load python/3.6.5
+module load ffmpeg/4.0.2
 
-author="SK"
+config_template=./config/vrconfig_3dfof_subhalos_SO_hydro.cfg
 
-for i in 0 1 2
-do
+function get_snap_index
+{
+  filename=$1
+  tmp=${filename#*_}
+  num=${tmp%.*}
+  echo "$num"
+}
 
-  out_name="halo_${author}${i}_0001"
-  config_file="config_zoom_dmo.cfg"
-  stdout_name="vr_output_${out_name}.stdout"
-  stderr_name="vr_output_${out_name}.stderr"
+mkdir -p "$PWD/stf"
 
-  # Specify the path to the snapshot (without the final .hdf5 extension)
-  snap_path="/cosma6/data/dp004/rttw52/EAGLE-XL/EAGLE-XL_Cluster${author}${i}_DMO/snapshots/EAGLE-XL_Cluster${author}${i}_DMO_0001"
+for snap_path in ./snapshots/*.hdf5; do
 
-  outpath="/cosma6/data/dp004/dc-alta2/xl-zooms/${out_name}"
-  stdout_path="${outpath}/${stdout_name}"
-  stderr_path="${outpath}/${stderr_name}"
+  # NOTE: $snap_path contains also the relative path to the hdf5 file
+  snap_name=$(basename "$snap_path")                                    # Delete the path info in $snap_path and retain "filename.hdf5"
+  base_name=$(echo "$snap_name" | cut -f 1 -d '.')                      # Delete the file extension in $name and retain "filename"
+  out_dir_name=$base_name                                               # Make it the name of output directory
+  outpath="$PWD/stf/$out_dir_name"                                      # Create a directory named as "filename"
+  mkdir -p "$outpath"
 
-  echo "Running VR for ${out_name}"
-  if [ -d $outpath ]; then
-    rm -rf $outpath
-  fi
-  mkdir $outpath
+  cp $config_template "$outpath"                                        # Copy template config file in output directory
+  mv "$outpath/$(basename $config_template)" "$outpath/$base_name.cfg"  # Rename with its corresponding snapshot name
+  config_file="$outpath/$base_name.cfg"                                 # Create new file path
+  sed -i "s/SNAP/$(get_snap_index $snap_name)/" "$config_file"          # Replace snapshot-specific data in cfg template
+  stdout_path="$PWD/stf/$out_dir_name/$base_name.stdout"                # Create file paths for stdout in output directory
+  stderr_path="$PWD/stf/$out_dir_name/$base_name.stderr"                # Create file paths for stderr in output directory
 
-  # Change the config file for the output number
-  cp ./$config_file $outpath
-  sed 's/SNAP/0001/' $outpath/$config_file
+  ./VELOCIraptor-STF-hydro/stf -i "$snap_path" -I 2 -o "$outpath" -C "$config_file" > "$stdout_path" 2>"$stderr_path"
 
-  ./stf -i $snap_path -I 2 -o $outpath -C $outpath/$config_file > $stdout_path 2>$stderr_path
-
-  # Move outputs inside directory
-  mv /cosma6/data/dp004/dc-alta2/xl-zooms/$out_name.* $outpath
+  mv "$PWD/stf/$base_name".* "$outpath"                                 # Move outputs inside directory
 
 done
-

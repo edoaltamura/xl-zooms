@@ -61,7 +61,7 @@ mkdir -p ./config
 mkdir -p ./ics
 
 cp $old_directory/swift/run_swift.slurm .
-cp 
+cp $old_directory/velociraptor/standlone/run_vr_allz.sh .
 cp $old_directory/swift/parameters_hydro.yml ./config
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
