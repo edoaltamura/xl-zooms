@@ -23,16 +23,9 @@ module load cmake
 module load python/3.6.5
 module load ffmpeg/4.0.2
 
-# Start from ICs if we have a file 'begin'
-restartflag="--restart"
-if [ -e begin ] ; then
-  \rm -f begin
-  restartflag=""
-fi
 
 # Run swift
 ./swiftsim-hydro/examples/swift \
-  ${restartflag} \
   -v 1 \
   --cosmology \
   --eagle \
