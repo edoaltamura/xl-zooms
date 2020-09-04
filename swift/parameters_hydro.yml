@@ -82,7 +82,7 @@ StructureFinding:
  scale_factor_first:   0.02                            # Scale-factor of the first output
  delta_time:           1.02                            # Delta log-a between outputs
  output_list_on:       1
- output_list:          ./config/v_redshifts.txt
+ output_list:          ./config/vr_redshifts.txt
 
 Scheduler:
   max_top_level_cells:   32
