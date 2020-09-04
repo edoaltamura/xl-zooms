@@ -56,3 +56,7 @@ for snap_path in ./snapshots/*.hdf5; do
   mv "$PWD/stf/$base_name".* "$outpath"                                 # Move outputs inside directory
 
 done
+
+echo "Job done, info follows..."
+sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
+exit

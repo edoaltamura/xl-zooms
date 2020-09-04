@@ -70,6 +70,8 @@ cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 ./
 cp -r $old_directory/swift/coolingtables .
 cp -r $old_directory/swift/yieldtables .
 
+mv ./run_vr_allz.sh ./run_vr.slurm
+
 sbatch ./run_swift.slurm
 squeue -u dc-alta2
 cd "$old_directory" || exit
