@@ -61,7 +61,7 @@ mkdir -p ./config
 mkdir -p ./ics
 
 cp $old_directory/swift/run_swift.slurm .
-cp $old_directory/velociraptor/standlone/run_vr_allz.sh .
+cp $old_directory/velociraptor/standlone/run_vr.slurm .
 cp $old_directory/swift/parameters_hydro.yml ./config
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
@@ -69,8 +69,6 @@ cp $old_directory/swift/vr_redshifts.txt ./config
 cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 ./ics
 cp -r $old_directory/swift/coolingtables .
 cp -r $old_directory/swift/yieldtables .
-
-mv ./run_vr_allz.sh ./run_vr.slurm
 
 sbatch ./run_swift.slurm
 squeue -u dc-alta2
