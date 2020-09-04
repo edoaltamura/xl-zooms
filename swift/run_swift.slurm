@@ -30,8 +30,6 @@ if [ -e begin ] ; then
   restartflag=""
 fi
 
-# Use
-
 # Run swift
 ./swiftsim-hydro/examples/swift \
   ${restartflag} \
@@ -42,6 +40,11 @@ fi
   --threads=$OMP_NUM_THREADS \
   ./config/parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
 
-echo "Job done, info follows..."
+echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
+
+echo "Initializing Velociraptor on outputs..."
+sbatch ./run_vr.slurm
+squeue -u dc-alta2
+
 exit
