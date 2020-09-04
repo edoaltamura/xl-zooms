@@ -39,5 +39,3 @@ sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,M
 echo "Initializing Velociraptor on outputs..."
 sbatch ./run_vr.slurm
 squeue -u dc-alta2
-
-exit

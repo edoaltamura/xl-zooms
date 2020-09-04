@@ -59,4 +59,3 @@ done
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
-exit

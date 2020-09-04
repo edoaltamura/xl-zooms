@@ -73,4 +73,3 @@ cp -r $old_directory/swift/yieldtables .
 sbatch ./run_swift.slurm
 squeue -u dc-alta2
 cd "$old_directory" || exit
-exit
