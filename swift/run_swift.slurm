@@ -31,7 +31,7 @@ module load ffmpeg/4.0.2
   --eagle \
   --pin \
   --threads=$OMP_NUM_THREADS \
-  ./config/parameters_hydro.yml 2>&1 | tee ./logs/stdout.log
+  ./config/eagle_lowres.yml 2>&1 | tee ./logs/stdout_swift.log
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
