@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=28
+#SBATCH --cpus-per-task=16
 #SBATCH --exclusive
 #SBATCH -J EAGLE-XL_ClusterSK0_HYDRO
 #SBATCH -o ./logs/%x.%J.out
 #SBATCH -e ./logs/%x.%J.err
-#SBATCH -p cosma7
+#SBATCH -p cosma6
 #SBATCH -A dp004
 #SBATCH -t 60:00:00
 
@@ -31,7 +31,7 @@ module load ffmpeg/4.0.2
   --eagle \
   --pin \
   --threads=$OMP_NUM_THREADS \
-  ./config/eagle_lowres.yml 2>&1 | tee ./logs/stdout_swift.log
+  ./config/eagle_-8res.yml 2>&1 | tee ./logs/stdout_swift.log
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode

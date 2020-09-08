@@ -62,7 +62,7 @@ mkdir -p ./ics
 
 cp $old_directory/swift/run_swift.slurm .
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
-cp $old_directory/swift/eagle_lowres.yml ./config
+cp $old_directory/swift/eagle_-8res.yml ./config
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
 cp $old_directory/swift/vr_redshifts.txt ./config
