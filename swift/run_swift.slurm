@@ -1,12 +1,12 @@
 #!/bin/bash
 
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=28
 #SBATCH --exclusive
 #SBATCH -J EAGLE-XL_ClusterSK0_HYDRO
 #SBATCH -o ./logs/%x.%J.out
 #SBATCH -e ./logs/%x.%J.err
-#SBATCH -p cosma6
+#SBATCH -p cosma7
 #SBATCH -A dp004
 #SBATCH -t 60:00:00
 
