@@ -58,6 +58,7 @@ Gravity:
   max_physical_DM_softening:     0.0007    # Max physical DM softening length (in internal units).
   comoving_baryon_softening:     0.0026994 # Comoving DM softening length (in internal units).
   max_physical_baryon_softening: 0.0007    # Max physical DM softening length (in internal units).
+  softening_ratio_background:    0.020
 
 # Parameters for the hydrodynamics scheme
 SPH:
@@ -67,7 +68,7 @@ SPH:
   CFL_condition:         0.2              # Courant-Friedrich-Levy condition for time integration.
   minimal_temperature:   100              # (internal units)
   particle_splitting:    1
-  particle_splitting_mass_threshold: 7e-4 # Internal units (i.e. 7e6 Msun ~ 4 times the initial gas mass)
+  particle_splitting_mass_threshold: 5.85562e-3 # Internal units (i.e. 7e6 Msun ~ 4 times the initial gas mass)
 
 # Parameters of the stars neighbour search
 Stars:
