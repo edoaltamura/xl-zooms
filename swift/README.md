@@ -22,41 +22,42 @@ Structure of this directory
 ./RUN_NAME
 |
 |-- config
-|   |-- eagle_-8res.yml
-|   |-- vrconfig_3dfof_subhalos_SO_hydro.cfg
-|   |-- snap_redshifts.txt
-|   |-- vr_redshifts.txt
+|   |-- SWIFT parameter file (.yml)
+|   |-- VR parameter file (.cfg)
+|   |-- SWIFT output snaps list (.txt)
+|   |-- VR output snaps list (.txt)
 |
 |-- ics
-|   |-- EAGLE-XL_ClusterSK0.hdf5
+|   |-- RUN_NAME.hdf5
 |
 |-- logs
-|   |-- stdout_swift.log
+|   |-- SWIFT stdout (.log)
 |   |-- VR-specific-log-files
-|   |-- SLURM out/err from SWIFT
-|   |-- SLURM out/err from VR
+|   |-- SLURM stdout from SWIFT (.out/.err)
+|   |-- SLURM stdout from VR (.out/.err)
 |
 |-- run_swift.slurm
 |-- run_vr.slurm
-|-- run_vr.slurm
-|-- coolingtables
+|
+|-- coolingtables                # EAGLE old cooling tables
 |   |-- ...
 |
-|-- yieldtables
+|-- yieldtables                  # EAGLE feedback tables
 |   |-- ...
 |
-|-- swiftsim-hydro
-|   |-- ...
+|-- swiftsim-hydro               # Cloned Git repository
+|   |-- ...                      # (compiled executable inside)
 |
-|-- VELOCIraptor-STF-hydro
-|   |-- ...
+|-- VELOCIraptor-STF-hydro       # Cloned Git repository
+|   |-- ...                      # (compiled executable inside)
 |
-|-- UV_dust1_CR1_G1_shield1.hdf5
-|-- snapshots
-|   |-- ...
+|-- UV_dust1_CR1_G1_shield1.hdf5 # Colibre new cooling tables
 |
-|-- stf
-|   |-- ...
+|-- snapshots                    # Directory with the snap outputs
+|   |-- ...                      # The format is: RUN_NAME_XXXX.hdf5 (XXXX = 4-digit integer)
+|
+|-- stf                          # Directory with the Velociaptor outputs
+|   |-- ...                      # Format to be defined
 |
 |-- README.md
 ```

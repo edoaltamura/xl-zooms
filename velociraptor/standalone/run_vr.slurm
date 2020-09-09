@@ -3,7 +3,7 @@
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=28
 #SBATCH --exclusive
-#SBATCH -J VR-EAGLE-XL_ClusterSK0_HYDRO
+#SBATCH -J VR-RUN_NAME
 #SBATCH -o ./logs/%x.%J.out
 #SBATCH -e ./logs/%x.%J.err
 #SBATCH -p cosma7

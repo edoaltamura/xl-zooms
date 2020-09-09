@@ -3,10 +3,10 @@
 # USAGE
 # Run with: git pull; source migrate_source.sh
 
-source modules.sh
+run_name=EAGLE-XL_ClusterSK1
 
+source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
-run_name=EAGLE-XL_ClusterSK0
 
 old_directory=$(pwd)
 
@@ -67,10 +67,17 @@ cp $old_directory/swift/eagle_-8res.yml ./config
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
 cp $old_directory/swift/vr_redshifts.txt ./config
-cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 ./ics
+cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/$run_name.hdf5 ./ics
 cp -r $old_directory/swift/coolingtables .
 cp -r $old_directory/swift/yieldtables .
 cp /cosma7/data/dp004/dc-ploe1/CoolingTables/2019_most_recent/UV_dust1_CR1_G1_shield1.hdf5 .
+cp $old_directory/swift/README.md .
+
+# Edit run names in the submission and parameter files
+sed -i "s/RUN_NAME/$run_name/" ./run_swift.slurm
+sed -i "s/RUN_NAME/$run_name/" ./run_vr.slurm
+sed -i "s/RUN_NAME/$run_name/" ./config/eagle_-8res.yml
+sed -i "s/RUN_NAME/$run_name/" ./README.md
 
 sbatch ./run_swift.slurm
 squeue -u dc-alta2
