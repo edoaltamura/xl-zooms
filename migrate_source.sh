@@ -72,6 +72,6 @@ cp -r $old_directory/swift/coolingtables .
 cp -r $old_directory/swift/yieldtables .
 cp /cosma7/data/dp004/dc-ploe1/CoolingTables/2019_most_recent/UV_dust1_CR1_G1_shield1.hdf5 .
 
-#sbatch ./run_swift.slurm
+sbatch ./run_swift.slurm
 squeue -u dc-alta2
 cd "$old_directory" || exit
