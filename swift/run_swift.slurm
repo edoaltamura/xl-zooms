@@ -10,7 +10,7 @@
 #SBATCH -A dp004
 #SBATCH -t 60:00:00
 
-export OMP_NUM_THREADS=$SLURM_NTASKS
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 module purge
 module load intel_comp/2020

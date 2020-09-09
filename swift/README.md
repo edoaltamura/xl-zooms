@@ -20,35 +20,45 @@ Structure of this directory
 ------------
 ```commandline
 ./RUN_NAME
-├── config
-│   ├── eagle_-8res.yml
-│   ├── vrconfig_3dfof_subhalos_SO_hydro.cfg
-│   ├── snap_redshifts.txt
-│   └── vr_redshifts.txt
-├── ics
-│   └── EAGLE-XL_ClusterSK0.hdf5
-├── logs
-│   ├── stdout_swift.log
-│   ├── VR-specific-log-files
-│   ├── SLURM out/err from SWIFT
-│   └── SLURM out/err from VR
-├── run_swift.slurm
-├── run_vr.slurm
-├── run_vr.slurm
-├── coolingtables
-│   └── ...
-├── yieldtables
-│   └── ...
-├── swiftsim-hydro
-│   └── ...
-├── VELOCIraptor-STF-hydro
-│   └── ...
-├── UV_dust1_CR1_G1_shield1.hdf5
-├── snapshots
-│   └── ...
-├── stf
-│   └── ...
-└── README.md
+|
+|-- config
+|   |-- eagle_-8res.yml
+|   |-- vrconfig_3dfof_subhalos_SO_hydro.cfg
+|   |-- snap_redshifts.txt
+|   |-- vr_redshifts.txt
+|
+|-- ics
+|   |-- EAGLE-XL_ClusterSK0.hdf5
+|
+|-- logs
+|   |-- stdout_swift.log
+|   |-- VR-specific-log-files
+|   |-- SLURM out/err from SWIFT
+|   |-- SLURM out/err from VR
+|
+|-- run_swift.slurm
+|-- run_vr.slurm
+|-- run_vr.slurm
+|-- coolingtables
+|   |-- ...
+|
+|-- yieldtables
+|   |-- ...
+|
+|-- swiftsim-hydro
+|   |-- ...
+|
+|-- VELOCIraptor-STF-hydro
+|   |-- ...
+|
+|-- UV_dust1_CR1_G1_shield1.hdf5
+|-- snapshots
+|   |-- ...
+|
+|-- stf
+|   |-- ...
+|
+|-- README.md
 ```
 
 Details
