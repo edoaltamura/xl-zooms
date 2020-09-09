@@ -3,7 +3,7 @@
 # USAGE
 # Run with: git pull; source migrate_source.sh
 
-run_name=EAGLE-XL_ClusterSK1
+run_name=EAGLE-XL_ClusterSK0
 
 source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
@@ -24,7 +24,6 @@ if [ ! -d ./VELOCIraptor-STF-hydro ]; then
   mv ./VELOCIraptor-STF ./VELOCIraptor-STF-hydro
 fi
 
-# Configure makefile. Compile into executable ./stf
 cd ./VELOCIraptor-STF-hydro || exit
 git fetch
 cmake . -DVR_USE_HYDRO=ON \
@@ -43,7 +42,6 @@ if [ ! -d ./swiftsim-hydro ]; then
   mv ./swiftsim ./swiftsim-hydro
 fi
 
-# Configure makefile
 cd ./swiftsim-hydro || exit
 sh ./autogen.sh
 sh ./configure \
@@ -52,8 +50,6 @@ sh ./configure \
   --with-kernel=wendland-C2 \
   --with-tbbmalloc \
   --enable-ipo
-#  --enable-debugging-checks
-#  --with-velociraptor=`pwd`/../VELOCIraptor-STF-hydro/src
 make -j
 cd ..
 
@@ -62,6 +58,7 @@ mkdir -p ./config
 mkdir -p ./ics
 
 cp $old_directory/swift/run_swift.slurm .
+cp $old_directory/modules.sh .
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
 cp $old_directory/swift/eagle_-8res.yml ./config
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
