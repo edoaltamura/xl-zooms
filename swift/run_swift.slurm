@@ -15,7 +15,7 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 ##source modules.sh
 
 # Run swift
-./swiftsim-hydro/examples/swift \
+../swift \
   -v 1 \
   --cosmology \
   --eagle \
@@ -26,6 +26,6 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
 
-echo "Initializing Velociraptor on outputs..."
-sbatch ./run_vr.slurm
+#echo "Initializing Velociraptor on outputs..."
+#sbatch ./run_vr.slurm
 squeue -u dc-alta2

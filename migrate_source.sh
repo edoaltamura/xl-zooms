@@ -18,40 +18,40 @@ mkdir -p $destination_directory/$run_name
 cd $destination_directory/$run_name || exit
 
 # Prepare Velociraptor standlone
-if [ ! -d ./VELOCIraptor-STF-hydro ]; then
-  echo VELOCIraptor-STF source code not found - cloning from GitLab...
-  git clone https://github.com/ICRAR/VELOCIraptor-STF
-  mv ./VELOCIraptor-STF ./VELOCIraptor-STF-hydro
-fi
-
-cd ./VELOCIraptor-STF-hydro || exit
-git fetch
-cmake . -DVR_USE_HYDRO=ON \
-  -DVR_USE_SWIFT_INTERFACE=OFF \
-  -DCMAKE_CXX_FLAGS="-fPIC" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DVR_ZOOM_SIM=ON \
-  -DVR_MPI=OFF
-make -j
-cd ..
-
-# Prepare SWIFT
-if [ ! -d ./swiftsim-hydro ]; then
-  echo SWIFT source code not found - cloning from GitLab...
-  git clone https://gitlab.cosma.dur.ac.uk/swift/swiftsim.git
-  mv ./swiftsim ./swiftsim-hydro
-fi
-
-cd ./swiftsim-hydro || exit
-sh ./autogen.sh
-sh ./configure \
-  --with-subgrid=EAGLE-XL \
-  --with-hydro=sphenix \
-  --with-kernel=wendland-C2 \
-  --with-tbbmalloc \
-  --enable-ipo
-make -j
-cd ..
+#if [ ! -d ./VELOCIraptor-STF-hydro ]; then
+#  echo VELOCIraptor-STF source code not found - cloning from GitLab...
+#  git clone https://github.com/ICRAR/VELOCIraptor-STF
+#  mv ./VELOCIraptor-STF ./VELOCIraptor-STF-hydro
+#fi
+#
+#cd ./VELOCIraptor-STF-hydro || exit
+#git fetch
+#cmake . -DVR_USE_HYDRO=ON \
+#  -DVR_USE_SWIFT_INTERFACE=OFF \
+#  -DCMAKE_CXX_FLAGS="-fPIC" \
+#  -DCMAKE_BUILD_TYPE=Release \
+#  -DVR_ZOOM_SIM=ON \
+#  -DVR_MPI=OFF
+#make -j
+#cd ..
+#
+## Prepare SWIFT
+#if [ ! -d ./swiftsim-hydro ]; then
+#  echo SWIFT source code not found - cloning from GitLab...
+#  git clone https://gitlab.cosma.dur.ac.uk/swift/swiftsim.git
+#  mv ./swiftsim ./swiftsim-hydro
+#fi
+#
+#cd ./swiftsim-hydro || exit
+#sh ./autogen.sh
+#sh ./configure \
+#  --with-subgrid=EAGLE-XL \
+#  --with-hydro=sphenix \
+#  --with-kernel=wendland-C2 \
+#  --with-tbbmalloc \
+#  --enable-ipo
+#make -j
+#cd ..
 
 mkdir -p ./logs
 mkdir -p ./config
