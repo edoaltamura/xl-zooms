@@ -31,7 +31,7 @@ Snapshots:
   time_first:          0.01  # Time of the first output (non-cosmological run) (in internal units)
   delta_time:          1.01  # Time difference between consecutive outputs (in internal units)
   output_list_on: 1
-  output_list: ./config/snap_redshifts.txt
+  output_list: ./snap_redshifts.txt
   invoke_stf: 0
   compression: 9
   subdir: snapshots

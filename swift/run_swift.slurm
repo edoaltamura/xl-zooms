@@ -12,7 +12,7 @@
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-##source modules.sh
+source modules.sh
 
 # Run swift
 ../swift \
@@ -21,11 +21,9 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
   --eagle \
   --pin \
   --threads=$OMP_NUM_THREADS \
-  ./config/eagle_-8res.yml 2>&1 | tee ./logs/stdout_swift.log
+  eagle_-8res.yml 2>&1 | tee ./logs/stdout_swift.log
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
 
-#echo "Initializing Velociraptor on outputs..."
-#sbatch ./run_vr.slurm
-squeue -u dc-alta2
+sbatch ./run_vr.slurm

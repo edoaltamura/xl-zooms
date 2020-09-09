@@ -12,9 +12,9 @@
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-##source modules.sh
+source modules.sh
 
-config_template=./config/vrconfig_3dfof_subhalos_SO_hydro.cfg
+config_template=./vrconfig_3dfof_subhalos_SO_hydro.cfg
 
 function get_snap_index
 {
