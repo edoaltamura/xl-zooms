@@ -13,8 +13,8 @@
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 module purge
-module load intel_comp/2020
-module load intel_mpi/2020
+module load intel_comp/2018
+module load intel_mpi/2018
 module load parmetis/4.0.3
 module load parallel_hdf5/1.10.3
 module load gsl/2.4
