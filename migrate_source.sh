@@ -18,40 +18,35 @@ cd $destination_directory
 if [ ! -d ./VELOCIraptor-STF ]; then
   echo VELOCIraptor-STF source code not found - cloning from GitLab...
   git clone https://github.com/ICRAR/VELOCIraptor-STF
+  cd $destination_directory/VELOCIraptor-STF
+  git fetch
+  cmake . -DVR_USE_HYDRO=ON \
+    -DVR_USE_SWIFT_INTERFACE=OFF \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DVR_ZOOM_SIM=ON \
+    -DVR_MPI=OFF
+  make -j
 fi
-
-cd $destination_directory/VELOCIraptor-STF
-git fetch
-cmake . -DVR_USE_HYDRO=ON \
-  -DVR_USE_SWIFT_INTERFACE=OFF \
-  -DCMAKE_CXX_FLAGS="-fPIC" \
-  -DCMAKE_BUILD_TYPE=Release \
-  -DVR_ZOOM_SIM=ON \
-  -DVR_MPI=OFF
-make -j
-vr_path_exe=$destination_directory/VELOCIraptor-STF
 
 # Prepare SWIFT
 cd $destination_directory
 if [ ! -d $destination_directory/swiftsim ]; then
   echo SWIFT source code not found - cloning from GitLab...
   git clone https://gitlab.cosma.dur.ac.uk/swift/swiftsim.git
+  cd $destination_directory/swiftsim
+  sh ./autogen.sh
+  sh ./configure \
+    --with-subgrid=EAGLE-XL \
+    --with-hydro=sphenix \
+    --with-kernel=wendland-C2 \
+    --with-tbbmalloc \
+    --enable-ipo \
+    --with-parmetis \
+    --with-gsl \
+    --enable-debug
+  make -j
 fi
-
-cd $destination_directory/swiftsim
-sh ./autogen.sh
-sh ./configure \
-  --with-subgrid=EAGLE-XL \
-  --with-hydro=sphenix \
-  --with-kernel=wendland-C2 \
-  --with-tbbmalloc \
-  --enable-ipo \
-  --with-parmetis \
-  --with-gsl \
-  --enable-debug
-make -j
-swift_path_exe=$destination_directory/swiftsim/examples
-
 
 # We are now in the run data directory
 cd $destination_directory/$run_name

@@ -51,7 +51,11 @@ for snap_path in ./snapshots/*.hdf5; do
   stdout_path="$PWD/stf/$out_dir_name/$base_name.stdout"                # Create file paths for stdout in output directory
   stderr_path="$PWD/stf/$out_dir_name/$base_name.stderr"                # Create file paths for stderr in output directory
 
-  PATH_EXECUTABLE/stf -i "$snap_path" -I 2 -o "$outpath" -C "$config_file" > "$stdout_path" 2>"$stderr_path"
+  /cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF/stf \
+   -i "$snap_path" \
+   -I 2 \
+   -o "$outpath" \
+   -C "$config_file" > "$stdout_path" 2>"$stderr_path"
 
   mv "$PWD/stf/$base_name".* "$outpath"                                 # Move outputs inside directory
 
