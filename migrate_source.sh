@@ -51,8 +51,8 @@ sh ./configure \
   --with-hydro=sphenix \
   --with-kernel=wendland-C2 \
   --with-tbbmalloc \
-  --enable-ipo \
-  --enable-debugging-checks
+  --enable-ipo
+#  --enable-debugging-checks
 #  --with-velociraptor=`pwd`/../VELOCIraptor-STF-hydro/src
 make -j
 cd ..
