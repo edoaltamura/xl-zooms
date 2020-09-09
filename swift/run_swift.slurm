@@ -24,7 +24,7 @@ module load cosma/2018
 module load cmake
 
 # Run swift
-/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/swiftsim/examples/swift \
+../swiftsim/examples/swift \
   -v 1 \
   --cosmology \
   --eagle \
@@ -35,4 +35,4 @@ module load cmake
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
 
-sbatch ./run_vr.slurm
+#sbatch ./run_vr.slurm
