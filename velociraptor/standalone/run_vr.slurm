@@ -12,7 +12,16 @@
 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-source modules.sh
+module purge
+module load intel_comp/2018
+module load intel_mpi/2018
+module load parmetis/4.0.3
+module load parallel_hdf5/1.8.20
+module load gsl/2.4
+module load fftw/3.3.7
+module load python/3.6.5
+module load cosma/2018
+module load cmake
 
 config_template=./vrconfig_3dfof_subhalos_SO_hydro.cfg
 
@@ -42,7 +51,7 @@ for snap_path in ./snapshots/*.hdf5; do
   stdout_path="$PWD/stf/$out_dir_name/$base_name.stdout"                # Create file paths for stdout in output directory
   stderr_path="$PWD/stf/$out_dir_name/$base_name.stderr"                # Create file paths for stderr in output directory
 
-  ./VELOCIraptor-STF-hydro/stf -i "$snap_path" -I 2 -o "$outpath" -C "$config_file" > "$stdout_path" 2>"$stderr_path"
+  PATH_EXECUTABLE/stf -i "$snap_path" -I 2 -o "$outpath" -C "$config_file" > "$stdout_path" 2>"$stderr_path"
 
   mv "$PWD/stf/$base_name".* "$outpath"                                 # Move outputs inside directory
 

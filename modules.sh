@@ -8,7 +8,4 @@ module load gsl/2.4
 module load fftw/3.3.7
 module load python/3.6.5
 module load cosma/2018
-module load allinea/ddt/20.0.3
-module load hdfview/2.14.0
-module load gadgetviewer/1.1.0
-module load utils/201805
+module load cmake
