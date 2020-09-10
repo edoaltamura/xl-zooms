@@ -24,7 +24,7 @@ module load cosma/2018
 module load cmake
 
 # Run swift
-/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/swiftsim/examples/swift \
+$(pwd)/../swiftsim/examples/swift \
   -v 1 \
   -e \
   --cosmology \
