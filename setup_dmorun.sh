@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # USAGE:
-# Run with: git pull; source migrate_source.sh
+# Run with: git pull; source setup_hydrorun.sh
 
-run_name=EAGLE-XL_ClusterSK0
+run_name=EAGLE-XL_ClusterSK1
 
 source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
@@ -20,7 +20,7 @@ if [ ! -d ./VELOCIraptor-STF ]; then
   git clone https://github.com/ICRAR/VELOCIraptor-STF
   cd $destination_directory/VELOCIraptor-STF
   git fetch
-  cmake . -DVR_USE_HYDRO=ON \
+  cmake . -DVR_USE_HYDRO=OFF \
     -DVR_USE_SWIFT_INTERFACE=OFF \
     -DCMAKE_CXX_FLAGS="-fPIC" \
     -DCMAKE_BUILD_TYPE=Release \
