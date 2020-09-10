@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # USAGE:
-# Run with: git pull; source setup_hydrorun.sh
+# Run with: git pull; source setup_dmorun.sh
 resolution="-8res"
 run_name="EAGLE-XL_ClusterSK0_$resolution"
 
