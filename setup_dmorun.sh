@@ -2,7 +2,7 @@
 
 # USAGE:
 # Run with: git pull; source setup_dmorun.sh
-resolution="+1res"
+resolution="-8res"
 run_name="EAGLE-XL_ClusterSK0_$resolution"
 
 source modules.sh
