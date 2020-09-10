@@ -26,10 +26,11 @@ module load cmake
 # Run swift
 /cosma7/data/dp004/dc-alta2/xl-zooms/hydro/swiftsim/examples/swift \
   -v 1 \
+  -e \
   --cosmology \
   --eagle \
   --pin \
-  --threads=$OMP_NUM_THREADS \
+  --threads=$SLURM_CPUS_PER_TASK \
   eagle_-8res.yml 2>&1 | tee ./logs/stdout_swift.log
 
 echo "Job done, info follows."

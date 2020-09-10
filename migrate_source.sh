@@ -44,7 +44,8 @@ if [ ! -d $destination_directory/swiftsim ]; then
     --enable-ipo \
     --with-parmetis \
     --with-gsl \
-    --enable-debug
+    --enable-debug \
+    --disable-optimization
   make -j
 fi
 
