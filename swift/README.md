@@ -57,8 +57,8 @@ resolution is taken to be that of EAGLE and the mass-resolution of these runs is
 ```{filename}_{resolution_sign}{resolution_factor}res.{fileextension}```
 
 Examples:
-- Parameter file at 8x the EAGLE resolution:    ```eagle_+8res.yml```
-- Parameter file at EAGLE resolution:           ```eagle_+1res.yml```
-- Parameter file at 1/8th of EAGLE resolution:  ```eagle_-8res.yml```
+- Parameter file at 8x the EAGLE resolution:    ```{eagle/dmo}_+8res.yml```
+- Parameter file at EAGLE resolution:           ```{eagle/dmo}_+1res.yml```
+- Parameter file at 1/8th of EAGLE resolution:  ```{eagle/dmo}_-8res.yml```
 
-This run has parameter file: PARAM_FILE.
+This run has parameter file: PARAM_FILE.yml
