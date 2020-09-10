@@ -31,7 +31,7 @@ $(pwd)/../swiftsim/examples/swift \
   --eagle \
   --pin \
   --threads=$SLURM_CPUS_PER_TASK \
-  eagle_-8res.yml 2>&1 | tee ./logs/stdout_swift.log
+  eagle_-8res.yml > "./logs/swift.stdout" 2>"./logs/swift.stderr"
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
