@@ -55,8 +55,8 @@ cp $old_directory/swift/snap_redshifts.txt ./config
 cp $old_directory/swift/vr_redshifts.txt ./config
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
-cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0_DMO.hdf5 ./ics
-mv ./ics/EAGLE-XL_ClusterSK0_DMO.hdf5 ./ics/$run_name.hdf5
+cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0.hdf5 ./ics
+mv ./ics/EAGLE-XL_ClusterSK0.hdf5.hdf5 ./ics/$run_name.hdf5
 
 # Edit run names in the submission and parameter files
 sed -i "s/RUN_NAME/$run_name/" ./run_swift.slurm
