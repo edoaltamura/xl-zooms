@@ -50,3 +50,15 @@ Structure of this directory
 
 Details
 ------------
+**Note on the resolution of zooms.** In order to keep track of SWIFT runs at different resolution and
+to avoid confusion with SWIFT parameter files, the following resolution nomenclature is used. The reference
+resolution is taken to be that of EAGLE and the mass-resolution of these runs is normalised to EAGLE.
+
+```{filename}_{resolution_sign}{resolution_factor}res.{fileextension}```
+
+Examples:
+- Parameter file at 8x the EAGLE resolution:    ```eagle_+8res.yml```
+- Parameter file at EAGLE resolution:           ```eagle_+1res.yml```
+- Parameter file at 1/8th of EAGLE resolution:  ```eagle_-8res.yml```
+
+This run has parameter file: PARAM_FILE.

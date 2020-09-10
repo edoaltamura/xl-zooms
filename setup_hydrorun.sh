@@ -80,6 +80,8 @@ sed -i "s/RUN_NAME/$run_name/" ./run_swift.slurm
 sed -i "s/RUN_NAME/$run_name/" ./run_vr.slurm
 sed -i "s/RUN_NAME/$run_name/" ./config/eagle_+1res.yml
 sed -i "s/RUN_NAME/$run_name/" ./README.md
+sed -i "s/PARAM_FILE/eagle_+1res/" ./run_swift.slurm
+sed -i "s/PARAM_FILE/eagle_+1res/" ./README.md
 
 sbatch ./run_swift.slurm
 cd "$old_directory"

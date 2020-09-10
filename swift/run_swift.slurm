@@ -30,7 +30,7 @@ module load cmake
   --eagle \
   --pin \
   --threads=$SLURM_CPUS_PER_TASK \
-  ./config/eagle_+1res.yml
+  ./config/PARAM_FILE.yml
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
