@@ -3,7 +3,7 @@
 # USAGE:
 # Run with: git pull; source setup_hydrorun.sh
 
-run_name=EAGLE-XL_ClusterSK1
+run_name=EAGLE-XL_ClusterSK2
 
 source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
