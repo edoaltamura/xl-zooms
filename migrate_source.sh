@@ -41,7 +41,7 @@ if [ ! -d $destination_directory/swiftsim ]; then
     --with-hydro=sphenix \
     --with-kernel=wendland-C2 \
     --with-tbbmalloc \
-    --enable-ipo \
+    --enable-ipo
   make -j
 fi
 
