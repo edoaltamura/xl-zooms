@@ -42,8 +42,6 @@ if [ ! -d $destination_directory/swiftsim ]; then
     --with-kernel=wendland-C2 \
     --with-tbbmalloc \
     --enable-ipo \
-    --with-parmetis \
-    --with-gsl \
     --enable-debug \
     --disable-optimization
   make -j

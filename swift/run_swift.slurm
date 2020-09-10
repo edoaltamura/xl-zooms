@@ -35,5 +35,3 @@ $(pwd)/../swiftsim/examples/swift \
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
-
-#sbatch ./run_vr.slurm
