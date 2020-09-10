@@ -39,20 +39,6 @@ Structure of this directory
 |-- run_swift.slurm
 |-- run_vr.slurm
 |
-|-- coolingtables                # EAGLE old cooling tables
-|   |-- ...
-|
-|-- yieldtables                  # EAGLE feedback tables
-|   |-- ...
-|
-|-- swiftsim-hydro               # Cloned Git repository
-|   |-- ...                      # (compiled executable inside)
-|
-|-- VELOCIraptor-STF-hydro       # Cloned Git repository
-|   |-- ...                      # (compiled executable inside)
-|
-|-- UV_dust1_CR1_G1_shield1.hdf5 # Colibre new cooling tables
-|
 |-- snapshots                    # Directory with the snap outputs
 |   |-- ...                      # The format is: RUN_NAME_XXXX.hdf5 (XXXX = 4-digit integer)
 |

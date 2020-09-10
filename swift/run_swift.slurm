@@ -4,8 +4,8 @@
 #SBATCH --cpus-per-task=28
 #SBATCH --exclusive
 #SBATCH -J RUN_NAME
-#SBATCH -o ./logs/%x.%J.out
-#SBATCH -e ./logs/%x.%J.err
+#SBATCH -o ./logs/%x.%J.swift.out
+#SBATCH -e ./logs/%x.%J.swift.err
 #SBATCH -p cosma7
 #SBATCH -A dp004
 #SBATCH -t 72:00:00

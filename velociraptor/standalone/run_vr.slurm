@@ -4,8 +4,8 @@
 #SBATCH --cpus-per-task=28
 #SBATCH --exclusive
 #SBATCH -J VR-RUN_NAME
-#SBATCH -o ./logs/%x.%J.out
-#SBATCH -e ./logs/%x.%J.err
+#SBATCH -o ./logs/%x.%J.stf.out
+#SBATCH -e ./logs/%x.%J.stf.err
 #SBATCH -p cosma7
 #SBATCH -A dp004
 #SBATCH -t 60:00:00
@@ -23,7 +23,7 @@ module load python/3.6.5
 module load cosma/2018
 module load cmake
 
-config_template=./vrconfig_3dfof_subhalos_SO_hydro.cfg
+config_template=./config/vrconfig_3dfof_subhalos_SO_hydro.cfg
 
 function get_snap_index
 {
