@@ -3,7 +3,7 @@
 # USAGE:
 # Run with: git pull; source setup_hydrorun.sh
 
-run_name=EAGLE-XL_ClusterSK2
+run_name=EAGLE-XL_ClusterSK0
 
 source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
@@ -50,10 +50,12 @@ cd $destination_directory
 if [ ! -d ./yieldtables ]; then
   wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/YieldTables/EAGLE/yieldtables.tar.gz
   tar -xf yieldtables.tar.gz
+  rm ./yieldtables.tar.gz
 fi
 if [ ! -d ./coolingtables ]; then
   wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/CoolingTables/EAGLE/coolingtables.tar.gz
   tar -xf coolingtables.tar.gz
+  rm ./coolingtables.tar.gz
   wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/CoolingTables/COLIBRE/UV_dust1_CR1_G1_shield1.hdf5
 fi
 
