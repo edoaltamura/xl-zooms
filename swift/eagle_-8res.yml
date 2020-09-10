@@ -31,7 +31,7 @@ Snapshots:
   time_first:          0.01  # Time of the first output (non-cosmological run) (in internal units)
   delta_time:          1.01  # Time difference between consecutive outputs (in internal units)
   output_list_on: 1
-  output_list: ./snap_redshifts.txt
+  output_list: ./config/snap_redshifts.txt
   invoke_stf: 0
   compression: 9
   subdir: snapshots
@@ -121,7 +121,7 @@ EAGLEChemistry:
 
 # EAGLE cooling parameters
 EAGLECooling:
-  dir_name:                ./coolingtables/
+  dir_name:                ../coolingtables/
   H_reion_z:               7.5                 # Planck 2018
   H_reion_eV_p_H:          2.0
   He_reion_z_centre:       3.5
@@ -130,7 +130,7 @@ EAGLECooling:
 
 # COLIBRE cooling parameters
 COLIBRECooling:
-  dir_name:                ./UV_dust1_CR1_G1_shield1.hdf5 # Location of the cooling tables
+  dir_name:                ../UV_dust1_CR1_G1_shield1.hdf5 # Location of the cooling tables
   H_reion_z:               7.5               # Redshift of Hydrogen re-ionization (Planck 2018)
   H_reion_eV_p_H:          2.0
   He_reion_z_centre:       3.5               # Redshift of the centre of the Helium re-ionization Gaussian
@@ -173,7 +173,7 @@ EAGLEFeedback:
   use_AGB_enrichment:               1               # Global switch for enrichement from AGB stars.
   use_SNII_enrichment:              1               # Global switch for enrichement from SNII stars.
   use_SNIa_enrichment:              1               # Global switch for enrichement from SNIa stars.
-  filename:                         ./yieldtables/  # Path to the directory containing the EAGLE yield tables.
+  filename:                         ../yieldtables/  # Path to the directory containing the EAGLE yield tables.
   IMF_min_mass_Msun:                0.1             # Minimal stellar mass considered for the Chabrier IMF in solar masses.
   IMF_max_mass_Msun:              100.0             # Maximal stellar mass considered for the Chabrier IMF in solar masses.
   SNII_min_mass_Msun:               8.0             # Minimal mass considered for SNII stars in solar masses.

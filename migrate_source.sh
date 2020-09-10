@@ -42,32 +42,40 @@ if [ ! -d $destination_directory/swiftsim ]; then
     --with-kernel=wendland-C2 \
     --with-tbbmalloc \
     --enable-ipo \
-    --enable-debug \
-    --disable-optimization
   make -j
+fi
+
+# Retrieve cool/yield tables
+cd $destination_directory
+if [ ! -d ./yieldtables ]; then
+  wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/YieldTables/EAGLE/yieldtables.tar.gz
+  tar -xf yieldtables.tar.gz
+fi
+if [ ! -d ./coolingtables ]; then
+  wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/CoolingTables/EAGLE/coolingtables.tar.gz
+  tar -xf coolingtables.tar.gz
+  wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/CoolingTables/COLIBRE/UV_dust1_CR1_G1_shield1.hdf5
 fi
 
 # We are now in the run data directory
 cd $destination_directory/$run_name
 mkdir -p ./logs
 mkdir -p ./ics
+mkdir -p ./config
 
 cp $old_directory/swift/README.md .
 cp $old_directory/swift/run_swift.slurm .
-cp $old_directory/swift/eagle_-8res.yml .
-cp $old_directory/swift/snap_redshifts.txt .
-cp $old_directory/swift/vr_redshifts.txt .
-cp -r $old_directory/swift/coolingtables .
-cp -r $old_directory/swift/yieldtables .
+cp $old_directory/swift/eagle_-8res.yml ./config
+cp $old_directory/swift/snap_redshifts.txt ./config
+cp $old_directory/swift/vr_redshifts.txt ./config
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
-cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg .
+cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
 cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/$run_name.hdf5 ./ics
-cp /cosma7/data/dp004/dc-ploe1/CoolingTables/2019_most_recent/UV_dust1_CR1_G1_shield1.hdf5 .
 
 # Edit run names in the submission and parameter files
 sed -i "s/RUN_NAME/$run_name/" ./run_swift.slurm
 sed -i "s/RUN_NAME/$run_name/" ./run_vr.slurm
-sed -i "s/RUN_NAME/$run_name/" ./eagle_-8res.yml
+sed -i "s/RUN_NAME/$run_name/" ./config/eagle_-8res.yml
 sed -i "s/RUN_NAME/$run_name/" ./README.md
 
 sbatch ./run_swift.slurm

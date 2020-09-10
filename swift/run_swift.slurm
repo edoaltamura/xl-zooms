@@ -26,12 +26,11 @@ module load cmake
 # Run swift
 $(pwd)/../swiftsim/examples/swift \
   -v 1 \
-  -e \
   --cosmology \
   --eagle \
   --pin \
   --threads=$SLURM_CPUS_PER_TASK \
-  eagle_-8res.yml #> "./logs/swift.stdout" 2>"./logs/swift.stderr"
+  ./config/eagle_-8res.yml
 
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
