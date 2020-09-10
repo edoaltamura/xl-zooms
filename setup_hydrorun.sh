@@ -3,7 +3,8 @@
 # USAGE:
 # Run with: git pull; source setup_hydrorun.sh
 
-run_name=EAGLE-XL_ClusterSK0_+1res
+resolution="-8res"
+run_name="EAGLE-XL_ClusterSK0_$resolution"
 
 source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
@@ -67,7 +68,7 @@ mkdir -p ./config
 
 cp $old_directory/swift/README.md .
 cp $old_directory/swift/run_swift.slurm .
-cp $old_directory/swift/eagle_+1res.yml ./config
+cp $old_directory/swift/eagle_$resolution.yml ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
 cp $old_directory/swift/vr_redshifts.txt ./config
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
@@ -80,8 +81,9 @@ sed -i "s/RUN_NAME/$run_name/" ./run_swift.slurm
 sed -i "s/RUN_NAME/$run_name/" ./run_vr.slurm
 sed -i "s/RUN_NAME/$run_name/" ./config/eagle_+1res.yml
 sed -i "s/RUN_NAME/$run_name/" ./README.md
-sed -i "s/PARAM_FILE/eagle_+1res/" ./run_swift.slurm
-sed -i "s/PARAM_FILE/eagle_+1res/" ./README.md
+
+sed -i "s/PARAM_FILE/eagle_$resolution/" ./run_swift.slurm
+sed -i "s/PARAM_FILE/eagle_$resolution/" ./README.md
 
 sbatch ./run_swift.slurm
 cd "$old_directory"
