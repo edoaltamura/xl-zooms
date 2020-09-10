@@ -3,7 +3,7 @@
 # USAGE:
 # Run with: git pull; source setup_hydrorun.sh
 
-run_name=EAGLE-XL_ClusterSK0
+run_name=EAGLE-XL_ClusterSK0_+1res
 
 source modules.sh
 destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
@@ -67,17 +67,18 @@ mkdir -p ./config
 
 cp $old_directory/swift/README.md .
 cp $old_directory/swift/run_swift.slurm .
-cp $old_directory/swift/eagle_-8res.yml ./config
+cp $old_directory/swift/eagle_+1res.yml ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
 cp $old_directory/swift/vr_redshifts.txt ./config
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
 cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
-cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/$run_name.hdf5 ./ics
+cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK0_High.hdf5 ./ics
+mv ./ics/EAGLE-XL_ClusterSK0_High.hdf5 ./ics/$run_name.hdf5
 
 # Edit run names in the submission and parameter files
 sed -i "s/RUN_NAME/$run_name/" ./run_swift.slurm
 sed -i "s/RUN_NAME/$run_name/" ./run_vr.slurm
-sed -i "s/RUN_NAME/$run_name/" ./config/eagle_-8res.yml
+sed -i "s/RUN_NAME/$run_name/" ./config/eagle_+1res.yml
 sed -i "s/RUN_NAME/$run_name/" ./README.md
 
 sbatch ./run_swift.slurm

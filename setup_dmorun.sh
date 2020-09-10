@@ -3,10 +3,10 @@
 # USAGE:
 # Run with: git pull; source setup_hydrorun.sh
 
-run_name=EAGLE-XL_ClusterSK1
+run_name=EAGLE-XL_ClusterSK0
 
 source modules.sh
-destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/hydro
+destination_directory=/cosma7/data/dp004/dc-alta2/xl-zooms/dmo
 
 old_directory=$(pwd)
 mkdir -p /cosma7/data/dp004/dc-alta2/xl-zooms
@@ -37,24 +37,9 @@ if [ ! -d $destination_directory/swiftsim ]; then
   cd $destination_directory/swiftsim
   sh ./autogen.sh
   sh ./configure \
-    --with-subgrid=EAGLE-XL \
-    --with-hydro=sphenix \
-    --with-kernel=wendland-C2 \
     --with-tbbmalloc \
     --enable-ipo
   make -j
-fi
-
-# Retrieve cool/yield tables
-cd $destination_directory
-if [ ! -d ./yieldtables ]; then
-  wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/YieldTables/EAGLE/yieldtables.tar.gz
-  tar -xf yieldtables.tar.gz
-fi
-if [ ! -d ./coolingtables ]; then
-  wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/CoolingTables/EAGLE/coolingtables.tar.gz
-  tar -xf coolingtables.tar.gz
-  wget http://virgodb.cosma.dur.ac.uk/swift-webstorage/CoolingTables/COLIBRE/UV_dust1_CR1_G1_shield1.hdf5
 fi
 
 # We are now in the run data directory
