@@ -74,7 +74,7 @@ About
 For further information about the usage of codes in this repository, please contact [edoardo.altamura@manchester.ac.uk](mailto:edoardo.altamura@manchester.ac.uk).
 These programs are provided and distributed without any warranty. 
 
-If you are a fan of dark modes when viewing code, you can enable this for GitHub by adding [this extension](https://chrome.google.com/webstore/detail/github-dark-theme/odkdlljoangmamjilkamahebpkgpeacp) 
+If you are a fan of dark modes when viewing code, you can enable a dark theme for GitHub by adding [this extension](https://chrome.google.com/webstore/detail/github-dark-theme/odkdlljoangmamjilkamahebpkgpeacp) 
 to your favourite web browser.
 
 <sup>Logo design by Edo Altamura &copy; 2020</sup>
