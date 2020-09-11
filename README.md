@@ -58,6 +58,14 @@ Before running a high-resolution zoom simulation of a galaxy cluster (or group),
 EAGLE-XL's testing program includes the production of medium-sized dark matter-only cosmological boxes (size 300 Mpc) and the first set of
 halos are selected from one of such boxes: `L0300N0564`.
 Dark matter field-halos are identified using Velociraptor. Then, we select those which are found to be in a relatively isolated region of 
-the box, defined by specific isolation criteria. 
+the box, defined by specific isolation criteria.
+
+Extras
+------------
+For further information about the usage of codes in this repository, please contact [edoardo.altamura@manchester.ac.uk](mailto:edoardo.altamura@manchester.ac.uk).
+These programs are provided and distributed without any warranty. 
+
+If you are a fan of dark modes when viewing code, you can enable this for GitHub by adding [this extension](https://chrome.google.com/webstore/detail/github-dark-theme/odkdlljoangmamjilkamahebpkgpeacp) 
+to your favourite web browser.
 
 <sup>Logo design by Edo Altamura &copy; 2020</sup>
