@@ -35,9 +35,9 @@ mkdir -p "$PWD/stf"
 
 # Make a dmo/hydro switch
 if [[ $PWD == *"hydro"* ]]; then
-  switch_mode="hydro"
+  switch_mode="hydro"                 # If this file in "/hydro" subdirectory, use hydro VR and hydro parameter file
 else
-  switch_mode="dmo"
+  switch_mode="dmo"                   # If this file in "/dmo" subdirectory, use dmo VR and hydro parameter file
 fi
 
 config_template="./config/vr_config_zoom_$switch_mode.cfg"
@@ -47,8 +47,8 @@ for snap_path in ./snapshots/*.hdf5; do
   snap_name=$(basename "$snap_path")                                      # Delete the path info in $snap_path and retain "filename.hdf5"
   base_name=$(echo "$snap_name" | cut -f 1 -d '.')                        # Delete the file extension in $name and retain "filename"
   inpath="$PWD/snapshots/$base_name"                                      # Specify the path of the input snapshot
-  outpath="$PWD/stf/$base_name"                                           # Create a directory named as "filename"
-  mkdir -p "$outpath"
+  outpath="$PWD/stf/$base_name"                                           # Specify the path of the output catalogs
+  mkdir -p "$outpath"                                                     # Create a directory named as "filename"
   cp "$config_template" "$outpath"                                        # Copy template config file in output directory
   mv "$outpath/$(basename $config_template)" "$outpath/$base_name.cfg"    # Rename with its corresponding snapshot name
   sed -i "s/SNAP/$(get_snap_index $snap_name)/" "$outpath/$base_name.cfg" # Replace snapshot-specific data in cfg template
@@ -56,12 +56,12 @@ for snap_path in ./snapshots/*.hdf5; do
   stderr_path="$PWD/stf/$base_name/$base_name.stderr"                     # Create file paths for stderr in output directory
 
   /cosma7/data/dp004/dc-alta2/xl-zooms/$switch_mode/VELOCIraptor-STF/stf \
-   -i "$inpath" \
-   -I 2 \
-   -o "$outpath" \
-   -C "$outpath/$base_name.cfg" > "$stdout_path" 2>"$stderr_path"
+   -i "$inpath" \                                                         # Input snapshot (without file extension)
+   -I 2 \                                                                 # Specify input extension (2 = .hdf5)
+   -o "$outpath" \                                                        # Path for output catalogs (saved in same directory as $outpath, not inside it)
+   -C "$outpath/$base_name.cfg" > "$stdout_path" 2>"$stderr_path"         # Parameter file and stdout/stderr log files
 
-  mv "$PWD/stf/$base_name".* "$outpath"                                   # Move outputs inside directory
+  mv "$PWD/stf/$base_name".* "$outpath"                                   # Move outputs of VR inside $outpath directory
 
 done
 
