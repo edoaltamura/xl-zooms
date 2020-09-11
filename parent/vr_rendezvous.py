@@ -44,8 +44,7 @@ zPotMin = zPotMin[index]
 print("Number of haloes in sample =", numHaloes)
 
 with open("/cosma7/data/dp004/dc-alta2/xl-zooms/analysis/halo_selected_SK.txt", "w") as text_file:
-    print("# Halo counter, M200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
-          file=text_file)
+    print("# Halo counter, M200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]", file=text_file)
 
 for i in range(3):
     print(f"Finding properties of halo {i:d}...")
