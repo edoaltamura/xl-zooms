@@ -54,7 +54,7 @@ cp $old_directory/swift/dmo_$resolution.yml ./config
 cp $old_directory/swift/snap_redshifts.txt ./config
 cp $old_directory/swift/vr_redshifts.txt ./config
 cp $old_directory/velociraptor/standalone/run_vr.slurm .
-cp $old_directory/velociraptor/interface-swift/vrconfig_3dfof_subhalos_SO_hydro.cfg ./config
+cp $old_directory/velociraptor/standalone/vr_config_zoom_dmo.cfg ./config
 cp /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/EAGLE-XL_ClusterSK2.hdf5 ./ics
 mv ./ics/EAGLE-XL_ClusterSK2.hdf5 ./ics/$run_name.hdf5
 mv ./run_swift_dmo.slurm ./run_swift.slurm

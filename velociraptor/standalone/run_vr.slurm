@@ -40,7 +40,7 @@ else
   switch_mode="dmo"
 fi
 
-config_template=./config/vrconfig_3dfof_subhalos_SO_$switch_mode.cfg
+config_template="./config/vr_config_zoom_$switch_mode.cfg"
 
 for snap_path in ./snapshots/*.hdf5; do
 
