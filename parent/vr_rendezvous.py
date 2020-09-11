@@ -43,7 +43,7 @@ yPotMin = yPotMin[index]
 zPotMin = zPotMin[index]
 print("Number of haloes in sample =", numHaloes)
 
-with open("outfiles/halo_selected_SK.txt", "w") as text_file:
+with open("/cosma7/data/dp004/dc-alta2/xl-zooms/analysis/halo_selected_SK.txt", "w") as text_file:
     print("# Halo counter, M200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
           file=text_file)
 
@@ -57,5 +57,5 @@ for i in range(3):
 
     # Print to txt file
     print(i, find_M200c / 1.e13, find_R200c, find_x, find_y, find_z)
-    with open("outfiles/halo_selected_SK.txt", "a") as text_file:
+    with open("/cosma7/data/dp004/dc-alta2/xl-zooms/analysis/halo_selected_SK.txt", "a") as text_file:
         print(f"{i}, {find_M200c / 1.e13}, {find_R200c}, {find_x}, {find_y}, {find_z}", file=text_file)
