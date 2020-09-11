@@ -23,8 +23,6 @@ module load python/3.6.5
 module load cosma/2018
 module load cmake
 
-config_template=./config/vrconfig_3dfof_subhalos_SO_hydro.cfg
-
 function get_snap_index
 {
   filename=$1
@@ -42,28 +40,28 @@ else
   switch_mode="dmo"
 fi
 
+config_template=./config/vrconfig_3dfof_subhalos_SO_$switch_mode.cfg
+
 for snap_path in ./snapshots/*.hdf5; do
 
-  snap_name=$(basename "$snap_path")                                    # Delete the path info in $snap_path and retain "filename.hdf5"
-  base_name=$(echo "$snap_name" | cut -f 1 -d '.')                      # Delete the file extension in $name and retain "filename"
-  inpath="$PWD/snapshots/$base_name"                                    # Specify the path of the input snapshot
-  outpath="$PWD/stf/$base_name"                                         # Create a directory named as "filename"
+  snap_name=$(basename "$snap_path")                                      # Delete the path info in $snap_path and retain "filename.hdf5"
+  base_name=$(echo "$snap_name" | cut -f 1 -d '.')                        # Delete the file extension in $name and retain "filename"
+  inpath="$PWD/snapshots/$base_name"                                      # Specify the path of the input snapshot
+  outpath="$PWD/stf/$base_name"                                           # Create a directory named as "filename"
   mkdir -p "$outpath"
-  cp "$config_template" "$outpath"                                      # Copy template config file in output directory
-  mv "$outpath/$(basename $config_template)" "$outpath/$base_name.cfg"  # Rename with its corresponding snapshot name
-  config_file="$outpath/$base_name.cfg"                                 # Create new file path
-  sed -i "s/SNAP/$(get_snap_index $snap_name)/" "$config_file"          # Replace snapshot-specific data in cfg template
-  stdout_path="$PWD/stf/$base_name/$base_name.stdout"                   # Create file paths for stdout in output directory
-  stderr_path="$PWD/stf/$base_name/$base_name.stderr"                   # Create file paths for stderr in output directory
+  cp "$config_template" "$outpath"                                        # Copy template config file in output directory
+  mv "$outpath/$(basename $config_template)" "$outpath/$base_name.cfg"    # Rename with its corresponding snapshot name
+  sed -i "s/SNAP/$(get_snap_index $snap_name)/" "$outpath/$base_name.cfg" # Replace snapshot-specific data in cfg template
+  stdout_path="$PWD/stf/$base_name/$base_name.stdout"                     # Create file paths for stdout in output directory
+  stderr_path="$PWD/stf/$base_name/$base_name.stderr"                     # Create file paths for stderr in output directory
 
   /cosma7/data/dp004/dc-alta2/xl-zooms/$switch_mode/VELOCIraptor-STF/stf \
    -i "$inpath" \
    -I 2 \
    -o "$outpath" \
-   -C "$config_file" > "$stdout_path" 2>"$stderr_path"
+   -C "$outpath/$base_name.cfg" > "$stdout_path" 2>"$stderr_path"
 
-  mv "$PWD/stf/$base_name".* "$outpath"                                 # Move outputs inside directory
-  rm "$config_file"                                                     # Remove the snap-specific config file
+  mv "$PWD/stf/$base_name".* "$outpath"                                   # Move outputs inside directory
 
 done
 
