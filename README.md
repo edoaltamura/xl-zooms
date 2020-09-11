@@ -51,6 +51,10 @@ The process of simulating useful zooms of a galaxy cluster (or group) comprises 
 - Submit the initial condition file to SWIFT (with Velociraptor embedded) and run to the present redshift (hydro and subgrid).
 - The full hydro version of the zoom simulation is complete and ready to be analysed.
 
+An alternative route consists in running SWIFT without Velociraptor embedded and then launch the structure finder on the snapshots
+in the post-production phase. Since the SWIFT/Velociraptor integration for hydrodynamic runs is still under development, the current 
+zoom pipeline operates with the stand-alone version of Velociraptor, called once the SWIFT job is completed.
+
 
 The parent box
 ------------
@@ -60,7 +64,12 @@ halos are selected from one of such boxes: `L0300N0564`.
 Dark matter field-halos are identified using Velociraptor. Then, we select those which are found to be in a relatively isolated region of 
 the box, defined by specific isolation criteria.
 
-Extras
+Performance toolkit
+------------
+The `/xl-zooms/performance` directory contains a suite of scripts for a simple diagnostics of the runtime. They are adapted from 
+[Josh's `xl-pipeline`](https://github.com/JBorrow/xl-pipeline) and from [SWIFT's `tools` repository](https://github.com/SWIFTSIM/swiftsim/tree/master/tools). 
+
+About
 ------------
 For further information about the usage of codes in this repository, please contact [edoardo.altamura@manchester.ac.uk](mailto:edoardo.altamura@manchester.ac.uk).
 These programs are provided and distributed without any warranty. 
