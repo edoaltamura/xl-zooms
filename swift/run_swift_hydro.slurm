@@ -32,5 +32,8 @@ module load cmake
   --threads=$SLURM_CPUS_PER_TASK \
   ./config/PARAM_FILE.yml
 
+echo "Submitting VR job..."
+sbatch ./run_vr.slurm
+
 echo "Job done, info follows."
 sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode
