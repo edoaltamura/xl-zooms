@@ -16,10 +16,10 @@ comm = MPI.COMM_WORLD
 comm_rank = comm.rank
 comm_size = comm.size
 
-try:
-    plt.style.use("../../mnras.mplstyle")
-except:
-    pass
+# try:
+#     plt.style.use("../../mnras.mplstyle")
+# except:
+#     pass
 
 output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks"
 
