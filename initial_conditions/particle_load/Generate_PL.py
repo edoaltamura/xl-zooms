@@ -52,7 +52,7 @@ class ParticleLoad:
         if comm_rank == 0:
             params = yaml.load(open(param_file))
         else:
-            params = None:
+            params = None
         params = comm.bcast(params, root=0)
 
         # Params that are required.
