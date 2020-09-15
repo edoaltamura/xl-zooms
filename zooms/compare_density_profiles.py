@@ -319,11 +319,11 @@ if __name__ == "__main__":
         snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
         snap_filepath_zoom = [
             f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_-8res/snapshots/EAGLE-XL_ClusterSK{i}_-8res_0036.hdf5",
-            # f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_+1res/snapshots/EAGLE-XL_ClusterSK{i}_+1res_0036.hdf5"
+            f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_+1res/snapshots/EAGLE-XL_ClusterSK{i}_+1res_0036.hdf5"
         ]
         velociraptor_properties_zoom = [
             f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_-8res/stf/EAGLE-XL_ClusterSK{i}_-8res_0036/EAGLE-XL_ClusterSK{i}_-8res_0036.properties",
-            # f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_+1res/stf/EAGLE-XL_ClusterSK{i}_+1res_0036/EAGLE-XL_ClusterSK{i}_+1res_0036.properties",
+            f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_+1res/stf/EAGLE-XL_ClusterSK{i}_+1res_0036/EAGLE-XL_ClusterSK{i}_+1res_0036.properties",
         ]
         output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
