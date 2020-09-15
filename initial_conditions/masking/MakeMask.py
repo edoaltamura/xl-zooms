@@ -203,7 +203,7 @@ class MakeMask:
         while True:
             com_coords = self.get_com(ic_coords, self.params['bs'])
             if comm_rank == 0:
-                print(f'COM iteration {count} c={com_coords:s} Mpc/h')
+                print(f'COM iteration {count} c={com_coords} Mpc/h')
             ic_coords = np.mod(ic_coords - com_coords + 0.5 * self.params['bs'],
                                self.params['bs']) + com_coords - 0.5 * self.params['bs']
             if np.sum(np.abs(com_coords - last_com_coords)) <= 1e-6:
