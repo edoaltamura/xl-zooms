@@ -35,11 +35,11 @@ class ParticleLoad:
         self.save_data = save_data
 
         # Save directories.
-        self.pl_dir = './particle_loads/'
-        self.gadget_dir = '/cosma6/data/dp004/rttw52/GADGET_runs/'
-        self.swift_dir = '/cosma7/data/dp004/rttw52/swift_runs/runs/'
-        self.ic_dir = '/cosma7/data/dp004/rttw52/codes/ic_gen/run/'
-        self.gadget4_dir = '/cosma7/data/dp004/rttw52/gadget4_runs/'
+        self.pl_dir = '/cosma7/data/dp004/dc-alta2/xl-zooms/ics/particle_load/'
+        self.gadget_dir = '/cosma7/data/dp004/dc-alta2/xl-zooms/ics/'
+        self.swift_dir = '/cosma7/data/dp004/dc-alta2/xl-zooms/ics/swift_runs/'
+        self.ic_dir = '/cosma7/data/dp004/dc-alta2/xl-zooms/ics/ic_gen/run/'
+        self.gadget4_dir = '/cosma7/data/dp004/dc-alta2/xl-zooms/ics/'
 
         # Read the parameter file.
         self.read_param_file(param_file)
@@ -110,9 +110,6 @@ class ParticleLoad:
 
         # For special set of params.
         self.template_set = 'default'
-
-        # Do structure finding.
-        self.structure_finding = False
 
         # Is this a slab simulation?
         self.is_slab = False
@@ -1019,14 +1016,14 @@ class ParticleLoad:
             # make_param_file_gadget(self.gadget_dir, self.f_name, self.box_size,
             #    s_high, s_low, s_low_low, self.Omega0, self.OmegaLambda,
             #    self.OmegaBaryon, self.HubbleParam, self.dm_only,
-            #    self.starting_z, self.finishing_z, self.high_output, self.structure_finding)
+            #    self.starting_z, self.finishing_z, self.high_output)
             # print 'Saved gadget param file.'
 
         if self.do_swift:
             # Make swift param file (remember no h's for swift).
             make_param_file_swift(self.swift_dir, self.Omega0, self.OmegaLambda,
                                   self.OmegaBaryon, self.HubbleParam, self.starting_z, self.finishing_z,
-                                  self.f_name, self.structure_finding, self.is_zoom, self.template_set,
+                                  self.f_name, self.is_zoom, self.template_set,
                                   self.softening_ratio_background, eps_dm, eps_baryon, eps_dm_physical,
                                   eps_baryon_physical)
             print('Saved swift param file.')
@@ -1041,12 +1038,12 @@ class ParticleLoad:
 
         if self.do_gadget:
             make_submit_file_gadget(self.gadget_dir, self.n_cores_gadget, self.f_name,
-                                    self.n_species, self.structure_finding, self.gadget_exec)
+                                    self.n_species, self.gadget_exec)
             print('Saved gadget submit file.')
 
         if self.do_swift:
             # Make swift submit files.
-            make_submit_file_swift(self.swift_dir, self.f_name, self.structure_finding,
+            make_submit_file_swift(self.swift_dir, self.f_name,
                                    self.n_nodes_swift, self.num_hours_swift, self.template_set)
             print('Saved swift submit file.')
 
