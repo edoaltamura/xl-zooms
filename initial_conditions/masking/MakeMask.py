@@ -265,9 +265,9 @@ class MakeMask:
         if comm_rank == 0:
             plot_coords = np.vstack(plot_coords)
             fig, axarr = plt.subplots(1, 3, figsize=(10, 4))
-            axarr.set_aspect('equal')
 
             for count, (i, j) in enumerate(zip([0, 0, 1], [1, 2, 2])):
+                axarr[count].set_aspect('equal')
                 rect = patches.Rectangle(
                     (-lens[i * 2], -lens[j * 2]),
                     lens[i * 2 + 1] + lens[i * 2],
