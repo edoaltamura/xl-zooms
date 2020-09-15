@@ -17,7 +17,7 @@ comm_rank = comm.rank
 comm_size = comm.size
 
 try:
-    plt.style.use("mnras.mplstyle")
+    plt.style.use("../../mnras.mplstyle")
 except:
     pass
 
