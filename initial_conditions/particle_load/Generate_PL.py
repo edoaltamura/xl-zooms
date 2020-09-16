@@ -713,7 +713,7 @@ class ParticleLoad:
             # Default of high resolution grid is a cube.
             n_cells_high = [max_cells, max_cells, max_cells]
         else:
-            # For a slab keep the assymetry.
+            # For a slab keep the asymmetry.
             tmp_mask = np.where(n_cells_high == n_cells)[0]
             assert len(tmp_mask) == 2, 'For a slab simulation, 2 dimentions have to fill box ' + \
                                        'n_cells_high=%s n_cells=%i' % (n_cells_high, n_cells)

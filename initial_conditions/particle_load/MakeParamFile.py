@@ -173,7 +173,7 @@ def make_submit_file_gadget4(dir, fname):
 # |--------------------------------|
 
 def make_param_file_swift(dir, omega0, omegaL, omegaB, h, starting_z, finishing_z, fname,
-                          structure_finding, is_zoom, template_set,
+                          is_zoom, template_set,
                           softening_ratio_background, eps_dm, eps_baryon, eps_dm_physical, eps_baryon_physical):
     # Make data dir.
     data_dir = dir + '%s/' % fname
