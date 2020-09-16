@@ -228,12 +228,11 @@ def make_param_file_swift(dir, omega0, omegaL, omegaB, h, starting_z, finishing_
 # | Make submit file for Swift. |
 # |-----------------------------|
 
-def make_submit_file_swift(dir, fname, structure_finding, n_nodes, num_hours, template_set):
+def make_submit_file_swift(dir, fname, n_nodes, num_hours, template_set):
     data_dir = dir + '%s/' % fname
     if not os.path.exists(data_dir): os.makedirs(data_dir)
 
     extras = ''
-    if structure_finding: extras = extras + '--velociraptor '
     if 'tabula_' in template_set.lower():
         extras = extras + '--line-of-sight '
 
