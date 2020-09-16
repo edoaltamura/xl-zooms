@@ -1154,9 +1154,12 @@ class ParticleLoad:
         save_dir_hdf = save_dir + 'hdf5/'
         save_dir_bin = save_dir + 'fbinary/'
         if comm_rank == 0:
-            if not os.path.exists(save_dir): os.makedirs(save_dir)
-            if not os.path.exists(save_dir_hdf) and self.save_hdf5: os.makedirs(save_dir_hdf)
-            if not os.path.exists(save_dir_bin): os.makedirs(save_dir_bin)
+            if not os.path.exists(save_dir):
+                os.makedirs(save_dir)
+            if not os.path.exists(save_dir_hdf) and self.save_hdf5:
+                os.makedirs(save_dir_hdf)
+            if not os.path.exists(save_dir_bin):
+                os.makedirs(save_dir_bin)
         comm.barrier()
 
         # Make sure not to save more than max_save at a time.
@@ -1167,7 +1170,8 @@ class ParticleLoad:
             if comm_rank >= lo and comm_rank < hi:
 
                 if self.save_hdf5:
-                    if comm_rank == 0: print('Saving HDF5 files...')
+                    if comm_rank == 0:
+                        print('Saving HDF5 files...')
                     f = h5py.File(save_dir_hdf + 'PL.%d.hdf5' % comm_rank, 'w')
                     f.create_dataset('Coordinates_x', data=np.array(coords_x, dtype='f8'))
                     f.create_dataset('Coordinates_y', data=np.array(coords_y, dtype='f8'))
