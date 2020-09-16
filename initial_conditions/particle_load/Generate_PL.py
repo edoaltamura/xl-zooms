@@ -116,7 +116,7 @@ class ParticleLoad:
 
         # Use glass files to surround the high res region rather than grids?
         self.grid_also_glass = True
-        self.glass_files_dir = './glass_files/'
+        self.glass_files_dir = '../glass_files/'
 
         # Softening for zooms.
         self.softening_ratio_background = 0.02  # 1/50 M-P-S.

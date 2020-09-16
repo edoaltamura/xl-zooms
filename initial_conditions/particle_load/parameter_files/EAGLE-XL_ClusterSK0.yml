@@ -14,6 +14,6 @@ which_cosmology: Planck2018
 
 template_set: dmo
 
-swift_dir: /cosma7/data/dp004/rttw52/swift_runs/runs/EAGLE-XL/
+swift_dir: /cosma7/data/dp004/dc-alta2/xl-zooms/ics/swift_runs/
 
 panphasian_descriptor: "[Panph1,L18,(74412,22732,260484),S3,CH1799108544,EAGLE-XL_L0300_VOL1]"
