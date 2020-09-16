@@ -12,7 +12,7 @@ use_ph_ids: False
 
 which_cosmology: Planck2018
 
-template_set: dmo
+template_set: default
 
 swift_dir: /cosma7/data/dp004/dc-alta2/xl-zooms/ics/swift_runs/
 
