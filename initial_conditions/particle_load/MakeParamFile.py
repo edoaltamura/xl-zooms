@@ -15,14 +15,14 @@ def make_submit_file_gadget(dir, ncores, fname, n_sp, structure_finding, exec_fi
     if not os.path.exists(dir + fname + '/data/'): os.makedirs(dir + fname + '/data/')
 
     # GADGET submit file.
-    with open('./templates/gadget_submit.sh', 'r') as f:
+    with open('../templates/gadget_submit.sh', 'r') as f:
         data = f.read()
 
     with open('%s/%s/submit.sh' % (dir, fname), 'w') as f:
         f.write(re.sub('XXX', lambda m, i=iter(r): next(i), data))
 
     # GADGET resubmit file.
-    with open('./templates/gadget_resubmit.sh', 'r') as f:
+    with open('../templates/gadget_resubmit.sh', 'r') as f:
         data = f.read()
 
     with open('%s/%s/resubmit.sh' % (dir, fname), 'w') as f:
@@ -39,7 +39,7 @@ def make_submit_file_gadget(dir, ncores, fname, n_sp, structure_finding, exec_fi
 
 def make_submit_file_ics(dir, fname, num_hours, ncores):
     # First load template.
-    with open('./templates/ic_gen/submit', 'r') as f:
+    with open('../templates/ic_gen/submit', 'r') as f:
         data = f.read()
 
     # Write new param file.
@@ -111,7 +111,7 @@ def make_param_file_ics(dir, fname, n_sp, sp1_2_div,
          '%i' % ntot, '%i' % ndim_fft, '%i' % multigrid, '%.8f' % x, '%.8f' % y, '%.8f' % z, '%.8f' % L, '%i' % nhi]
 
     # First load template.
-    with open('./templates/ic_gen/params.inp', 'r') as f:
+    with open('../templates/ic_gen/params.inp', 'r') as f:
         data = f.read()
 
     # Write new param file.
@@ -142,7 +142,7 @@ def make_param_file_gadget4(dir, fname, boxsize, starting_z, finishing_z,
          '%.8f' % soft_high, '%.8f' % (soft_high * a)]
 
     # First load template.
-    with open('./templates/gadget4_params.txt', 'r') as f:
+    with open('../templates/gadget4_params.txt', 'r') as f:
         data = f.read()
 
     # Write new param file.
@@ -160,7 +160,7 @@ def make_submit_file_gadget4(dir, fname):
 
     r = []
 
-    with open('./templates/gadget4_submit.sh', 'r') as f:
+    with open('../templates/gadget4_submit.sh', 'r') as f:
         data = f.read()
 
     # Write new param file.
@@ -193,7 +193,7 @@ def make_param_file_swift(dir, omega0, omegaL, omegaB, h, starting_z, finishing_
              '%.8f' % (eps_baryon / h), '%.3f' % (softening_ratio_background),
              '%.8f' % (eps_baryon_physical / h), '%.8f' % (eps_dm_physical / h), fname]
 
-        subprocess.call("cp ./templates/swift/%s/select_output.yml %s" % \
+        subprocess.call("cp ../templates/swift/%s/select_output.yml %s" % \
                         (template_set, data_dir), shell=True)
     elif template_set.lower() == 'default':
         r = ['%.5f' % h, '%.8f' % starting_a, '%.8f' % finishing_a, '%.8f' % omega0, '%.8f' % omegaL,
@@ -213,7 +213,7 @@ def make_param_file_swift(dir, omega0, omegaL, omegaB, h, starting_z, finishing_
     else:
         raise ValueError("Invalid template set")
 
-    t_file = './templates/swift/%s/params.yml' % template_set
+    t_file = '../templates/swift/%s/params.yml' % template_set
 
     # Load the template.
     with open(t_file, 'r') as f:
@@ -238,8 +238,8 @@ def make_submit_file_swift(dir, fname, structure_finding, n_nodes, num_hours, te
         extras = extras + '--line-of-sight '
 
     r = ['%i' % n_nodes, fname, '%i' % num_hours, extras]
-    s_file = './templates/swift/%s/submit' % template_set.lower()
-    rs_file = './templates/swift/%s/resubmit' % template_set.lower()
+    s_file = '../templates/swift/%s/submit' % template_set.lower()
+    rs_file = '../templates/swift/%s/resubmit' % template_set.lower()
 
     # Swift submit file.
     with open(s_file, 'r') as f:
