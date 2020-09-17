@@ -293,15 +293,25 @@ class MakeMask:
         m = np.where(H >= self.params['min_num_per_cell'])
         bin_mask[m] = True
 
+        # Fill holes and extrude the mask
+        if comm_rank == 0:
+            print("(1/3) [Topological extrusion] Scanning x-y plane...")
         for layer_id in range(bin_mask.shape[0]):
             bin_mask[layer_id, :, :] = ndimage.binary_dilation(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
-            bin_mask[layer_id, :, :] = ndimage.binary_closing(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
+            # bin_mask[layer_id, :, :] = ndimage.binary_closing(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
+
+        if comm_rank == 0:
+            print("(2/3) [Topological extrusion] Scanning y-z plane...")
         for layer_id in range(bin_mask.shape[1]):
             bin_mask[:, layer_id, :] = ndimage.binary_dilation(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
-            bin_mask[:, layer_id, :] = ndimage.binary_closing(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
+            # bin_mask[:, layer_id, :] = ndimage.binary_closing(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
+
+        if comm_rank == 0:
+            print("(3/3) [Topological extrusion] Scanning x-z plane...")
         for layer_id in range(bin_mask.shape[2]):
             bin_mask[:, :, layer_id] = ndimage.binary_dilation(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
-            bin_mask[:, :, layer_id] = ndimage.binary_closing(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
+            # bin_mask[:, :, layer_id] = ndimage.binary_closing(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
+
 
         # Computing bounding region
         m = np.where(bin_mask == True)
