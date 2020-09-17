@@ -353,9 +353,11 @@ class MakeMask:
                 np.set_printoptions(threshold=sys.maxsize)
                 print(bin_mask[bin_centre[0]])
                 bin_mask = ndimage.binary_closing(
-                    bin_mask,
-                    origin=bin_centre
+                    bin_mask[bin_centre[0]],
+                    origin=bin_centre[[0,1]]
                 ).astype(bin_mask.dtype)
+                print(bin_mask[bin_centre[0]])
+
 
                 # Computing bounding region
                 m = np.where(bin_mask == 1)
