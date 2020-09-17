@@ -352,7 +352,6 @@ class MakeMask:
                 bin_centre = ndimage.measurements.center_of_mass(bin_mask)
                 bin_mask = ndimage.binary_closing(
                     bin_mask,
-                    structure=np.ones((2,2)),
                     origin=bin_centre
                 ).astype(bin_mask.dtype)
 
