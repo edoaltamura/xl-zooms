@@ -349,8 +349,8 @@ class MakeMask:
                 m = np.where(H >= self.params['min_num_per_cell'])
                 # 3x3 structuring element with connectivity 2
                 bin_mask[m] = 1
-                bin_mask = bin_mask[:-1,:-1,:-1]
                 bin_centre = np.asarray(ndimage.measurements.center_of_mass(bin_mask)).astype(np.int)
+                print(bin_mask[bin_centre[0]])
                 bin_mask = ndimage.binary_closing(
                     bin_mask,
                     origin=bin_centre
