@@ -5,6 +5,7 @@ from typing import List, Tuple
 from warnings import warn
 import numpy as np
 from scipy.spatial import distance
+from scipy.ndimage import binary_fill_holes
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 
@@ -129,8 +130,8 @@ class MakeMask:
         if comm_rank == 0:
             print(
                 "Velociraptor search results:\n",
-                f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n",
-                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "\n",
+                f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n"
+                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "\n"
                 f"- High-res radius: {radius}\n"
                 f"- R200_crit: {R200c}\n"
                 f"- R500_crit: {R500c}\n"
@@ -276,19 +277,25 @@ class MakeMask:
             if (count > 10) or (self.params['shape'] == 'slab'):
                 break
         if comm_rank == 0:
-            print('COM of lagrangian region %s Mpc/h (compared to coords %s Mpc/h)' \
+            print('COM of lagrangian region %s Mpc/h\n\t(compared to coords %s Mpc/h)' \
                   % (com_coords, self.params['coords']))
         ic_coords -= com_coords
 
-        # Compute outline.
+        # Compute outline
         num_bins = int(np.ceil(self.params['bs'] / (self.params['mpc_cell_size'])))
         bins = np.linspace(-self.params['bs'] / 2., self.params['bs'] / 2., num_bins)
         bin_width = bins[1] - bins[0]
         H, edges = np.histogramdd(ic_coords, bins=(bins, bins, bins))
         H = comm.allreduce(H)
 
-        # Computing bounding region.
+        # Initialize binary mask
+        bin_mask = np.zeros_like(H)
         m = np.where(H >= self.params['min_num_per_cell'])
+        bin_mask[m] = 1
+        # bin_mask = binary_fill_holes(bin_mask).astype(int)
+
+        # Computing bounding region
+        m = np.where(bin_mask == 1)
         lens = np.array([np.abs(np.min(edges[0][m[0]])),
                          np.max(edges[0][m[0]]) + bin_width,
                          np.abs(np.min(edges[1][m[1]])),

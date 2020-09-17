@@ -17,7 +17,7 @@ select_from_vr:    1                   # If set to 1, it enables automatic group
 # AUTOMATIC GROUP SELECTION #
 GN:                 50                  # The Group-Number of the halo in the structure-finding catalogue (requires `sub_file`)
 vr_file:           /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0 # The location of the Velociraptor group catalogue (to find coordinates of given GN)
-highres_radius_r200: 5.                # How many times r200 of the passed group do you want to re-simulate. Overrides `highres_radius_r500` if both selected
+highres_radius_r200: 5.                 # How many times r200 of the passed group do you want to re-simulate. Overrides `highres_radius_r500` if both selected
 #highres_radius_r500: 5.                # How many times r500 of the passed group do you want to re-simulate
 
 # MANUAL GROUP SELECTION #
