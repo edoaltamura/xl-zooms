@@ -292,7 +292,10 @@ class MakeMask:
         bin_mask = np.zeros_like(H, dtype=np.int)
         m = np.where(H >= self.params['min_num_per_cell'])
         bin_mask[m] = 1
+        print(bin_mask)
         bin_mask = binary_fill_holes(bin_mask).astype(int)
+        print(bin_mask)
+
 
         # Computing bounding region
         m = np.where(bin_mask == 1)
