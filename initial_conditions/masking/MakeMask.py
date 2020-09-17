@@ -349,7 +349,14 @@ class MakeMask:
                 axarr[count].set_xlim(-lens[i * 2], lens[i * 2 + 1])
                 axarr[count].set_ylim(-lens[j * 2], lens[j * 2 + 1])
 
+                # Initialize binary mask
+                bin_mask = np.zeros_like(H)
                 m = np.where(H >= self.params['min_num_per_cell'])
+                bin_mask[m] = 1
+                # bin_mask = binary_fill_holes(bin_mask).astype(int)
+
+                # Computing bounding region
+                m = np.where(bin_mask == 1)
                 axarr[count].scatter(
                     edges[i][m[i]] + bin_width / 2.,
                     edges[j][m[j]] + bin_width / 2.,
