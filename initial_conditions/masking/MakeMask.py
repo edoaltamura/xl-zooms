@@ -292,9 +292,12 @@ class MakeMask:
         bin_mask = np.zeros_like(H, dtype=np.bool)
         m = np.where(H >= self.params['min_num_per_cell'])
         bin_mask[m] = True
+        print(len(bin_mask), bin_mask.shape)
         for layer_id in range(len(bin_mask)):
-            bin_mask[layer_id] = ndimage.binary_dilation(bin_mask[layer_id], iterations=3).astype(np.bool)
-            bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id], iterations=3).astype(np.bool)
+            bin_centre = ndimage.measurements.center_of_mass(bin_mask[layer_id])
+            bin_centre = tuple(map(int, bin_centre)) # Convert into integer coordinates
+            bin_mask[layer_id] = ndimage.binary_dilation(bin_mask[layer_id], iterations=3, origin=bin_centre).astype(np.bool)
+            bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id], iterations=3, origin=bin_centre).astype(np.bool)
 
         # Computing bounding region
         m = np.where(bin_mask == True)
@@ -316,13 +319,13 @@ class MakeMask:
             tot_cells = len(H[0][m[0]]) + len(H[1][m[1]]) + len(H[2][m[2]])
             print(f'There are {tot_cells:d} total glass cells.')
         # Plot.
-        self.plot(H, edges, bin_width, ic_coords, lens)
+        self.plot(H, edges, bin_width, m, ic_coords, lens)
 
         # Save.
         if comm_rank == 0:
-            self.save(H, edges, bin_width, lens, com_coords)
+            self.save(H, edges, bin_width, m, lens, com_coords)
 
-    def plot(self, H, edges, bin_width, ic_coords, lens):
+    def plot(self, H, edges, bin_width, m, ic_coords, lens):
         """ Plot the region outline. """
         axes_label = ['x', 'y', 'z']
         # Subsample.
@@ -352,16 +355,6 @@ class MakeMask:
                 axarr[count].set_xlim(-lens[i * 2], lens[i * 2 + 1])
                 axarr[count].set_ylim(-lens[j * 2], lens[j * 2 + 1])
 
-                # Initialize binary mask
-                bin_mask = np.zeros_like(H, dtype=np.bool)
-                m = np.where(H >= self.params['min_num_per_cell'])
-                bin_mask[m] = True
-                for layer_id in range(len(bin_mask)):
-                    bin_mask[layer_id] = ndimage.binary_dilation(bin_mask[layer_id], iterations=3).astype(np.bool)
-                    bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id], iterations=3).astype(np.bool)
-
-                # Computing bounding region
-                m = np.where(bin_mask == True)
                 axarr[count].scatter(
                     edges[i][m[i]] + bin_width / 2.,
                     edges[j][m[j]] + bin_width / 2.,
@@ -387,20 +380,9 @@ class MakeMask:
             fig.savefig(f"{output_directory}/{self.params['fname']:s}.png")
             plt.show()
 
-    def save(self, H, edges, bin_width, lens, com_coords):
+    def save(self, H, edges, bin_width, m, lens, com_coords):
         # Save (everything needs to be saved in h inverse units, for the IC GEN).
         f = h5py.File(f"{output_directory}/{self.params['fname']:s}.hdf5", 'w')
-
-        # Initialize binary mask
-        bin_mask = np.zeros_like(H, dtype=np.bool)
-        m = np.where(H >= self.params['min_num_per_cell'])
-        bin_mask[m] = True
-        for layer_id in range(len(bin_mask)):
-            bin_mask[layer_id] = ndimage.binary_dilation(bin_mask[layer_id], iterations=3).astype(np.bool)
-            bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id], iterations=3).astype(np.bool)
-
-        # Computing bounding region
-        m = np.where(bin_mask == True)
         coords = np.c_[edges[0][m[0]] + bin_width / 2.,
                        edges[1][m[1]] + bin_width / 2.,
                        edges[2][m[2]] + bin_width / 2.]
