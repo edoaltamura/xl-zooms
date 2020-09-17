@@ -1,16 +1,23 @@
-from ParallelFunctions import *
-from MakeParamFile import *
-from scipy.spatial import distance
-import numpy as np
-import h5py
+import sys
 import os
-import re
 import subprocess
+import re
+import h5py
+import yaml
+import numpy as np
+from scipy.spatial import distance
 from astropy.cosmology import FlatLambdaCDM
 import astropy.units as u
-import sys
+
 from MakeGrid import *
-import yaml
+from ParallelFunctions import repartition
+from MakeParamFile import (
+    make_submit_file_ics,
+    make_submit_file_gadget,
+    make_submit_file_swift,
+    make_param_file_ics,
+    make_param_file_swift
+)
 
 from mpi4py import MPI
 
@@ -136,6 +143,7 @@ class ParticleLoad:
             self.HubbleParam = 0.6777
             self.Sigma8 = 0.8288
             self.linear_ps = 'extended_planck_linear_powspec'
+
         elif self.which_cosmology == 'Planck2018':
             self.Omega0 = 0.3111
             self.OmegaLambda = 0.6889
@@ -160,10 +168,8 @@ class ParticleLoad:
             rho_crit = cosmo.critical_density0.to(u.solMass / u.Mpc ** 3)
 
             M_tot_dm_dmo = self.Omega0 * rho_crit.value * (self.box_size / self.HubbleParam) ** 3
-            M_tot_dm = (self.Omega0 - self.OmegaBaryon) \
-                       * rho_crit.value * (self.box_size / self.HubbleParam) ** 3
-            M_tot_gas = self.OmegaBaryon * rho_crit.value \
-                        * (self.box_size / self.HubbleParam) ** 3
+            M_tot_dm = (self.Omega0 - self.OmegaBaryon) * rho_crit.value * (self.box_size / self.HubbleParam) ** 3
+            M_tot_gas = self.OmegaBaryon * rho_crit.value * (self.box_size / self.HubbleParam) ** 3
 
             dm_mass = M_tot_dm / self.n_particles
             dm_mass_dmo = M_tot_dm_dmo / self.n_particles
@@ -289,8 +295,8 @@ class ParticleLoad:
         self.nq_info = {'diff': 1.e20, 'n_tot_lo': 0}
 
         # What are we starting from?
-        if comm_rank == 0: print('Computing slab nq: half_slab=%.2f suggested_nq=%i' \
-                                 % (half_slab, suggested_nq))
+        if comm_rank == 0:
+            print(f'Computing slab nq: half_slab={half_slab:.2f} suggested_nq={suggested_nq:d}')
 
         # You start with a given suggested nq, then you remove nq_reduce from it at each level.
         # This tries multiple nq_reduce values.
@@ -300,7 +306,8 @@ class ParticleLoad:
             for i in range(200):
 
                 # If this takes me >50% away from the suggested nq, don't bother.
-                if np.true_divide(suggested_nq - i, suggested_nq) < 0.5: break
+                if np.true_divide(suggested_nq - i, suggested_nq) < 0.5:
+                    break
 
                 # Reset all values.
                 offset = half_slab  # Starting from the edge of the slab.
@@ -309,7 +316,7 @@ class ParticleLoad:
                 nlev_slab = 0  # Counting the number of levels.
                 n_tot_lo = 0  # Counting the total number of low res particles.
 
-                # Itterate levels for this starting nq until you reach the edge of the box.
+                # Iterate levels for this starting nq until you reach the edge of the box.
                 while True:
                     # Cell length at this level.
                     m_int_sep = self.box_size / float(this_nq)
@@ -345,7 +352,8 @@ class ParticleLoad:
                                 self.nq_info['nq_reduce'] = nq_reduce
                                 self.nq_info['extra'] = extra
                                 self.nq_info['nlev_slab'] = nlev_slab
-                                if (nlev_slab - 1) % comm_size == comm_rank: n_tot_lo += 2 * this_nq ** 2
+                                if (nlev_slab - 1) % comm_size == comm_rank:
+                                    n_tot_lo += 2 * this_nq ** 2
                                 self.nq_info['n_tot_lo'] = n_tot_lo
                                 self.nq_info['dv_slab'] = -1.0 * (
                                             (offset + m_int_sep - self.box_size / 2.) * self.box_size ** 2.) / \
@@ -358,13 +366,15 @@ class ParticleLoad:
                             this_nq -= extra
                         break
                     else:
-                        if (nlev_slab - 1) % comm_size == comm_rank: n_tot_lo += 2 * this_nq ** 2
+                        if (nlev_slab - 1) % comm_size == comm_rank:
+                            n_tot_lo += 2 * this_nq ** 2
 
                     # Compute nq for next level.
                     this_nq -= nq_reduce
 
                     # We've gotten too small. 
-                    if this_nq < 10: break
+                    if this_nq < 10:
+                        break
 
         if comm_rank == 0:
             print(
@@ -381,7 +391,8 @@ class ParticleLoad:
 
         self.nq_info = {'diff': 1.e20}
         lbox = 1. / side
-        if comm_rank == 0: print('Looking for best nq, suggested_nq=%i' % (suggested_nq))
+        if comm_rank == 0:
+            print('Looking for best nq, suggested_nq=%i' % (suggested_nq))
 
         # Loop over a range of potential nq's.
         for nq in np.arange(suggested_nq - 5, suggested_nq + 5, 1):
@@ -390,7 +401,8 @@ class ParticleLoad:
 
             # Loop over a range of extras.
             for extra in range(-10, 10, 1):
-                if nq + extra < 10: continue
+                if nq + extra < 10:
+                    continue
 
                 # For this nq and extra, what volume would the particles fill.
                 total_volume, nlev = get_guess_nq(lbox, nq, extra, comm_rank, comm_size)
@@ -411,7 +423,8 @@ class ParticleLoad:
         # Compute low res particle number for this core.
         n_tot_lo = 0
         for l in range(self.nq_info['nlev']):
-            if l % comm_size != comm_rank: continue
+            if l % comm_size != comm_rank:
+                continue
             if l == self.nq_info['nlev'] - 1:
                 n_tot_lo += (self.nq_info['nq'] - 1 + self.nq_info['extra']) ** 2 * 6 + 2
             else:
@@ -523,12 +536,10 @@ class ParticleLoad:
 
         # Compute the masses of each particle type in the high res-grid.
         for num_per_cell in self.cell_info['num_particles_per_cell']:
-            self.cell_info['particle_mass'].append( \
-                ((cell_length / num_per_cell ** (1 / 3.)) / self.box_size) ** 3.)
+            self.cell_info['particle_mass'].append(((cell_length / num_per_cell ** (1 / 3.)) / self.box_size) ** 3.)
         for att in self.cell_info.keys():
             self.cell_info[att] = np.array(self.cell_info[att])
-        all_particle_masses = \
-            np.unique(np.concatenate(comm.allgather(self.cell_info['particle_mass'])))
+        all_particle_masses = np.unique(np.concatenate(comm.allgather(self.cell_info['particle_mass'])))
         mask = all_particle_masses != np.min(all_particle_masses)
         if self.is_zoom:
             self.min_grid_mass = np.min(all_particle_masses[mask])
@@ -605,7 +616,8 @@ class ParticleLoad:
             glass = np.loadtxt(self.glass_files_dir + 'ascii_glass_%i' % num,
                                dtype={'names': ['x', 'y', 'z'], 'formats': ['f8', 'f8', 'f8']},
                                skiprows=1)
-            if comm_rank == 0: print('Loaded glass file, %i particles in file.' % num)
+            if comm_rank == 0:
+                print('Loaded glass file, %i particles in file.' % num)
         else:
             glass = None
 
@@ -1146,8 +1158,7 @@ class ParticleLoad:
             if comm_rank == 0: print('Done load balancing.')
 
         comm.barrier()
-        assert len(masses) == len(coords_x) == len(coords_y) \
-               == len(coords_z), 'Array length error'
+        assert len(masses) == len(coords_x) == len(coords_y) == len(coords_z), 'Array length error'
 
         """ Save particle load to HDF5 file. """
         save_dir = '%s/%s/' % (self.pl_dir, self.f_name)

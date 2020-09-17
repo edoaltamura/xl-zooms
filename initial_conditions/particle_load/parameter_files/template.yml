@@ -1,0 +1,24 @@
+box_size:           202.98
+n_particles:        11451483064                 # Number of particles if whole box was at target resolution
+f_name:             EAGLE-XL_ClusterSK0_DMO     # Run name. The output directory will have this name
+glass_num:          12167                       # Particles in glass file. NOTE: `n_particles` must be divisible by this number.
+ndim_fft_start:     3
+is_zoom:            1                           # Set to 1 for zoom simulations, set to 0 for cosmological volumes
+dm_only:            0                           # Set to 0 for hydro runs, 1 for dark-matter-only runs
+n_species:          2                           # Number of DM species. For zooms, these are 2: high and low-res particles
+mask_file:          /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks/EAGLE-XL_Cluster5.hdf5
+
+# SUBMISSION FILES #
+n_cores_ic_gen: 48
+num_hours_ic_gen: 36
+n_nodes_swift: 1
+num_hours_swift: 72
+use_ph_ids: False
+
+which_cosmology: Planck2018
+
+template_set: default
+
+swift_dir: /cosma7/data/dp004/dc-alta2/xl-zooms/ics/swift_runs/
+
+panphasian_descriptor: "[Panph1,L18,(74412,22732,260484),S3,CH1799108544,EAGLE-XL_L0300_VOL1]"
