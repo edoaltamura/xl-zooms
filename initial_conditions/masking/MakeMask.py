@@ -353,7 +353,7 @@ class MakeMask:
                 for layer_id, layer in enumerate(bin_mask):
                     print(layer)
                     bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id]).astype(bin_mask.dtype)
-                    print(bin_mask[layer_id])
+                    print(bin_mask[layer_id], "\n\n")
 
 
                 # Computing bounding region
