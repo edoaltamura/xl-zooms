@@ -101,10 +101,8 @@ class MakeMask:
             except KeyError as error:
                 if comm_rank == 0:
                     print(error)
-                    warn(
-                        "If using highres_radius_r500, the selection will use R_200crit instead.\
-                        The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 ."
-                    )
+                    print("If using highres_radius_r500, the selection will use R_200crit instead.")
+                    warn("The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2.", RuntimeWarning)
                 R500c = R200c / 2
 
             xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
