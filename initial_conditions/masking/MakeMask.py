@@ -81,8 +81,8 @@ class MakeMask:
 
         # Find the group we want to resimulate (if selected).
         if self.params['select_from_vr'] and self.params['GN'] is not None:
-           self.params['coords,'], self.params['radius'] = self.find_group()
-           self.params['shape'] = 'sphere'
+            self.params['coords,'], self.params['radius'] = self.find_group()
+            self.params['shape'] = 'sphere'
 
         self.params['coords'] = np.array(self.params['coords'], dtype='f8')
         if 'dim' in self.params.keys():
@@ -102,8 +102,8 @@ class MakeMask:
                 if comm_rank == 0:
                     print(error)
                     warn(
-                        "If using `highres_radius_r500`, the selection will use R_200crit instead.",
-                         "The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 ."
+                        "If using highres_radius_r500, the selection will use R_200crit instead.",
+                        "The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 ."
                     )
                 R500c = R200c / 2
 
@@ -137,7 +137,6 @@ class MakeMask:
             )
 
         return [xPotMin, yPotMin, zPotMin], radius
-
 
     def compute_ic_positions(self, ids) -> np.ndarray:
         """ Compute the positions at ICs. """
@@ -204,7 +203,8 @@ class MakeMask:
                     self.params['radius'],
                     self.params['length_unit']
                 ))
-            dists = distance.cdist(coords, self.params['coords'].reshape(1, 3), metric='euclidean').reshape(len(coords),)
+            dists = distance.cdist(coords, self.params['coords'].reshape(1, 3), metric='euclidean').reshape(
+                len(coords), )
             mask = np.where(dists <= self.params['radius'])
 
         elif self.params['shape'] == 'cuboid' or self.params['shape'] == 'slab':
@@ -217,11 +217,21 @@ class MakeMask:
 
             mask = np.where(
                 np.logical_and(coords[:, 0] >= (self.params['coords'][0] - self.params['dim'][0] / 2.),
-                np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
-                np.logical_and(coords[:, 1] >= (self.params['coords'][1] - self.params['dim'][1] / 2.),
-                np.logical_and(coords[:, 1] <= (self.params['coords'][1] + self.params['dim'][1] / 2.),
-                np.logical_and(coords[:, 2] >= (self.params['coords'][2] - self.params['dim'][2] / 2.),
-                               coords[:, 2] <= (self.params['coords'][2] + self.params['dim'][2] / 2.)))))))
+                               np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
+                                              np.logical_and(coords[:, 1] >= (
+                                                          self.params['coords'][1] - self.params['dim'][1] / 2.),
+                                                             np.logical_and(coords[:, 1] <= (
+                                                                         self.params['coords'][1] + self.params['dim'][
+                                                                     1] / 2.),
+                                                                            np.logical_and(coords[:, 2] >= (
+                                                                                        self.params['coords'][2] -
+                                                                                        self.params['dim'][2] / 2.),
+                                                                                           coords[:, 2] <= (self.params[
+                                                                                                                'coords'][
+                                                                                                                2] +
+                                                                                                            self.params[
+                                                                                                                'dim'][
+                                                                                                                2] / 2.)))))))
 
         ids = ids[mask]
         print(f'[Rank {comm_rank}] Clipped to {len(ids)} dark matter particles.')
@@ -257,7 +267,7 @@ class MakeMask:
         # Rescale IC coords to 0-->boxsize.
         ic_coords *= np.true_divide(self.params['bs'], 2 ** self.params['bits'] - 1)
         ic_coords = np.mod(ic_coords - self.params['coords'] + 0.5 * self.params['bs'],
-            self.params['bs']) + self.params['coords'] - 0.5 * self.params['bs']
+                           self.params['bs']) + self.params['coords'] - 0.5 * self.params['bs']
 
         # Find COM of the lagrangian region.
         count = 0
