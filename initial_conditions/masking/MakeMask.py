@@ -175,7 +175,7 @@ class MakeMask:
                       self.params['coords'][2] - self.params['dim'][2] / 2.,
                       self.params['coords'][2] + self.params['dim'][2] / 2.]
         if comm_rank == 0:
-            print(f'Loading region {region}...')
+            print('Loading region...\n', region)
         if self.params['data_type'].lower() == 'gadget':
             snap.select_region(*region)
             snap.split_selection(comm_rank, comm_size)
@@ -215,21 +215,11 @@ class MakeMask:
 
             mask = np.where(
                 np.logical_and(coords[:, 0] >= (self.params['coords'][0] - self.params['dim'][0] / 2.),
-                               np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
-                                              np.logical_and(coords[:, 1] >= (
-                                                      self.params['coords'][1] - self.params['dim'][1] / 2.),
-                                                             np.logical_and(coords[:, 1] <= (
-                                                                     self.params['coords'][1] + self.params['dim'][
-                                                                 1] / 2.),
-                                                                            np.logical_and(coords[:, 2] >= (
-                                                                                    self.params['coords'][2] -
-                                                                                    self.params['dim'][2] / 2.),
-                                                                                           coords[:, 2] <= (self.params[
-                                                                                                                'coords'][
-                                                                                                                2] +
-                                                                                                            self.params[
-                                                                                                                'dim'][
-                                                                                                                2] / 2.)))))))
+                np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
+                np.logical_and(coords[:, 1] >= (self.params['coords'][1] - self.params['dim'][1] / 2.),
+                np.logical_and(coords[:, 1] <= (self.params['coords'][1] + self.params['dim'][1] / 2.),
+                np.logical_and(coords[:, 2] >= (self.params['coords'][2] -self.params['dim'][2] / 2.),
+                coords[:, 2] <= (self.params['coords'][2] +self.params['dim'][2] / 2.)))))))
 
         ids = ids[mask]
         print(f'[Rank {comm_rank}] Clipped to {len(ids)} dark matter particles.')
@@ -351,21 +341,28 @@ class MakeMask:
                 axarr[count].set_ylim(-lens[j * 2], lens[j * 2 + 1])
 
                 m = np.where(H >= self.params['min_num_per_cell'])
-                axarr[count].scatter(edges[i][m[i]] + bin_width / 2.,
-                                     edges[j][m[j]] + bin_width / 2.,
-                                     marker='^', color='red', s=3
-                                     )
+                axarr[count].scatter(
+                    edges[i][m[i]] + bin_width / 2.,
+                    edges[j][m[j]] + bin_width / 2.,
+                    marker='^', color='red', s=3
+                )
+
                 if len(m[i]) < 10000:
                     for e_x, e_y in zip(edges[i][m[i]], edges[j][m[j]]):
                         rect = patches.Rectangle(
-                            (e_x, e_y), bin_width, bin_width, linewidth=1, edgecolor='r', facecolor='none'
+                            (e_x, e_y),
+                            bin_width,
+                            bin_width,
+                            linewidth=1,
+                            edgecolor='r',
+                            facecolor='none'
                         )
                         axarr[count].add_patch(rect)
 
-                axarr[count].set_xlabel(f'{axes_label[i]} [Mpc]')
-                axarr[count].set_ylabel(f'{axes_label[j]} [Mpc]')
+                axarr[count].set_xlabel(f"{axes_label[i]} [Mpc h$^{{-1}}$]")
+                axarr[count].set_ylabel(f"{axes_label[j]} [Mpc h$^{{-1}}$]")
 
-            plt.tight_layout(pad=0.1)
+            plt.tight_layout(pad=0.3)
             fig.savefig(f"{output_directory}/{self.params['fname']:s}.png")
             plt.show()
 

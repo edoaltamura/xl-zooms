@@ -21,7 +21,7 @@ highres_radius_r200: 5.                # How many times r200 of the passed group
 #highres_radius_r500: 5.                # How many times r500 of the passed group do you want to re-simulate
 
 # MANUAL GROUP SELECTION #
-coords:             [130.80472552964693,181.69450614895746,151.48072933190596]       # Centre of region you want to re-simulate (at the time of the snapshot provided in `snap_file`)
-radius:             5.                 # If shape is sphere, need to provide the radius
+#coords:             [130.80472552964693,181.69450614895746,151.48072933190596]       # Centre of region you want to re-simulate (at the time of the snapshot provided in `snap_file`)
+#radius:             5.                 # If shape is sphere, need to provide the radius
 #dim:                [1., 1., 1.]       # If shape is a cuboid or slab, need to provide [x,y,z] array of the lengths
 
