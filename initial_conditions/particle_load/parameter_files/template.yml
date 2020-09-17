@@ -1,5 +1,5 @@
 # INFO PARTICLE LOAD #
-box_size:           202.98                      # The size of the parent box divided by the Hubble parameter
+box_size:           202.98                      # The size of the parent box divided by the Hubble parameter (E.g. for L0300 boxes, enter 300 / h = 202)
 which_cosmology:    Planck2018                  # Select the type of cosmology (use Planck2018 for EAGLE-XL)
 n_particles:        11451483064                 # Number of particles if whole box was at target resolution
 f_name:             EAGLE-XL_ClusterSK0_DMO     # Run name. The output directory will have this name

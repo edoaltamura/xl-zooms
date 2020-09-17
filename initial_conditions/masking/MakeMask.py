@@ -1,6 +1,7 @@
 import sys
 import yaml
 import h5py
+from typing import List, Tuple
 import numpy as np
 from scipy.spatial import distance
 import matplotlib.patches as patches
@@ -39,20 +40,30 @@ class MakeMask:
             # Defaults.
             self.params = {}
             self.params['GN'] = None
-            self.params['num_times_r200'] = 1.
-            self.params['data_type'] = 'gadget'
+            self.params['data_type'] = 'swift'
             self.params['min_num_per_cell'] = 3
             self.params['mpc_cell_size'] = 3.  # Cell size in Mpc/h
+            self.params['select_from_vr'] = False
 
-            # Params that are required.
-            required_params = ['fname', 'snap_file', 'bits', 'shape', 'data_type', 'divide_ids_by_two']
+            required_params = [
+                'select_from_vr',
+                'fname',
+                'snap_file',
+                'bits',
+                'shape',
+                'data_type',
+                'divide_ids_by_two'
+            ]
             for att in required_params:
                 assert att in params.keys(), 'Need to have %s as a param' % att
 
-            # For the case of a single group.
-            if 'GN' in params.keys():
-                assert 'sub_file' in params.keys(), 'Need to provide a sub_file'
-            # The manual case.
+            # Run checks for automatic and manual group selection
+            if params['select_from_vr']:
+                assert 'GN' in params.keys(), 'Need to provide a Group-Number for the group'
+                assert 'vr_file' in params.keys(), 'Need to provide a sub_file'
+                assert 'highres_radius_r200' in params.keys() or 'highres_radius_r500' in params.keys(), \
+                    'Need to provide a radius for the high-resolution region in either R200crit ot R500crit units.'
+
             else:
                 assert 'shape' in params.keys(), 'Need to provide a shape of region.'
                 assert 'coords' in params.keys(), 'Need to provide coords of region.'
@@ -68,20 +79,49 @@ class MakeMask:
         self.params = comm.bcast(self.params)
 
         # Find the group we want to resimulate (if selected).
-        #    if self.params['GN'] is not None:
-        #        self.params['coords,'], self.params['radius'] = self.find_group()
-        #        self.params['shape'] = 'sphere'
-        self.params['coords'] = np.array(self.params['coords'], dtype='f8')
-        if 'dim' in self.params.keys(): self.params['dim'] = np.array(self.params['dim'])
+        if self.params['select_from_vr'] and self.params['GN'] is not None:
+           self.params['coords,'], self.params['radius'] = self.find_group()
+           self.params['shape'] = 'sphere'
 
-    def compute_ic_positions(self, ids):
+        self.params['coords'] = np.array(self.params['coords'], dtype='f8')
+        if 'dim' in self.params.keys():
+            self.params['dim'] = np.array(self.params['dim'])
+
+    def find_group(self) -> Tuple[List[float], float]:
+
+        # Read in halo properties
+        with h5py.File(self.params['vr_file'], 'r') as vr_file:
+            structType = vr_file['/Structuretype'][:]
+            field_halos = np.where(structType == 10)[0]
+            R200c = vr_file['/R_200crit'][field_halos][self.params['GN']]
+            R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
+            xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
+            yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']]
+            zPotMin = vr_file['/Zcminpot'][field_halos][self.params['GN']]
+
+        is_r200 = 'highres_radius_r200' in self.params.keys()
+        is_r500 = 'highres_radius_r500' in self.params.keys()
+
+        # If no radius is selected, use the default R200
+        if is_r200 and is_r500:
+            print("Both highres_radius_r200 and highres_radius_r500 were entered. Overriding highres_radius_r500.")
+            radius = R200c * self.params['highres_radius_r200']
+        elif not is_r200 and is_r500:
+            radius = R500c * self.params['highres_radius_r500']
+        elif is_r200 and not is_r500:
+            radius = R200c * self.params['highres_radius_r200']
+        else:
+            raise ValueError("Neither highres_radius_r200 nor highres_radius_r500 were entered.")
+
+        return [xPotMin, yPotMin, zPotMin], radius
+
+
+    def compute_ic_positions(self, ids) -> np.ndarray:
         """ Compute the positions at ICs. """
-        print('[Rank %i] Computing initial positions of dark matter particles...' \
-              % comm_rank)
+        print('[Rank %i] Computing initial positions of dark matter particles...' % comm_rank)
         X, Y, Z = peano_hilbert_key_inverses(ids, self.params['bits'])
         ic_coords = np.vstack((X, Y, Z)).T
-        assert np.all(ic_coords) >= 0 and np.all(ic_coords) < 2 ** self.params['bits'], \
-            'Initial coords out of range'
+        assert 0 <= np.all(ic_coords) < 2 ** self.params['bits'], 'Initial coords out of range'
         return np.array(ic_coords, dtype='f8')
 
     def load_particles(self):
@@ -164,12 +204,12 @@ class MakeMask:
         print(f'[Rank {comm_rank}] Clipped to {len(ids)} dark matter particles.')
 
         # Put back into original IDs.
-        if self.params['divide_ids_by_two'] == True:
+        if self.params['divide_ids_by_two']:
             ids /= 2
 
         return ids, coords
 
-    def convert_to_inverse_h(self, coords):
+    def convert_to_inverse_h(self, coords: np.ndarray) -> np.ndarray:
         h = self.params['h_factor']
         keys = self.params.keys()
         if 'radius' in keys:

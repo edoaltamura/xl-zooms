@@ -1,16 +1,19 @@
 #!/bin/bash -l
-#
-# Batch script for bash users
-#
+
 #SBATCH --ntasks=XXX
 #SBATCH --job-name=XXX
 #SBATCH --output=out_files/XXX.log
-#SBATCH --partition=cosma7
+#SBATCH --partition=cosma6
 #SBATCH --account=dp004
 #SBATCH --exclusive
 #SBATCH --time=XXX:00:00
 
-load_icgen
+module purge
+module load intel_comp/2018
+module load intel_mpi/2018
+module load fftw/2.1.5
+module load gsl/2.4
+module load hdf5/1.10.3
 
 cd ..
 
