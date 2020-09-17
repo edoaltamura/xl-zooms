@@ -55,6 +55,7 @@ class MakeMask:
                 'data_type',
                 'divide_ids_by_two'
             ]
+
             for att in required_params:
                 assert att in params.keys(), 'Need to have %s as a param' % att
 
@@ -77,11 +78,12 @@ class MakeMask:
                 self.params[att] = params[att]
         else:
             self.params = None
+
         self.params = comm.bcast(self.params)
 
-        # Find the group we want to resimulate (if selected).
-        if self.params['select_from_vr'] and self.params['GN'] is not None:
-            self.params['coords,'], self.params['radius'] = self.find_group()
+        # Find the group we want to re-simulate (if selected)
+        if self.params['select_from_vr']:
+            self.params['coords'], self.params['radius'] = self.find_group()
             self.params['shape'] = 'sphere'
 
         self.params['coords'] = np.array(self.params['coords'], dtype='f8')
