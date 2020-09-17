@@ -5,7 +5,7 @@ from typing import List, Tuple
 from warnings import warn
 import numpy as np
 from scipy.spatial import distance
-from scipy.ndimage import binary_fill_holes
+from scipy import ndimage
 import matplotlib.patches as patches
 import matplotlib.pyplot as plt
 
@@ -288,17 +288,8 @@ class MakeMask:
         H, edges = np.histogramdd(ic_coords, bins=(bins, bins, bins))
         H = comm.allreduce(H)
 
-        # Initialize binary mask
-        bin_mask = np.zeros_like(H, dtype=np.int)
-        m = np.where(H >= self.params['min_num_per_cell'])
-        bin_mask[m] = 1
-        print(bin_mask[bin_mask==1])
-        bin_mask = binary_fill_holes(bin_mask).astype(int)
-        print(bin_mask[bin_mask==1])
-
-
         # Computing bounding region
-        m = np.where(bin_mask == 1)
+        m = np.where(H >= self.params['min_num_per_cell'])
         lens = np.array([np.abs(np.min(edges[0][m[0]])),
                          np.max(edges[0][m[0]]) + bin_width,
                          np.abs(np.min(edges[1][m[1]])),
@@ -307,14 +298,15 @@ class MakeMask:
                          np.max(edges[2][m[2]]) + bin_width])
 
         if comm_rank == 0:
-            print('Encompasing dimensions x=%.5f Mpc/h y=%.5f Mpc/h z=%.5f Mpc/h' % (
-                lens[0] + lens[1],
-                lens[2] + lens[3],
-                lens[4] + lens[5]
-            ))
+            print(
+                f"Encompassing dimensions:\n"
+                f"\tx = {(lens[0] + lens[1]):.4f} Mpc/h\n"
+                f"\ty = {(lens[2] + lens[3]):.4f} Mpc/h\n"
+                f"\tz = {(lens[4] + lens[5]):.4f} Mpc/h"
+            )
 
             tot_cells = len(H[0][m[0]]) + len(H[1][m[1]]) + len(H[2][m[2]])
-            print('There are %i total glass cells.' % tot_cells)
+            print(f'There are {tot_cells:d} total glass cells.')
         # Plot.
         self.plot(H, edges, bin_width, ic_coords, lens)
 
@@ -355,8 +347,10 @@ class MakeMask:
                 # Initialize binary mask
                 bin_mask = np.zeros_like(H, dtype=np.int)
                 m = np.where(H >= self.params['min_num_per_cell'])
+                # 3x3 structuring element with connectivity 2
+                struct2 = ndimage.generate_binary_structure(2, 2)
                 bin_mask[m] = 1
-                bin_mask = binary_fill_holes(bin_mask).astype(int)
+                bin_mask = ndimage.binary_dilation(bin_mask, structure=struct2).astype(bin_mask.dtype)
 
                 # Computing bounding region
                 m = np.where(bin_mask == 1)
