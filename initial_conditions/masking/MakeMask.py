@@ -349,14 +349,11 @@ class MakeMask:
                 m = np.where(H >= self.params['min_num_per_cell'])
                 # 3x3 structuring element with connectivity 2
                 bin_mask[m] = 1
-                bin_centre = np.asarray(ndimage.measurements.center_of_mass(bin_mask)).astype(np.int)
                 np.set_printoptions(threshold=sys.maxsize)
-                print(bin_mask[bin_centre[0]])
-                bin_mask = ndimage.binary_closing(
-                    bin_mask[bin_centre[0]],
-                    origin=bin_centre[[0,1]]
-                ).astype(bin_mask.dtype)
-                print(bin_mask[bin_centre[0]])
+                for layer_id, layer in enumerate(bin_mask):
+                    print(layer)
+                    bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id]).astype(bin_mask.dtype)
+                    print(bin_mask[layer_id])
 
 
                 # Computing bounding region
