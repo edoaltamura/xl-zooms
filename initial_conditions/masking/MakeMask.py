@@ -292,12 +292,16 @@ class MakeMask:
         bin_mask = np.zeros_like(H, dtype=np.bool)
         m = np.where(H >= self.params['min_num_per_cell'])
         bin_mask[m] = True
-        print(len(bin_mask), bin_mask.shape)
-        for layer_id in range(len(bin_mask)):
-            bin_centre = ndimage.measurements.center_of_mass(bin_mask[layer_id])
-            bin_centre = tuple(map(int, bin_centre)) # Convert into integer coordinates
-            bin_mask[layer_id] = ndimage.binary_dilation(bin_mask[layer_id], iterations=3, origin=bin_centre).astype(np.bool)
-            bin_mask[layer_id] = ndimage.binary_closing(bin_mask[layer_id], iterations=3, origin=bin_centre).astype(np.bool)
+
+        for layer_id in range(bin_mask.shape[0]):
+            bin_mask[layer_id, :, :] = ndimage.binary_dilation(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
+            bin_mask[layer_id, :, :] = ndimage.binary_closing(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
+        for layer_id in range(bin_mask.shape[1]):
+            bin_mask[:, layer_id, :] = ndimage.binary_dilation(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
+            bin_mask[:, layer_id, :] = ndimage.binary_closing(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
+        for layer_id in range(bin_mask.shape[2]):
+            bin_mask[:, :, layer_id] = ndimage.binary_dilation(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
+            bin_mask[:, :, layer_id] = ndimage.binary_closing(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
 
         # Computing bounding region
         m = np.where(bin_mask == True)
