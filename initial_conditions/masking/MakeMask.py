@@ -98,9 +98,9 @@ class MakeMask:
 
             try:
                 R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
-            except KeyError as e:
+            except KeyError as error:
                 if comm_rank == 0:
-                    print(e.message, e.args)
+                    print(error)
                     warn(
                         "If using `highres_radius_r500`, the selection will use R_200crit instead.",
                          "The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 ."
