@@ -24,9 +24,6 @@ comm_size = comm.size
 # except:
 #     pass
 
-output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks"
-
-
 class MakeMask:
 
     def __init__(self, param_file):
@@ -46,6 +43,9 @@ class MakeMask:
             self.params['min_num_per_cell'] = 3
             self.params['mpc_cell_size'] = 3.  # Cell size in Mpc/h
             self.params['select_from_vr'] = False
+            self.params['topology_fill_holes'] = False
+            self.params['topology_dilation_niter'] = 0
+            self.params['topology_closing_niter'] = 0
 
             required_params = [
                 'select_from_vr',
@@ -54,7 +54,8 @@ class MakeMask:
                 'bits',
                 'shape',
                 'data_type',
-                'divide_ids_by_two'
+                'divide_ids_by_two',
+                'output_dir'
             ]
 
             for att in required_params:
@@ -75,6 +76,7 @@ class MakeMask:
                 elif params['shape'] == 'sphere':
                     assert 'radius' in params.keys(), 'Need to provide radius of sphere.'
 
+            # Load all parameters into the class
             for att in params.keys():
                 self.params[att] = params[att]
         else:
@@ -297,21 +299,56 @@ class MakeMask:
         if comm_rank == 0:
             print("(1/3) [Topological extrusion] Scanning x-y plane...")
         for layer_id in range(bin_mask.shape[0]):
-            bin_mask[layer_id, :, :] = ndimage.binary_dilation(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
-            bin_mask[layer_id, :, :] = ndimage.binary_closing(bin_mask[layer_id, :, :], iterations=1).astype(np.bool)
+            if self.params['topology_fill_holes']:
+                bin_mask[layer_id, :, :] = ndimage.binary_fill_holes(
+                    bin_mask[layer_id, :, :]
+                ).astype(np.bool)
+            if self.params['topology_dilation_niter'] > 0:
+                bin_mask[layer_id, :, :] = ndimage.binary_dilation(
+                    bin_mask[layer_id, :, :],
+                    iterations=self.params['topology_dilation_niter']
+                ).astype(np.bool)
+            if self.params['topology_closing_niter'] > 0:
+                bin_mask[layer_id, :, :] = ndimage.binary_closing(
+                    bin_mask[layer_id, :, :],
+                    iterations=self.params['topology_closing_niter']
+                ).astype(np.bool)
 
         if comm_rank == 0:
             print("(2/3) [Topological extrusion] Scanning y-z plane...")
         for layer_id in range(bin_mask.shape[1]):
-            bin_mask[:, layer_id, :] = ndimage.binary_dilation(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
-            bin_mask[:, layer_id, :] = ndimage.binary_closing(bin_mask[:, layer_id, :], iterations=1).astype(np.bool)
+            if self.params['topology_fill_holes']:
+                bin_mask[:, layer_id, :] = ndimage.binary_fill_holes(
+                    bin_mask[:, layer_id, :],
+                ).astype(np.bool)
+            if self.params['topology_dilation_niter'] > 0:
+                bin_mask[:, layer_id, :] = ndimage.binary_dilation(
+                    bin_mask[:, layer_id, :],
+                    iterations=self.params['topology_dilation_niter']
+                ).astype(np.bool)
+            if self.params['topology_closing_niter'] > 0:
+                bin_mask[:, layer_id, :] = ndimage.binary_closing(
+                    bin_mask[:, layer_id, :],
+                    iterations=self.params['topology_closing_niter']
+                ).astype(np.bool)
 
         if comm_rank == 0:
             print("(3/3) [Topological extrusion] Scanning x-z plane...")
         for layer_id in range(bin_mask.shape[2]):
-            bin_mask[:, :, layer_id] = ndimage.binary_dilation(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
-            bin_mask[:, :, layer_id] = ndimage.binary_closing(bin_mask[:, :, layer_id], iterations=1).astype(np.bool)
-
+            if self.params['topology_fill_holes']:
+                bin_mask[:, :, layer_id] = ndimage.binary_fill_holes(
+                    bin_mask[:, :, layer_id],
+                ).astype(np.bool)
+            if self.params['topology_dilation_niter'] > 0:
+                bin_mask[:, :, layer_id] = ndimage.binary_dilation(
+                    bin_mask[:, :, layer_id],
+                    iterations=self.params['topology_dilation_niter']
+                ).astype(np.bool)
+            if self.params['topology_closing_niter'] > 0:
+                bin_mask[:, :, layer_id] = ndimage.binary_closing(
+                    bin_mask[:, :, layer_id],
+                    iterations=self.params['topology_closing_niter']
+                ).astype(np.bool)
 
         # Computing bounding region
         m = np.where(bin_mask == True)
