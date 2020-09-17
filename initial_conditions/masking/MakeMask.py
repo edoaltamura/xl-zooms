@@ -103,7 +103,7 @@ class MakeMask:
                     print(error)
                     warn(
                         ("If using highres_radius_r500, the selection will use R_200crit instead.",
-                        "The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 .")
+                         "The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 .")
                     )
                 R500c = R200c / 2
 
@@ -219,13 +219,13 @@ class MakeMask:
                 np.logical_and(coords[:, 0] >= (self.params['coords'][0] - self.params['dim'][0] / 2.),
                                np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
                                               np.logical_and(coords[:, 1] >= (
-                                                          self.params['coords'][1] - self.params['dim'][1] / 2.),
+                                                      self.params['coords'][1] - self.params['dim'][1] / 2.),
                                                              np.logical_and(coords[:, 1] <= (
-                                                                         self.params['coords'][1] + self.params['dim'][
-                                                                     1] / 2.),
+                                                                     self.params['coords'][1] + self.params['dim'][
+                                                                 1] / 2.),
                                                                             np.logical_and(coords[:, 2] >= (
-                                                                                        self.params['coords'][2] -
-                                                                                        self.params['dim'][2] / 2.),
+                                                                                    self.params['coords'][2] -
+                                                                                    self.params['dim'][2] / 2.),
                                                                                            coords[:, 2] <= (self.params[
                                                                                                                 'coords'][
                                                                                                                 2] +
