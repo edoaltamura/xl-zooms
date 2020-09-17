@@ -101,8 +101,11 @@ class MakeMask:
             except KeyError as e:
                 if comm_rank == 0:
                     print(e.message, e.args)
-                    warn("Falling back to R_200crit selection! The radial factor will be divided by 2.")
-                R500c = R200c
+                    warn(
+                        "If using `highres_radius_r500`, the selection will use R_200crit instead.",
+                         "The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2 ."
+                    )
+                R500c = R200c / 2
 
             xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
             yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']]
