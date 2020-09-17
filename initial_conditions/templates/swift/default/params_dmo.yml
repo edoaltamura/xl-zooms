@@ -6,7 +6,7 @@ InternalUnitSystem:
   UnitCurrent_in_cgs:  1             # Amperes
   UnitTemp_in_cgs:     1             # Kelvin
 
-# Planck-13 cosmology
+# Cosmological parameters
 Cosmology:
   h:              XXX
   a_begin:        XXX
@@ -17,8 +17,8 @@ Cosmology:
 
 # Parameters governing the time integration
 TimeIntegration:
-  dt_min:     1e-6 
-  dt_max:     0.01
+  dt_min:     1e-10 # The minimal time-step size of the simulation (in internal units).
+  dt_max:     1e-2  # The maximal time-step size of the simulation (in internal units).
 
 Scheduler:
   max_top_level_cells: 32
@@ -30,7 +30,7 @@ Snapshots:
   delta_time:          1.02
   scale_factor_first:  0.02
   output_list_on:      1
-  output_list:         ../../snap_times
+  output_list:         ./config/snap_redshifts.txt
   invoke_stf:          0
   compression:         9
   subdir:              snapshots 
@@ -64,14 +64,16 @@ Gravity:
 
 # Parameters related to the initial conditions
 InitialConditions:
-  file_name:                   /cosma7/data/dp004/rttw52/swift_runs/make_ics/ics/XXX.hdf5
+  file_name:                   ./ics/XXX.hdf5
   periodic:                    1
-  cleanup_h_factors:           1    
-  cleanup_velocity_factors:    1  
+  cleanup_h_factors:           1
+  cleanup_velocity_factors:    1
 
-StructureFinding:
-  config_file_name:         none
-  basename:                 stf
-  output_list_on:           0
-  output_list:              list.txt
-  subdir_per_output:        stf
+# Parameters of the line-of-sight outputs
+LineOfSight:
+  basename:            los
+  num_along_x:         0
+  num_along_y:         0
+  num_along_z:         100
+  scale_factor_first:  0.1
+  delta_time:          1.1

@@ -15,14 +15,14 @@ def make_submit_file_gadget(dir, ncores, fname, n_sp, structure_finding, exec_fi
     if not os.path.exists(dir + fname + '/data/'): os.makedirs(dir + fname + '/data/')
 
     # GADGET submit file.
-    with open('../templates/gadget_submit.sh', 'r') as f:
+    with open('../templates/gadget4/gadget_submit.sh', 'r') as f:
         data = f.read()
 
     with open('%s/%s/submit.sh' % (dir, fname), 'w') as f:
         f.write(re.sub('XXX', lambda m, i=iter(r): next(i), data))
 
     # GADGET resubmit file.
-    with open('../templates/gadget_resubmit.sh', 'r') as f:
+    with open('../templates/gadget4/gadget_resubmit.sh', 'r') as f:
         data = f.read()
 
     with open('%s/%s/resubmit.sh' % (dir, fname), 'w') as f:
@@ -142,7 +142,7 @@ def make_param_file_gadget4(dir, fname, boxsize, starting_z, finishing_z,
          '%.8f' % soft_high, '%.8f' % (soft_high * a)]
 
     # First load template.
-    with open('../templates/gadget4_params.txt', 'r') as f:
+    with open('../templates/gadget4/gadget4_params.txt', 'r') as f:
         data = f.read()
 
     # Write new param file.
@@ -160,7 +160,7 @@ def make_submit_file_gadget4(dir, fname):
 
     r = []
 
-    with open('../templates/gadget4_submit.sh', 'r') as f:
+    with open('../templates/gadget4/gadget4_submit.sh', 'r') as f:
         data = f.read()
 
     # Write new param file.
@@ -213,14 +213,14 @@ def make_param_file_swift(dir, omega0, omegaL, omegaB, h, starting_z, finishing_
     else:
         raise ValueError("Invalid template set")
 
-    t_file = '../templates/swift/%s/params.yml' % template_set
+    t_file = '../templates/swift/%s/params_dmo.yml' % template_set
 
     # Load the template.
     with open(t_file, 'r') as f:
         data = f.read()
 
     # Write new param file.
-    with open('%s/params.yml' % data_dir, 'w') as f:
+    with open('%s/params_dmo.yml' % data_dir, 'w') as f:
         f.write(re.sub('XXX', lambda m, i=iter(r): next(i), data))
 
 
