@@ -2,6 +2,7 @@ import sys
 import yaml
 import h5py
 from typing import List, Tuple
+from warnings import warn
 import numpy as np
 from scipy.spatial import distance
 import matplotlib.patches as patches
@@ -94,7 +95,15 @@ class MakeMask:
             structType = vr_file['/Structuretype'][:]
             field_halos = np.where(structType == 10)[0]
             R200c = vr_file['/R_200crit'][field_halos][self.params['GN']]
-            R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
+
+            try:
+                R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
+            except KeyError as e:
+                if comm_rank == 0:
+                    print(e.message, e.args)
+                    warn("Falling back to R_200crit selection! The radial factor will be divided by 2.")
+                R500c = R200c
+
             xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
             yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']]
             zPotMin = vr_file['/Zcminpot'][field_halos][self.params['GN']]
@@ -105,7 +114,7 @@ class MakeMask:
         # If no radius is selected, use the default R200
         if is_r200 and is_r500:
             if comm_rank == 0:
-                print("Both highres_radius_r200 and highres_radius_r500 were entered. Overriding highres_radius_r500.")
+                warn("Both highres_radius_r200 and highres_radius_r500 were entered. Overriding highres_radius_r500.")
             radius = R200c * self.params['highres_radius_r200']
         elif not is_r200 and is_r500:
             radius = R500c * self.params['highres_radius_r500']
