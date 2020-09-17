@@ -1,4 +1,4 @@
-# SET-UP INFO PARTICLE LOAD #
+# INFO PARTICLE LOAD #
 box_size:           202.98                      # The size of the parent box divided by the Hubble parameter
 which_cosmology:    Planck2018                  # Select the type of cosmology (use Planck2018 for EAGLE-XL)
 n_particles:        11451483064                 # Number of particles if whole box was at target resolution
@@ -6,26 +6,24 @@ f_name:             EAGLE-XL_ClusterSK0_DMO     # Run name. The output directory
 is_zoom:            1                           # Set to 1 for zoom simulations, set to 0 for cosmological volumes
 dm_only:            0                           # Set to 0 for hydro runs, 1 for dark-matter-only runs
 n_species:          2                           # Number of DM species. For zooms, these are 2: high and low-res particles
-mask_file:          /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks/EAGLE-XL_Cluster5.hdf5
+mask_file:          /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks/EAGLE-XL_Cluster5.hdf5 # Location of the mask file
 glass_num:          12167                       # Particles in glass file. NOTE: `n_particles` must be divisible by this number.
-ndim_fft_start:     3
-use_ph_ids:         0
-
-# PARAMETER FILES AND DIRECTORIES #
-template_set:          default                  # Specify the set of templates to draw SWIFT parameter files from
-pl_dir:                /cosma7/data/dp004/dc-alta2/xl-zooms/ics/particle_load/
-ic_dir:                /cosma7/data/dp004/dc-alta2/xl-zooms/ics/ic_gen/run/
-swift_dir:             /cosma7/data/dp004/dc-alta2/xl-zooms/ics/swift_runs/
 
 # PANPHASIA INTERACTION #
-# NOTE: The Panphasian descriptor is unique to the parent volume and must be kept unchanged for zooms
-panphasian_descriptor: "[Panph1,L18,(74412,22732,260484),S3,CH1799108544,EAGLE-XL_L0300_VOL1]"
+ndim_fft_start:     3                           # Compute the minimum FFT grid that we need
+use_ph_ids:         0                           # Set to 1 if using Peano-Hilbert indexing, 0 otherwise
+panphasian_descriptor: "[Panph1,L18,(74412,22732,260484),S3,CH1799108544,EAGLE-XL_L0300_VOL1]" # The Panphasian descriptor is unique to the parent volume and must be kept unchanged for zooms
+ic_dir:             /cosma7/data/dp004/dc-alta2/xl-zooms/ics/ic_gen/run/                       # Directory for saving Panphasia parameter and submission files
+n_cores_ic_gen:     48                          # Number of cores to use when running Panphasia
+num_hours_ic_gen:   36                          # Wall-clock limit (in hours) for the Panphasia job
 
-# SUBMIT FILES #
-n_cores_ic_gen:     48
-num_hours_ic_gen:   36
-n_nodes_swift:      1
-num_hours_swift:    72
+# SWIFT SET-UP #
+template_set:       default                     # Specify the set of templates to draw SWIFT parameter files from
+pl_dir:             /cosma7/data/dp004/dc-alta2/xl-zooms/ics/particle_load/
+swift_dir:          /cosma7/data/dp004/dc-alta2/xl-zooms/ics/swift_runs/
+n_nodes_swift:      1                           # Number of nodes to use when running SWIFT
+num_hours_swift:    72                          # Wall-clock limit (in hours) for the SWIFT job between re-submissions
+
 
 
 
