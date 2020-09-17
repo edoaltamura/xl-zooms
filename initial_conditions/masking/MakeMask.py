@@ -129,7 +129,7 @@ class MakeMask:
 
         if comm_rank == 0:
             print(
-                "Velociraptor search results:\n",
+                "Velociraptor search results:\n"
                 f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n"
                 f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "\n"
                 f"- High-res radius: {radius}\n"
@@ -292,7 +292,7 @@ class MakeMask:
         bin_mask = np.zeros_like(H)
         m = np.where(H >= self.params['min_num_per_cell'])
         bin_mask[m] = 1
-        # bin_mask = binary_fill_holes(bin_mask).astype(int)
+        bin_mask = binary_fill_holes(bin_mask).astype(int)
 
         # Computing bounding region
         m = np.where(bin_mask == 1)
@@ -353,7 +353,7 @@ class MakeMask:
                 bin_mask = np.zeros_like(H)
                 m = np.where(H >= self.params['min_num_per_cell'])
                 bin_mask[m] = 1
-                # bin_mask = binary_fill_holes(bin_mask).astype(int)
+                bin_mask = binary_fill_holes(bin_mask).astype(int)
 
                 # Computing bounding region
                 m = np.where(bin_mask == 1)
