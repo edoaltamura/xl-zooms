@@ -350,6 +350,7 @@ class MakeMask:
                 # 3x3 structuring element with connectivity 2
                 bin_mask[m] = 1
                 bin_centre = np.asarray(ndimage.measurements.center_of_mass(bin_mask)).astype(np.int)
+                np.set_printoptions(threshold=sys.maxsize)
                 print(bin_mask[bin_centre[0]])
                 bin_mask = ndimage.binary_closing(
                     bin_mask,
