@@ -73,7 +73,7 @@ class ParticleLoad:
         self.radius = 0.
         self.mask_file = None  # Use a precomputed mask for glass particles.
         self.all_grid = False  # Only make from grids (no glass particles).
-        self.n_species = 1  # Number of DM species.
+        self.n_species = 1     # Number of DM species.
 
         self.constraint_phase_descriptor = '%dummy'
         self.constraint_phase_descriptor_path = '%dummy'
@@ -84,10 +84,10 @@ class ParticleLoad:
         self.constraint_phase_descriptor_levels2 = '%dummy'
 
         # Params for hi res grid.
-        self.skin_reduce_factor = 1 / 8.  # What factor do high res skins reduce by.
-        self.min_num_per_cell = 1  # Min number of particles in high res cell (must be cube).
+        self.skin_reduce_factor = 1 / 8.   # What factor do high res skins reduce by.
+        self.min_num_per_cell = 1          # Min number of particles in high res cell (must be cube).
         self.radius_factor = 1.
-        self.glass_buffer_cells = 0  # Number of buffer cells on each side (must be even, eg. 2 = 1 on each side)
+        self.glass_buffer_cells = 0        # Number of buffer cells on each side (must be even, eg. 2 = 1 on each side)
         self.ic_region_buffer_frac = 1.25  # 25% (buffer for FFT grid during ICs).
 
         # Default starting and finishing redshifts.
