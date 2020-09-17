@@ -348,9 +348,13 @@ class MakeMask:
                 bin_mask = np.zeros_like(H, dtype=np.int)
                 m = np.where(H >= self.params['min_num_per_cell'])
                 # 3x3 structuring element with connectivity 2
-                struct2 = ndimage.generate_binary_structure(2, 1)
                 bin_mask[m] = 1
-                bin_mask = ndimage.binary_dilation(bin_mask, structure=struct2).astype(bin_mask.dtype)
+                bin_centre = ndimage.measurements.center_of_mass(bin_mask)
+                bin_mask = ndimage.binary_closing(
+                    bin_mask,
+                    structure=np.ones((2,2)),
+                    origin=bin_centre
+                ).astype(bin_mask.dtype)
 
                 # Computing bounding region
                 m = np.where(bin_mask == 1)
