@@ -428,12 +428,12 @@ class MakeMask:
                 axarr[count].set_ylabel(f"{axes_label[j]} [Mpc h$^{{-1}}$]")
 
             plt.tight_layout(pad=0.3)
-            fig.savefig(f"{output_directory}/{self.params['fname']:s}.png")
+            fig.savefig(f"{self.params['output_dir']}/{self.params['fname']:s}.png")
             plt.show()
 
     def save(self, H, edges, bin_width, m, lens, com_coords):
         # Save (everything needs to be saved in h inverse units, for the IC GEN).
-        f = h5py.File(f"{output_directory}/{self.params['fname']:s}.hdf5", 'w')
+        f = h5py.File(f"{self.params['output_dir']}/{self.params['fname']:s}.hdf5", 'w')
         coords = np.c_[edges[0][m[0]] + bin_width / 2.,
                        edges[1][m[1]] + bin_width / 2.,
                        edges[2][m[2]] + bin_width / 2.]
@@ -455,7 +455,7 @@ class MakeMask:
         else:
             ds.attrs.create('high_res_volume', 4 / 3. * np.pi * self.params['radius'] ** 3.)
         f.close()
-        print(f"Saved {output_directory}/{self.params['fname']:s}.hdf5")
+        print(f"Saved {self.params['output_dir']}/{self.params['fname']:s}.hdf5")
 
     def get_com(self, ic_coords, bs):
         """ Find centre of mass for passed coordinates. """
