@@ -292,9 +292,9 @@ class MakeMask:
         bin_mask = np.zeros_like(H, dtype=np.int)
         m = np.where(H >= self.params['min_num_per_cell'])
         bin_mask[m] = 1
-        print(bin_mask)
+        print(bin_mask[bin_mask==1])
         bin_mask = binary_fill_holes(bin_mask).astype(int)
-        print(bin_mask)
+        print(bin_mask[bin_mask==1])
 
 
         # Computing bounding region
@@ -347,7 +347,7 @@ class MakeMask:
                     lens[j * 2 + 1] + lens[j * 2],
                     linewidth=1, edgecolor='r', facecolor='none'
                 )
-                axarr[count].scatter(plot_coords[:, i], plot_coords[:, j], s=1, c='blue')
+                axarr[count].scatter(plot_coords[:, i], plot_coords[:, j], s=0.5, c='blue')
                 axarr[count].add_patch(rect)
                 axarr[count].set_xlim(-lens[i * 2], lens[i * 2 + 1])
                 axarr[count].set_ylim(-lens[j * 2], lens[j * 2 + 1])
@@ -372,7 +372,7 @@ class MakeMask:
                             (e_x, e_y),
                             bin_width,
                             bin_width,
-                            linewidth=1,
+                            linewidth=0.5,
                             edgecolor='r',
                             facecolor='none'
                         )
