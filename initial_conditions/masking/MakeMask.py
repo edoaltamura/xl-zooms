@@ -104,7 +104,8 @@ class MakeMask:
 
         # If no radius is selected, use the default R200
         if is_r200 and is_r500:
-            print("Both highres_radius_r200 and highres_radius_r500 were entered. Overriding highres_radius_r500.")
+            if comm_rank == 0:
+                print("Both highres_radius_r200 and highres_radius_r500 were entered. Overriding highres_radius_r500.")
             radius = R200c * self.params['highres_radius_r200']
         elif not is_r200 and is_r500:
             radius = R500c * self.params['highres_radius_r500']
@@ -112,6 +113,16 @@ class MakeMask:
             radius = R200c * self.params['highres_radius_r200']
         else:
             raise ValueError("Neither highres_radius_r200 nor highres_radius_r500 were entered.")
+
+        if comm_rank == 0:
+            print(
+                "Velociraptor search results:\n",
+                f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n",
+                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "\n",
+                f"- High-res radius: {radius}\n"
+                f"- R200_crit: {R200c}\n"
+                f"- R500_crit: {R500c}\n"
+            )
 
         return [xPotMin, yPotMin, zPotMin], radius
 
