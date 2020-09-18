@@ -95,27 +95,29 @@ class MakeMask:
 
     def find_group(self) -> Tuple[List[float], float]:
 
+        is_r200 = 'highres_radius_r200' in self.params.keys()
+        is_r500 = 'highres_radius_r500' in self.params.keys()
+
         # Read in halo properties
         with h5py.File(self.params['vr_file'], 'r') as vr_file:
+
             structType = vr_file['/Structuretype'][:]
             field_halos = np.where(structType == 10)[0]
             R200c = vr_file['/R_200crit'][field_halos][self.params['GN']]
 
-            try:
-                R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
-            except KeyError as error:
-                if comm_rank == 0:
-                    print(error)
-                    print("If using highres_radius_r500, the selection will use R_200crit instead.")
-                    warn("The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2.", RuntimeWarning)
-                R500c = R200c / 2
+            if is_r500:
+                try:
+                    R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
+                except KeyError as error:
+                    if comm_rank == 0:
+                        print(error)
+                        print("If using highres_radius_r500, the selection will use R_200crit instead.")
+                        warn("The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2.", RuntimeWarning)
+                    R500c = R200c / 2
 
             xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
             yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']]
             zPotMin = vr_file['/Zcminpot'][field_halos][self.params['GN']]
-
-        is_r200 = 'highres_radius_r200' in self.params.keys()
-        is_r500 = 'highres_radius_r500' in self.params.keys()
 
         # If no radius is selected, use the default R200
         if is_r200 and is_r500:
