@@ -66,7 +66,7 @@ def make_masks_from_list() -> None:
         elif '200' in sort_key:
             replace_pattern('SORTM200', '1', mask_file)
             replace_pattern('SORTM500', '0', mask_file)
-        # mask = MakeMask(mask_file)
+        mask = MakeMask(mask_file)
 
 
 if __name__ == '__main__':
