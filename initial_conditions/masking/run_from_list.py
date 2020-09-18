@@ -53,21 +53,27 @@ def replace_pattern(pattern: str, replacement: str, filepath: str):
 
 
 def make_masks_from_list() -> None:
+
+    out_dir = get_output_dir_from_template()
+    copyfile(
+        os.path.join(this_file_directory, args.template),
+        os.path.join(out_dir, os.path.basename(args.template))
+    )
+
     for group_number in get_group_numbers_list():
 
         mask_name = get_run_name_from_template().replace('GROUPNUMBER', str(group_number))
-        mask_file = os.path.join(get_output_dir_from_template(), f"{mask_name}.hdf5")
-        copyfile(os.path.join(this_file_directory, args.template), mask_file)
-        replace_pattern('GROUPNUMBER', str(group_number), mask_file)
+        mask_paramfile = os.path.join(out_dir, f"{mask_name}.yml")
+        copyfile(os.path.join(out_dir, os.path.basename(args.template)), mask_paramfile)
+        replace_pattern('GROUPNUMBER', str(group_number), mask_paramfile)
         sort_key = get_mass_sort_key()
         if '500' in sort_key:
-            replace_pattern('SORTM200', '0', mask_file)
-            replace_pattern('SORTM500', '1', mask_file)
+            replace_pattern('SORTM200', '0', mask_paramfile)
+            replace_pattern('SORTM500', '1', mask_paramfile)
         elif '200' in sort_key:
-            replace_pattern('SORTM200', '1', mask_file)
-            replace_pattern('SORTM500', '0', mask_file)
-        mask = MakeMask(mask_file)
-
+            replace_pattern('SORTM200', '1', mask_paramfile)
+            replace_pattern('SORTM500', '0', mask_paramfile)
+        mask = MakeMask(mask_paramfile)
 
 if __name__ == '__main__':
     make_masks_from_list()
