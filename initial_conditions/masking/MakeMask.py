@@ -65,6 +65,8 @@ class MakeMask:
             if params['select_from_vr']:
                 assert 'GN' in params.keys(), 'Need to provide a Group-Number for the group'
                 assert 'vr_file' in params.keys(), 'Need to provide a sub_file'
+                assert 'sort_m200crit' in params.keys() or 'sort_m500crit' in params.keys(), \
+                    'Need to provide a sort rule for the catalogue by either soring by M200crit ot M500crit.'
                 assert 'highres_radius_r200' in params.keys() or 'highres_radius_r500' in params.keys(), \
                     'Need to provide a radius for the high-resolution region in either R200crit ot R500crit units.'
 
@@ -97,52 +99,90 @@ class MakeMask:
 
         is_r200 = 'highres_radius_r200' in self.params.keys()
         is_r500 = 'highres_radius_r500' in self.params.keys()
+        is_m200 = 'sort_m200crit' in self.params.keys()
+        is_m500 = 'sort_m500crit' in self.params.keys()
+
+        # Warn if conflicts are detected
+        if comm_rank == 0:
+            if is_r200 and is_r500:
+                warn("Conflict: highres_radius_r200 and highres_radius_r500 both specified. Fallback onto R_200crit")
+            if is_m200 and is_m500:
+                warn("Conflict: sort_m200crit and sort_m500crit both specified. Fallback onto M_200crit")
 
         # Read in halo properties
         with h5py.File(self.params['vr_file'], 'r') as vr_file:
 
             structType = vr_file['/Structuretype'][:]
             field_halos = np.where(structType == 10)[0]
-            R200c = vr_file['/R_200crit'][field_halos][self.params['GN']]
+            _M200c = vr_file['/Mass_200crit'][field_halos] * 1e10
 
-            if is_r500:
+            # Sort group catalogue by specified rule
+            if is_m200:
+                sort_key = np.argsort(_M200c)[::-1]  # Reverse for descending order
+            elif is_m500 and not is_m200:
                 try:
-                    R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
-                    R500c_str = f"{R500c:.4f}"
+                    _M500c = vr_file['/SO_Mass_500_rhocrit'][field_halos] * 1e10
+                    ok_m500 = True
                 except KeyError as error:
+                    _M500c = _M200c
+                    ok_m500 = False
+                    if comm_rank == 0:
+                        print(error)
+                        print("If using sort_m500crit, the sorting rule will use M_200crit instead.")
+                        warn("The groups are now sorted by M_200crit.", RuntimeWarning)
+                else:
+                    sort_key = np.argsort(_M500c)[::-1]  # Reverse for descending order
+            else:
+                raise ValueError("Mass-sorting keys not correctly configured. Check the parameter file.")
+
+            # Values to strings for printing into log
+            M200c = _M200c[sort_key][self.params['GN']]
+            if is_m500:
+                M500c = _M500c[sort_key][self.params['GN']]
+                M500c_str = f"{M500c:.4f}" if ok_m500 else f"? | Fallback M_200crit: {M200c:.4f}"
+            else:
+                M500c_str = f"None"
+
+            # Construct high resolution radius
+            R200c = vr_file['/R_200crit'][field_halos][sort_key][self.params['GN']]
+            if is_r200:
+                radius = R200c * self.params['highres_radius_r200']
+            elif is_r500 and not is_r200:
+                try:
+                    R500c = vr_file['/SO_R_500_rhocrit'][field_halos][sort_key][self.params['GN']]
+                    ok_r500 = True
+                except KeyError as error:
+                    ok_r500 = False
+                    R500c = R200c / 2
                     if comm_rank == 0:
                         print(error)
                         print("If using highres_radius_r500, the selection will use R_200crit instead.")
                         warn("The high-resolution radius is now set to R_200crit * highres_radius_r500 / 2.", RuntimeWarning)
-                    R500c = R200c / 2
-                    R500c_str = f"? {R500c:.4f}"
+                else:
+                    radius = R500c * self.params['highres_radius_r500']
+            else:
+                raise ValueError("Neither highres_radius_r200 nor highres_radius_r500 were entered.")
+
+            # Values to strings for printing into log
+            if is_r500:
+                R500c_str = f"{R500c:.4f}" if ok_r500 else f"? | Fallback R_200crit/2: {R500c:.4f}"
             else:
                 R500c_str = f"None"
 
-            xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
-            yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']]
-            zPotMin = vr_file['/Zcminpot'][field_halos][self.params['GN']]
-
-        # If no radius is selected, use the default R200
-        if is_r200 and is_r500:
-            if comm_rank == 0:
-                warn("Both highres_radius_r200 and highres_radius_r500 were entered. Overriding highres_radius_r500.")
-            radius = R200c * self.params['highres_radius_r200']
-        elif not is_r200 and is_r500:
-            radius = R500c * self.params['highres_radius_r500']
-        elif is_r200 and not is_r500:
-            radius = R200c * self.params['highres_radius_r200']
-        else:
-            raise ValueError("Neither highres_radius_r200 nor highres_radius_r500 were entered.")
+            xPotMin = vr_file['/Xcminpot'][field_halos][sort_key][self.params['GN']]
+            yPotMin = vr_file['/Ycminpot'][field_halos][sort_key][self.params['GN']]
+            zPotMin = vr_file['/Zcminpot'][field_halos][sort_key][self.params['GN']]
 
         if comm_rank == 0:
             print(
-                "Velociraptor search results:\n"
-                f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n"
-                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "Mpc\n"
-                f"- High-res radius: {radius:.4f} Mpc\n"
-                f"- R200_crit: {R200c:.4f} Mpc\n"
-                f"- R500_crit: {R500c_str} Mpc\n"
+                "Velociraptor search results:\n",
+                f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n",
+                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "Mpc\n",
+                f"- High-res radius: {radius:.4f} Mpc\n",
+                f"- R_200crit: {R200c:.4f} Mpc\n",
+                f"- R_500crit: {R500c_str} Mpc\n",
+                f"- M_200crit: {M200c:.4f} $M_\odot$\n",
+                f"- M_500crit: {M500c_str} $M_\odot$\n"
             )
 
         return [xPotMin, yPotMin, zPotMin], radius

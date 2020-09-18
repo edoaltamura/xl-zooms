@@ -2,6 +2,9 @@
 # All params, e.g. the coordinates, are expected to be in the native units of the snapshot.
 # NOTE: If you are using an automatic group selection, make sure you are using a Velociraptor
 # output catalogue (.properties). SUBFIND outputs are deprecated as of 17-09-2020.
+# If using automatic selection through the Velociraptor catalogue a sorting key must be selected
+# and the GroupNumber is the index of the group in the list sorted by decreasing mass (from largest to
+# smallest).
 
 # SET-UP MASK #
 fname:             my_run              # The save name for the mask file
@@ -20,8 +23,10 @@ topology_dilation_niter:   1           # Number of iterations of the algorithm f
 topology_closing_niter:    1           # Number of iterations of the algorithm for rounding edges. Set value to 0 to disable (default 0)
 
 # AUTOMATIC GROUP SELECTION #
-GN:                 0                  # The Group-Number of the halo in the structure-finding catalogue (requires `sub_file`)
-vr_file:           path/to/stf/properties # The location of the Velociraptor group catalogue (to find coordinates of given GN)
+vr_file:             path/to/stf/properties # The location of the Velociraptor group catalogue (to find coordinates of given GN)
+sort_m200crit:       0                 # If 1, sorts groups in the VR catalogue by M_200crit. Overrides `sort_m500crit` if both specified
+sort_m500crit:       1                 # If 1, sorts groups in the VR catalogue by M_500crit
+GN:                  0                 # The Group-Number of the halo in the structure-finding catalogue (requires `vr_file`). GN relative to the sorting rule
 highres_radius_r200: 1.                # How many times r200 of the passed group do you want to re-simulate. Overrides `highres_radius_r500` if both selected
 highres_radius_r500: 5.                # How many times r500 of the passed group do you want to re-simulate
 
@@ -31,5 +36,5 @@ radius:             1.                 # If shape is sphere, need to provide the
 dim:                [1., 1., 1.]       # If shape is a cuboid or slab, need to provide [x,y,z] array of the lengths
 
 # OUTPUT DIRECTORY #
-output_dir:        path/to/output/mask # Directory where the mask image and hdf5 output are saved
+output_dir:         path/to/output/mask # Directory where the mask image and hdf5 output are saved
 
