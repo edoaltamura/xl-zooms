@@ -29,7 +29,7 @@ def get_run_name_from_template() -> str:
 
 
 def get_group_numbers_list() -> ndarray:
-    return loadtxt(args.listfile)
+    return loadtxt(args.listfile).astype(int)
 
 
 def get_mass_sort_key() -> str:
