@@ -37,11 +37,12 @@ def get_mass_sort_key() -> str:
         lines = selection.readlines()
         for line in lines:
             if 'mass_sort' in line:
-                sort_key = line.split(':')[1]
+                sort_key = line.split()[-1]
                 break
     assert '500' in sort_key or '200' in sort_key, ("Mass sort key returned unexpected value.",
                                                     f"Expected `M_200crit` or `M_500crit`, got {sort_key}")
     return sort_key
+
 
 def replace_pattern(pattern: str, replacement: str, filepath: str):
     with open(filepath, "r") as sources:
@@ -52,7 +53,6 @@ def replace_pattern(pattern: str, replacement: str, filepath: str):
 
 
 def make_masks_from_list() -> None:
-
     for group_number in get_group_numbers_list():
 
         mask_name = get_run_name_from_template().replace('GROUPNUMBER', str(group_number))
@@ -66,7 +66,7 @@ def make_masks_from_list() -> None:
         elif '200' in sort_key:
             replace_pattern('SORTM200', '1', mask_file)
             replace_pattern('SORTM500', '0', mask_file)
-        mask = MakeMask(mask_file)
+        # mask = MakeMask(mask_file)
 
 
 if __name__ == '__main__':
