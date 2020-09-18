@@ -101,14 +101,13 @@ class MakeMask:
         # Read in halo properties
         with h5py.File(self.params['vr_file'], 'r') as vr_file:
 
-            hubble = float(vr_file['Configuration'].attrs['h_val'])
             structType = vr_file['/Structuretype'][:]
             field_halos = np.where(structType == 10)[0]
-            R200c = vr_file['/R_200crit'][field_halos][self.params['GN']] * hubble
+            R200c = vr_file['/R_200crit'][field_halos][self.params['GN']]
 
             if is_r500:
                 try:
-                    R500c = vr_file['/R_500crit'][field_halos][self.params['GN']] * hubble
+                    R500c = vr_file['/R_500crit'][field_halos][self.params['GN']]
                     R500c_str = f"{R500c:.4f}"
                 except KeyError as error:
                     if comm_rank == 0:
@@ -120,9 +119,9 @@ class MakeMask:
             else:
                 R500c_str = f"None"
 
-            xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']] * hubble
-            yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']] * hubble
-            zPotMin = vr_file['/Zcminpot'][field_halos][self.params['GN']] * hubble
+            xPotMin = vr_file['/Xcminpot'][field_halos][self.params['GN']]
+            yPotMin = vr_file['/Ycminpot'][field_halos][self.params['GN']]
+            zPotMin = vr_file['/Zcminpot'][field_halos][self.params['GN']]
 
         # If no radius is selected, use the default R200
         if is_r200 and is_r500:
