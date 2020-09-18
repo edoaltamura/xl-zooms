@@ -491,6 +491,11 @@ class MakeMask:
         coords = np.c_[edges[0][m[0]] + bin_width / 2.,
                        edges[1][m[1]] + bin_width / 2.,
                        edges[2][m[2]] + bin_width / 2.]
+
+        # Push parameter file data as file attributes
+        for param_attr in self.params:
+            f.attrs.create(param_attr, self.params[param_attr])
+
         ds = f.create_dataset('Coordinates', data=np.array(coords, dtype='f8'))
         ds.attrs.create('xlen_lo', lens[0])
         ds.attrs.create('xlen_hi', lens[1])
@@ -502,10 +507,10 @@ class MakeMask:
         ds.attrs.create('com_coords', com_coords)
         ds.attrs.create('grid_cell_width', bin_width)
         if self.params['shape'] == 'cuboid' or self.params['shape'] == 'slab':
-            ds.attrs.create('high_res_volume',
-                            self.params['dim'][0] * self.params['dim'][1] * self.params['dim'][2])
+            high_res_volume = self.params['dim'][0] * self.params['dim'][1] * self.params['dim'][2]
         else:
-            ds.attrs.create('high_res_volume', 4 / 3. * np.pi * self.params['radius'] ** 3.)
+            high_res_volume = 4 / 3. * np.pi * self.params['radius'] ** 3.
+        ds.attrs.create('high_res_volume', high_res_volume)
         f.close()
         print(f"Saved {self.params['output_dir']}/{self.params['fname']:s}.hdf5")
 
