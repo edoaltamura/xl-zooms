@@ -483,7 +483,7 @@ class MakeMask:
 
             plt.tight_layout(pad=0.3)
             fig.savefig(f"{self.params['output_dir']}/{self.params['fname']:s}.png")
-            plt.show()
+            # plt.show()
 
     def save(self, H, edges, bin_width, m, lens, com_coords):
         # Save (everything needs to be saved in h inverse units, for the IC GEN).
