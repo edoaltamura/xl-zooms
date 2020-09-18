@@ -26,7 +26,7 @@ topology_closing_niter:    1           # Number of iterations of the algorithm f
 vr_file:             /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0 # The location of the Velociraptor group catalogue (to find coordinates of given GN)
 #sort_m200crit:       0                 # If 1, sorts groups in the VR catalogue by M_200crit. Overrides `sort_m500crit` if both specified
 sort_m500crit:       1                 # If 1, sorts groups in the VR catalogue by M_500crit
-GN:                  50                # The Group-Number of the halo in the structure-finding catalogue (requires `vr_file`). GN relative to the sorting rule
+GN:                  250                # The Group-Number of the halo in the structure-finding catalogue (requires `vr_file`). GN relative to the sorting rule
 #highres_radius_r200: 5.                 # How many times r200 of the passed group do you want to re-simulate. Overrides `highres_radius_r500` if both selected
 highres_radius_r500: 10.                # How many times r500 of the passed group do you want to re-simulate
 
