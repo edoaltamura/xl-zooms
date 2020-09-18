@@ -10,8 +10,8 @@ from make_mask import MakeMask
 this_file_directory = os.path.dirname(__file__)
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-template', default=False, action='store_true')
-parser.add_argument('-listfile', default=False, action='store_true')
+parser.add_argument('--template', action='store', type=str)
+parser.add_argument('--listfile', action='store', type=str)
 args = parser.parse_args()
 
 
