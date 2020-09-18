@@ -65,6 +65,10 @@ class MakeMask:
             if params['select_from_vr']:
                 assert 'GN' in params.keys(), 'Need to provide a Group-Number for the group'
                 assert 'vr_file' in params.keys(), 'Need to provide a sub_file'
+                if 'sort_m200crit' in params.keys() and not params['sort_m200crit']:
+                    del params['sort_m200crit']
+                if 'sort_m500crit' in params.keys() and not params['sort_m500crit']:
+                    del params['sort_m500crit']
                 assert 'sort_m200crit' in params.keys() or 'sort_m500crit' in params.keys(), \
                     'Need to provide a sort rule for the catalogue by either soring by M200crit ot M500crit.'
                 assert 'highres_radius_r200' in params.keys() or 'highres_radius_r500' in params.keys(), \
