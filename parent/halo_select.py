@@ -201,7 +201,7 @@ for i in np.arange(numHaloes_select):
 # Print to txt file
 with open(f"{output_dir}/groupnumbers_defaultSept.txt", "w") as text_file:
     print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
-    print("# Halo index", file=text_file)
+    print("# Halo index:", file=text_file)
     for i in np.arange(numHaloes_select):
         print(f"{indexList_select[i]:d}", file=text_file)
 
