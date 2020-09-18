@@ -133,7 +133,7 @@ class MakeMask:
             print(
                 "Velociraptor search results:\n"
                 f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n"
-                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "\n"
+                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "Mpc\n"
                 f"- High-res radius: {radius}\n"
                 f"- R200_crit: {R200c}\n"
                 f"- R500_crit: {R500c}\n"
@@ -189,10 +189,11 @@ class MakeMask:
             snap.split_selection(comm)
 
         # Load DM particle IDs.
-        if comm_rank == 0: print('Loading particle data ...')
+        if comm_rank == 0:
+            print('Loading particle data...')
         ids = snap.read_dataset(1, 'ParticleIDs')
         coords = snap.read_dataset(1, 'Coordinates')
-        print(f'[Rank {comm_rank}] Loaded {len(ids)} dark matter particles.')
+        print(f'[Rank {comm_rank}] Loaded {len(ids)} dark matter particles')
 
         # Wrap coordinates.
         coords = np.mod(coords - self.params['coords'] + 0.5 * self.params['bs'],
@@ -223,11 +224,11 @@ class MakeMask:
                 np.logical_and(coords[:, 0] <= (self.params['coords'][0] + self.params['dim'][0] / 2.),
                 np.logical_and(coords[:, 1] >= (self.params['coords'][1] - self.params['dim'][1] / 2.),
                 np.logical_and(coords[:, 1] <= (self.params['coords'][1] + self.params['dim'][1] / 2.),
-                np.logical_and(coords[:, 2] >= (self.params['coords'][2] -self.params['dim'][2] / 2.),
-                coords[:, 2] <= (self.params['coords'][2] +self.params['dim'][2] / 2.)))))))
+                np.logical_and(coords[:, 2] >= (self.params['coords'][2] - self.params['dim'][2] / 2.),
+                coords[:, 2] <= (self.params['coords'][2] + self.params['dim'][2] / 2.)))))))
 
         ids = ids[mask]
-        print(f'[Rank {comm_rank}] Clipped to {len(ids)} dark matter particles.')
+        print(f'[Rank {comm_rank}] Clipped to {len(ids)} dark matter particles')
 
         # Put back into original IDs.
         if self.params['divide_ids_by_two']:
@@ -269,7 +270,7 @@ class MakeMask:
         while True:
             com_coords = self.get_com(ic_coords, self.params['bs'])
             if comm_rank == 0:
-                print(f'COM iteration {count} c={com_coords} Mpc/h')
+                print(f'COM iteration {count} c: {com_coords} Mpc/h')
             ic_coords = np.mod(ic_coords - com_coords + 0.5 * self.params['bs'],
                                self.params['bs']) + com_coords - 0.5 * self.params['bs']
             if np.sum(np.abs(com_coords - last_com_coords)) <= 1e-6:
@@ -297,7 +298,7 @@ class MakeMask:
 
         # Fill holes and extrude the mask
         if comm_rank == 0:
-            print("(1/3) [Topological extrusion] Scanning x-y plane...")
+            print("[Topological extrusion (1/3)] Scanning x-y plane...")
         for layer_id in range(bin_mask.shape[0]):
             if self.params['topology_fill_holes']:
                 bin_mask[layer_id, :, :] = ndimage.binary_fill_holes(
@@ -315,7 +316,7 @@ class MakeMask:
                 ).astype(np.bool)
 
         if comm_rank == 0:
-            print("(2/3) [Topological extrusion] Scanning y-z plane...")
+            print("[Topological extrusion (2/3)] Scanning y-z plane...")
         for layer_id in range(bin_mask.shape[1]):
             if self.params['topology_fill_holes']:
                 bin_mask[:, layer_id, :] = ndimage.binary_fill_holes(
@@ -333,7 +334,7 @@ class MakeMask:
                 ).astype(np.bool)
 
         if comm_rank == 0:
-            print("(3/3) [Topological extrusion] Scanning x-z plane...")
+            print("[Topological extrusion (3/3)] Scanning x-z plane...")
         for layer_id in range(bin_mask.shape[2]):
             if self.params['topology_fill_holes']:
                 bin_mask[:, :, layer_id] = ndimage.binary_fill_holes(
@@ -352,12 +353,14 @@ class MakeMask:
 
         # Computing bounding region
         m = np.where(bin_mask == True)
-        lens = np.array([np.abs(np.min(edges[0][m[0]])),
-                         np.max(edges[0][m[0]]) + bin_width,
-                         np.abs(np.min(edges[1][m[1]])),
-                         np.max(edges[1][m[1]]) + bin_width,
-                         np.abs(np.min(edges[2][m[2]])),
-                         np.max(edges[2][m[2]]) + bin_width])
+        lens = np.array([
+            np.abs(np.min(edges[0][m[0]])),
+            np.max(edges[0][m[0]]) + bin_width,
+            np.abs(np.min(edges[1][m[1]])),
+            np.max(edges[1][m[1]]) + bin_width,
+            np.abs(np.min(edges[2][m[2]])),
+            np.max(edges[2][m[2]]) + bin_width
+        ])
 
         if comm_rank == 0:
             print(
@@ -369,10 +372,11 @@ class MakeMask:
 
             tot_cells = len(H[0][m[0]]) + len(H[1][m[1]]) + len(H[2][m[2]])
             print(f'There are {tot_cells:d} total glass cells.')
-        # Plot.
+
+        # Plot the mask and the ameba
         self.plot(H, edges, bin_width, m, ic_coords, lens)
 
-        # Save.
+        # Save the mask to hdf5
         if comm_rank == 0:
             self.save(H, edges, bin_width, m, lens, com_coords)
 
@@ -449,9 +453,7 @@ class MakeMask:
         ds.attrs.create('grid_cell_width', bin_width)
         if self.params['shape'] == 'cuboid' or self.params['shape'] == 'slab':
             ds.attrs.create('high_res_volume',
-                            self.params['dim'][0] \
-                            * self.params['dim'][1] \
-                            * self.params['dim'][2])
+                            self.params['dim'][0] * self.params['dim'][1] * self.params['dim'][2])
         else:
             ds.attrs.create('high_res_volume', 4 / 3. * np.pi * self.params['radius'] ** 3.)
         f.close()
