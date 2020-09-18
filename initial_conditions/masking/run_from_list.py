@@ -1,3 +1,8 @@
+# Run with:
+# python3 run_from_list.py \
+#   --template param_files/default_sept.yml \
+#   --listfile /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks/groupnumbers_defaultSept.txt
+
 import argparse
 import os
 import re
@@ -53,7 +58,6 @@ def replace_pattern(pattern: str, replacement: str, filepath: str):
 
 
 def make_masks_from_list() -> None:
-
     out_dir = get_output_dir_from_template()
     copyfile(
         os.path.join(this_file_directory, args.template),
@@ -74,6 +78,7 @@ def make_masks_from_list() -> None:
             replace_pattern('SORTM200', '1', mask_paramfile)
             replace_pattern('SORTM500', '0', mask_paramfile)
         mask = MakeMask(mask_paramfile)
+
 
 if __name__ == '__main__':
     make_masks_from_list()
