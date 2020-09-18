@@ -139,10 +139,10 @@ class MakeMask:
             print(
                 "Velociraptor search results:\n"
                 f"- Run name: {self.params['fname']}\tGroupNumber: {self.params['GN']}\n"
-                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "Mpc/h\n"
-                f"- High-res radius: {radius:.4f} Mpc/h\n"
-                f"- R200_crit: {R200c:.4f} Mpc/h\n"
-                f"- R500_crit: {R500c_str} Mpc/h\n"
+                f"- Coordinate centre: ", ([xPotMin, yPotMin, zPotMin]), "Mpc\n"
+                f"- High-res radius: {radius:.4f} Mpc\n"
+                f"- R200_crit: {R200c:.4f} Mpc\n"
+                f"- R500_crit: {R500c_str} Mpc\n"
             )
 
         return [xPotMin, yPotMin, zPotMin], radius
