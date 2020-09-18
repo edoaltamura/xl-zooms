@@ -1,8 +1,0 @@
-shape: sphere
-snap_file: /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5
-bits: 21 # 14 for old eagle
-fname: EAGLE-XL_Cluster101
-coords: [68.94294498810993,105.00380216555172,100.39364582824412]
-radius: 3.
-data_type: swift
-divide_ids_by_two: False

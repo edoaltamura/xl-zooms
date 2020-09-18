@@ -1,6 +1,6 @@
 import numpy as np
+import matplotlib.pyplot as plt
 import h5py as h5
-from matplotlib import pyplot as plt
 
 
 def wrap(dx, box):
@@ -11,21 +11,22 @@ def wrap(dx, box):
     result[index] += box
     return result
 
-# GLOBAL PARAMETERS ##########################################################
 
-np.random.seed(0)
 boxMpc = 300.
-# Range of M200c masses to select haloes in
-minMassSelectMsun = 1.e13
-maxMassSelectMsun = 1.e14
-# Number of haloes to select within each mass bin, and number of mass bins
-numHaloesPerBin = 1
-numBins_select = 3
-# Isolation criteria (distance and mass limit)
-minDistFac = 10.  # isolation distance criterion (multiples of r200c)
-minMassFrac = 0.1  # isolation mass criterion (fraction of M200c)
+np.random.seed(3000)
 
-#############################################################################
+# Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
+massChoice = 1
+# Range of masses to select haloes in
+minMassSelectMsun = 10. ** 13
+maxMassSelectMsun = 10. ** 14.5
+# Number of haloes to select within each mass bin, and number of mass bins
+numHaloesPerBin = 6
+numBins_select = 5
+# Isolation criteria (distance and mass limit)
+minDistFac = 10.  # isolation distance criterion (multiples of RDeltac)
+minDistMpc = 5.  # isolation distance criterion (Mpc)
+minMassFrac = 0.1  # isolation mass criterion (fraction of MDeltac)
 
 # EAGLE-XL data path
 dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
@@ -33,57 +34,86 @@ dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
 vrPath = dataPath + "stf_swiftdm_3dfof_subhalo_0036/"
 # Halo properties file
 haloPropFile = vrPath + "stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
+# Output directory
+output_dir = "/cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks"
 
 # Read in halo properties
-with h5.File(haloPropFile, 'r') as f:
-    M200c = f['/Mass_200crit'][:] * 1.e10  # Msun units
-    R200c = f['/R_200crit'][:]
-    structType = f['/Structuretype'][:]
-    xPotMin = f['/Xcminpot'][:]
-    yPotMin = f['/Ycminpot'][:]
-    zPotMin = f['/Zcminpot'][:]
+h5file = h5.File(haloPropFile, 'r')
+if massChoice == 0:
+    print('Using M200c/R200c')
+    h5dset = h5file['/Mass_200crit']
+    MDeltac = h5dset[...] * 1.e10  # Msun units
+    h5dset = h5file['/R_200crit']
+    RDeltac = h5dset[...]
+else:
+    print('Using M500c/R500c')
+    h5dset = h5file['/SO_Mass_500_rhocrit']
+    MDeltac = h5dset[...] * 1.e10  # Msun units
+    h5dset = h5file['/SO_R_500_rhocrit']
+    RDeltac = h5dset[...]
+h5dset = h5file['/Structuretype']
+structType = h5dset[...]
+h5dset = h5file['/Xcminpot']
+xPotMin = h5dset[...]
+h5dset = h5file['/Ycminpot']
+yPotMin = h5dset[...]
+h5dset = h5file['/Zcminpot']
+zPotMin = h5dset[...]
+h5file.close()
 
-print("Set-up search parameters")
-# Cut down main sample to field haloes above minimum mass
-index = np.where((structType == 10) & (M200c > (minMassFrac * minMassSelectMsun)))[0]
-numHaloes = index.size
-M200c = M200c[index]
-R200c = R200c[index]
+# Store position in list (0 is most massive)
+index = np.argsort(MDeltac)[::-1]  # most massive to least massive
+MDeltac = MDeltac[index]
+RDeltac = RDeltac[index]
 xPotMin = xPotMin[index]
 yPotMin = yPotMin[index]
 zPotMin = zPotMin[index]
+indexList = np.arange(MDeltac.size)
+
+# Cut down main sample to field haloes above minimum mass
+index = np.where((structType == 10) & (MDeltac > (minMassFrac * minMassSelectMsun)))[0]
+numHaloes = index.size
+MDeltac = MDeltac[index]
+RDeltac = RDeltac[index]
+xPotMin = xPotMin[index]
+yPotMin = yPotMin[index]
+zPotMin = zPotMin[index]
+indexList = indexList[index]
 print("Number of haloes in sample =", numHaloes)
 
 # Select primary haloes with structure type 10 (field haloes) and within mass range
-index = np.where((M200c > minMassSelectMsun) & (M200c < maxMassSelectMsun))[0]
-print("Primary sample selected in M200c mass range [min,max] =", minMassSelectMsun, maxMassSelectMsun)
+index = np.where((MDeltac > minMassSelectMsun) & (MDeltac < maxMassSelectMsun))[0]
+print("Primary sample selected in MDeltac mass range [min,max] =", minMassSelectMsun, maxMassSelectMsun)
 numHaloesPrimary = index.size
 print("Number of haloes in primary sample =", numHaloesPrimary)
-M200c_primary = M200c[index]
-R200c_primary = R200c[index]
+MDeltac_primary = MDeltac[index]
+RDeltac_primary = RDeltac[index]
 xPotMin_primary = xPotMin[index]
 yPotMin_primary = yPotMin[index]
 zPotMin_primary = zPotMin[index]
+indexList_primary = indexList[index]
 
 selectFlag = np.zeros(numHaloesPrimary, dtype=np.bool)
 for i in np.arange(numHaloesPrimary - 1):
-    minDistMpc = minDistFac * R200c_primary[i]  # Halo pair separation should be no smaller than this
-    minMassMsun = minMassFrac * M200c_primary[i]  # Neighbour masses must not be larger than this
+    minDist = np.max(
+        [minDistMpc, minDistFac * RDeltac_primary[i]])  # Halo pair separation should be no smaller than this
+    minMassMsun = minMassFrac * MDeltac_primary[i]  # Neighbour masses must not be larger than this
     dx = wrap(xPotMin - xPotMin_primary[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_primary[i], boxMpc)
     dz = wrap(zPotMin - zPotMin_primary[i], boxMpc)
     dr2 = (dx ** 2) + (dy ** 2) + (dz ** 2)
-    index = np.where((M200c > minMassMsun) & (dr2 < minDistMpc ** 2))[0]
+    index = np.where((MDeltac > minMassMsun) & (dr2 < minDist ** 2))[0]
     if index.size == 1:
         selectFlag[i] = True
 
 # Subset of haloes that satisfy isolation criterion
-M200c_iso = M200c_primary[selectFlag]
-R200c_iso = R200c_primary[selectFlag]
+MDeltac_iso = MDeltac_primary[selectFlag]
+RDeltac_iso = RDeltac_primary[selectFlag]
 xPotMin_iso = xPotMin_primary[selectFlag]
 yPotMin_iso = yPotMin_primary[selectFlag]
 zPotMin_iso = zPotMin_primary[selectFlag]
-numHaloes_iso = M200c_iso.size
+indexList_iso = indexList_primary[selectFlag]
+numHaloes_iso = MDeltac_iso.size
 print('Number of haloes satisfying isolation critertion =', numHaloes_iso)
 
 # Now select haloes at random within each mass bins
@@ -93,56 +123,98 @@ maxMass = np.log10(maxMassSelectMsun)
 dlogM = (maxMass - minMass) / float(numBins_select)
 
 print("Number of halo mass bins =", numBins_select)
-print(f"Mass bins: log(Mmin) = {minMass:2.2f} log(Mmax) = {maxMass:2.2f} dlogM = {dlogM:2.2f}")
+print("Mass bins: log(Mmin) log(Mmax) dlogM =", minMass, maxMass, dlogM)
 print("Number of haloes to select within each mass bin =", numHaloesPerBin)
 
-M200c_select = np.zeros(numHaloes_select)
-R200c_select = np.zeros(numHaloes_select)
+MDeltac_select = np.zeros(numHaloes_select)
+RDeltac_select = np.zeros(numHaloes_select)
 xPotMin_select = np.zeros(numHaloes_select)
 yPotMin_select = np.zeros(numHaloes_select)
 zPotMin_select = np.zeros(numHaloes_select)
+indexList_select = np.zeros(numHaloes_select, dtype=np.int)
 
 haloCounter = 0
-print("\nSample halos in mass bins\ni, haloCounter, bin1, bin2, index.size, selectedHaloes")
 for i in np.arange(numBins_select):
     bin1 = minMass + float(i) * dlogM
     bin2 = bin1 + dlogM
-    index = np.where((np.log10(M200c_iso) > bin1) & (np.log10(M200c_iso) <= bin2))[0]
+    index = np.where((np.log10(MDeltac_iso) > bin1) & (np.log10(MDeltac_iso) <= bin2))[0]
     # Select haloes at random without replacement
     selectedHaloes = index[np.random.choice(index.size, size=numHaloesPerBin, replace=False)]
-    M200c_select[haloCounter:haloCounter + numHaloesPerBin] = M200c_iso[selectedHaloes]
-    R200c_select[haloCounter:haloCounter + numHaloesPerBin] = R200c_iso[selectedHaloes]
+
+    MDeltac_select[haloCounter:haloCounter + numHaloesPerBin] = MDeltac_iso[selectedHaloes]
+    RDeltac_select[haloCounter:haloCounter + numHaloesPerBin] = RDeltac_iso[selectedHaloes]
     xPotMin_select[haloCounter:haloCounter + numHaloesPerBin] = xPotMin_iso[selectedHaloes]
     yPotMin_select[haloCounter:haloCounter + numHaloesPerBin] = yPotMin_iso[selectedHaloes]
     zPotMin_select[haloCounter:haloCounter + numHaloesPerBin] = zPotMin_iso[selectedHaloes]
+    indexList_select[haloCounter:haloCounter + numHaloesPerBin] = indexList_iso[selectedHaloes]
     print(i, haloCounter, bin1, bin2, index.size, selectedHaloes)
     haloCounter += numHaloesPerBin
 
-# Print out sample
-print("\nPick halos randomly in mass bins\ni, M200c / 1.e13, r200c, xPotMin, yPotMin, zPotMin")
-for i in np.arange(numHaloes_select):
-    print(i, M200c_select[i] / 1.e13, R200c_select[i], xPotMin_select[i], yPotMin_select[i], zPotMin_select[i])
+# Sort sample in mass order
+index = np.argsort(MDeltac_select)
+MDeltac_select = MDeltac_select[index]
+RDeltac_select = RDeltac_select[index]
+xPotMin_select = xPotMin_select[index]
+yPotMin_select = yPotMin_select[index]
+zPotMin_select = zPotMin_select[index]
+indexList_select = indexList_select[index]
 
-# Print to txt file
-with open("outfiles/halo_selected_EA.txt", "w") as text_file:
-    print("# Halo counter, M200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]", file = text_file)
-    for i in np.arange(numHaloes_select):
-        print(f"{i}, {M200c_select[i] / 1.e13}, {R200c_select[i]}, {xPotMin_select[i]}, {yPotMin_select[i]}, {zPotMin_select[i]}", file = text_file)
+# Print out sample
+print()
+print()
+print('**************************************************')
+print('**************************************************')
+print('SAMPLE LIST: ID, MDelta(crit), RDelta(crit), [x,y,z]_MinPot')
+print('ID is position in array sorted in MDelta(crit) - ID=0 is most massive cluster')
+print('MDelta(crit) is SO mass in units of 1e13 Msun')
+print('RDelta(crit) is SO radius in units of Mpc')
+print('[x,y,z]_MinPot is 3D position of particle with minimum potential in Mpc')
+for i in np.arange(numHaloes_select):
+    print(indexList_select[i],
+          '{:.3f}'.format(MDeltac_select[i] / 1.e13),
+          '{:.3f}'.format(RDeltac_select[i]),
+          '{:.3f}'.format(xPotMin_select[i]),
+          '{:.3f}'.format(yPotMin_select[i]),
+          '{:.3f}'.format(zPotMin_select[i]))
+print('**************************************************')
+print('**************************************************')
+print()
+print()
 
 # Sanity check - find the closest halo that is more massive
-print('\nSanity check: 2nd last column should always be more than last column')
-print("i, index.size, Distance to nearest halo, minDistFac * r200c")
+print('Sanity check: 2nd last column (nearest massive object) should always be more than last column (minDist)')
 for i in np.arange(numHaloes_select):
     dx = wrap(xPotMin - xPotMin_select[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_select[i], boxMpc)
     dz = wrap(zPotMin - zPotMin_select[i], boxMpc)
     dr2 = (dx ** 2) + (dy ** 2) + (dz ** 2)
-    index = np.where((M200c > minMassFrac * M200c_select[i]) & (dr2 > 0.001))[0]
-    print(i, index.size, np.sqrt(dr2[index].min()), minDistFac * R200c_select[i])
+    index = np.where((MDeltac > minMassFrac * MDeltac_select[i]) & (dr2 > 0.001))[0]
+    print(i, index.size, np.sqrt(dr2[index].min()), np.max([minDistMpc, minDistFac * RDeltac_select[i]]))
 
 # Plot HMF for selected objects and total
 # plt.figure()
 # plt.yscale('log')
-# plt.hist(np.log10(M200c), bins=6, range=(13., 15.))
-# plt.hist(np.log10(M200c[np.where(selectFlag == 1)[0]]), bins=6, range=(13., 15.))
+# plt.hist(np.log10(MDeltac),bins=6,range=(13.,15.))
+# plt.hist(np.log10(MDeltac[selectFlag]),bins=6,range=(13.,15.))
 # plt.show()
+
+# Print to txt file
+with open(f"{output_dir}/groupnumbers_defaultSept.txt", "w") as text_file:
+    print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
+    print("# Halo index", file=text_file)
+    for i in np.arange(numHaloes_select):
+        print(f"{indexList_select[i]:d}", file=text_file)
+
+with open(f"{output_dir}/selected_halos_defaultSept.txt", "w") as text_file:
+    print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
+    print("# Halo index, M{delta}c/1.e13 [Msun], r{delta}c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
+          file=text_file)
+    for i in np.arange(numHaloes_select):
+        print("%d, %.3f, %.3f, %.3f, %.3f, %.3f" % (
+            indexList_select[i],
+            MDeltac_select[i] / 1e13,
+            RDeltac_select[i],
+            xPotMin_select[i],
+            yPotMin_select[i],
+            zPotMin_select[i]
+        ), file=text_file)
