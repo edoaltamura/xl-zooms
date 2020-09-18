@@ -101,7 +101,7 @@ class MakeMask:
         # Read in halo properties
         with h5py.File(self.params['vr_file'], 'r') as vr_file:
 
-            hubble = vr_file['Configuration'].attrs['h_val']
+            hubble = float(vr_file['Configuration'].attrs['h_val'])
             structType = vr_file['/Structuretype'][:]
             field_halos = np.where(structType == 10)[0]
             R200c = vr_file['/R_200crit'][field_halos][self.params['GN']] * hubble
