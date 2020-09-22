@@ -6,6 +6,28 @@ EAGLE-XL is the next generation of cosmological simulations of periodic cubic vo
 hydrodynamical code and its derivatives: [Velociraptor](https://github.com/SWIFTSIM/velociraptor-python) for halo finding 
 and [Swiftsimio](https://github.com/SWIFTSIM/swiftsimio) for handling initial conditions and reading outputs.
 
+Set-up this repository
+------------
+In order to clone this repository locally, just run
+```commandline
+git clone https://github.com/edoaltamura/xl-zooms.git
+```
+This will download all the top-level codes for zooms analysis. The `ic-zooms` directory links to an external project for the generation
+of initial conditions of zoom simulations. After cloning `xl-zooms`, `ic-zooms` will still be empty, as Git does not import submodules
+by default. If you have read privileges on the project linked to `ic-zooms`, run 
+```commandline
+git submodule update --init --recursive
+```
+in the cloned `xl-zooms` repository to clone the submodules recursively. If your want to update `xl-zooms`, you can do so with
+```commandline
+git pull
+``` 
+and for updating all submodules
+```commandline
+git submodule update --recursive --remote
+```
+Access to the mirrored `ic-zooms` repository may be granted on a case-by-case basis after consulting the contributing co-authors of the project.
+
 Why zoom simulations?
 ------------
 Zoom-in simulations are high-resolution runs of a given cosmological volume, where the particle resolution is highly
