@@ -97,6 +97,6 @@ For further information about the usage of codes in this repository, please cont
 These programs are provided and distributed without any warranty. 
 
 If you are a fan of dark modes when viewing code, you can enable a dark theme for GitHub by adding [this extension](https://chrome.google.com/webstore/detail/github-dark-theme/odkdlljoangmamjilkamahebpkgpeacp) 
-to your favourite web browser.
+to your favourite web browser. The EAGLE-XL logo displayed on this page will also give a much more pleasant outlook with dark-mode enabled.
 
 <sup>Logo design by Edo Altamura &copy; 2020</sup>
