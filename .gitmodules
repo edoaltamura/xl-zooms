@@ -1,0 +1,3 @@
+[submodule "ic-zooms"]
+	path = ic-zooms
+	url = https://github.com/stuartmcalpine/particle_load.git
