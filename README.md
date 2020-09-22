@@ -9,21 +9,21 @@ and [Swiftsimio](https://github.com/SWIFTSIM/swiftsimio) for handling initial co
 Set-up this repository
 ------------
 In order to clone this repository locally, just run
-```bash
+```commandline
 git clone https://github.com/edoaltamura/xl-zooms.git
 ```
 This will download all the top-level codes for zooms analysis. The `ic-zooms` directory links to an external project for the generation
 of initial conditions of zoom simulations. After cloning `xl-zooms`, `ic-zooms` will still be empty, as Git does not import submodules
 by default. If you have read privileges on the project linked to `ic-zooms`, run 
-```bash
+```commandline
 git submodule update --init --recursive
 ```
 in the cloned `xl-zooms` repository to clone the submodules recursively. If your want to update `xl-zooms`, you can do so with
-```bash
+```commandline
 git pull
 ``` 
 and for updating all submodules
-```bash
+```commandline
 git submodule update --recursive --remote
 ```
 Access to the mirrored `ic-zooms` repository may be granted on a case-by-case basis after consulting the contributing co-authors of the project.
