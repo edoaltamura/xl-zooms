@@ -1,0 +1,3 @@
+[submodule "initial-conditions"]
+	path = initial-conditions
+	url = https://github.com/stuartmcalpine/make_particle_load.git
