@@ -1,5 +1,4 @@
 import numpy as np
-import matplotlib.pyplot as plt
 import h5py as h5
 
 
@@ -37,29 +36,23 @@ haloPropFile = vrPath + "stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.
 # Output directory
 output_dir = "/cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks"
 
+##################################################################################################################
+
 # Read in halo properties
-h5file = h5.File(haloPropFile, 'r')
-if massChoice == 0:
-    print('Using M200c/R200c')
-    h5dset = h5file['/Mass_200crit']
-    MDeltac = h5dset[...] * 1.e10  # Msun units
-    h5dset = h5file['/R_200crit']
-    RDeltac = h5dset[...]
-else:
-    print('Using M500c/R500c')
-    h5dset = h5file['/SO_Mass_500_rhocrit']
-    MDeltac = h5dset[...] * 1.e10  # Msun units
-    h5dset = h5file['/SO_R_500_rhocrit']
-    RDeltac = h5dset[...]
-h5dset = h5file['/Structuretype']
-structType = h5dset[...]
-h5dset = h5file['/Xcminpot']
-xPotMin = h5dset[...]
-h5dset = h5file['/Ycminpot']
-yPotMin = h5dset[...]
-h5dset = h5file['/Zcminpot']
-zPotMin = h5dset[...]
-h5file.close()
+with h5.File(haloPropFile, 'r') as h5file:
+    if massChoice == 0:
+        print('Using M200c/R200c')
+        MDeltac = h5file['/Mass_200crit'][:] * 1.e10  # Msun units
+        RDeltac = h5file['/R_200crit'][:]
+    else:
+        print('Using M500c/R500c')
+        MDeltac = h5file['/SO_Mass_500_rhocrit'] * 1.e10  # Msun units
+        RDeltac = h5file['/SO_R_500_rhocrit']
+
+    structType = h5file['/Structuretype'][:]
+    xPotMin = h5file['/Xcminpot'][:]
+    yPotMin = h5file['/Ycminpot'][:]
+    zPotMin = h5file['/Zcminpot'][:]
 
 # Store position in list (0 is most massive)
 index = np.argsort(MDeltac)[::-1]  # most massive to least massive
@@ -95,9 +88,10 @@ indexList_primary = indexList[index]
 
 selectFlag = np.zeros(numHaloesPrimary, dtype=np.bool)
 for i in np.arange(numHaloesPrimary - 1):
-    minDist = np.max(
-        [minDistMpc, minDistFac * RDeltac_primary[i]])  # Halo pair separation should be no smaller than this
-    minMassMsun = minMassFrac * MDeltac_primary[i]  # Neighbour masses must not be larger than this
+    # Halo pair separation should be no smaller than this
+    minDist = np.max([minDistMpc, minDistFac * RDeltac_primary[i]])
+    # Neighbour masses must not be larger than this
+    minMassMsun = minMassFrac * MDeltac_primary[i]
     dx = wrap(xPotMin - xPotMin_primary[i], boxMpc)
     dy = wrap(yPotMin - yPotMin_primary[i], boxMpc)
     dz = wrap(zPotMin - zPotMin_primary[i], boxMpc)
@@ -190,13 +184,6 @@ for i in np.arange(numHaloes_select):
     dr2 = (dx ** 2) + (dy ** 2) + (dz ** 2)
     index = np.where((MDeltac > minMassFrac * MDeltac_select[i]) & (dr2 > 0.001))[0]
     print(i, index.size, np.sqrt(dr2[index].min()), np.max([minDistMpc, minDistFac * RDeltac_select[i]]))
-
-# Plot HMF for selected objects and total
-# plt.figure()
-# plt.yscale('log')
-# plt.hist(np.log10(MDeltac),bins=6,range=(13.,15.))
-# plt.hist(np.log10(MDeltac[selectFlag]),bins=6,range=(13.,15.))
-# plt.show()
 
 # Print to txt file
 with open(f"{output_dir}/groupnumbers_defaultSept.txt", "w") as text_file:
