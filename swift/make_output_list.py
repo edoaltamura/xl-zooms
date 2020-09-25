@@ -56,7 +56,7 @@ out_name = out_name[sort_key]
 out_redshift[-1] = 0.
 
 # Write to file
-with open("~/output_list.txt", "w") as text_file:
+with open("/cosma/home/dp004/dc-alta2/output_list.txt", "w") as text_file:
     print("# Redshift, Select Output", file=text_file)
     for z, name in zip(out_redshift, out_name):
         print(f"{z:.8f}, {name:s}", file=text_file)
