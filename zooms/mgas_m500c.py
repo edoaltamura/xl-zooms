@@ -147,7 +147,6 @@ if __name__ == "__main__":
     ]
     output_directory = ""
 
-    plt.style.use('../mnras.mplstyle')
 
     make_single_image(
         name_list=name_list,
