@@ -1,4 +1,4 @@
-Default:
+Snapshot:
   # Particle Type Gas
   Coordinates_Gas: on  # Co-moving positions of the particles : a U_L  [ cm ]
   Velocities_Gas: on  # Peculiar velocities of the stars. This is (a * dx/dt) where x is the co-moving positions of the particles : U_L U_t^-1  [ cm s^-1 ]

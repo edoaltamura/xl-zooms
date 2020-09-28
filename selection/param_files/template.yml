@@ -1,0 +1,31 @@
+# This lists all the available options, not to be used as a param file in its native form.
+# All params, e.g. the coordinates, are expected to be in the native units of the snapshot.
+# NOTE: If you are using an automatic group selection, make sure you are using a Velociraptor
+# output catalogue (.properties). SUBFIND output catalogues are deprecated as of 17-09-2020.
+# If using automatic selection through the Velociraptor catalogue a sorting key must be selected
+# and the GroupNumber is the index of the group in the list sorted by decreasing mass (from largest to
+# smallest).
+
+vr_file:            /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0
+output_dir:         /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
+
+random_seed:     3000
+mass_choice:        1 # Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
+min_mass_select:   10.e13
+max_mass_select:   10.e14.5
+num_haloes_per_bin: 6
+num_bins_select:    5
+min_dist_fac:      10.   # isolation distance criterion (multiples of RDeltac)
+min_dist_mpc:       5.   # isolation distance criterion (Mpc)
+min_mass_frac:      0.1  # isolation mass criterion (fraction of MDeltac)
+
+topology_filter:             1
+masks_dir:                   /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
+groupnumbers_list_file:      groupnumbers_september.txt
+topology_list_file:          topology_september.txt
+make_masks_script:           ../initial-conditions/make_mask/run_from_list.py
+make_masks_param_file:       ../initial-conditions/make_mask/param_files/default_sept.yml
+groupnumbers_list_dump_file: groupnumbers_september_dump.txt
+topology_list_dump_file:     topology_september_dump.txt
+
+

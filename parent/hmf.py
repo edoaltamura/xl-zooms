@@ -1,37 +1,45 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import h5py as h5
+from typing import List
 
-volMpc3 = 300. ** 3
 
-# EAGLE-XL data path
-dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
-# VR data path
-vrPath = dataPath + "stf_swiftdm_3dfof_subhalo_0036/"
+def halo_mass_function(
+        vr_file: str = None,
+        boxsize: float = None,
+        n_bins: int = 15,
+        bin_bounds: List[float] = [13., 16.],
+        out_dir: str = None
+):
+    with h5.File(vr_file, 'r') as catalogue:
+        M200c = catalogue['/Mass_200crit'][:] * 1.e10
 
-# Halo properties file
-haloPropFile = vrPath + "stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
+    bins = 10 ** (np.linspace(bin_bounds[0], bin_bounds[1], n_bins))
+    hist, edges = np.histogram(M200c, bins=bins)
 
-# Read in halo properties
-h5file = h5.File(haloPropFile, 'r')
-h5dset = h5file['/Mass_200crit']
-M200c = h5dset[...]
-h5file.close()
-# Convert to Msun units
-M200c *= 1.e10
+    fig, ax = plt.subplots()
+    ax.set_xlim(bin_bounds)
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.step(M200c, hist, where='mid')
+    plt.savefig(f"{out_dir}/halo_mass_function.png")
+    plt.show()
+    fig.close()
 
-# Plot histogram of HMF
-numBins = 12
-minBin = 13.
-maxBin = 16.
-dlogX = (maxBin - minBin) / float(numBins)
-binX = minBin + dlogX * (0.5 + np.arange(numBins))
+    volMpc3 = boxsize ** 3
+    hmf_rescaled = hist / (volMpc3 * np.log10(bins))
 
-plt.figure()
-plt.xlim([minBin, maxBin])
-plt.yscale('log')
-# hist,edges=np.histogram(np.log10(M200c),bins=numBins,range=(minBin,maxBin))
-plt.hist(np.log10(M200c), bins=numBins, range=(minBin, maxBin))
-# binY=hist#/(volMpc3*binX)
-# plt.plot(binX,binY)
-plt.show()
+    fig, ax = plt.subplots()
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.plot(bins, hmf_rescaled)
+    plt.savefig(f"{out_dir}/halo_mass_function_rescaled.png")
+    plt.show()
+    fig.close()
+
+
+halo_mass_function(
+    boxsize=300.,
+    vr_file="/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0",
+    out_dir='~'
+)
