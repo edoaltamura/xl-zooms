@@ -161,7 +161,7 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties"
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties"
     ]
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
