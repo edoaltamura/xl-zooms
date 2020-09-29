@@ -109,7 +109,7 @@ def make_single_image(
     M500c *= (h70_XL / 1.e3)
     Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
 
-    colours = ['blue', 'blue', 'blue', 'cyan', 'red', 'purple', 'orange']
+    colours = ['blue', 'blue', 'blue', 'purple', 'purple', 'purple', 'red']
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
@@ -117,7 +117,7 @@ def make_single_image(
     plt.plot(M500_Lov, Mgas500_Lov, '*', color='gray', label='Lovisari et al. (2015)')
 
     for i in range(numZooms):
-        plt.scatter(M500c[i], Mhot500c[i], color=colours[i], label=name_list[i])
+        plt.scatter(M500c[i], Mhot500c[i], color=colours[i], label=name_list[i], alpha=0.5)
 
     plt.xlabel(r'$M_{500{\rm c}}/10^{13}h_{70}^{-1}{\rm M}_{\odot}$')
     plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
@@ -142,7 +142,8 @@ if __name__ == "__main__":
         "SK2_-8res_AGN1",
         "SK0_-8res_AGN1_AGNseed1e4",
         "SK1_-8res_AGN1_AGNseed1e4",
-        "SK2_-8res_AGN1_AGNseed1e4"
+        "SK2_-8res_AGN1_AGNseed1e4",
+        "SK0_+1res_AGN1_AGNseed1e4",
     ]
     snapshot_filenames = [
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/snapshots/EAGLE-XL_ClusterSK0_-8res_0036.hdf5",
@@ -150,7 +151,8 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res/snapshots/EAGLE-XL_ClusterSK2_-8res_0036.hdf5",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5"
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
     ]
     catalogue_filenames = [
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/stf/EAGLE-XL_ClusterSK0_-8res_0036/EAGLE-XL_ClusterSK0_-8res_0036.properties",
@@ -158,7 +160,8 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res/stf/EAGLE-XL_ClusterSK2_-8res_0036/EAGLE-XL_ClusterSK2_-8res_0036.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties"
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties"
     ]
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
