@@ -109,7 +109,7 @@ def make_single_image(
     M500c *= (h70_XL / 1.e3)
     Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
 
-    colours = ['blue', 'blue', 'blue', 'purple', 'purple', 'purple', 'red']
+    colours = ['blue', 'blue', 'blue', 'cyan', 'purple', 'purple', 'purple', 'red']
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
