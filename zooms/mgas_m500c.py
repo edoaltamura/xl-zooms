@@ -104,7 +104,7 @@ def make_single_image(
 
     h70_XL = H0_XL / 70.
     M500c *= h70_XL
-    Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
+    Mhot500c *= (h70_XL ** 2.5)
 
     colours = [
         'blue', 'blue', 'blue', 'cyan',
@@ -115,8 +115,8 @@ def make_single_image(
     ]
 
     fig, ax = plt.subplots()
-    ax.scatter(M500_Sun * 1.e13, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
-    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
+    ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
+    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov * 1.e13, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
     print(f"\n{'Run name':<25s} {'M500c           ':<15s} {'Mhot500c           ':<15s}")
     for i in range(numZooms):
