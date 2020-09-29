@@ -44,7 +44,7 @@ def process_single_halo(
     mask.constrain_spatial(region)
     data = sw.load(f'{path_to_snap}', mask=mask)
     posGas = data.gas.coordinates
-    massGas = data.gas.masses
+    massGas = data.gas.masses * 1.e10
     tempGas = data.gas.temperatures
 
     # Select hot gas within sphere
@@ -88,7 +88,7 @@ def make_single_image(
         [0.097, 0.086, 0.068, 0.049, 0.069, 0.060, 0.076, 0.081, 0.108, 0.086, 0.056, 0.076, 0.075, 0.114, 0.074, 0.088,
          0.094, 0.094, 0.078, 0.099, 0.065, 0.090, 0.093]
     )
-    Mgas500_Sun = M500_Sun * f500_Sun
+    Mgas500_Sun = M500_Sun * f500_Sun * 1.e10
 
     # Lovisari et al. 2015 (in h_70 units already)
     M500_Lov = np.array(
@@ -106,18 +106,18 @@ def make_single_image(
     Mgas500_Sun *= (h70_Sun ** 2.5)
 
     h70_XL = H0_XL / 70.
-    M500c *= (h70_XL / 1.e3)
-    Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
+    M500c *= h70_XL
+    Mhot500c *= (h70_XL ** 2.5)
 
     colours = ['blue', 'blue', 'blue', 'cyan', 'purple', 'purple', 'purple', 'red']
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
-    plt.plot(M500_Sun, Mgas500_Sun, 's', s=1, alpha=0.7, color='gray', label='Sun et al. (2009)')
-    plt.plot(M500_Lov, Mgas500_Lov, '*', s=1, alpha=0.7, color='gray', label='Lovisari et al. (2015)')
+    plt.scatter(M500_Sun, Mgas500_Sun, marker='s', s=1, alpha=0.7, c='gray', label='Sun et al. (2009)')
+    plt.scatter(M500_Lov, Mgas500_Lov, marker='*', s=1, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
     for i in range(numZooms):
-        plt.scatter(M500c[i], Mhot500c[i], color=colours[i], label=name_list[i], alpha=0.5, size=1)
+        plt.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=1)
 
     plt.xlabel(r'$M_{500{\rm c}}/10^{13}h_{70}^{-1}{\rm M}_{\odot}$')
     plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
