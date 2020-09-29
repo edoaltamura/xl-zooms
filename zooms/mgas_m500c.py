@@ -129,7 +129,7 @@ def make_single_image(
     ax.set_yscale('log')
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
-    fig.savefig(f'{output_path}/m500cgas_mhotgas.png', dpi=400)
+    fig.savefig(f'{output_path}/m500cgas_mhotgas.png', dpi=500)
     plt.show()
     plt.close()
 
