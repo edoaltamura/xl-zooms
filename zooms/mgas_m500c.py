@@ -131,7 +131,7 @@ def make_single_image(
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
     fig.savefig(f'{output_path}/m500cgas_mhotgas.png', dpi=400)
     plt.show()
-    fig.close()
+    plt.close()
 
     return
 
