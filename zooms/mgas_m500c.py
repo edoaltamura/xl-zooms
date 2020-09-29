@@ -106,7 +106,7 @@ def make_single_image(
     M500c *= h70_XL
     Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
 
-    colours = ['blue', 'blue', 'blue', 'cyan', 'purple', 'purple', 'purple', 'red']
+    colours = ['blue', 'blue', 'blue', 'cyan', 'purple', 'purple', 'purple', 'red', 'cyan']
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
@@ -141,6 +141,8 @@ if __name__ == "__main__":
         "SK1_-8res_AGN1_AGNseed1e4",
         "SK2_-8res_AGN1_AGNseed1e4",
         "SK0_+1res_AGN8_AGNseed1e4",
+
+        "SK0_+1res_AGN1_DefSept",
     ]
     snapshot_filenames = [
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/snapshots/EAGLE-XL_ClusterSK0_-8res_0036.hdf5",
@@ -152,6 +154,8 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
+
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5"
     ]
     catalogue_filenames = [
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/stf/EAGLE-XL_ClusterSK0_-8res_0036/EAGLE-XL_ClusterSK0_-8res_0036.properties",
@@ -162,7 +166,9 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties"
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
+
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties"
     ]
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
