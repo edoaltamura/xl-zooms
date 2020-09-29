@@ -114,7 +114,7 @@ def make_single_image(
         'brown'
     ]
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7, 3))
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
     ax.scatter(M500_Lov * 1.e13, Mgas500_Lov * 1.e13, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
