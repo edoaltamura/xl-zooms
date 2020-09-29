@@ -155,9 +155,9 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
     ]
     catalogue_filenames = [
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/stf/EAGLE-XL_ClusterSK0_0036/EAGLE-XL_ClusterSK0_0036.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res/stf/EAGLE-XL_ClusterSK1_0036/EAGLE-XL_ClusterSK1_0036.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res/stf/EAGLE-XL_ClusterSK2_0036/EAGLE-XL_ClusterSK2_0036.properties",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/stf/EAGLE-XL_ClusterSK0_-8res_0036/EAGLE-XL_ClusterSK0_-8res_0036.properties",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res/stf/EAGLE-XL_ClusterSK1_-8res_0036/EAGLE-XL_ClusterSK1_-8res_0036.properties",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res/stf/EAGLE-XL_ClusterSK2_-8res_0036/EAGLE-XL_ClusterSK2_-8res_0036.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
