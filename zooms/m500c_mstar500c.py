@@ -86,8 +86,8 @@ def make_single_image(
 
     h70_XL = H0_XL / 70.
     M500c *= h70_XL
-    Mhot500c *= ((h70_XL ** 2.5) * 1.e10)
-    Mstar500c *= ((h70_XL ** 2.5) * 1.e10)
+    Mhot500c *= (h70_XL ** 2.5)
+    Mstar500c *= (h70_XL ** 2.5)
 
     colours = [
         'blue', 'blue', 'blue', 'cyan',
@@ -111,7 +111,6 @@ def make_single_image(
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-    ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
     fig.savefig(f'{output_path}/m500c_mstar500c.png', dpi=500)
     plt.show()
     plt.close()
