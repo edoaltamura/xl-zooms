@@ -120,7 +120,7 @@ def make_single_image(
 
     print(f"\n{'Run name':<25s} {'M500c           ':<15s} {'Mhot500c           ':<15s}")
     for i in range(numZooms):
-        print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<15.3f} * 1e13 Msun {(Mhot500c[i]):<15.3f} * 1e13 Msun")
+        print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<5.3f} * 1e13 Msun {(Mhot500c[i]):<5.3f} * 1e13 Msun")
         ax.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
 
     ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
@@ -128,7 +128,7 @@ def make_single_image(
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.legend(loc='lower right')
-    ax.plot(ax.get_xlim(), fbary*ax.get_xlim(), '--', color='k')
+    ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
     fig.savefig(f'{output_path}/m500cgas_mhotgas.png', dpi=400)
     plt.show()
     fig.close()
