@@ -114,24 +114,24 @@ def make_single_image(
         'brown'
     ]
 
-    plt.figure()
-    plt.scatter(M500_Sun * 1.e13, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
-    plt.scatter(M500_Lov * 1.e13, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
+    fig, ax = plt.subplots()
+    ax.scatter(M500_Sun * 1.e13, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
+    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
-    print(f"\n{'Run name':<25s} {'M500c / 1e13 Msun':<15s} {'Mhot500c / 1e13 Msun':<15s}")
+    print(f"\n{'Run name':<25s} {'M500c           ':<15s} {'Mhot500c           ':<15s}")
     for i in range(numZooms):
-        print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<15.3f} {(Mhot500c[i]):<15.3f}")
-        plt.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
+        print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<15.3f} * 1e13 Msun {(Mhot500c[i]):<15.3f} * 1e13 Msun")
+        ax.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
 
-    plt.xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
-    plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
-    plt.xscale('log')
-    plt.yscale('log')
-    plt.legend(loc='lower right')
-    # plt.plot(massRange,fbary*massRange,'--')
-    plt.savefig(f'{output_path}/m500cgas_mhotgas.png', dpi=400)
+    ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
+    ax.set_ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.legend(loc='lower right')
+    ax.plot(ax.get_xlim(), fbary*ax.get_xlim(), '--', color='k')
+    fig.savefig(f'{output_path}/m500cgas_mhotgas.png', dpi=400)
     plt.show()
-    plt.close()
+    fig.close()
 
     return
 
