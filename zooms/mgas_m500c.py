@@ -110,8 +110,8 @@ def make_single_image(
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
-    plt.scatter(M500_Sun * 1.e1e, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
-    plt.scatter(M500_Lov * 1.e1e, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
+    plt.scatter(M500_Sun * 1.e13, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
+    plt.scatter(M500_Lov * 1.e13, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
     for i in range(numZooms):
         plt.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=3)
