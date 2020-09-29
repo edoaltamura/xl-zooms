@@ -106,7 +106,13 @@ def make_single_image(
     M500c *= h70_XL
     Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
 
-    colours = ['blue', 'blue', 'blue', 'cyan', 'purple', 'purple', 'purple', 'red', 'orange', 'lime']
+    colours = [
+        'blue', 'blue', 'blue', 'cyan',
+        'purple', 'purple', 'purple', 'red',
+        'orange', 'orange', 'orange', 'yellow',
+        'green', 'green', 'green', 'lime',
+        'brown'
+    ]
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
@@ -114,7 +120,7 @@ def make_single_image(
     plt.scatter(M500_Lov * 1.e13, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
     for i in range(numZooms):
-        plt.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=3)
+        plt.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
 
     plt.xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
     plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
@@ -142,8 +148,16 @@ if __name__ == "__main__":
         "SK2_-8res_AGN1_AGNseed1e4",
         "SK0_+1res_AGN8_AGNseed1e4",
 
+        "SK0_-8res_AGN1",
+        "SK1_-8res_AGN1",
+        "SK2_-8res_AGN1",
         "SK0_+1res_AGN1",
+
+        "SK0_-8res_AGN1_DefSep",
+        "SK1_-8res_AGN1_DefSep",
+        "SK2_-8res_AGN1_DefSep",
         "SK0_+1res_AGN1_DefSep",
+        "SK0_+1res_AGN8_DefSep",
     ]
     snapshot_filenames = [
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/snapshots/EAGLE-XL_ClusterSK0_-8res_0036.hdf5",
@@ -156,8 +170,16 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
 
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res/snapshots/EAGLE-XL_ClusterSK1_HYDRO_0036.hdf5",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res/snapshots/EAGLE-XL_ClusterSK2_HYDRO_0036.hdf5",
         "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
+
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res_DefSep/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res_DefSep/snapshots/EAGLE-XL_ClusterSK1_HYDRO_0036.hdf5",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res_DefSep/snapshots/EAGLE-XL_ClusterSK2_HYDRO_0036.hdf5",
         "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep_AGN8/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
     ]
     catalogue_filenames = [
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/stf/EAGLE-XL_ClusterSK0_-8res_0036/EAGLE-XL_ClusterSK0_-8res_0036.properties",
@@ -170,8 +192,16 @@ if __name__ == "__main__":
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
 
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res/stf/EAGLE-XL_ClusterSK1_HYDRO_0036/EAGLE-XL_ClusterSK1_HYDRO_0036.properties",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res/stf/EAGLE-XL_ClusterSK2_HYDRO_0036/EAGLE-XL_ClusterSK2_HYDRO_0036.properties",
         "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
+
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res_DefSep/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res_DefSep/stf/EAGLE-XL_ClusterSK1_HYDRO_0036/EAGLE-XL_ClusterSK1_HYDRO_0036.properties",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res_DefSep/stf/EAGLE-XL_ClusterSK2_HYDRO_0036/EAGLE-XL_ClusterSK2_HYDRO_0036.properties",
         "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
+        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep_AGN8/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
     ]
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
