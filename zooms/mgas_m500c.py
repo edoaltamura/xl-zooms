@@ -13,9 +13,6 @@ except:
     pass
 
 THOT = 1.e5  # Hot gas temperature threshold in K
-massRange = np.array([8.e-1, 3.e1])
-mgasRange = np.array([1.e-2, 5.e0])
-
 
 fbary = 0.15741  # Cosmic baryon fraction
 H0_XL = 67.66  # Hubble constant in km/s/Mpc
@@ -121,8 +118,6 @@ def make_single_image(
 
     plt.xlabel(r'$M_{500{\rm c}}/10^{13}h_{70}^{-1}{\rm M}_{\odot}$')
     plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
-    plt.xlim(massRange)
-    plt.ylim(mgasRange)
     plt.xscale('log')
     plt.yscale('log')
     plt.legend(loc='lower right')
