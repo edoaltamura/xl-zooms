@@ -140,6 +140,8 @@ if __name__ == "__main__":
         "SK0_-8res_AGN1",
         "SK1_-8res_AGN1",
         "SK2_-8res_AGN1",
+        "SK0_+1res_AGN1",
+
         "SK0_-8res_AGN1_AGNseed1e4",
         "SK1_-8res_AGN1_AGNseed1e4",
         "SK2_-8res_AGN1_AGNseed1e4",
