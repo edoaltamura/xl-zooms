@@ -103,20 +103,20 @@ def make_single_image(
     Mgas500_Sun *= (h70_Sun ** 2.5)
 
     h70_XL = H0_XL / 70.
-    M500c *= (h70_XL / 1.e3)
+    M500c *= h70_XL
     Mhot500c *= ((h70_XL ** 2.5) / 1.e3)
 
     colours = ['blue', 'blue', 'blue', 'cyan', 'purple', 'purple', 'purple', 'red']
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
-    plt.scatter(M500_Sun * 1.e10, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
-    plt.scatter(M500_Lov * 1.e10, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
+    plt.scatter(M500_Sun * 1.e1e, Mgas500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
+    plt.scatter(M500_Lov * 1.e1e, Mgas500_Lov, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
 
     for i in range(numZooms):
         plt.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=3)
 
-    plt.xlabel(r'$M_{500{\rm c}}/10^{13}h_{70}^{-1}{\rm M}_{\odot}$')
+    plt.xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
     plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
     plt.xscale('log')
     plt.yscale('log')
