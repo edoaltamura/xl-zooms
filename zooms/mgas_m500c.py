@@ -31,7 +31,7 @@ def process_single_halo(
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0], 1.e10 * unyt.Solar_Mass)
+        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
     print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
@@ -113,11 +113,11 @@ def make_single_image(
     # shapes = ['s', 's', 's', 's', 'o', 'o']
 
     plt.figure()
-    plt.plot(M500_Sun, Mgas500_Sun, 's', color='gray', label='Sun et al. (2009)')
-    plt.plot(M500_Lov, Mgas500_Lov, '*', color='gray', label='Lovisari et al. (2015)')
+    plt.plot(M500_Sun, Mgas500_Sun, 's', size=1, alpha=0.7, color='gray', label='Sun et al. (2009)')
+    plt.plot(M500_Lov, Mgas500_Lov, '*', size=1, alpha=0.7, color='gray', label='Lovisari et al. (2015)')
 
     for i in range(numZooms):
-        plt.scatter(M500c[i], Mhot500c[i], color=colours[i], label=name_list[i], alpha=0.5)
+        plt.scatter(M500c[i], Mhot500c[i], color=colours[i], label=name_list[i], alpha=0.5, size=1)
 
     plt.xlabel(r'$M_{500{\rm c}}/10^{13}h_{70}^{-1}{\rm M}_{\odot}$')
     plt.ylabel(r'$M_{{\rm gas},500{\rm c}}/10^{13}h_{70}^{-5/2}{\rm M}_{\odot}$')
