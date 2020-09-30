@@ -136,8 +136,8 @@ for i in np.arange(numBins_select):
         else:
             print(
                 f"\t{key:<13s}: "
-                f"[{mass_bins_repository[f'mass_bin{bin_counter}'][key][0]:d} ... "
-                f"{mass_bins_repository[f'mass_bin{bin_counter}'][key][-1]:d}]"
+                f"[{mass_bins_repository[f'mass_bin{bin_counter}'][key][0]} ... "
+                f"{mass_bins_repository[f'mass_bin{bin_counter}'][key][-1]}]"
             )
 
     bin_counter += 1
