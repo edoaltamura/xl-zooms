@@ -130,11 +130,11 @@ for i in np.arange(numBins_select):
     bin2 = bin1 + dlogM
     index_this_bin = np.where((np.log10(MDeltac_iso) > bin1) & (np.log10(MDeltac_iso) <= bin2))[0]
     mass_bins_repository[f'mass_bin{bin_counter}'] = dict()
-    mass_bins_repository[f'mass_bin{bin_counter}']['mass_min'] = float(bin1)
-    mass_bins_repository[f'mass_bin{bin_counter}']['mass_max'] = float(bin2)
+    mass_bins_repository[f'mass_bin{bin_counter}']['mass_min_log'] = float(bin1)
+    mass_bins_repository[f'mass_bin{bin_counter}']['mass_max_log'] = float(bin2)
     mass_bins_repository[f'mass_bin{bin_counter}']['num_halos'] = len(indexList_iso[index_this_bin])
-    mass_bins_repository[f'mass_bin{bin_counter}']['index_list'] = list(indexList_iso[index_this_bin])
-    mass_bins_repository[f'mass_bin{bin_counter}']['mass_list'] = list(MDeltac_iso[index_this_bin])
+    mass_bins_repository[f'mass_bin{bin_counter}']['index_list'] = indexList_iso[index_this_bin].tolist()
+    mass_bins_repository[f'mass_bin{bin_counter}']['mass_list'] = MDeltac_iso[index_this_bin].tolist()
 
     print(f'mass_bins_repository INFO: mass_bin{bin_counter}')
     for key in mass_bins_repository[f'mass_bin{bin_counter}']:
