@@ -1,7 +1,8 @@
+import sys
 import numpy as np
 import h5py as h5
 import yaml
-
+import swiftsimio
 
 
 def wrap(dx, box):
@@ -13,35 +14,27 @@ def wrap(dx, box):
     return result
 
 
-boxMpc = 300.
-np.random.seed(3000)
+# Load parameter file
+with open(sys.argv[1], "r") as handle:
+    params = yaml.load(handle, Loader=yaml.Loader)
 
-# Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
-massChoice = 1
-# Range of masses to select haloes in
-minMassSelectMsun = 10. ** 13
-maxMassSelectMsun = 10. ** 14.5
-# Number of haloes to select within each mass bin, and number of mass bins
-numHaloesPerBin = 6
-numBins_select = 5
-# Isolation criteria (distance and mass limit)
-minDistFac = 10.  # isolation distance criterion (multiples of RDeltac)
-minDistMpc = 5.  # isolation distance criterion (Mpc)
-minMassFrac = 0.1  # isolation mass criterion (fraction of MDeltac)
+np.random.seed(int(params['random_seed']))
+massChoice = bool(params['mass_choice'])
+minMassSelectMsun = 10. ** float(params['min_mass_select_log10'])
+maxMassSelectMsun = 10. ** float(params['max_mass_select_log10'])
+numHaloesPerBin = int(params['num_halos_per_bin'])
+numBins_select = int(params['num_bins_select'])
+minDistFac = float(params['min_dist_fac'])
+minDistMpc = float(params['min_dist_mpc'])
+minMassFrac = float(params['min_mass_frac'])
 
-# EAGLE-XL data path
-dataPath = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
-# VR data path
-vrPath = dataPath + "stf_swiftdm_3dfof_subhalo_0036/"
-# Halo properties file
-haloPropFile = vrPath + "stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
-# Output directory
-output_dir = "/cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks"
-
-##################################################################################################################
+# Load box size
+snap = swiftsimio.load(params['snap_file'])
+boxMpc = snap.metadata.boxsize[0]
+del snap
 
 # Read in halo properties
-with h5.File(haloPropFile, 'r') as h5file:
+with h5.File(params['vr_file'], 'r') as h5file:
     if massChoice == 0:
         print('Using M200c/R200c')
         MDeltac = h5file['/Mass_200crit'][:] * 1.e10  # Msun units
@@ -138,11 +131,18 @@ for i in np.arange(numBins_select):
 
     print(f'mass_bins_repository INFO: mass_bin{bin_counter}')
     for key in mass_bins_repository[f'mass_bin{bin_counter}']:
-        print(f"\t{key:<13s} {mass_bins_repository[f'mass_bin{bin_counter}'][key]}")
+        if type(mass_bins_repository[f'mass_bin{bin_counter}'][key]) != list:
+            print(f"\t{key:<13s}: {mass_bins_repository[f'mass_bin{bin_counter}'][key]}")
+        else:
+            print(
+                f"\t{key:<13s}: "
+                f"[{mass_bins_repository[f'mass_bin{bin_counter}'][key][0]:d} ... "
+                f"{mass_bins_repository[f'mass_bin{bin_counter}'][key][-1]:d}]"
+            )
 
     bin_counter += 1
 
-with open(f"{output_dir}/mass_bins_repository.yml", "w") as handle:
+with open(f"{params['output_dir']}/mass_bins_repository.yml", "w") as handle:
     yaml.dump(mass_bins_repository, handle, default_flow_style=False)
 
 # Initialise arrays for random selection from each bin
@@ -213,13 +213,13 @@ for i in np.arange(numHaloes_select):
     print(i, index.size, np.sqrt(dr2[index].min()), np.max([minDistMpc, minDistFac * RDeltac_select[i]]))
 
 # Print to txt file
-with open(f"{output_dir}/groupnumbers_defaultSept.txt", "w") as text_file:
+with open(f"{params['output_dir']}/groupnumbers_defaultSept.txt", "w") as text_file:
     print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
     print("# Halo index:", file=text_file)
     for i in np.arange(numHaloes_select):
         print(f"{indexList_select[i]:d}", file=text_file)
 
-with open(f"{output_dir}/selected_halos_defaultSept.txt", "w") as text_file:
+with open(f"{params['output_dir']}/selected_halos_defaultSept.txt", "w") as text_file:
     print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
     print("# Halo index, M{delta}c/1.e13 [Msun], r{delta}c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
           file=text_file)

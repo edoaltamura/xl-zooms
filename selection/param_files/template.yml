@@ -6,26 +6,16 @@
 # and the GroupNumber is the index of the group in the list sorted by decreasing mass (from largest to
 # smallest).
 
-vr_file:            /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0
-output_dir:         /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
+snap_file:  /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5
+vr_file:    /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0
+output_dir: /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
 
-random_seed:     3000
-mass_choice:        1 # Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
-min_mass_select:   10.e13
-max_mass_select:   10.e14.5
-num_haloes_per_bin: 6
-num_bins_select:    5
-min_dist_fac:      10.   # isolation distance criterion (multiples of RDeltac)
-min_dist_mpc:       5.   # isolation distance criterion (Mpc)
-min_mass_frac:      0.1  # isolation mass criterion (fraction of MDeltac)
-
-topology_filter:             1
-masks_dir:                   /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
-groupnumbers_list_file:      groupnumbers_september.txt
-topology_list_file:          topology_september.txt
-make_masks_script:           ../initial-conditions/make_mask/run_from_list.py
-make_masks_param_file:       ../initial-conditions/make_mask/param_files/default_sept.yml
-groupnumbers_list_dump_file: groupnumbers_september_dump.txt
-topology_list_dump_file:     topology_september_dump.txt
-
-
+random_seed:           3000        # Random seed for the halo random selection
+mass_choice:              1        # Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
+min_mass_select_log10:   13.0      # Minimum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)
+max_mass_select_log10:   14.5      # Maximum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)
+num_halos_per_bin:       6        # Number of halos to be randomly sampled in each log-mass bin
+num_bins_select:          5        # Number of mass bins to select across the mass range (divided in log10-space)
+min_dist_fac:            10.       # Isolation distance criterion (multiples of RDeltac)
+min_dist_mpc:             5.       # Isolation distance criterion (Mpc)
+min_mass_frac:            0.1      # Isolation mass criterion (fraction of MDeltac)
