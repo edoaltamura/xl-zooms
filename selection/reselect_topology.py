@@ -16,7 +16,7 @@ parser = argparse.ArgumentParser(
     ),
     epilog=(
         "Example usage: python3 reselect_topology.py \ \n"
-        "-t ~/xl-zooms/initial-conditions/make_mask/param_files/sample_list.yml \ \n"
+        "-t ~/data7/xl-zooms/ics/masks/sample_list.yml \ \n"
         "-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt \ \n"
         "-r ~/data7/xl-zooms/ics/masks/mass_bins_repository.yml"
     ),
