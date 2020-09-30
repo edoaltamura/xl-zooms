@@ -1,10 +1,5 @@
-# This lists all the available options, not to be used as a param file in its native form.
-# All params, e.g. the coordinates, are expected to be in the native units of the snapshot.
-# NOTE: If you are using an automatic group selection, make sure you are using a Velociraptor
-# output catalogue (.properties). SUBFIND output catalogues are deprecated as of 17-09-2020.
-# If using automatic selection through the Velociraptor catalogue a sorting key must be selected
-# and the GroupNumber is the index of the group in the list sorted by decreasing mass (from largest to
-# smallest).
+# This lists all the available options. This parameter file defines the inputs
+# for making the object selection from a parent box.
 
 snap_file:  /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5
 vr_file:    /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0
@@ -14,7 +9,7 @@ random_seed:           3000        # Random seed for the halo random selection
 mass_choice:              1        # Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
 min_mass_select_log10:   13.0      # Minimum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)
 max_mass_select_log10:   14.5      # Maximum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)
-num_halos_per_bin:       6        # Number of halos to be randomly sampled in each log-mass bin
+num_halos_per_bin:        6        # Number of halos to be randomly sampled in each log-mass bin
 num_bins_select:          5        # Number of mass bins to select across the mass range (divided in log10-space)
 min_dist_fac:            10.       # Isolation distance criterion (multiples of RDeltac)
 min_dist_mpc:             5.       # Isolation distance criterion (Mpc)
