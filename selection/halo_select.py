@@ -1,5 +1,7 @@
 import numpy as np
 import h5py as h5
+import yaml
+
 
 
 def wrap(dx, box):
@@ -120,6 +122,30 @@ print("Number of halo mass bins =", numBins_select)
 print("Mass bins: log(Mmin) log(Mmax) dlogM =", minMass, maxMass, dlogM)
 print("Number of haloes to select within each mass bin =", numHaloesPerBin)
 
+# Save mass bin info
+mass_bins_repository = dict()
+bin_counter = 0
+for i in np.arange(numBins_select):
+    bin1 = minMass + float(i) * dlogM
+    bin2 = bin1 + dlogM
+    index_this_bin = np.where((np.log10(MDeltac_iso) > bin1) & (np.log10(MDeltac_iso) <= bin2))[0]
+    mass_bins_repository[f'mass_bin{bin_counter}'] = dict()
+    mass_bins_repository[f'mass_bin{bin_counter}']['mass_min'] = bin1
+    mass_bins_repository[f'mass_bin{bin_counter}']['mass_max'] = bin2
+    mass_bins_repository[f'mass_bin{bin_counter}']['num_halos'] = len(indexList_iso[index_this_bin])
+    mass_bins_repository[f'mass_bin{bin_counter}']['index_list'] = indexList_iso[index_this_bin]
+    mass_bins_repository[f'mass_bin{bin_counter}']['mass_list'] = MDeltac_iso[index_this_bin]
+
+    print(f'mass_bins_repository INFO: mass_bin{bin_counter}')
+    for key in mass_bins_repository[f'mass_bin{bin_counter}']:
+        print(f"\t{key:<13s} {mass_bins_repository[f'mass_bin{bin_counter}'][key]}")
+
+    bin_counter += 1
+
+with open(f"{output_dir}/mass_bins_repository", "w") as handle:
+    yaml.dump(mass_bins_repository, handle, default_flow_style=False)
+
+# Initialise arrays for random selection from each bin
 MDeltac_select = np.zeros(numHaloes_select)
 RDeltac_select = np.zeros(numHaloes_select)
 xPotMin_select = np.zeros(numHaloes_select)
@@ -132,6 +158,7 @@ for i in np.arange(numBins_select):
     bin1 = minMass + float(i) * dlogM
     bin2 = bin1 + dlogM
     index = np.where((np.log10(MDeltac_iso) > bin1) & (np.log10(MDeltac_iso) <= bin2))[0]
+
     # Select haloes at random without replacement
     selectedHaloes = index[np.random.choice(index.size, size=numHaloesPerBin, replace=False)]
 
