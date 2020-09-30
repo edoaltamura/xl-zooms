@@ -49,7 +49,7 @@ except:
 
 
 def get_output_dir_from_template() -> str:
-    params = load(open(args.template))
+    params = yaml.load(open(args.template))
     output_dir = params['output_dir']
     if not os.path.isdir(output_dir):
         raise OSError(f"The specified output directory does not exist. Trying to save to {output_dir}")
