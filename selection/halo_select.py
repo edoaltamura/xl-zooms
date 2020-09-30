@@ -48,8 +48,8 @@ with h5.File(haloPropFile, 'r') as h5file:
         RDeltac = h5file['/R_200crit'][:]
     else:
         print('Using M500c/R500c')
-        MDeltac = h5file['/SO_Mass_500_rhocrit'] * 1.e10  # Msun units
-        RDeltac = h5file['/SO_R_500_rhocrit']
+        MDeltac = h5file['/SO_Mass_500_rhocrit'][:] * 1.e10  # Msun units
+        RDeltac = h5file['/SO_R_500_rhocrit'][:]
 
     structType = h5file['/Structuretype'][:]
     xPotMin = h5file['/Xcminpot'][:]
