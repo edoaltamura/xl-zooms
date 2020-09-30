@@ -166,7 +166,7 @@ if __name__ == '__main__':
                             print(list_is_empty, file=log)
                             break
 
-                        new_group_number = random.sample(repository_bin_list, 1)
+                        new_group_number = random.sample(repository_bin_list, 1)[0]
                         print(f"\tMasking object index {new_group_number} [resampled]")
                         print(f"\tMasking object index {new_group_number} [resampled]", file=log)
                         launch_mask(new_group_number, out_dir)
