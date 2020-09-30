@@ -30,7 +30,7 @@ minMassFrac = float(params['min_mass_frac'])
 
 # Load box size
 snap = swiftsimio.load(params['snap_file'])
-boxMpc = snap.metadata.boxsize[0]
+boxMpc = snap.metadata.boxsize[0].value
 del snap
 
 # Read in halo properties
