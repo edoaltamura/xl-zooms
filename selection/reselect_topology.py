@@ -232,8 +232,8 @@ def query_mask(
     else:
         selection_message = "resampled"
 
-    pprint(f"\tMasking object index {group_number} [{selection_message}:s]")
-    pprint(f"\tMasking object index {group_number} [{selection_message}:s]", file=logger)
+    pprint(f"\tMasking object index {group_number} [{selection_message:s}]")
+    pprint(f"\tMasking object index {group_number} [{selection_message:s}]", file=logger)
     launch_mask(group_number, out_dir)
     is_ok = bool_query("\tEnter `y` to accept, `n` to sample a different object: ")
     pprint(f"\tEnter `y` to accept, `n` to sample a different object: {is_ok}", file=logger)
