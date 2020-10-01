@@ -7,6 +7,7 @@ import argparse
 import subprocess
 from warnings import warn
 from shutil import copyfile
+from io import TextIOWrapper
 from numpy import loadtxt, ndarray
 from contextlib import contextmanager
 from mpi4py import MPI
@@ -22,16 +23,36 @@ parser = argparse.ArgumentParser(
         "Generates masks for setting up initial conditions and allows object reselection."
     ),
     epilog=(
-        "Example usage: python3 reselect_topology.py \ \n"
-        "-t ~/data7/xl-zooms/ics/masks/sample_list.yml \ \n"
-        "-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt \ \n"
+        "Example usage: python3 reselect_topology.py \\ \n"
+        "-t ~/data7/xl-zooms/ics/masks/mask_template.yml \\ \n"
+        "-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt \\ \n"
         "-r ~/data7/xl-zooms/ics/masks/mass_bins_repository.yml"
     ),
 )
-parser.add_argument('-t', '--template', action='store', type=str, required=True)
-parser.add_argument('-l', '--listfile', action='store', type=str, required=True)
-parser.add_argument('-r', '--repository', action='store', type=str, required=True)
-parser.add_argument('-v', '--verbose', action='store_true', default=False, required=False)
+parser.add_argument(
+    '-t',
+    '--template',
+    action='store',
+    type=str,
+    required=True,
+    help="Path to the template parameter file for running masks. The same template from `run_from_list.py` can be used."
+)
+parser.add_argument(
+    '-l',
+    '--listfile',
+    action='store',
+    type=str,
+    required=True,
+    help="Path to the object index list produced by `halo_select.py` (initial random sample)."
+)
+parser.add_argument(
+    '-r',
+    '--repository',
+    action='store',
+    type=str,
+    required=True,
+    help="Path to the more extended yaml repository produced by `halo_select.py` (pool for random re-sampling)."
+)
 parser.add_argument(
     '-m',
     '--make-mask',
@@ -41,7 +62,26 @@ parser.add_argument(
     default="/cosma/home/dp004/dc-alta2/make_particle_load/make_mask",
     help="Path to the `make_mask.py` module, used in the initial-conditions pipeline.",
 )
-parser.add_argument('-D', '--dry-run', action='store_true', default=False, required=False)
+parser.add_argument(
+    '-v',
+    '--verbose',
+    action='store_true',
+    default=False,
+    required=False,
+    help="Switches on stdout print statements from the `make_mask.py` module. Useful for debugging purposes."
+)
+parser.add_argument(
+    '-D',
+    '--dry-run',
+    action='store_true',
+    default=False,
+    required=False,
+    help=(
+        "Skips the call to `make_mask.py`, allowing avoiding extra run time "
+        "when debugging code without masking needed. Individual parameter files will be produced, "
+        "although no mask hdf5 or png outputs will be generated. Useful for debugging purposes."
+    )
+)
 
 args = parser.parse_args()
 
@@ -131,7 +171,8 @@ def get_mass_sort_key() -> str:
                 sort_key = line.split()[-1]
                 break
     assert '500' in sort_key or '200' in sort_key, (
-        "Mass sort key returned unexpected value. Expected `M_200crit` or `M_500crit`, got {sort_key}"
+        f"Mass sort key returned unexpected value. "
+        f"Expected `M_200crit` or `M_500crit`, got {sort_key}"
     )
     return sort_key
 
@@ -181,12 +222,32 @@ def launch_mask(group_number: int, out_dir: str) -> None:
     return
 
 
+def query_mask(
+        group_number: int,
+        out_dir: str,
+        logger: TextIOWrapper = None,
+        initial_selection: bool = False
+) -> bool:
+    if initial_selection:
+        selection_message = "initial selection"
+    else:
+        selection_message = "resampled"
+
+    pprint(f"\tMasking object index {group_number} [{selection_message}:s]")
+    pprint(f"\tMasking object index {group_number} [{selection_message}:s]", file=logger)
+    launch_mask(group_number, out_dir)
+    is_ok = bool_query("\tEnter `y` to accept, `n` to sample a different object: ")
+    pprint(f"\tEnter `y` to accept, `n` to sample a different object: {is_ok}", file=logger)
+    return is_ok
+
+
 if __name__ == '__main__':
 
     out_dir = get_output_dir_from_template()
     initial_selection_list = get_group_numbers_list()
     repository = get_selection_repository()
     final_selection_list = []
+    final_rejection_list = []
 
     with open(f"{out_dir}/groupnumbers_resampled.log", "w") as log:
         pprint("This file contains a log of the object indices with rejected and accepted masks.", file=log)
@@ -211,11 +272,7 @@ if __name__ == '__main__':
 
             for group_number in initial_bin_list:
 
-                pprint(f"\tMasking object index {group_number} [initial selection]")
-                pprint(f"\tMasking object index {group_number} [initial selection]", file=log)
-                launch_mask(group_number, out_dir)
-                is_ok_query = bool_query("\tEnter `y` to accept, `n` to sample a different object: ")
-                pprint(f"\tEnter `y` to accept, `n` to sample a different object: {is_ok_query}", file=log)
+                is_ok_query = query_mask(group_number, out_dir, logger=log, initial_selection=True)
 
                 if is_ok_query:
                     good_index_list.append(group_number)
@@ -238,11 +295,7 @@ if __name__ == '__main__':
                             break
 
                         new_group_number = random.sample(repository_bin_list, 1)[0]
-                        pprint(f"\tMasking object index {new_group_number} [resampled]")
-                        pprint(f"\tMasking object index {new_group_number} [resampled]", file=log)
-                        launch_mask(new_group_number, out_dir)
-                        is_ok_query = bool_query("\tEnter `y` to accept, `n` to sample a different object: ")
-                        pprint(f"\tEnter `y` to accept, `n` to sample a different object: {is_ok_query}", file=log)
+                        is_ok_query = query_mask(group_number, out_dir, logger=log)
 
                         if is_ok_query:
                             good_index_list.append(new_group_number)
@@ -261,11 +314,28 @@ if __name__ == '__main__':
             pprint("\t- group numbers from accepted masks: ", good_index_list, file=log)
 
             final_selection_list += good_index_list
+            final_rejection_list += bad_index_list
 
         final_selection_list.sort()
+        final_rejection_list.sort()
 
         # pprint to txt file
         with open(f"{args.listfile.replace('.txt', '_resampled.txt')}", "w") as text_file:
             pprint("# Halo index:", file=text_file)
             for i in final_selection_list:
                 pprint(f"{i:d}", file=text_file)
+
+        # Rename the output masks in the following way:
+        # Rejected masks will be kept and renamed with a leading `_` character,
+        # e.g. MyRejectedMask.hdf5 becomes _MyRejectedMask.hdf5
+        # File names for accepted masks will remain unchanged
+        if rank == 0:
+            common_name = get_run_name_from_template().replace('GROUPNUMBER', '')
+            for rejected_gn in final_selection_list:
+                rejected_mask_name = get_run_name_from_template().replace('GROUPNUMBER', str(rejected_gn))
+                for output_file in os.listdir(out_dir):
+                    if output_file.startswith(common_name) and rejected_mask_name in output_file:
+                        os.rename(
+                            os.path.join(out_dir, output_file),
+                            os.path.join(out_dir, f"_{output_file}")
+                        )
