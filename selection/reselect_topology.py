@@ -294,7 +294,7 @@ if __name__ == '__main__':
                             break
 
                         new_group_number = random.sample(repository_bin_list, 1)[0]
-                        is_ok_query = query_mask(group_number, out_dir, logger=log)
+                        is_ok_query = query_mask(new_group_number, out_dir, logger=log)
 
                         if is_ok_query:
                             good_index_list.append(new_group_number)
