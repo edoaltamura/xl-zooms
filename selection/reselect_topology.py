@@ -84,7 +84,7 @@ def suppress_stdout():
 def bool_query(prompt: str) -> bool:
     while True:
         try:
-            value = bool(input(prompt))
+            value = bool(raw_input(prompt))
         except ValueError:
             pprint("Sorry, the input does not appear to be a True or False.")
             continue
