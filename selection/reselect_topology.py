@@ -1,12 +1,19 @@
-import argparse
 import os
 import re
 import sys
-from shutil import copyfile
-from numpy import loadtxt, ndarray
 import yaml
 import random
+import argparse
+import subprocess
 from warnings import warn
+from shutil import copyfile
+from numpy import loadtxt, ndarray
+from contextlib import contextmanager
+from mpi4py import MPI
+
+comm = MPI.COMM_WORLD
+rank = comm.Get_rank()
+nproc = comm.Get_size()
 
 this_file_directory = os.path.dirname(__file__)
 
@@ -24,6 +31,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-t', '--template', action='store', type=str, required=True)
 parser.add_argument('-l', '--listfile', action='store', type=str, required=True)
 parser.add_argument('-r', '--repository', action='store', type=str, required=True)
+parser.add_argument('-v', '--verbose', action='store_true', type=bool, default=False, required=False)
 parser.add_argument(
     '-m',
     '--make-mask',
@@ -33,6 +41,8 @@ parser.add_argument(
     default="/cosma/home/dp004/dc-alta2/make_particle_load/make_mask",
     help="Path to the `make_mask.py` module, used in the initial-conditions pipeline.",
 )
+parser.add_argument('-D', '--dry-run', action='store_true', type=bool, default=False, required=False)
+
 args = parser.parse_args()
 
 sys.path.append(args.make_mask)
@@ -46,6 +56,41 @@ except:
         "Something else has gone wrong with importing the MakeMask class. "
         "Check that `make_mask.py` is set-up correctly and all its dependencies are in correct working order."
     )
+
+
+#######################################################################################################################
+
+def pprint(*args, **kwargs):
+    if rank == 0:
+        print(*args, **kwargs)
+
+
+def wwarn(*args, **kwargs):
+    if rank == 0:
+        warn(*args, **kwargs)
+
+
+@contextmanager
+def suppress_stdout():
+    with open(os.devnull, "w") as devnull:
+        old_stdout = sys.stdout
+        sys.stdout = devnull
+        try:
+            yield
+        finally:
+            sys.stdout = old_stdout
+
+
+def bool_query(prompt: str) -> bool:
+    while True:
+        try:
+            value = bool(input(prompt))
+        except ValueError:
+            pprint("Sorry, the input does not appear to be a True or False.")
+            continue
+        else:
+            break
+    return value
 
 
 def get_output_dir_from_template() -> str:
@@ -78,8 +123,9 @@ def get_mass_sort_key() -> str:
             if 'mass_sort' in line:
                 sort_key = line.split()[-1]
                 break
-    assert '500' in sort_key or '200' in sort_key, ("Mass sort key returned unexpected value.",
-                                                    f"Expected `M_200crit` or `M_500crit`, got {sort_key}")
+    assert '500' in sort_key or '200' in sort_key, (
+        "Mass sort key returned unexpected value. Expected `M_200crit` or `M_500crit`, got {sort_key}"
+    )
     return sort_key
 
 
@@ -90,8 +136,8 @@ def replace_pattern(pattern: str, replacement: str, filepath: str):
         for line in lines:
             sources.write(re.sub(pattern, replacement, line))
 
-def launch_mask(group_number: int, out_dir: str) -> None:
 
+def launch_mask(group_number: int, out_dir: str) -> None:
     if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template))):
         copyfile(
             os.path.join(this_file_directory, args.template),
@@ -108,7 +154,24 @@ def launch_mask(group_number: int, out_dir: str) -> None:
     elif '200' in sort_key:
         replace_pattern('SORTM200', '1', mask_paramfile)
         replace_pattern('SORTM500', '0', mask_paramfile)
-    mask = MakeMask(mask_paramfile)
+
+    if not args.dry_run:
+
+        if args.verbose:
+            MakeMask(mask_paramfile)
+        else:
+            with suppress_stdout():
+                MakeMask(mask_paramfile)
+        try:
+            subprocess.call(["eog", mask_paramfile.replace('.yml', '.png')])
+        except:
+            wwarn(
+                "Automatic call for `eog` command failed. Please, open the file manually to inspect. "
+                f"File to inspect: {mask_paramfile.replace('.yml', '.png')}"
+            )
+    else:
+        pprint("Dry run enabled. The code would have generated a mask at this point.")
+    return
 
 
 if __name__ == '__main__':
@@ -119,13 +182,13 @@ if __name__ == '__main__':
     final_selection_list = []
 
     with open(f"{out_dir}/groupnumbers_resampled.log", "w") as log:
-        print("This file contains a log of the object indices with rejected and accepted masks.", file=log)
-        print("-------------------------------------------------------------------------------.", file=log)
+        pprint("This file contains a log of the object indices with rejected and accepted masks.", file=log)
+        pprint("-------------------------------------------------------------------------------.", file=log)
 
         for idx_bin, mass_bin in enumerate(repository):
 
-            print(f"Examining selection repository: {mass_bin}")
-            print(f"Examining selection repository: {mass_bin}", file=log)
+            pprint(f"Examining selection repository: {mass_bin}")
+            pprint(f"Examining selection repository: {mass_bin}", file=log)
             repository_bin_list = repository[mass_bin]['index_list']
             initial_bin_list = []
 
@@ -141,11 +204,11 @@ if __name__ == '__main__':
 
             for group_number in initial_bin_list:
 
-                print(f"\tMasking object index {group_number} [initial selection]")
-                print(f"\tMasking object index {group_number} [initial selection]", file=log)
+                pprint(f"\tMasking object index {group_number} [initial selection]")
+                pprint(f"\tMasking object index {group_number} [initial selection]", file=log)
                 launch_mask(group_number, out_dir)
-                is_ok_query = bool(input("\tEnter 1 to accept, 0 to sample a different object: "))
-                print(f"\tEnter 1 to accept, 0 to sample a different object: {is_ok_query}", file=log)
+                is_ok_query = bool_query("\tEnter 1 to accept, 0 to sample a different object: ")
+                pprint(f"\tEnter 1 to accept, 0 to sample a different object: {is_ok_query}", file=log)
 
                 if is_ok_query:
                     good_index_list.append(group_number)
@@ -162,16 +225,16 @@ if __name__ == '__main__':
                                 "check these masks in the group number dump-file and perform a super-extrusion "
                                 "on the mask you wish to generate initial conditions from."
                             )
-                            warn(list_is_empty)
-                            print(list_is_empty, file=log)
+                            wwarn(list_is_empty)
+                            pprint(list_is_empty, file=log)
                             break
 
                         new_group_number = random.sample(repository_bin_list, 1)[0]
-                        print(f"\tMasking object index {new_group_number} [resampled]")
-                        print(f"\tMasking object index {new_group_number} [resampled]", file=log)
+                        pprint(f"\tMasking object index {new_group_number} [resampled]")
+                        pprint(f"\tMasking object index {new_group_number} [resampled]", file=log)
                         launch_mask(new_group_number, out_dir)
-                        is_ok_query = bool(input("\tEnter 1 to accept, 0 to sample a different object: "))
-                        print(f"\tEnter 1 to accept, 0 to sample a different object: {is_ok_query}", file=log)
+                        is_ok_query = bool_query("\tEnter 1 to accept, 0 to sample a different object: ")
+                        pprint(f"\tEnter 1 to accept, 0 to sample a different object: {is_ok_query}", file=log)
 
                         if is_ok_query:
                             good_index_list.append(new_group_number)
@@ -181,25 +244,19 @@ if __name__ == '__main__':
                             repository_bin_list = [x for x in repository_bin_list if x != new_group_number]
                             continue
 
-            print("\tReport from this bin:")
-            print("\t- group numbers from rejected masks: ", bad_index_list)
-            print("\t- group numbers from accepted masks: ", good_index_list)
-            print("\tReport from this bin:", file=log)
-            print("\t- group numbers from rejected masks: ", bad_index_list, file=log)
-            print("\t- group numbers from accepted masks: ", good_index_list, file=log)
+            pprint("\tReport from this bin:")
+            pprint("\t- group numbers from rejected masks: ", bad_index_list)
+            pprint("\t- group numbers from accepted masks: ", good_index_list)
+            pprint("\tReport from this bin:", file=log)
+            pprint("\t- group numbers from rejected masks: ", bad_index_list, file=log)
+            pprint("\t- group numbers from accepted masks: ", good_index_list, file=log)
 
             final_selection_list += good_index_list
 
         final_selection_list.sort()
 
-        # Print to txt file
+        # pprint to txt file
         with open(f"{args.listfile.replace('.txt', '_resampled.txt')}", "w") as text_file:
-            print("# Halo index:", file=text_file)
+            pprint("# Halo index:", file=text_file)
             for i in final_selection_list:
-                print(f"{i:d}", file=text_file)
-
-
-
-
-
-
+                pprint(f"{i:d}", file=text_file)
