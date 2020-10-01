@@ -82,14 +82,20 @@ def suppress_stdout():
 
 
 def bool_query(prompt: str) -> bool:
-    value = None
+    value = False
     while True:
         try:
-            value = bool(input(prompt))
+            value = str(input(prompt))
+            if value.lower() != 'y' and value.lower() != 'n':
+                raise ValueError
         except ValueError:
-            pprint("Sorry, the input does not appear to be a True or False.")
+            pprint("Sorry, the input does not appear to be `y` or `n`.")
             continue
         else:
+            if value.lower() == 'y':
+                value = True
+            elif value.lower() == 'n':
+                value = False
             break
     return value
 
@@ -208,8 +214,8 @@ if __name__ == '__main__':
                 pprint(f"\tMasking object index {group_number} [initial selection]")
                 pprint(f"\tMasking object index {group_number} [initial selection]", file=log)
                 launch_mask(group_number, out_dir)
-                is_ok_query = bool_query("\tEnter 1 to accept, 0 to sample a different object: ")
-                pprint(f"\tEnter 1 to accept, 0 to sample a different object: {is_ok_query}", file=log)
+                is_ok_query = bool_query("\tEnter `y` to accept, `n` to sample a different object: ")
+                pprint(f"\tEnter `y` to accept, `n` to sample a different object: {is_ok_query}", file=log)
 
                 if is_ok_query:
                     good_index_list.append(group_number)
@@ -234,8 +240,8 @@ if __name__ == '__main__':
                         pprint(f"\tMasking object index {new_group_number} [resampled]")
                         pprint(f"\tMasking object index {new_group_number} [resampled]", file=log)
                         launch_mask(new_group_number, out_dir)
-                        is_ok_query = bool_query("\tEnter 1 to accept, 0 to sample a different object: ")
-                        pprint(f"\tEnter 1 to accept, 0 to sample a different object: {is_ok_query}", file=log)
+                        is_ok_query = bool_query("\tEnter `y` to accept, `n` to sample a different object: ")
+                        pprint(f"\tEnter `y` to accept, `n` to sample a different object: {is_ok_query}", file=log)
 
                         if is_ok_query:
                             good_index_list.append(new_group_number)
