@@ -248,7 +248,7 @@ if __name__ == '__main__':
     final_selection_list = []
     final_rejection_list = []
 
-    with open(f"{out_dir}/groupnumbers_resampled.log", "w") as log:
+    with open(f"{out_dir}/resample.log", "w") as log:
         pprint("This file contains a log of the object indices with rejected and accepted masks.", file=log)
         pprint("--------------------------------------------------------------------------------", file=log)
 
