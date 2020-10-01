@@ -31,7 +31,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('-t', '--template', action='store', type=str, required=True)
 parser.add_argument('-l', '--listfile', action='store', type=str, required=True)
 parser.add_argument('-r', '--repository', action='store', type=str, required=True)
-parser.add_argument('-v', '--verbose', action='store_true', type=bool, default=False, required=False)
+parser.add_argument('-v', '--verbose', action='store_true', default=False, required=False)
 parser.add_argument(
     '-m',
     '--make-mask',
@@ -41,7 +41,7 @@ parser.add_argument(
     default="/cosma/home/dp004/dc-alta2/make_particle_load/make_mask",
     help="Path to the `make_mask.py` module, used in the initial-conditions pipeline.",
 )
-parser.add_argument('-D', '--dry-run', action='store_true', type=bool, default=False, required=False)
+parser.add_argument('-D', '--dry-run', action='store_true', default=False, required=False)
 
 args = parser.parse_args()
 
