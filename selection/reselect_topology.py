@@ -82,6 +82,7 @@ def suppress_stdout():
 
 
 def bool_query(prompt: str) -> bool:
+    value = None
     while True:
         try:
             value = bool(input(prompt))
