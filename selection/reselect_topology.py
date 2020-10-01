@@ -84,7 +84,7 @@ def suppress_stdout():
 def bool_query(prompt: str) -> bool:
     while True:
         try:
-            value = bool(raw_input(prompt))
+            value = bool(input(prompt))
         except ValueError:
             pprint("Sorry, the input does not appear to be a True or False.")
             continue
@@ -183,7 +183,7 @@ if __name__ == '__main__':
 
     with open(f"{out_dir}/groupnumbers_resampled.log", "w") as log:
         pprint("This file contains a log of the object indices with rejected and accepted masks.", file=log)
-        pprint("-------------------------------------------------------------------------------.", file=log)
+        pprint("--------------------------------------------------------------------------------", file=log)
 
         for idx_bin, mass_bin in enumerate(repository):
 
