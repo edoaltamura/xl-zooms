@@ -23,10 +23,11 @@ parser = argparse.ArgumentParser(
         "Generates masks for setting up initial conditions and allows object reselection."
     ),
     epilog=(
-        "Example usage: python3 reselect_topology.py \\ \n"
-        "-t ~/data7/xl-zooms/ics/masks/mask_template.yml \\ \n"
-        "-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt \\ \n"
-        "-r ~/data7/xl-zooms/ics/masks/mass_bins_repository.yml"
+        "Example usage: "
+        "\tpython3 reselect_topology.py \\  \n"
+        "\t\t\t-t ~/data7/xl-zooms/ics/masks/mask_template.yml \\  \n"
+        "\t\t\t-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt \\  \n"
+        "\t\t\t-r ~/data7/xl-zooms/ics/masks/mass_bins_repository.yml"
     ),
 )
 parser.add_argument(
