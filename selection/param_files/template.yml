@@ -1,10 +1,20 @@
 # This lists all the available options. This parameter file defines the inputs
 # for making the object selection from a parent box.
 
+
+# INPUTS
 snap_file:  /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5
 vr_file:    /cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0
-output_dir: /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
 
+
+# OUTPUTS
+output_dir: /cosma7/data/dp004/dc-alta2/xl-zooms/ics/masks
+selection_filename_short: selection_idx_short  # Output file name for the list of selected group indices (indices only). Note: no filename extension
+selection_filename_long:  selection_idx_long   # Output file name for the list of selected group indices (indices, M_delta, R_delta and CoP). Note: no filename extension
+selection_filename_repo:  selection_repo       # Output file name for the repository with the index pool for topology-informed reselection. Note: no filename extension
+
+
+# SELECTION PARAMETERS
 random_seed:           3000        # Random seed for the halo random selection
 mass_choice:              1        # Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
 min_mass_select_log10:   13.0      # Minimum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)

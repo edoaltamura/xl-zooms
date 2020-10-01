@@ -14,9 +14,25 @@ def wrap(dx, box):
     return result
 
 
+required_params = [
+    'snap_file',
+    'vr_file',
+    'output_dir',
+    'random_seed',
+    'mass_choice',
+    'min_mass_select_log10',
+    'max_mass_select_log10',
+    'num_halos_per_bin',
+    'num_bins_select',
+    'min_mass_frac',
+]
+
 # Load parameter file
 with open(sys.argv[1], "r") as handle:
     params = yaml.load(handle, Loader=yaml.Loader)
+
+for r_param in required_params:
+    assert r_param in params, f"The required parameter {r_param} cannot be found in the parameter file."
 
 np.random.seed(int(params['random_seed']))
 massChoice = bool(params['mass_choice'])
@@ -27,6 +43,17 @@ numBins_select = int(params['num_bins_select'])
 minDistFac = float(params['min_dist_fac'])
 minDistMpc = float(params['min_dist_mpc'])
 minMassFrac = float(params['min_mass_frac'])
+
+# Default output file names
+selection_filename_short = "selection_list_short"
+selection_filename_long = "selection_list_long"
+selection_filename_repo = "selection_repo"
+if params['selection_filename_short']:
+    selection_filename_short = os.path.splitext(params['selection_filename_short'])[0]
+if params['selection_filename_long']:
+    selection_filename_long = os.path.splitext(params['selection_filename_long'])[0]
+if params['selection_filename_repo']:
+    selection_filename_repo = os.path.splitext(params['selection_filename_repo'])[0]
 
 # Load box size
 snap = swiftsimio.load(params['snap_file'])
@@ -142,7 +169,7 @@ for i in np.arange(numBins_select):
 
     bin_counter += 1
 
-with open(f"{params['output_dir']}/mass_bins_repository.yml", "w") as handle:
+with open(f"{params['output_dir']}/{selection_filename_repo}.yml", "w") as handle:
     yaml.dump(mass_bins_repository, handle, default_flow_style=False)
 
 # Initialise arrays for random selection from each bin
@@ -213,13 +240,13 @@ for i in np.arange(numHaloes_select):
     print(i, index.size, np.sqrt(dr2[index].min()), np.max([minDistMpc, minDistFac * RDeltac_select[i]]))
 
 # Print to txt file
-with open(f"{params['output_dir']}/groupnumbers_defaultSept.txt", "w") as text_file:
+with open(f"{params['output_dir']}/{selection_filename_short}.txt", "w") as text_file:
     print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
     print("# Halo index:", file=text_file)
     for i in np.arange(numHaloes_select):
         print(f"{indexList_select[i]:d}", file=text_file)
 
-with open(f"{params['output_dir']}/selected_halos_defaultSept.txt", "w") as text_file:
+with open(f"{params['output_dir']}/{selection_filename_long}.txt", "w") as text_file:
     print(f"# mass_sort: {'M_500crit' if massChoice else 'M_200crit'}", file=text_file)
     print("# Halo index, M{delta}c/1.e13 [Msun], r{delta}c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
           file=text_file)
