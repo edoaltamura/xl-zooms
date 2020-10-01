@@ -24,10 +24,10 @@ parser = argparse.ArgumentParser(
     ),
     epilog=(
         "Example usage: "
-        "\tpython3 reselect_topology.py \\  \n"
-        "\t\t\t-t ~/data7/xl-zooms/ics/masks/mask_template.yml \\  \n"
-        "\t\t\t-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt \\  \n"
-        "\t\t\t-r ~/data7/xl-zooms/ics/masks/mass_bins_repository.yml"
+        "python3 reselect_topology.py "
+        "-t ~/data7/xl-zooms/ics/masks/mask_template.yml "
+        "-l ~/data7/xl-zooms/ics/masks/groupnumbers_defaultSept.txt "
+        "-r ~/data7/xl-zooms/ics/masks/mass_bins_repository.yml"
     ),
 )
 parser.add_argument(
@@ -98,8 +98,6 @@ except:
         "Check that `make_mask.py` is set-up correctly and all its dependencies are in correct working order."
     )
 
-
-#######################################################################################################################
 
 def pprint(*args, **kwargs):
     if rank == 0:
