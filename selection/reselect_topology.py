@@ -219,6 +219,7 @@ if __name__ == '__main__':
 
                 if is_ok_query:
                     good_index_list.append(group_number)
+                    pprint(f"\tMask for object {group_number} accepted.\n")
                 else:
                     bad_index_list.append(group_number)
 
@@ -245,6 +246,7 @@ if __name__ == '__main__':
 
                         if is_ok_query:
                             good_index_list.append(new_group_number)
+                            pprint(f"\tMask for object {new_group_number} accepted.\n")
                             break
                         else:
                             bad_index_list.append(new_group_number)
