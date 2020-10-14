@@ -193,8 +193,6 @@ for f in range(num_files):
         full_name_old = "/PartType" + str(ptype) + "/" + name_old
         if full_name_old in file:
             output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = file[full_name_old]
-        else:
-            output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = np.empty(0)
 
 
     def copy_grp_same_name(name, ptype):
