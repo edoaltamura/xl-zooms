@@ -194,7 +194,9 @@ for f in range(num_files):
         if full_name_old in file:
             output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = file[full_name_old]
         else:
-            output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = np.empty()
+            output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = np.empty(
+                (num_parts[ptype],)
+            )
 
 
     def copy_grp_same_name(name, ptype):
