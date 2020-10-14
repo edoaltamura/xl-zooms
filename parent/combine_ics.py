@@ -215,18 +215,18 @@ for f in range(num_files):
             copy_grp_same_name("Masses", 1)
 
     if num_parts[2] > 0:
-        copy_grp_same_name("Coordinates", 1)
-        copy_grp_same_name("Velocities", 1)
-        copy_grp_same_name("ParticleIDs", 1)
+        copy_grp_same_name("Coordinates", 2)
+        copy_grp_same_name("Velocities", 2)
+        copy_grp_same_name("ParticleIDs", 2)
         if DM_mass == 0.0:  # Do not overwrite values if there was a mass table
-            copy_grp_same_name("Masses", 1)
+            copy_grp_same_name("Masses", 2)
 
     if num_parts[3] > 0:
-        copy_grp_same_name("Coordinates", 1)
-        copy_grp_same_name("Velocities", 1)
-        copy_grp_same_name("ParticleIDs", 1)
+        copy_grp_same_name("Coordinates", 3)
+        copy_grp_same_name("Velocities", 3)
+        copy_grp_same_name("ParticleIDs", 3)
         if DM_mass == 0.0:  # Do not overwrite values if there was a mass table
-            copy_grp_same_name("Masses", 1)
+            copy_grp_same_name("Masses", 3)
 
     if num_parts[4] > 0:
         copy_grp_same_name("Coordinates", 4)
