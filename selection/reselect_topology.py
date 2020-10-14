@@ -330,7 +330,7 @@ if __name__ == '__main__':
         # File names for accepted masks will remain unchanged
         if rank == 0:
             common_name = get_run_name_from_template().replace('GROUPNUMBER', '')
-            for rejected_gn in final_selection_list:
+            for rejected_gn in final_rejection_list:
                 rejected_mask_name = get_run_name_from_template().replace('GROUPNUMBER', str(rejected_gn))
                 for output_file in os.listdir(out_dir):
                     if output_file.startswith(common_name) and rejected_mask_name in output_file:
