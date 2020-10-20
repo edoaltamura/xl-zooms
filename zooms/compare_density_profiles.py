@@ -215,10 +215,10 @@ def density_profile_compare_plot(
             # Calculate particle mass and rho_crit
             unitLength = data.metadata.units.length
             unitMass = data.metadata.units.mass
-            rho_crit = unyt.unyt_quantity(
-                data.metadata.cosmology['Critical density [internal units]'],
-                unitMass / unitLength ** 3
-            )[0].to('Msun/Mpc**3')
+            # rho_crit = unyt.unyt_quantity(
+            #     data.metadata.cosmology['Critical density [internal units]'],
+            #     unitMass / unitLength ** 3
+            # )[0].to('Msun/Mpc**3')
             particleMasses = data.dark_matter.masses.to('Msun')
             zoom_mass_resolution = particleMasses
 
