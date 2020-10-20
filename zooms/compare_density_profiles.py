@@ -279,9 +279,9 @@ def density_profile_compare_plot(
     ax_residual.set_xlabel(r"$R\ /\ R_{200c}$")
     ax.legend(loc="upper right")
     fig.tight_layout()
-    fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.png", dpi=300)
+    fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.pdf", dpi=300)
     plt.close(fig)
-    print(f"Saved: {output_directory}/{run_name}_density_profile_compare.png")
+    print(f"Saved: {output_directory}/{run_name}_density_profile_compare.pdf")
 
     return
 
