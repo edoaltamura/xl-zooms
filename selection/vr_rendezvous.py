@@ -17,6 +17,7 @@ def find_object(
         sample_x: float = None,
         sample_y: float = None,
         sample_z: float = None,
+        tolerance: float = 0.1,
 ) -> Tuple[int, float, float, float, float, float]:
     # Check that you have enough information for the queries
     arg_list = [sample_M200c, sample_x, sample_y, sample_z]
@@ -89,8 +90,8 @@ def find_object(
     max_error = max(finder_result['error'])
     max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
     max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
-    assert max(finder_result['error']) < 0.03, (
-        "At least one of the values matched by the VR finder deviates from the input more than 3%. "
+    assert max(finder_result['error']) < tolerance, (
+        f"At least one of the matched values deviates from the input more than {tolerance * 100:.2f}%. "
         "Large discrepancies can lead to the selection of the wrong object in the box.\n"
         f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
     )
