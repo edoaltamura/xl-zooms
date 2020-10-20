@@ -100,7 +100,7 @@ def density_profile_compare_plot(
         # Rendezvous over parent VR catalogue using zoom information
         with h5py.File(velociraptor_properties_zoom[0], 'r') as vr_file:
 
-            M200c, R200c, Xcminpot, Ycminpot, Zcminpot = find_object(
+            idx, M200c, R200c, Xcminpot, Ycminpot, Zcminpot = find_object(
                 vr_properties_catalog=velociraptor_properties_parent,
                 sample_mass_lower_lim=vr_file['/Mass_200crit'][0] * 1e10 * 0.9,
                 sample_x=vr_file['/Xcminpot'][0],
