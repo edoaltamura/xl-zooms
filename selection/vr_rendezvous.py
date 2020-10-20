@@ -17,7 +17,7 @@ def find_object(
         sample_x: float = None,
         sample_y: float = None,
         sample_z: float = None,
-        tolerance: float = 0.1,
+        tolerance: float = 0.01,
 ) -> Tuple[int, float, float, float, float, float]:
     # Check that you have enough information for the queries
     arg_list = [sample_M200c, sample_x, sample_y, sample_z]
