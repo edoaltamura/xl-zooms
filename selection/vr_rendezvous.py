@@ -12,7 +12,7 @@ def find_nearest(array, value):
 def find_object(
         vr_properties_catalog: str,
         sample_structType: int = 10,
-        sample_mass_lower_lim: float = 1.e12,
+        sample_mass_lower_lim: float = 1.e13,
         sample_M200c: float = None,
         sample_R200c: float = None,
         sample_x: float = None,
@@ -24,6 +24,10 @@ def find_object(
     number_valid_inputs = sum(1 for _ in filter(None.__ne__, arg_list))
     assert number_valid_inputs > 1, (
         f"Not enough valid inputs for the search. Need at least 2 non-None arguments, got {number_valid_inputs}."
+    )
+    assert sample_M200c > sample_mass_lower_lim, (
+        "The mass of the object to search is below the lower limit for the mass cut. "
+        f"`sample_mass_lower_lim` currently set to {sample_mass_lower_lim:.2f}."
     )
 
     # Read in halo properties
