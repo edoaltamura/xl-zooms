@@ -90,7 +90,7 @@ def find_object(
     max_error = max(finder_result['error'])
     max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
     max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
-    assert max(finder_result['error']) < tolerance, (
+    assert max(finder_result['error']) > tolerance, (
         f"At least one of the matched values deviates from the input more than {tolerance * 100:.2f}%. "
         "Large discrepancies can lead to the selection of the wrong object in the box.\n"
         f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
