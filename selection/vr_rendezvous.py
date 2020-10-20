@@ -4,7 +4,7 @@ from typing import Tuple
 from warnings import warn
 
 
-def find_nearest(array, value) -> Tuple[float, int]:
+def find_nearest(array: np.ndarray, value: float) -> Tuple[float, int]:
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx], idx
@@ -44,6 +44,7 @@ def find_object(
         yPotMin = f['/Ycminpot'][:]
         zPotMin = f['/Zcminpot'][:]
 
+    # Pre-filter arrays
     index = np.where((structType == sample_structType) & (M200c > sample_mass_lower_lim))[0]
 
     finder_result = dict()
