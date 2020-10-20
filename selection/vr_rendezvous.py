@@ -12,6 +12,7 @@ def find_nearest(array, value):
 def find_object(
         vr_properties_catalog: str,
         sample_structType: int = 10,
+        sample_mass_lower_lim: float = 1.e12,
         sample_M200c: float = None,
         sample_R200c: float = None,
         sample_x: float = None,
@@ -34,7 +35,7 @@ def find_object(
         yPotMin = f['/Ycminpot'][:]
         zPotMin = f['/Zcminpot'][:]
 
-    index = np.where(structType == sample_structType)[0]
+    index = np.where(structType == sample_structType & M200c > sample_mass_lower_lim)[0]
 
     finder_result = dict()
     finder_result['name'] = []
