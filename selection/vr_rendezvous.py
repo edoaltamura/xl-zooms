@@ -25,10 +25,6 @@ def find_object(
     assert number_valid_inputs > 1, (
         f"Not enough valid inputs for the search. Need at least 2 non-None arguments, got {number_valid_inputs}."
     )
-    assert sample_M200c > sample_mass_lower_lim, (
-        "The mass of the object to search is below the lower limit for the mass cut. "
-        f"`sample_mass_lower_lim` currently set to {sample_mass_lower_lim:.2f}."
-    )
 
     # Read in halo properties
     with h5.File(vr_properties_catalog, 'r') as f:
@@ -48,6 +44,10 @@ def find_object(
     finder_result['error'] = []
 
     if sample_M200c is not None:
+        assert sample_M200c > sample_mass_lower_lim, (
+            "The mass of the object to search is below the lower limit for the mass cut. "
+            f"`sample_mass_lower_lim` currently set to {sample_mass_lower_lim:.2f}."
+        )
         _M200c_tuple = find_nearest(M200c[index], sample_M200c)
         finder_result['name'].append('M200c')
         finder_result['value'].append(_M200c_tuple[0])
