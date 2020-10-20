@@ -1,6 +1,7 @@
 import numpy as np
 import h5py as h5
 from typing import Tuple
+from warnings import warn
 
 
 def find_nearest(array, value) -> Tuple[float, int]:
@@ -19,12 +20,20 @@ def find_object(
         sample_z: float = None,
         tolerance: float = 0.01,
 ) -> Tuple[int, float, float, float, float, float]:
+
     # Check that you have enough information for the queries
     arg_list = [sample_M200c, sample_x, sample_y, sample_z]
     number_valid_inputs = sum(1 for _ in filter(None.__ne__, arg_list))
     assert number_valid_inputs > 1, (
         f"Not enough valid inputs for the search. Need at least 2 non-None arguments, got {number_valid_inputs}."
     )
+    if sample_structType != 10 and sample_mass_lower_lim >= 1.e12:
+        warn((
+            "If you are looking for substructures instead of field halos, consider lowering the "
+            f"`sample_mass_lower_lim` threshold. Got sample_structType = {sample_structType:d}, "
+            f"sample_mass_lower_lim = {sample_mass_lower_lim:.2f}. Note: field halos are flagged with "
+            "structType = 10."
+        ))
 
     # Read in halo properties
     with h5.File(vr_properties_catalog, 'r') as f:
@@ -49,7 +58,6 @@ def find_object(
             f"`sample_mass_lower_lim` currently set to {sample_mass_lower_lim:.2f}."
         )
         _M200c_tuple = find_nearest(M200c[index], sample_M200c)
-        print(_M200c_tuple)
         finder_result['name'].append('M200c')
         finder_result['value'].append(_M200c_tuple[0])
         finder_result['index'].append(_M200c_tuple[1])
@@ -57,7 +65,6 @@ def find_object(
         del _M200c_tuple
     if sample_x is not None:
         _x_tuple = find_nearest(xPotMin[index], sample_x)
-        print(_x_tuple)
         finder_result['name'].append('x')
         finder_result['value'].append(_x_tuple[0])
         finder_result['index'].append(_x_tuple[1])
@@ -65,7 +72,6 @@ def find_object(
         del _x_tuple
     if sample_y is not None:
         _y_tuple = find_nearest(yPotMin[index], sample_y)
-        print(_y_tuple)
         finder_result['name'].append('y')
         finder_result['value'].append(_y_tuple[0])
         finder_result['index'].append(_y_tuple[1])
@@ -73,7 +79,6 @@ def find_object(
         del _y_tuple
     if sample_z is not None:
         _z_tuple = find_nearest(zPotMin[index], sample_z)
-        print(_z_tuple)
         finder_result['name'].append('z')
         finder_result['value'].append(_z_tuple[0])
         finder_result['index'].append(_z_tuple[1])
@@ -95,6 +100,13 @@ def find_object(
         "Large discrepancies can lead to the selection of the wrong object in the box.\n"
         f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
     )
+
+    full_index_key = np.argwhere(
+        (xPotMin == xPotMin[index][finder_result['index'][0]]) &
+        (yPotMin == yPotMin[index][finder_result['index'][0]]) &
+        (zPotMin == zPotMin[index][finder_result['index'][0]])
+    )[0]
+    print(full_index_key, full_index_key[0])
 
     return tuple([
         finder_result['index'][0],
