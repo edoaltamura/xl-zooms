@@ -21,7 +21,7 @@ from convergence_radius import convergence_radius
 # Constants
 bins = 40
 radius_bounds = [5e-3, 3]  # In units of R200crit
-residual_bounds = [-0.5, 0.5] # y-limits in the residual plot
+residual_bounds = [-0.5, 0.5]  # y-limits in the residual plot
 cmap_name = 'BuPu_r'
 
 
@@ -100,13 +100,14 @@ def density_profile_compare_plot(
         author, halo_id = match.groups()
     halo_id = int(halo_id)
 
-    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 4.1), sharex=True, gridspec_kw={'height_ratios': [3, 1]})
+    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 4.1), sharex=True,
+                                          gridspec_kw={'height_ratios': [3, 1]})
 
     # PARENT #
     if snap_filepath_parent:
-
         # Load VR output gathered from the halo selection process
-        lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
+        lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",",
+                           unpack=False).T
         M200c = lines[1] * 1e13
         R200c = lines[2]
         Xcminpot = lines[3]
@@ -170,14 +171,15 @@ def density_profile_compare_plot(
         conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
-        t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
+        t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
+                    alpha=0.6)
         t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
     # ZOOMS #
     if snap_filepath_zoom:
 
         # Set-up colors
-        cmap_discrete = plt.cm.get_cmap(cmap_name, len(velociraptor_properties_zoom)+3)
+        cmap_discrete = plt.cm.get_cmap(cmap_name, len(velociraptor_properties_zoom) + 3)
         cmaplist = [cmap_discrete(i) for i in range(cmap_discrete.N)]
 
         for snap_path, vrprop_path, color in zip(snap_filepath_zoom, velociraptor_properties_zoom, cmaplist):
@@ -243,7 +245,8 @@ def density_profile_compare_plot(
             # Compute convergence radius
             conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
             ax.axvline(conv_radius, color=color, linestyle='--')
-            t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical', alpha=0.6)
+            t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
+                        alpha=0.6)
             t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
             # RESIDUALS #
