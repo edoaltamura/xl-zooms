@@ -133,7 +133,7 @@ with h5py.File(velociraptor_properties_zoom, 'r') as vr_file:
     xCen = unyt.unyt_quantity(vr_file['/Xcminpot'][0], unyt.Mpc)
     yCen = unyt.unyt_quantity(vr_file['/Ycminpot'][0], unyt.Mpc)
     zCen = unyt.unyt_quantity(vr_file['/Zcminpot'][0], unyt.Mpc)
-    highres_radius = 6 * vr_file['/SO_Mass_500_rhocrit'][0]
+    highres_radius = 6 * vr_file['/SO_R_500_rhocrit'][0]
 
 # EAGLE-XL data path
 print(f"Rendering {snap_filepath_zoom}...")
