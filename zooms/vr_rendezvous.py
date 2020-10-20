@@ -91,7 +91,8 @@ def find_object(
         f"Not all the queries returned the same output index for the VR catalogue. Found "
         f"{len(set(finder_result['index'])):d} different values ({set(finder_result['index'])}). "
         "Check that the inputs are correct, that their precision is sufficient and that you are "
-        "providing enough data to match queries."
+        "providing enough data to match queries. \n"
+        f"finder_result: {finder_result}"
     )
     max_error = max(finder_result['error'])
     max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
