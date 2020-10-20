@@ -21,8 +21,8 @@ def find_object(
     # Check that you have enough information for the queries
     arg_list = [sample_M200c, sample_R200c, sample_x, sample_y, sample_z]
     number_valid_inputs = sum(1 for _ in filter(None.__ne__, arg_list))
-    assert number_valid_inputs > 2, (
-        f"Not enough valid inputs for the search. Need at least 3 non-None arguments, got {number_valid_inputs}."
+    assert number_valid_inputs > 1, (
+        f"Not enough valid inputs for the search. Need at least 2 non-None arguments, got {number_valid_inputs}."
     )
 
     # Read in halo properties
@@ -34,7 +34,6 @@ def find_object(
         yPotMin = f['/Ycminpot'][:]
         zPotMin = f['/Zcminpot'][:]
 
-    print(f"Finding properties of halo {i:d}...")
     index = np.where(structType == sample_structType)[0]
 
     finder_result = dict()
