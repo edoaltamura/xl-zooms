@@ -241,7 +241,7 @@ def density_profile_compare_plot(
             conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
             ax.axvline(conv_radius, color=color, linestyle='--')
             t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
-                        alpha=0.6)
+                        alpha=0.5)
             t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
             # RESIDUALS #
@@ -265,6 +265,7 @@ def density_profile_compare_plot(
         ha="left",
         va="bottom",
         backgroundcolor='white',
+        alpha=0.5,
         transform=ax.transAxes,
     )
 
