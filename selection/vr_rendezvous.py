@@ -101,20 +101,22 @@ def find_object(
         f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
     )
 
+    # Retrieve the index of the halo in the unfiltered VR catalogue
     full_index_key = np.argwhere(
         (xPotMin == xPotMin[index][finder_result['index'][0]]) &
         (yPotMin == yPotMin[index][finder_result['index'][0]]) &
         (zPotMin == zPotMin[index][finder_result['index'][0]])
     )[0]
-    print(full_index_key, full_index_key[0])
+    assert len(full_index_key) == 1, "Ambiguity in finding a unique object given its centre of potential coordinates."
+    full_index_key = full_index_key[0]
 
     return tuple([
-        finder_result['index'][0],
-        M200c[index][finder_result['index'][0]],
-        R200c[index][finder_result['index'][0]],
-        xPotMin[index][finder_result['index'][0]],
-        yPotMin[index][finder_result['index'][0]],
-        zPotMin[index][finder_result['index'][0]]
+        full_index_key,
+        M200c[full_index_key],
+        R200c[full_index_key],
+        xPotMin[full_index_key],
+        yPotMin[full_index_key],
+        zPotMin[full_index_key]
     ])
 
 
