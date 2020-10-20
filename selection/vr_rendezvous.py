@@ -14,13 +14,12 @@ def find_object(
         sample_structType: int = 10,
         sample_mass_lower_lim: float = 1.e12,
         sample_M200c: float = None,
-        sample_R200c: float = None,
         sample_x: float = None,
         sample_y: float = None,
         sample_z: float = None,
 ) -> Tuple[int, float, float, float, float, float]:
     # Check that you have enough information for the queries
-    arg_list = [sample_M200c, sample_R200c, sample_x, sample_y, sample_z]
+    arg_list = [sample_M200c, sample_x, sample_y, sample_z]
     number_valid_inputs = sum(1 for _ in filter(None.__ne__, arg_list))
     assert number_valid_inputs > 1, (
         f"Not enough valid inputs for the search. Need at least 2 non-None arguments, got {number_valid_inputs}."
@@ -55,14 +54,6 @@ def find_object(
         finder_result['index'].append(_M200c_tuple[1])
         finder_result['error'].append(np.abs(_M200c_tuple[1] / sample_M200c - 1))
         del _M200c_tuple
-    if sample_R200c is not None:
-        _R200c_tuple = find_nearest(R200c[index], sample_R200c)
-        print(_R200c_tuple)
-        finder_result['name'].append('R200c')
-        finder_result['value'].append(_R200c_tuple[0])
-        finder_result['index'].append(_R200c_tuple[1])
-        finder_result['error'].append(np.abs(_R200c_tuple[1] / sample_R200c - 1))
-        del _R200c_tuple
     if sample_x is not None:
         _x_tuple = find_nearest(xPotMin[index], sample_x)
         print(_x_tuple)
@@ -131,27 +122,12 @@ if __name__ == "__main__":
 
     #############################################################################
 
-    print("Testing with 5 inputs...")
-    for i in range(3):
-        try:
-            results = find_object(
-                vr_properties_catalog=haloPropFile,
-                sample_M200c=test_M200c[i],
-                sample_R200c=test_R200c[i],
-                sample_x=test_x[i],
-                sample_y=test_y[i],
-                sample_z=test_z[i],
-            )
-            print(results)
-        except AssertionError as e:
-            print(e)
-
     print("Testing with 4 inputs...")
     for i in range(3):
         try:
             results = find_object(
                 vr_properties_catalog=haloPropFile,
-                sample_R200c=test_R200c[i],
+                sample_M200c=test_M200c[i],
                 sample_x=test_x[i],
                 sample_y=test_y[i],
                 sample_z=test_z[i],
