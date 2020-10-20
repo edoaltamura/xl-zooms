@@ -35,7 +35,7 @@ def find_object(
         yPotMin = f['/Ycminpot'][:]
         zPotMin = f['/Zcminpot'][:]
 
-    index = np.where(structType == sample_structType & M200c > sample_mass_lower_lim)[0]
+    index = np.where((structType == sample_structType) & (M200c > sample_mass_lower_lim))[0]
 
     finder_result = dict()
     finder_result['name'] = []
