@@ -17,6 +17,7 @@ except:
     pass
 
 from convergence_radius import convergence_radius
+from vr_rendezvous import find_object
 
 # Constants
 bins = 40
@@ -37,6 +38,7 @@ def latex_float(f):
 def density_profile_compare_plot(
         run_name: str,
         snap_filepath_parent: str = None,
+        velociraptor_properties_parent: str = None,
         snap_filepath_zoom: List[str] = None,
         velociraptor_properties_zoom: List[str] = None,
         output_directory: str = None
@@ -80,7 +82,6 @@ def density_profile_compare_plot(
     """
 
     # ARGS CHECK #
-    assert run_name
     assert snap_filepath_parent or snap_filepath_zoom
     if snap_filepath_zoom and velociraptor_properties_zoom:
         assert len(snap_filepath_zoom) == len(velociraptor_properties_zoom)
@@ -90,34 +91,28 @@ def density_profile_compare_plot(
         raise ValueError
     assert output_directory
 
-    # TEMPORARY #
-    # Split the run_name into author and halo_id to make everything work fine for now
-    import re
-    match = re.match(r"([a-z]+)([0-9]+)", run_name, re.I)
-    author = None
-    halo_id = None
-    if match:
-        author, halo_id = match.groups()
-    halo_id = int(halo_id)
-
     fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 4.1), sharex=True,
                                           gridspec_kw={'height_ratios': [3, 1]})
 
     # PARENT #
     if snap_filepath_parent:
-        # Load VR output gathered from the halo selection process
-        lines = np.loadtxt(f"{output_directory}/halo_selected_{author}.txt", comments="#", delimiter=",",
-                           unpack=False).T
-        M200c = lines[1] * 1e13
-        R200c = lines[2]
-        Xcminpot = lines[3]
-        Ycminpot = lines[4]
-        Zcminpot = lines[5]
-        M200c = unyt.unyt_quantity(M200c[halo_id], unyt.Solar_Mass)
-        R200c = unyt.unyt_quantity(R200c[halo_id], unyt.Mpc)
-        xCen = unyt.unyt_quantity(Xcminpot[halo_id], unyt.Mpc)
-        yCen = unyt.unyt_quantity(Ycminpot[halo_id], unyt.Mpc)
-        zCen = unyt.unyt_quantity(Zcminpot[halo_id], unyt.Mpc)
+
+        # Rendezvous over parent VR catalogue using zoom information
+        with h5py.File(velociraptor_properties_zoom[0], 'r') as vr_file:
+
+            M200c, R200c, Xcminpot, Ycminpot, Zcminpot = find_object(
+                vr_properties_catalog=velociraptor_properties_parent,
+                sample_M200c=vr_file['/Mass_200crit'][0] * 1e10,
+                sample_x=vr_file['/Xcminpot'][0],
+                sample_y=vr_file['/Ycminpot'][0],
+                sample_z=vr_file['/Zcminpot'][0],
+            )
+
+            M200c = unyt.unyt_quantity(M200c, unyt.Solar_Mass)
+            R200c = unyt.unyt_quantity(R200c, unyt.Mpc)
+            xCen = unyt.unyt_quantity(Xcminpot, unyt.Mpc)
+            yCen = unyt.unyt_quantity(Ycminpot, unyt.Mpc)
+            zCen = unyt.unyt_quantity(Zcminpot, unyt.Mpc)
 
         # Construct spatial mask to feed into swiftsimio
         size = radius_bounds[1] * R200c
@@ -316,24 +311,22 @@ if __name__ == "__main__":
     # at different resolutions in the same arrays, as they are
     # overplotted in the same figure.
 
-    for i in range(1):
-        halo_id = i
-        run_name = f"SK{i}"
-        snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-        snap_filepath_zoom = [
-            f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_-8res/snapshots/EAGLE-XL_ClusterSK{i}_-8res_0036.hdf5",
-            f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_+1res/snapshots/EAGLE-XL_ClusterSK{i}_+1res_0036.hdf5"
-        ]
-        velociraptor_properties_zoom = [
-            f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_-8res/stf/EAGLE-XL_ClusterSK{i}_-8res_0036/EAGLE-XL_ClusterSK{i}_-8res_0036.properties",
-            f"/cosma7/data/dp004/dc-alta2/xl-zooms/dmo/EAGLE-XL_ClusterSK{i}_+1res/stf/EAGLE-XL_ClusterSK{i}_+1res_0036/EAGLE-XL_ClusterSK{i}_+1res_0036.properties",
-        ]
-        output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
+    run_name = "L0300N0564_VR93"
+    snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
+    velociraptor_properties_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
+    snap_filepath_zoom = [
+        "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
+    ]
+    velociraptor_properties_zoom = [
+        "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
+    ]
+    output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
-        density_profile_compare_plot(
-            run_name,
-            snap_filepath_parent=snap_filepath_parent,
-            snap_filepath_zoom=snap_filepath_zoom,
-            velociraptor_properties_zoom=velociraptor_properties_zoom,
-            output_directory=output_directory
-        )
+    density_profile_compare_plot(
+        run_name,
+        snap_filepath_parent=snap_filepath_parent,
+        velociraptor_properties_parent=velociraptor_properties_parent,
+        snap_filepath_zoom=snap_filepath_zoom,
+        velociraptor_properties_zoom=velociraptor_properties_zoom,
+        output_directory=output_directory
+    )
