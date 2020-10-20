@@ -53,8 +53,8 @@ def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R
         (
             f"Halo {run_name:s} DMO\n"
             f"$z={redshift:3.3f}$\n"
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c)}$ Mpc\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
             f"$R_{{\\rm clean}}={latex_float(highres_radius)}$ Mpc"
         ),
         color="black",
@@ -106,8 +106,8 @@ def hist_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, 
         (
             f"Halo {run_name:s} DMO\n"
             f"$z={redshift:3.3f}$\n"
-            f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c)}$ Mpc\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
             f"$R_{{\\rm clean}}={latex_float(highres_radius)}$ Mpc"
         ),
         color="black",
