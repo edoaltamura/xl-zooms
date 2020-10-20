@@ -88,10 +88,10 @@ def find_object(
     max_error = max(finder_result['error'])
     max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
     max_error_name = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
-    assert max(finder_result['error']) < 0.01, (
-        "At least one of the values matched by the VR finder deviates from the input more than 1%. "
+    assert max(finder_result['error']) < 0.03, (
+        "At least one of the values matched by the VR finder deviates from the input more than 3%. "
         "Large discrepancies can lead to the selection of the wrong object in the box.\n"
-        f"Maximum error found >> name: {max_error_name} error: {max_error} index: {max_error_index}"
+        f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
     )
 
     return tuple(
