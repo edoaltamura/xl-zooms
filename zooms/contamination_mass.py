@@ -187,7 +187,7 @@ ax.plot(lowres_coordinates['x'][~contaminated_idx], lowres_coordinates['y'][~con
 ax.set_xlim([-size.value, size.value])
 ax.set_ylim([-size.value, size.value])
 plt.legend()
-fig.savefig(f"{output_directory}_contamination_map{out_to_radius}r200_zoom.png")
+fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius}r200_zoom.png")
 plt.close(fig)
 
 # Histograms
@@ -215,5 +215,5 @@ ax.axvline(highres_radius / R200c, color="grey", linestyle='--')
 ax.set_xlim([0, out_to_radius])
 plt.legend()
 fig.tight_layout()
-fig.savefig(f"{output_directory}_contamination_hist_{out_to_radius}r200_zoom.png")
+fig.savefig(f"{output_directory}/{run_name}_contamination_hist_{out_to_radius}r200_zoom.png")
 plt.close(fig)
