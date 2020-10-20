@@ -91,7 +91,7 @@ def density_profile_compare_plot(
         raise ValueError
     assert output_directory
 
-    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(3.5, 4.1), sharex=True,
+    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(5, 7), sharex=True,
                                           gridspec_kw={'height_ratios': [3, 1]})
 
     # PARENT #
