@@ -170,7 +170,7 @@ del posDM
 
 # Flag contamination particles within 5 R200
 contaminated_idx = np.where(lowres_coordinates['r'] < highres_radius)[0]
-contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c[i])[0]
+contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c)[0]
 print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
 print(f"Contaminating low-res DM (< R_clean): {len(contaminated_idx)} particles detected")
 print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
