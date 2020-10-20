@@ -3,10 +3,10 @@ import h5py as h5
 from typing import Tuple
 
 
-def find_nearest(array, value):
+def find_nearest(array, value) -> Tuple[float, int]:
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
-    return array[idx], idx
+    return tuple(array[idx], idx)
 
 
 def find_object(
