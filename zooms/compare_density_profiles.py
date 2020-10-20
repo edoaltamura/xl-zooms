@@ -139,7 +139,7 @@ def density_profile_compare_plot(
         rho_crit = unyt.unyt_quantity(
             data.metadata.cosmology_raw['Critical density [internal units]'],
             unitMass / unitLength ** 3
-        )[0].to('Msun/Mpc**3')
+        ).to('Msun/Mpc**3')
         rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
         vol = data.metadata.boxsize[0] ** 3
         numPart = data.metadata.n_dark_matter
@@ -218,7 +218,7 @@ def density_profile_compare_plot(
             rho_crit = unyt.unyt_quantity(
                 data.metadata.cosmology_raw['Critical density [internal units]'],
                 unitMass / unitLength ** 3
-            )[0].to('Msun/Mpc**3')
+            ).to('Msun/Mpc**3')
             particleMasses = data.dark_matter.masses.to('Msun')
             zoom_mass_resolution = particleMasses
 
