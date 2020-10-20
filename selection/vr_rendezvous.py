@@ -86,8 +86,8 @@ def find_object(
         "providing enough data to match queries."
     )
     max_error = max(finder_result['error'])
+    max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
     max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
-    max_error_name = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
     assert max(finder_result['error']) < 0.03, (
         "At least one of the values matched by the VR finder deviates from the input more than 3%. "
         "Large discrepancies can lead to the selection of the wrong object in the box.\n"
