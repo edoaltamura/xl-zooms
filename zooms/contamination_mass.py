@@ -43,7 +43,7 @@ def latex_float(f):
         return float_str
 
 
-def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R200c: float) -> None:
+def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R200c: float) -> None:
     ax.set_aspect('equal')
     ax.set_ylabel(r"$y$ [Mpc]")
     ax.set_xlabel(r"$x$ [Mpc]")
@@ -51,7 +51,7 @@ def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R2
         0.025,
         0.025,
         (
-            f"Halo {halo_id:d} DMO\n"
+            f"Halo {run_name:s} DMO\n"
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c)}$ Mpc\n"
@@ -95,7 +95,7 @@ def map_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R2
 
     return
 
-def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R200c: float) -> None:
+def hist_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R200c: float) -> None:
     ax.set_yscale('log')
     ax.set_ylabel("Number of particles")
     ax.set_xlabel(r"$R\ /\ R_{200c}$")
@@ -104,7 +104,7 @@ def hist_setup_axes(ax: plt.Axes, halo_id: int, redshift: float, M200c: float, R
         0.025,
         0.025,
         (
-            f"Halo {halo_id:d} DMO\n"
+            f"Halo {run_name:s} DMO\n"
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c)}$ Mpc\n"
@@ -122,6 +122,7 @@ velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0
 snap_filepath_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
 output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 out_to_radius = 5
+run_name = 'L0300N0564_VR93'
 
 print("Loading halos selected...")
 # Rendezvous over parent VR catalogue using zoom information
@@ -177,7 +178,7 @@ print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particl
 
 # Make particle maps
 fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
-map_setup_axes(ax, i, data.metadata.z, M200c, R200c)
+map_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
 
 ax.plot(highres_coordinates['x'], highres_coordinates['y'], ',', c="C0", alpha=0.2, label='Highres')
 ax.plot(lowres_coordinates['x'][contaminated_idx], lowres_coordinates['y'][contaminated_idx], 'x', c="red", alpha=1, label='Lowres contaminating')
@@ -205,7 +206,7 @@ del bins, hist
 
 # Make radial distribution plot
 fig, ax = plt.subplots()
-hist_setup_axes(ax, i, data.metadata.z, M200c, R200c)
+hist_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
 
 ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_all'], where='mid', color='grey', label='Highres all')
 ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_all'], where='mid', color='green', label='Lowres all')
