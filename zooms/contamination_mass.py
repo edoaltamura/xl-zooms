@@ -177,7 +177,7 @@ print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particl
 
 # Make particle maps
 fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
-map_setup_axes(ax, i, data.metadata.z, M200c[i], R200c[i])
+map_setup_axes(ax, i, data.metadata.z, M200c, R200c)
 
 ax.plot(highres_coordinates['x'], highres_coordinates['y'], ',', c="C0", alpha=0.2, label='Highres')
 ax.plot(lowres_coordinates['x'][contaminated_idx], lowres_coordinates['y'][contaminated_idx], 'x', c="red", alpha=1, label='Lowres contaminating')
