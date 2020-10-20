@@ -6,13 +6,13 @@ from typing import Tuple
 def find_nearest(array, value) -> Tuple[float, int]:
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
-    return tuple(array[idx], idx)
+    return array[idx], idx
 
 
 def find_object(
         vr_properties_catalog: str,
         sample_structType: int = 10,
-        sample_mass_lower_lim: float = 1.e13,
+        sample_mass_lower_lim: float = 1.e12,
         sample_M200c: float = None,
         sample_R200c: float = None,
         sample_x: float = None,
@@ -49,6 +49,7 @@ def find_object(
             f"`sample_mass_lower_lim` currently set to {sample_mass_lower_lim:.2f}."
         )
         _M200c_tuple = find_nearest(M200c[index], sample_M200c)
+        print(_M200c_tuple)
         finder_result['name'].append('M200c')
         finder_result['value'].append(_M200c_tuple[0])
         finder_result['index'].append(_M200c_tuple[1])
@@ -56,6 +57,7 @@ def find_object(
         del _M200c_tuple
     if sample_R200c is not None:
         _R200c_tuple = find_nearest(R200c[index], sample_R200c)
+        print(_R200c_tuple)
         finder_result['name'].append('R200c')
         finder_result['value'].append(_R200c_tuple[0])
         finder_result['index'].append(_R200c_tuple[1])
@@ -63,6 +65,7 @@ def find_object(
         del _R200c_tuple
     if sample_x is not None:
         _x_tuple = find_nearest(xPotMin[index], sample_x)
+        print(_x_tuple)
         finder_result['name'].append('x')
         finder_result['value'].append(_x_tuple[0])
         finder_result['index'].append(_x_tuple[1])
@@ -70,6 +73,7 @@ def find_object(
         del _x_tuple
     if sample_y is not None:
         _y_tuple = find_nearest(yPotMin[index], sample_y)
+        print(_y_tuple)
         finder_result['name'].append('y')
         finder_result['value'].append(_y_tuple[0])
         finder_result['index'].append(_y_tuple[1])
@@ -77,6 +81,7 @@ def find_object(
         del _y_tuple
     if sample_z is not None:
         _z_tuple = find_nearest(zPotMin[index], sample_z)
+        print(_z_tuple)
         finder_result['name'].append('z')
         finder_result['value'].append(_z_tuple[0])
         finder_result['index'].append(_z_tuple[1])
@@ -99,14 +104,14 @@ def find_object(
         f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
     )
 
-    return tuple(
+    return tuple([
         finder_result['index'][0],
         M200c[index][finder_result['index'][0]],
         R200c[index][finder_result['index'][0]],
         xPotMin[index][finder_result['index'][0]],
         yPotMin[index][finder_result['index'][0]],
         zPotMin[index][finder_result['index'][0]]
-    )
+    ])
 
 
 if __name__ == "__main__":
