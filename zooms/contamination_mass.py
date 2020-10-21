@@ -190,6 +190,7 @@ def contamination_map(
     ax.set_ylim([-size.value, size.value])
     plt.legend()
     fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
+    print(f"Saved: {output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
     plt.close(fig)
 
 
@@ -323,6 +324,7 @@ def contamination_radial_histogram(
     plt.legend()
     fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
+    print(f"Saved: {output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
     plt.close(fig)
 
 
