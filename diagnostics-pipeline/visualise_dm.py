@@ -151,6 +151,7 @@ def dm_map_parent(
     fig.savefig(f"{output_directory}/{run_name}_dark_matter_map_parent.png")
     plt.close(fig)
     print(f"Saved: {output_directory}/{run_name}_dark_matter_map_parent.png")
+    del data, dm_mass
 
     return
 
@@ -247,6 +248,7 @@ def dm_map_zoom(
     fig.savefig(f"{output_directory}/{run_name}_dark_matter_map_zoom.png")
     plt.close(fig)
     print(f"Saved: {output_directory}/{run_name}_dark_matter_map_zoom.png")
+    del data, dm_mass
 
     return
 
