@@ -140,12 +140,12 @@ def dm_map_parent(
         ha="center",
         va="bottom"
     )
-    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
-    circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
+    circle_r200 = plt.Circle((xCen, yCen), R200c, color="black", fill=False, linestyle='-')
+    circle_clean = plt.Circle((xCen, yCen), _highres_radius.value, color="red", fill=False, linestyle=':')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_clean)
-    ax.set_xlim([-size.value, size.value])
-    ax.set_ylim([-size.value, size.value])
+    ax.set_xlim([xCen-size.value, xCen+size.value])
+    ax.set_ylim([yCen-size.value, yCen+size.value])
     fig.savefig(f"{output_directory}/{run_name}_dark_matter_map_parent.png")
     plt.close(fig)
     print(f"Saved: {output_directory}/{run_name}_dark_matter_map_parent.png")
@@ -181,7 +181,7 @@ if __name__ == "__main__":
 
     snap_filepath_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
     velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
-    
+
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
     out_to_radius = (5, 'R200c')
     highres_radius = (6, 'R500c')
