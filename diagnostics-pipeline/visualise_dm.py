@@ -31,9 +31,10 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
         swio_data.metadata.boxsize,
         kernel_gamma=1.8,
         neighbours=57,
-        speedup_fac=3,
+        speedup_fac=2,
         dimension=3,
     )
+    print('hey1')
     # Project the dark matter mass
     dm_map = project_pixel_grid(
         # Note here that we pass in the dark matter dataset not the whole
@@ -45,6 +46,7 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
         parallel=True,
         region=region
     )
+    print('hey2')
     return dm_map
 
 
