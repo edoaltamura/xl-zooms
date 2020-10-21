@@ -1,3 +1,5 @@
+import os
+
 from compare_density_profiles import density_profile_compare_plot
 from contamination_mass import contamination_map, contamination_radial_histogram
 from visualise_dm import dm_map_parent, dm_map_zoom
@@ -28,6 +30,12 @@ out_to_radius = (5, 'R200c')
 highres_radius = (6, 'R500c')
 
 output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
+
+#####################################################################################################
+
+if not os.path.isdir(os.path.join(output_directory, run_name)):
+    os.mkdir(os.path.join(output_directory, run_name))
+output_directory = os.path.join(output_directory, run_name)
 
 density_profile_compare_plot(
     run_name=run_name,
