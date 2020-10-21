@@ -144,10 +144,10 @@ def cumulative_mass_compare_plot(
         unitLength = data.metadata.units.length
         unitMass = data.metadata.units.mass
         rho_crit = unyt.unyt_quantity(
-            data.metadata.cosmology['Critical density [internal units]'],
+            data.metadata.cosmology_raw['Critical density [internal units]'],
             unitMass / unitLength ** 3
-        )[0].to('Msun/Mpc**3')
-        rhoMean = rho_crit * data.metadata.cosmology['Omega_m']
+        ).to('Msun/Mpc**3')
+        rhoMean = rho_crit * data.metadata.cosmology.Om0
         vol = data.metadata.boxsize[0] ** 3
         numPart = data.metadata.n_dark_matter
         particleMass = rhoMean * vol / numPart
@@ -230,9 +230,9 @@ def cumulative_mass_compare_plot(
             unitLength = data.metadata.units.length
             unitMass = data.metadata.units.mass
             rho_crit = unyt.unyt_quantity(
-                data.metadata.cosmology['Critical density [internal units]'],
+                data.metadata.cosmology_raw['Critical density [internal units]'],
                 unitMass / unitLength ** 3
-            )[0].to('Msun/Mpc**3')
+            ).to('Msun/Mpc**3')
             particleMasses = data.dark_matter.masses.to('Msun')
             zoom_mass_resolution = particleMasses
 
