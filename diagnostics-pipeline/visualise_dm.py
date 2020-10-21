@@ -281,7 +281,7 @@ if __name__ == "__main__":
         output_directory=output_directory,
     )
 
-    dm_map_parent(
+    dm_map_zoom(
         run_name=run_name,
         snap_filepath_zoom=snap_filepath_zoom,
         velociraptor_properties_zoom=velociraptor_properties_zoom,
