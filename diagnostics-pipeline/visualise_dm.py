@@ -31,7 +31,7 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
         swio_data.metadata.boxsize,
         kernel_gamma=1.8,
         neighbours=57,
-        speedup_fac=2,
+        speedup_fac=3,
         dimension=3,
     )
     # Project the dark matter mass

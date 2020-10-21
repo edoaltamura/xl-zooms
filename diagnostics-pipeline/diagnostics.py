@@ -1,4 +1,3 @@
-
 from compare_density_profiles import density_profile_compare_plot
 from contamination_mass import contamination_map, contamination_radial_histogram
 from visualise_dm import dm_map_parent, dm_map_zoom
@@ -65,6 +64,15 @@ for zoom_snap, zoom_vr in zip(
         run_name=run_name,
         velociraptor_properties_parent=velociraptor_properties_parent,
         snap_filepath_parent=snap_filepath_parent,
+        velociraptor_properties_zoom=zoom_vr,
+        out_to_radius=out_to_radius,
+        highres_radius=highres_radius,
+        output_directory=output_directory,
+    )
+
+    dm_map_zoom(
+        run_name=run_name,
+        snap_filepath_zoom=zoom_snap,
         velociraptor_properties_zoom=zoom_vr,
         out_to_radius=out_to_radius,
         highres_radius=highres_radius,
