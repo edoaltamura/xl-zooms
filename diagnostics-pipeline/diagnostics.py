@@ -1,6 +1,7 @@
 from compare_density_profiles import density_profile_compare_plot
 from contamination_mass import contamination_map, contamination_radial_histogram
 from visualise_dm import dm_map_parent, dm_map_zoom
+from compare_cumulative_mass import cumulative_mass_compare_plot
 
 run_name = "L0300N0564_VR93"
 
@@ -29,6 +30,15 @@ highres_radius = (6, 'R500c')
 output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
 density_profile_compare_plot(
+    run_name=run_name,
+    snap_filepath_parent=snap_filepath_parent,
+    velociraptor_properties_parent=velociraptor_properties_parent,
+    snap_filepath_zoom=snap_filepath_zoom,
+    velociraptor_properties_zoom=velociraptor_properties_zoom,
+    output_directory=output_directory
+)
+
+cumulative_mass_compare_plot(
     run_name=run_name,
     snap_filepath_parent=snap_filepath_parent,
     velociraptor_properties_parent=velociraptor_properties_parent,
