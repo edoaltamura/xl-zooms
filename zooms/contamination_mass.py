@@ -33,83 +33,6 @@ def latex_float(f):
         return float_str
 
 
-def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R200c: float) -> None:
-    ax.set_aspect('equal')
-    ax.set_ylabel(r"$y$ [Mpc]")
-    ax.set_xlabel(r"$x$ [Mpc]")
-    ax.text(
-        0.025,
-        0.025,
-        (
-            f"Halo {run_name:s} DMO\n"
-            f"$z={redshift:3.3f}$\n"
-            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
-            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
-        ),
-        color="black",
-        ha="left",
-        va="bottom",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0,
-        0 + 1.05 * R200c,
-        r"$R_{200c}$",
-        color="black",
-        ha="center",
-        va="bottom"
-    )
-    ax.text(
-        0,
-        0 + 1.002 * 5 * R200c,
-        r"$5 \times R_{200c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
-    )
-    ax.text(
-        0,
-        0 + 1.02 * _highres_radius.value,
-        r"$R_\mathrm{clean}$",
-        color="red",
-        ha="center",
-        va="bottom"
-    )
-    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
-    circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
-    ax.add_artist(circle_r200)
-    ax.add_artist(circle_5r200)
-    ax.add_artist(circle_clean)
-
-    return
-
-
-def hist_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R200c: float) -> None:
-    ax.set_yscale('log')
-    ax.set_ylabel("Number of particles")
-    ax.set_xlabel(r"$R\ /\ R_{200c}$")
-    ax.axvline(1, color="grey", linestyle='--')
-    ax.text(
-        0.025,
-        0.025,
-        (
-            f"Halo {run_name:s} DMO\n"
-            f"$z={redshift:3.3f}$\n"
-            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
-            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
-        ),
-        color="black",
-        ha="left",
-        va="bottom",
-        transform=ax.transAxes,
-    )
-
-    return
-
-
 def contamination_map(
         run_name: str,
         velociraptor_properties_zoom: str,
@@ -136,6 +59,8 @@ def contamination_map(
         size = out_to_radius[0] * R500c
     elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
         size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
+    else:
+        raise ValueError("The `out_to_radius` input is not in the correct format or not recognised.")
 
     if highres_radius[1] == 'R200c':
         _highres_radius = highres_radius[0] * R200c
@@ -143,6 +68,8 @@ def contamination_map(
         _highres_radius = highres_radius[0] * R500c
     elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
         _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
+    else:
+        raise ValueError("The `highres_radius` input is not in the correct format or not recognised.")
 
     mask = sw.mask(snap_filepath_zoom)
     region = [
@@ -184,7 +111,10 @@ def contamination_map(
 
     # Make particle maps
     fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
-    map_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
+
+    ax.set_aspect('equal')
+    ax.set_ylabel(r"$y$ [Mpc]")
+    ax.set_xlabel(r"$x$ [Mpc]")
 
     ax.plot(
         highres_coordinates['x'][::4],
@@ -211,6 +141,51 @@ def contamination_map(
         label='Lowres clean'
     )
 
+    ax.text(
+        0.025,
+        0.025,
+        (
+            f"Halo {run_name:s} DMO\n"
+            f"$z={redshift:3.3f}$\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
+            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
+        ),
+        color="black",
+        ha="left",
+        va="bottom",
+        transform=ax.transAxes,
+    )
+    ax.text(
+        0,
+        0 + 1.05 * R200c,
+        r"$R_{200c}$",
+        color="black",
+        ha="center",
+        va="bottom"
+    )
+    ax.text(
+        0,
+        0 + 1.002 * 5 * R200c,
+        r"$5 \times R_{200c}$",
+        color="grey",
+        ha="center",
+        va="bottom"
+    )
+    ax.text(
+        0,
+        0 + 1.02 * _highres_radius,
+        r"$R_\mathrm{clean}$",
+        color="red",
+        ha="center",
+        va="bottom"
+    )
+    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
+    circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
+    circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
+    ax.add_artist(circle_r200)
+    ax.add_artist(circle_5r200)
+    ax.add_artist(circle_clean)
     ax.set_xlim([-size.value, size.value])
     ax.set_ylim([-size.value, size.value])
     plt.legend()
@@ -300,7 +275,10 @@ def contamination_radial_histogram(
 
     # Make radial distribution plot
     fig, ax = plt.subplots()
-    hist_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
+
+    ax.set_yscale('log')
+    ax.set_ylabel("Number of particles")
+    ax.set_xlabel(r"$R\ /\ R_{200c}$")
 
     ax.step(
         highres_coordinates['r_bins'],
@@ -323,6 +301,23 @@ def contamination_radial_histogram(
         color='red',
         label='Lowres contaminating'
     )
+    ax.text(
+        0.025,
+        0.025,
+        (
+            f"Halo {run_name:s} DMO\n"
+            f"$z={redshift:3.3f}$\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
+            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
+        ),
+        color="black",
+        ha="left",
+        va="bottom",
+        transform=ax.transAxes,
+    )
+
+    ax.axvline(1, color="grey", linestyle='--')
     ax.axvline(_highres_radius / R200c, color="red", linestyle='--')
     ax.set_xlim([0, size.value])
     plt.legend()
