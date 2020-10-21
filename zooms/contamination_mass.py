@@ -45,7 +45,7 @@ def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
-            f"$R_{{\\rm clean}}={latex_float(highres_radius)}$ Mpc"
+            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
         ),
         color="black",
         ha="left",
@@ -70,7 +70,7 @@ def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R
     )
     ax.text(
         0,
-        0 + 1.02 * highres_radius,
+        0 + 1.02 * _highres_radius.value,
         r"$R_\mathrm{clean}$",
         color="red",
         ha="center",
@@ -78,7 +78,7 @@ def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R
     )
     circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
     circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
-    circle_clean = plt.Circle((0, 0), highres_radius, color="red", fill=False, linestyle=':')
+    circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_5r200)
     ax.add_artist(circle_clean)
@@ -99,7 +99,7 @@ def hist_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, 
             f"$z={redshift:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
-            f"$R_{{\\rm clean}}={latex_float(highres_radius)}$ Mpc"
+            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
         ),
         color="black",
         ha="left",
@@ -324,7 +324,7 @@ def contamination_radial_histogram(
         label='Lowres contaminating'
     )
     ax.axvline(_highres_radius / R200c, color="red", linestyle='--')
-    ax.set_xlim([0, out_to_radius])
+    ax.set_xlim([0, size.value])
     plt.legend()
     fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
