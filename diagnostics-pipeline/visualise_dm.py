@@ -34,7 +34,6 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
         speedup_fac=2,
         dimension=3,
     )
-    print('hey1')
     # Project the dark matter mass
     dm_map = project_pixel_grid(
         # Note here that we pass in the dark matter dataset not the whole
@@ -46,7 +45,6 @@ def dm_render(swio_data, region: list = None, resolution: int = 1024):
         parallel=True,
         region=region
     )
-    print('hey2')
     return dm_map
 
 
@@ -274,19 +272,19 @@ if __name__ == "__main__":
     highres_radius = (6, 'R500c')
 
     dm_map_parent(
-        run_name=run_name,
-        velociraptor_properties_parent=velociraptor_properties_parent,
-        snap_filepath_parent=snap_filepath_parent,
-        velociraptor_properties_zoom=velociraptor_properties_zoom,
+        run_name,
+        velociraptor_properties_parent,
+        snap_filepath_parent,
+        velociraptor_properties_zoom,
         out_to_radius=out_to_radius,
         highres_radius=highres_radius,
         output_directory=output_directory,
     )
 
     dm_map_zoom(
-        run_name=run_name,
-        snap_filepath_zoom=snap_filepath_zoom,
-        velociraptor_properties_zoom=velociraptor_properties_zoom,
+        run_name,
+        snap_filepath_zoom,
+        velociraptor_properties_zoom,
         out_to_radius=out_to_radius,
         highres_radius=highres_radius,
         output_directory=output_directory,
