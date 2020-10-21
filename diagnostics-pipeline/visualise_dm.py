@@ -68,7 +68,7 @@ def dm_map_parent(
             sample_y=vr_file['/Ycminpot'][0],
             sample_z=vr_file['/Zcminpot'][0],
         )
-    with h5py.File(velociraptor_properties_zoom, 'r') as vr_file:
+    with h5py.File(velociraptor_properties_parent, 'r') as vr_file:
         R500c = unyt.unyt_quantity(vr_file['/SO_R_500_rhocrit'][idx], unyt.Mpc)
 
     M200c = unyt.unyt_quantity(M200c, unyt.Solar_Mass)
