@@ -98,48 +98,19 @@ for i in range(len(snap_relative_filepaths)):
     ax.imshow(dm_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
     ax.text(
         0.025,
-        0.975,
-        f"Halo {i:d} DMO\n",
-        color="white",
-        ha="left",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
-        0.975,
-        f"$z={data.metadata.z:3.3f}$",
-        color="white",
-        ha="right",
-        va="top",
-        transform=ax.transAxes,
-    )
-    ax.text(
-        0.975,
         0.025,
         (
-            f"$M_{{200c}}={latex_float(M200c[i])}$ M$_\odot$"
+            f"Halo {run_name:s} DMO\n"
+            f"$z={data.metadata.z:3.3f}$\n"
+            f"$M_{{200c}}={latex_float(M200c.value)}\\ {M200c.units.latex_repr}$\n"
+            f"$R_{{200c}}={latex_float(R200c.value)}\\ {R200c.units.latex_repr}$"
         ),
         color="white",
-        ha="right",
+        ha="left",
         va="bottom",
+        backgroundcolor='black',
+        alpha=0.5,
         transform=ax.transAxes,
-    )
-    ax.text(
-        xCen.value,
-        yCen.value + 1.05 * R200c[i],
-        r"$R_{200c}$",
-        color="white",
-        ha="center",
-        va="bottom"
-    )
-    ax.text(
-        xCen.value,
-        yCen.value + 1.05 * 5 * R200c[i],
-        r"$5 \times R_{200c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
     )
     circle_r200 = plt.Circle((xCen, yCen), R200c[i], color="white", fill=False, linestyle='-')
     circle_5r200 = plt.Circle((xCen, yCen), 5 * R200c[i], color="grey", fill=False, linestyle='--')
