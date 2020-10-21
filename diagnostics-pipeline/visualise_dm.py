@@ -5,7 +5,7 @@ matplotlib.use('Agg')
 import numpy as np
 import unyt
 import h5py
-
+from typing import Tuple
 import swiftsimio as sw
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
@@ -57,7 +57,6 @@ def dm_map_parent(
         highres_radius: Tuple[int, str] = (6, 'R500c'),
         output_directory: str = '.'
 ) -> None:
-
     print(f"Rendering {snap_filepath_parent}...")
 
     # Rendezvous over parent VR catalogue using zoom information
@@ -162,13 +161,10 @@ def dm_map_zoom(
         highres_radius: Tuple[int, str] = (6, 'R500c'),
         output_directory: str = '.'
 ) -> None:
-
     return
 
 
-
 if __name__ == "__main__":
-
     run_name = 'L0300N0564_VR93'
     snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
     velociraptor_properties_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
