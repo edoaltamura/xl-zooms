@@ -146,7 +146,7 @@ def contamination_map(
         0.025,
         (
             f"Halo {run_name:s} DMO\n"
-            f"$z={redshift:3.3f}$\n"
+            f"$z={data.metadata.z:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
             f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
@@ -306,7 +306,7 @@ def contamination_radial_histogram(
         0.025,
         (
             f"Halo {run_name:s} DMO\n"
-            f"$z={redshift:3.3f}$\n"
+            f"$z={data.metadata.z:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
             f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
             f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
