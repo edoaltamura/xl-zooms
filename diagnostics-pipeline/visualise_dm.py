@@ -14,6 +14,8 @@ from matplotlib.colors import LogNorm
 
 from vr_rendezvous import find_object
 
+resolution = 2048
+
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -100,10 +102,10 @@ def dm_map_parent(
     ]
     mask.constrain_spatial(region)
     data = sw.load(snap_filepath_parent, mask=mask)
-    dm_mass = dm_render(data, region=(region[0] + region[1]))
+    dm_mass = dm_render(data, region=(region[0] + region[1]), resolution=resolution)
 
     # Make figure
-    fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
     ax.imshow(dm_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
@@ -196,10 +198,10 @@ def dm_map_zoom(
     ]
     mask.constrain_spatial(region)
     data = sw.load(snap_filepath_zoom, mask=mask)
-    dm_mass = dm_render(data, region=(region[0] + region[1]))
+    dm_mass = dm_render(data, region=(region[0] + region[1]), resolution=resolution)
 
     # Make figure
-    fig, ax = plt.subplots(figsize=(8, 8), dpi=1024 // 8)
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
     fig.subplots_adjust(0, 0, 1, 1)
     ax.axis("off")
     ax.imshow(dm_mass.T, norm=LogNorm(), cmap="inferno", origin="lower", extent=(region[0] + region[1]))
@@ -272,19 +274,19 @@ if __name__ == "__main__":
     highres_radius = (6, 'R500c')
 
     dm_map_parent(
-        run_name,
-        velociraptor_properties_parent,
-        snap_filepath_parent,
-        velociraptor_properties_zoom,
+        run_name=run_name,
+        velociraptor_properties_parent=velociraptor_properties_parent,
+        snap_filepath_parent=snap_filepath_parent,
+        velociraptor_properties_zoom=velociraptor_properties_zoom,
         out_to_radius=out_to_radius,
         highres_radius=highres_radius,
         output_directory=output_directory,
     )
 
     dm_map_zoom(
-        run_name,
-        snap_filepath_zoom,
-        velociraptor_properties_zoom,
+        run_name=run_name,
+        snap_filepath_zoom=snap_filepath_zoom,
+        velociraptor_properties_zoom=velociraptor_properties_zoom,
         out_to_radius=out_to_radius,
         highres_radius=highres_radius,
         output_directory=output_directory,
