@@ -114,7 +114,7 @@ def dm_map_parent(
             f"Halo {run_name:s} DMO\n"
             f"$z={data.metadata.z:3.3f}$\n"
             f"$M_{{200c}}={latex_float(M200c.value)}\\ {M200c.units.latex_repr}$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}\\ {R200c.units.latex_repr}$"
+            f"$R_{{200c}}={latex_float(R200c.value)}\\ {R200c.units.latex_repr}$\n"
             f"$R_\\mathrm{{clean}}={highres_radius[0]}\\ {highres_radius[1]}$"
         ),
         color="white",
@@ -140,8 +140,8 @@ def dm_map_parent(
         ha="center",
         va="bottom"
     )
-    circle_r200 = plt.Circle((xCen, yCen), R200c, color="black", fill=False, linestyle='-')
-    circle_clean = plt.Circle((xCen, yCen), _highres_radius.value, color="red", fill=False, linestyle=':')
+    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
+    circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
     ax.add_artist(circle_r200)
     ax.add_artist(circle_clean)
     ax.set_xlim([-size.value, size.value])
