@@ -24,6 +24,7 @@ bins = 40
 radius_bounds = [5e-3, 3]  # In units of R200crit
 residual_bounds = [-0.5, 0.5]  # y-limits in the residual plot
 cmap_name = 'BuPu_r'
+resolution = 2048
 
 
 def latex_float(f):
@@ -91,8 +92,14 @@ def density_profile_compare_plot(
         raise ValueError
     assert output_directory
 
-    fig, (ax, ax_residual) = plt.subplots(nrows=2, ncols=1, figsize=(5, 7), sharex=True,
-                                          gridspec_kw={'height_ratios': [3, 1]})
+    fig, (ax, ax_residual) = plt.subplots(
+        nrows=2, 
+        ncols=1, 
+        figsize=(7, 8),
+        dpi=resolution // 8,
+        sharex=True,
+        gridspec_kw={'height_ratios': [3, 1]}
+    )
 
     # PARENT #
     if snap_filepath_parent:
@@ -159,15 +166,25 @@ def density_profile_compare_plot(
 
         # Plot density profile for each selected halo in volume
         densities_parent[densities_parent == 0] = np.nan
-        parent_label = f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ {parent_mass_resolution.units.latex_repr}$'
+        parent_label = (
+            f'Parent: $m_\\mathrm{{DM}} = {latex_float(parent_mass_resolution.value[0])}\\ '
+            f'{parent_mass_resolution.units.latex_repr}$'
+        )
         ax.plot(bin_centre, densities_parent, c="grey", linestyle="-", label=parent_label)
 
         # Compute convergence radius
         conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
-        t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
-                    alpha=0.6)
+        t = ax.text(
+            conv_radius, 
+            ax.get_ylim()[1], 
+            'Convergence radius', 
+            ha='center', 
+            va='top', 
+            rotation='vertical',
+            alpha=0.6
+        )
         t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
     # ZOOMS #
@@ -234,14 +251,24 @@ def density_profile_compare_plot(
 
             # Plot density profile for each selected halo in volume
             densities_zoom[densities_zoom == 0] = np.nan
-            zoom_label = f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ {zoom_mass_resolution.units.latex_repr}$'
+            zoom_label = (
+                f'Zoom: $m_\\mathrm{{DM}} = {latex_float(zoom_mass_resolution.value[0])}\\ '
+                f'{zoom_mass_resolution.units.latex_repr}$'
+            )
             ax.plot(bin_centre, densities_zoom, c=color, linestyle="-", label=zoom_label)
 
             # Compute convergence radius
             conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
             ax.axvline(conv_radius, color=color, linestyle='--')
-            t = ax.text(conv_radius, ax.get_ylim()[1], 'Convergence radius', ha='center', va='top', rotation='vertical',
-                        alpha=0.5)
+            t = ax.text(
+                conv_radius, 
+                ax.get_ylim()[1], 
+                'Convergence radius', 
+                ha='center', 
+                va='top', 
+                rotation='vertical',
+                alpha=0.5
+            )
             t.set_bbox(dict(facecolor='white', alpha=0.6, edgecolor='none'))
 
             # RESIDUALS #
@@ -280,9 +307,9 @@ def density_profile_compare_plot(
     ax_residual.set_xlabel(r"$R\ /\ R_{200c}$")
     ax.legend(loc="upper right")
     fig.tight_layout()
-    fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.pdf", dpi=300)
+    fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.png")
     plt.close(fig)
-    print(f"Saved: {output_directory}/{run_name}_density_profile_compare.pdf")
+    print(f"Saved: {output_directory}/{run_name}_density_profile_compare.png")
 
     return
 

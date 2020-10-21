@@ -29,7 +29,7 @@ highres_radius = (6, 'R500c')
 output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
 density_profile_compare_plot(
-    run_name,
+    run_name=run_name,
     snap_filepath_parent=snap_filepath_parent,
     velociraptor_properties_parent=velociraptor_properties_parent,
     snap_filepath_zoom=snap_filepath_zoom,
@@ -43,7 +43,7 @@ for zoom_snap, zoom_vr in zip(
 ):
 
     contamination_map(
-        run_name,
+        run_name=run_name,
         velociraptor_properties_zoom=zoom_vr,
         snap_filepath_zoom=zoom_snap,
         out_to_radius=out_to_radius,
@@ -52,7 +52,7 @@ for zoom_snap, zoom_vr in zip(
     )
 
     contamination_radial_histogram(
-        run_name,
+        run_name=run_name,
         velociraptor_properties_zoom=zoom_vr,
         snap_filepath_zoom=zoom_snap,
         out_to_radius=out_to_radius,

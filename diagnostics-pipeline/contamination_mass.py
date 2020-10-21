@@ -14,6 +14,8 @@ try:
 except:
     pass
 
+resolution = 2048
+
 
 def wrap(dx, box):
     result = dx
@@ -110,7 +112,7 @@ def contamination_map(
     print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
 
     # Make particle maps
-    fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
+    fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
 
     ax.set_aspect('equal')
     ax.set_ylabel(r"$y$ [Mpc]")
@@ -275,7 +277,7 @@ def contamination_radial_histogram(
     del bins, hist
 
     # Make radial distribution plot
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(5, 5), dpi=resolution // 5)
 
     ax.set_yscale('log')
     ax.set_ylabel("Number of particles")
