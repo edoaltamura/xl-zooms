@@ -5,6 +5,7 @@ matplotlib.use('Agg')
 import numpy as np
 import unyt
 import h5py
+from typing import Tuple
 import matplotlib.pyplot as plt
 import swiftsimio as sw
 
@@ -12,17 +13,6 @@ try:
     plt.style.use("mnras.mplstyle")
 except:
     pass
-
-#############################################
-# INPUTS
-author = "SK"
-highres_radius = 4 # in Mpc
-out_to_radius = 5 # in R200crit units
-boxMpc = 300. # in Mpc
-
-
-
-#############################################
 
 
 def wrap(dx, box):
@@ -95,6 +85,7 @@ def map_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R
 
     return
 
+
 def hist_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, R200c: float) -> None:
     ax.set_yscale('log')
     ax.set_ylabel("Number of particles")
@@ -115,105 +106,254 @@ def hist_setup_axes(ax: plt.Axes, run_name: str, redshift: float, M200c: float, 
         va="bottom",
         transform=ax.transAxes,
     )
+
     return
 
 
-velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
-snap_filepath_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
-output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
-out_to_radius = 5
-run_name = 'L0300N0564_VR93'
+def contamination_map(
+        run_name: str,
+        velociraptor_properties_zoom: str,
+        snap_filepath_zoom: str,
+        out_to_radius: Tuple[int, str] = (5, 'R200c'),
+        highres_radius: Tuple[int, str] = (6, 'R500c'),
+        output_directory: str = '.'
+) -> None:
+    # Rendezvous over parent VR catalogue using zoom information
+    with h5py.File(velociraptor_properties_zoom, 'r') as vr_file:
+        M200c = unyt.unyt_quantity(vr_file['/Mass_200crit'][0] * 1e10, unyt.Solar_Mass)
+        R200c = unyt.unyt_quantity(vr_file['/R_200crit'][0], unyt.Mpc)
+        R500c = unyt.unyt_quantity(vr_file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        xCen = unyt.unyt_quantity(vr_file['/Xcminpot'][0], unyt.Mpc)
+        yCen = unyt.unyt_quantity(vr_file['/Ycminpot'][0], unyt.Mpc)
+        zCen = unyt.unyt_quantity(vr_file['/Zcminpot'][0], unyt.Mpc)
 
-print("Loading halos selected...")
-# Rendezvous over parent VR catalogue using zoom information
-with h5py.File(velociraptor_properties_zoom, 'r') as vr_file:
+    # EAGLE-XL data path
+    print(f"Rendering {snap_filepath_zoom}...")
 
-    M200c = unyt.unyt_quantity(vr_file['/Mass_200crit'][0] * 1e10, unyt.Solar_Mass)
-    R200c = unyt.unyt_quantity(vr_file['/R_200crit'][0], unyt.Mpc)
-    xCen = unyt.unyt_quantity(vr_file['/Xcminpot'][0], unyt.Mpc)
-    yCen = unyt.unyt_quantity(vr_file['/Ycminpot'][0], unyt.Mpc)
-    zCen = unyt.unyt_quantity(vr_file['/Zcminpot'][0], unyt.Mpc)
-    highres_radius = 6 * vr_file['/SO_R_500_rhocrit'][0]
+    if out_to_radius[1] == 'R200c':
+        size = out_to_radius[0] * R200c
+    elif out_to_radius[1] == 'R500c':
+        size = out_to_radius[0] * R500c
+    elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
+        size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
 
-# EAGLE-XL data path
-print(f"Rendering {snap_filepath_zoom}...")
-size = unyt.unyt_quantity(out_to_radius * R200c, unyt.Mpc)
-mask = sw.mask(snap_filepath_zoom)
-region = [
-    [xCen - size, xCen + size],
-    [yCen - size, yCen + size],
-    [zCen - size, zCen + size]
-]
-mask.constrain_spatial(region)
+    if highres_radius[1] == 'R200c':
+        _highres_radius = highres_radius[0] * R200c
+    elif highres_radius[1] == 'R500c':
+        _highres_radius = highres_radius[0] * R500c
+    elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
+        _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
 
-# Load data using mask
-data = sw.load(snap_filepath_zoom, mask=mask)
-posDM = data.dark_matter.coordinates / data.metadata.a
-highres_coordinates = {
-    'x': wrap(posDM[:, 0] - xCen, boxMpc),
-    'y': wrap(posDM[:, 1] - yCen, boxMpc),
-    'z': wrap(posDM[:, 2] - zCen, boxMpc),
-    'r': np.sqrt(wrap(posDM[:, 0] - xCen, boxMpc) ** 2 +
-                 wrap(posDM[:, 1] - yCen, boxMpc) ** 2 +
-                 wrap(posDM[:, 2] - zCen, boxMpc) ** 2)
-}
-del posDM
-posDM = data.boundary.coordinates / data.metadata.a
-lowres_coordinates = {
-    'x': wrap(posDM[:, 0] - xCen, boxMpc),
-    'y': wrap(posDM[:, 1] - yCen, boxMpc),
-    'z': wrap(posDM[:, 2] - zCen, boxMpc),
-    'r': np.sqrt(wrap(posDM[:, 0] - xCen, boxMpc) ** 2 +
-                 wrap(posDM[:, 1] - yCen, boxMpc) ** 2 +
-                 wrap(posDM[:, 2] - zCen, boxMpc) ** 2)
-}
-del posDM
+    mask = sw.mask(snap_filepath_zoom)
+    region = [
+        [xCen - size, xCen + size],
+        [yCen - size, yCen + size],
+        [zCen - size, zCen + size]
+    ]
+    mask.constrain_spatial(region)
 
-# Flag contamination particles within 5 R200
-contaminated_idx = np.where(lowres_coordinates['r'] < highres_radius)[0]
-contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c)[0]
-print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
-print(f"Contaminating low-res DM (< R_clean): {len(contaminated_idx)} particles detected")
-print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
+    # Load data using mask
+    data = sw.load(snap_filepath_zoom, mask=mask)
+    posDM = data.dark_matter.coordinates / data.metadata.a
+    highres_coordinates = {
+        'x': wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]),
+        'y': wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]),
+        'z': wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]),
+        'r': np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
+                     wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
+                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
+    }
+    del posDM
+    posDM = data.boundary.coordinates / data.metadata.a
+    lowres_coordinates = {
+        'x': wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]),
+        'y': wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]),
+        'z': wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]),
+        'r': np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
+                     wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
+                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
+    }
+    del posDM
 
-# Make particle maps
-fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
-map_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
+    # Flag contamination particles within 5 R200
+    contaminated_idx = np.where(lowres_coordinates['r'] < _highres_radius)[0]
+    contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c)[0]
+    print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
+    print(f"Contaminating low-res DM (< R_clean): {len(contaminated_idx)} particles detected")
+    print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
 
-ax.plot(highres_coordinates['x'], highres_coordinates['y'], ',', c="C0", alpha=0.2, label='Highres')
-ax.plot(lowres_coordinates['x'][contaminated_idx], lowres_coordinates['y'][contaminated_idx], 'x', c="red", alpha=1, label='Lowres contaminating')
-ax.plot(lowres_coordinates['x'][~contaminated_idx], lowres_coordinates['y'][~contaminated_idx], '.', c="green", alpha=0.2, label='Lowres clean')
+    # Make particle maps
+    fig, ax = plt.subplots(figsize=(7, 7), dpi=1024 // 7)
+    map_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
 
-ax.set_xlim([-size.value, size.value])
-ax.set_ylim([-size.value, size.value])
-plt.legend()
-fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius}r200_zoom.png")
-plt.close(fig)
+    ax.plot(
+        highres_coordinates['x'][::4],
+        highres_coordinates['y'][::4],
+        ',',
+        c="C0",
+        alpha=0.1,
+        label='Highres'
+    )
+    ax.plot(
+        lowres_coordinates['x'][contaminated_idx],
+        lowres_coordinates['y'][contaminated_idx],
+        'x',
+        c="red",
+        alpha=1,
+        label='Lowres contaminating'
+    )
+    ax.plot(
+        lowres_coordinates['x'][~contaminated_idx],
+        lowres_coordinates['y'][~contaminated_idx],
+        '.',
+        c="green",
+        alpha=0.2,
+        label='Lowres clean'
+    )
 
-# Histograms
-bins = np.linspace(0, out_to_radius * R200c, 40)
-hist, bin_edges = np.histogram(lowres_coordinates['r'][contaminated_idx], bins=bins)
-lowres_coordinates['r_bins'] = (bin_edges[1:] + bin_edges[:-1]) / 2 / R200c
-lowres_coordinates['hist_contaminating'] = hist
-del hist, bin_edges
-hist, _ = np.histogram(lowres_coordinates['r'], bins=bins)
-lowres_coordinates['hist_all'] = hist
-del hist
-hist, _ = np.histogram(highres_coordinates['r'], bins=bins)
-highres_coordinates['r_bins'] = lowres_coordinates['r_bins']
-highres_coordinates['hist_all'] = hist
-del bins, hist
+    ax.set_xlim([-size.value, size.value])
+    ax.set_ylim([-size.value, size.value])
+    plt.legend()
+    fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
+    plt.close(fig)
 
-# Make radial distribution plot
-fig, ax = plt.subplots()
-hist_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
 
-ax.step(highres_coordinates['r_bins'], highres_coordinates['hist_all'], where='mid', color='grey', label='Highres all')
-ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_all'], where='mid', color='green', label='Lowres all')
-ax.step(lowres_coordinates['r_bins'], lowres_coordinates['hist_contaminating'], where='mid', color='red', label='Lowres contaminating')
-ax.axvline(highres_radius / R200c, color="grey", linestyle='--')
-ax.set_xlim([0, out_to_radius])
-plt.legend()
-fig.tight_layout()
-fig.savefig(f"{output_directory}/{run_name}_contamination_hist_{out_to_radius}r200_zoom.png")
-plt.close(fig)
+def contamination_radial_histogram(
+        run_name: str,
+        velociraptor_properties_zoom: str,
+        snap_filepath_zoom: str,
+        out_to_radius: Tuple[int, str] = (5, 'R200c'),
+        highres_radius: Tuple[int, str] = (6, 'R500c'),
+        output_directory: str = '.'
+) -> None:
+    # Rendezvous over parent VR catalogue using zoom information
+    with h5py.File(velociraptor_properties_zoom, 'r') as vr_file:
+        M200c = unyt.unyt_quantity(vr_file['/Mass_200crit'][0] * 1e10, unyt.Solar_Mass)
+        R200c = unyt.unyt_quantity(vr_file['/R_200crit'][0], unyt.Mpc)
+        R500c = unyt.unyt_quantity(vr_file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        xCen = unyt.unyt_quantity(vr_file['/Xcminpot'][0], unyt.Mpc)
+        yCen = unyt.unyt_quantity(vr_file['/Ycminpot'][0], unyt.Mpc)
+        zCen = unyt.unyt_quantity(vr_file['/Zcminpot'][0], unyt.Mpc)
+
+    # EAGLE-XL data path
+    print(f"Rendering {snap_filepath_zoom}...")
+
+    if out_to_radius[1] == 'R200c':
+        size = out_to_radius[0] * R200c
+    elif out_to_radius[1] == 'R500c':
+        size = out_to_radius[0] * R500c
+    elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
+        size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
+
+    if highres_radius[1] == 'R200c':
+        _highres_radius = highres_radius[0] * R200c
+    elif highres_radius[1] == 'R500c':
+        _highres_radius = highres_radius[0] * R500c
+    elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
+        _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
+
+    mask = sw.mask(snap_filepath_zoom)
+    region = [
+        [xCen - size, xCen + size],
+        [yCen - size, yCen + size],
+        [zCen - size, zCen + size]
+    ]
+    mask.constrain_spatial(region)
+
+    # Load data using mask
+    data = sw.load(snap_filepath_zoom, mask=mask)
+    posDM = data.dark_matter.coordinates / data.metadata.a
+    highres_coordinates = {
+        'x': wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]),
+        'y': wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]),
+        'z': wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]),
+        'r': np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
+                     wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
+                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
+    }
+    del posDM
+    posDM = data.boundary.coordinates / data.metadata.a
+    lowres_coordinates = {
+        'x': wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]),
+        'y': wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]),
+        'z': wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]),
+        'r': np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
+                     wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
+                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
+    }
+    del posDM
+
+    # Histograms
+    contaminated_idx = np.where(lowres_coordinates['r'] < _highres_radius)[0]
+    bins = np.linspace(0, size, 40)
+    hist, bin_edges = np.histogram(lowres_coordinates['r'][contaminated_idx], bins=bins)
+    lowres_coordinates['r_bins'] = (bin_edges[1:] + bin_edges[:-1]) / 2 / R200c
+    lowres_coordinates['hist_contaminating'] = hist
+    del hist, bin_edges
+    hist, _ = np.histogram(lowres_coordinates['r'], bins=bins)
+    lowres_coordinates['hist_all'] = hist
+    del hist
+    hist, _ = np.histogram(highres_coordinates['r'], bins=bins)
+    highres_coordinates['r_bins'] = lowres_coordinates['r_bins']
+    highres_coordinates['hist_all'] = hist
+    del bins, hist
+
+    # Make radial distribution plot
+    fig, ax = plt.subplots()
+    hist_setup_axes(ax, run_name, data.metadata.z, M200c, R200c)
+
+    ax.step(
+        highres_coordinates['r_bins'],
+        highres_coordinates['hist_all'],
+        where='mid',
+        color='grey',
+        label='Highres all'
+    )
+    ax.step(
+        lowres_coordinates['r_bins'],
+        lowres_coordinates['hist_all'],
+        where='mid',
+        color='green',
+        label='Lowres all'
+    )
+    ax.step(
+        lowres_coordinates['r_bins'],
+        lowres_coordinates['hist_contaminating'],
+        where='mid',
+        color='red',
+        label='Lowres contaminating'
+    )
+    ax.axvline(_highres_radius / R200c, color="red", linestyle='--')
+    ax.set_xlim([0, out_to_radius])
+    plt.legend()
+    fig.tight_layout()
+    fig.savefig(f"{output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
+    plt.close(fig)
+
+
+if __name__ == "__main__":
+    
+    run_name = 'L0300N0564_VR93'
+    velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
+    snap_filepath_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
+    output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
+    out_to_radius = (5, 'R200c')
+    highres_radius = (6, 'R500c')
+
+    contamination_map(
+        run_name,
+        velociraptor_properties_zoom,
+        snap_filepath_zoom,
+        out_to_radius=out_to_radius,
+        highres_radius=highres_radius,
+        output_directory=output_directory,
+    )
+
+    contamination_radial_histogram(
+        run_name,
+        velociraptor_properties_zoom,
+        snap_filepath_zoom,
+        out_to_radius=out_to_radius,
+        highres_radius=highres_radius,
+        output_directory=output_directory,
+    )
