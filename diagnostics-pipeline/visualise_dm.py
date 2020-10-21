@@ -165,11 +165,23 @@ def dm_map_zoom(
 
 
 if __name__ == "__main__":
+
     run_name = 'L0300N0564_VR93'
-    snap_filepath_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
-    velociraptor_properties_parent = "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/stf_swiftdm_3dfof_subhalo_0036/stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
+
+    snap_filepath_parent = (
+        "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
+        "EAGLE-XL_L0300N0564_DMONLY_0036.hdf5"
+    )
+
+    velociraptor_properties_parent = (
+        "/cosma7/data/dp004/jch/EAGLE-XL/DMONLY/Cosma7/L0300N0564/snapshots/"
+        "stf_swiftdm_3dfof_subhalo_0036/"
+        "stf_swiftdm_3dfof_subhalo_0036.VELOCIraptor.properties.0"
+    )
+
     snap_filepath_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
     velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
+    
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
     out_to_radius = (5, 'R200c')
     highres_radius = (6, 'R500c')
