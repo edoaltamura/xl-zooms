@@ -100,14 +100,14 @@ parser.add_argument(
 args = parser.parse_args()
 
 try:
-    from Generate_PL import ParticleLoad, comm_rank
+    from Generate_PL import ParticleLoad, comm, comm_rank
 except ImportError:
     try:
         if args.particle_load_library:
             sys.path.append(
                 os.path.split(args.particle_load_library)[0]
             )
-            from Generate_PL import ParticleLoad, comm_rank
+            from Generate_PL import ParticleLoad, comm, comm_rank
         else:
             raise Exception("The --particle-load-library argument is needed to import Generate_PL.py.")
     except ImportError:
@@ -150,43 +150,58 @@ def get_from_template(parameter: str) -> str:
 
 
 def make_particle_load_from_list() -> None:
-    out_dir = get_output_directory()
 
-    if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template))):
-        copyfile(
-            os.path.join(this_file_directory, args.template),
-            os.path.join(out_dir, os.path.basename(args.template))
-        )
+    if comm_rank == 0:
+        out_dir = get_output_directory()
+        if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template))):
+            copyfile(
+                os.path.join(this_file_directory, args.template),
+                os.path.join(out_dir, os.path.basename(args.template))
+            )
+        mask_paths_list = get_mask_paths_list()
+    else:
+        out_dir = None
+        mask_paths_list = None
 
-    for mask_filepath in get_mask_paths_list():
+    out_dir = comm.bcast(out_dir, root=0)
+    mask_paths_list = comm.bcast(mask_paths_list, root=0)
 
-        # Construct particle load parameter file name
-        mask_name = os.path.splitext(
-            os.path.split(mask_filepath)[-1]
-        )[0]
+    for mask_filepath in mask_paths_list:
 
-        file_name = get_from_template('f_name').replace('FILENAME', str(mask_name))
-        particle_load_paramfile = os.path.join(out_dir, f"{file_name}.yml")
-        copyfile(os.path.join(out_dir, os.path.basename(args.template)), particle_load_paramfile)
+        if comm_rank == 0:
 
-        replace_pattern('PATH_TO_MASK', str(mask_filepath), particle_load_paramfile)
-        replace_pattern('FILENAME', str(mask_name), particle_load_paramfile)
+            # Construct particle load parameter file name
+            mask_name = os.path.splitext(
+                os.path.split(mask_filepath)[-1]
+            )[0]
 
-        if args.dry:
-            if comm_rank == 0:
-                print(f"ParticleLoad({particle_load_paramfile}, only_calc_ntot={args.only_calc_ntot})")
+            file_name = get_from_template('f_name').replace('FILENAME', str(mask_name))
+            particle_load_paramfile = os.path.join(out_dir, f"{file_name}.yml")
+            copyfile(os.path.join(out_dir, os.path.basename(args.template)), particle_load_paramfile)
+
+            replace_pattern('PATH_TO_MASK', str(mask_filepath), particle_load_paramfile)
+            replace_pattern('FILENAME', str(mask_name), particle_load_paramfile)
+
+            print(f"ParticleLoad({particle_load_paramfile}, only_calc_ntot={args.only_calc_ntot})")
+
         else:
+            particle_load_paramfile = None
+            file_name = None
+
+        particle_load_paramfile = comm.bcast(particle_load_paramfile, root=0)
+        file_name = comm.bcast(file_name, root=0)
+
+        if not args.dry:
             ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
 
-        if args.submit:
+        if args.submit and comm_rank == 0:
             old_cwd = os.getcwd()
             ic_submit_dir = os.path.join(
                 get_from_template('ic_dir'),
                 'ic_gen_submit_files',
                 file_name
             )
-            if comm_rank == 0:
-                print(f"Submitting IC_Gen.x at {ic_submit_dir}")
+            print(f"Submitting IC_Gen.x at {ic_submit_dir}")
             if not args.dry:
                 os.chdir(ic_submit_dir)
                 subprocess.call(["sbatch", "submit.sh"])
