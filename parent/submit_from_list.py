@@ -7,8 +7,6 @@ from yaml import load
 from typing import List
 import subprocess
 
-from Generate_PL import ParticleLoad, comm_rank
-
 this_file_directory = os.path.dirname(__file__)
 
 parser = argparse.ArgumentParser(
@@ -54,8 +52,27 @@ parser.add_argument(
     default=False,
     required=False,
 )
+parser.add_argument(
+    '-p'
+    '--particle-load-library',
+    action='store',
+    default='.',
+    required=False,
+)
 
 args = parser.parse_args()
+
+try:
+    from Generate_PL import ParticleLoad, comm_rank
+except ImportError:
+    try:
+        if args.particle_load_library:
+            sys.path.append(args.particle_load_library)
+            from Generate_PL import ParticleLoad, comm_rank
+        else:
+            raise Exception("The --particle-load-library argument is needed to import Generate_PL.py.")
+    except ImportError:
+        raise Exception("Make sure you have added the `Generate_PL.py` module directory to your $PYTHONPATH.")
 
 
 def get_mask_paths_list() -> List[str]:
@@ -84,7 +101,6 @@ def get_from_template(parameter: str) -> str:
 
 
 def make_particle_load_from_list() -> None:
-
     out_dir = get_output_directory()
 
     if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template))):
@@ -124,5 +140,4 @@ def make_particle_load_from_list() -> None:
 
 
 if __name__ == '__main__':
-    
     make_particle_load_from_list()
