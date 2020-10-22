@@ -23,7 +23,7 @@ parser = argparse.ArgumentParser(
 )
 
 parser.add_argument(
-    '-t'
+    '-t',
     '--template',
     action='store',
     required=True,
@@ -31,7 +31,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-l'
+    '-l',
     '--listfile',
     action='store',
     required=True,
@@ -46,14 +46,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-s'
+    '-s',
     '--submit',
     action='store_true',
     default=False,
     required=False,
 )
 parser.add_argument(
-    '-p'
+    '-p',
     '--particle-load-library',
     action='store',
     default='.',
