@@ -90,13 +90,7 @@ def get_mask_paths_list() -> List[str]:
         mask_name = os.path.splitext(
             os.path.split(line)[-1]
         )[0]
-
-        try:
-            detect_group_number = re.search('_VR(.+?)', mask_name).group(1)
-        except AttributeError:
-            detect_group_number = ''
-
-        group_numbers.append(detect_group_number)
+        group_numbers.append(mask_name.split('_VR')[-1])
 
     print(group_numbers)
     return lines
