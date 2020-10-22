@@ -78,7 +78,6 @@ except ImportError:
 
 
 def get_mask_paths_list() -> List[str]:
-
     with open(args.listfile) as f:
         lines = f.read().splitlines()
 
@@ -90,9 +89,9 @@ def get_mask_paths_list() -> List[str]:
         mask_name = os.path.splitext(
             os.path.split(line)[-1]
         )[0]
-        group_numbers.append(mask_name.split('_VR')[-1])
+        group_numbers.append(int(mask_name.split('_VR')[-1]))
 
-    print(group_numbers)
+    print([x for _, x in sorted(zip(group_numbers, group_numbers))])
     return lines
 
 
