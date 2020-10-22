@@ -80,8 +80,11 @@ except ImportError:
 def get_mask_paths_list() -> List[str]:
     with open(args.listfile) as f:
         lines = f.read().splitlines()
+    group_numbers = []
     for line in lines:
         assert line.endswith('.hdf5'), f"Extension of the mask file {line} is ambiguous. File path must end in `.hdf5`."
+        group_numbers.append(re.search('_VR(.*)_', line))
+    print(group_numbers)
     return lines
 
 
