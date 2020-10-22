@@ -123,7 +123,9 @@ def make_particle_load_from_list() -> None:
         replace_pattern('PATH_TO_MASK', str(mask_filepath), particle_load_paramfile)
         replace_pattern('FILENAME', str(mask_name), particle_load_paramfile)
 
-        ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
+        if comm_rank == 0:
+            print("ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)")
+        # ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
 
         if args.submit:
             old_cwd = os.getcwd()
@@ -136,7 +138,7 @@ def make_particle_load_from_list() -> None:
             if comm_rank == 0:
                 print(f"Submitting IC_Gen.x at {ic_submit_dir}")
             # subprocess.call(["sbatch", "submit.sh"])
-            
+
             os.chdir(old_cwd)
 
 
