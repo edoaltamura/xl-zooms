@@ -93,12 +93,10 @@ def get_mask_paths_list() -> List[str]:
 
         try:
             detect_group_number = re.search('_VR(.+?)_', mask_name).group(1)
-
         except AttributeError:
-            # Group Number not found in the original string
             detect_group_number = ''
 
-        group_numbers.append(detect_group_number)
+        group_numbers.append(mask_name)
 
     print(group_numbers)
     return lines
