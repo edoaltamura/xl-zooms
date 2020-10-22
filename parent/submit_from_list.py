@@ -192,7 +192,10 @@ def make_particle_load_from_list() -> None:
         file_name = comm.bcast(file_name, root=0)
 
         if not args.dry:
+            old_cwd = os.getcwd()
+            os.chdir(os.path.split(args.particle_load_library)[0])
             ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
+            os.chdir(old_cwd)
 
         if args.submit and comm_rank == 0:
             old_cwd = os.getcwd()
