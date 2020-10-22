@@ -136,6 +136,7 @@ def make_particle_load_from_list() -> None:
             if comm_rank == 0:
                 print(f"Submitting IC_Gen.x at {ic_submit_dir}")
             # subprocess.call(["sbatch", "submit.sh"])
+            
             os.chdir(old_cwd)
 
 
