@@ -83,8 +83,11 @@ def get_mask_paths_list() -> List[str]:
     group_numbers = []
     for line in lines:
         assert line.endswith('.hdf5'), f"Extension of the mask file {line} is ambiguous. File path must end in `.hdf5`."
+        mask_name = os.path.splitext(
+            os.path.split(mask_filepath)[-1]
+        )[0]
         try:
-            detect_group_number = re.search('_VR(.+?)_', line).group(1)
+            detect_group_number = re.search('_VR(.+?)_', mask_name).group(1)
         except AttributeError:
             # Group Number not found in the original string
             detect_group_number = ''
