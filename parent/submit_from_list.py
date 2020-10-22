@@ -17,8 +17,9 @@ parser = argparse.ArgumentParser(
     epilog=(
         "Example usage: "
         "mpirun -np 28 python3 submit_from_list.py "
-        "-t param_files/default_sept.yml "
+        "-t /cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/particle_loads/template_-8res.yml"
         "-l /cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/particle_loads/masks_list.txt "
+        "-p /cosma/home/dp004/dc-alta2/make_particle_load/particle_load/ "
         "-s "
     ),
 )
@@ -28,7 +29,12 @@ parser.add_argument(
     '--template',
     action='store',
     required=True,
-    type=str
+    type=str,
+    help=(
+        "The master parameter file to use as a template to generate mask-specific ones. "
+        "It usually contains the hot keywords PATH_TO_MASK and FILENAME, which can be replaced "
+        "with mask-dependent values."
+    )
 )
 
 parser.add_argument(
@@ -36,7 +42,13 @@ parser.add_argument(
     '--listfile',
     action='store',
     required=True,
-    type=str
+    type=str,
+    help=(
+        "The file with the list of full paths to the mask files that are to be handled. "
+        "The file paths are required to end with the file name with the correct `.hdf5` extension. "
+        "The base-name of the masks files is used to replace the hot keywords PATH_TO_MASK and "
+        "FILENAME in the template."
+    )
 )
 
 parser.add_argument(
@@ -53,13 +65,36 @@ parser.add_argument(
     action='store_true',
     default=False,
     required=False,
+    help=(
+        "If activated, the program automatically executes the command `sbatch submit.sh` and launches the "
+        "`IC_Gen.x` code for generating initial conditions. NOTE: all particle load in the list will be submitted "
+        "to the SLURM batch system as individual jobs."
+    )
 )
+
 parser.add_argument(
     '-p',
     '--particle-load-library',
     action='store',
     default='.',
     required=False,
+    help=(
+        "If this script is not located in the same directory as the `Generate_PL.py` code, you can import "
+        "the code as an external library by specifying the full path to the `Generate_PL.py` file."
+    )
+)
+
+parser.add_argument(
+    '-d',
+    '--dry',
+    action='store_true',
+    default=False,
+    required=False,
+    help=(
+        "Use this option to produce dry runs, where the `ParticleLoad` class is deactivated, as well as the "
+        "functionality for submitting jobs to the queue automatically, i.e. overrides --submit. Use this for "
+        "testing purposes."
+    )
 )
 
 args = parser.parse_args()
@@ -69,7 +104,9 @@ try:
 except ImportError:
     try:
         if args.particle_load_library:
-            sys.path.append(args.particle_load_library)
+            sys.path.append(
+                os.path.split(args.particle_load_library)[0]
+            )
             from Generate_PL import ParticleLoad, comm_rank
         else:
             raise Exception("The --particle-load-library argument is needed to import Generate_PL.py.")
@@ -135,9 +172,11 @@ def make_particle_load_from_list() -> None:
         replace_pattern('PATH_TO_MASK', str(mask_filepath), particle_load_paramfile)
         replace_pattern('FILENAME', str(mask_name), particle_load_paramfile)
 
-        if comm_rank == 0:
-            print("ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)")
-        # ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
+        if args.dry:
+            if comm_rank == 0:
+                print(f"ParticleLoad({particle_load_paramfile}, only_calc_ntot={args.only_calc_ntot})")
+        else:
+            ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
 
         if args.submit:
             old_cwd = os.getcwd()
@@ -146,10 +185,11 @@ def make_particle_load_from_list() -> None:
                 'ic_gen_submit_files',
                 file_name
             )
-            # os.chdir(ic_submit_dir)
             if comm_rank == 0:
                 print(f"Submitting IC_Gen.x at {ic_submit_dir}")
-            # subprocess.call(["sbatch", "submit.sh"])
+            if not args.dry:
+                os.chdir(ic_submit_dir)
+                subprocess.call(["sbatch", "submit.sh"])
 
             os.chdir(old_cwd)
 
