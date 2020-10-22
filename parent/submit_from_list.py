@@ -40,6 +40,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    '-o',
     '--only-calc-ntot',
     action='store_true',
     default=False,
