@@ -91,8 +91,8 @@ def get_mask_paths_list() -> List[str]:
         )[0]
         group_numbers.append(int(mask_name.split('_VR')[-1]))
 
-    print([x for _, x in sorted(zip(group_numbers, group_numbers))])
-    return lines
+    lines_sorted = [x for _, x in sorted(zip(group_numbers, lines))]
+    return lines_sorted
 
 
 def get_output_directory() -> str:
