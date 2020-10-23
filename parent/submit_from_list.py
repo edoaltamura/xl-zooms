@@ -16,10 +16,11 @@ parser = argparse.ArgumentParser(
     ),
     epilog=(
         "Example usage: "
-        "mpirun -np 28 python3 submit_from_list.py "
+        "python3 submit_from_list.py "
         "-t /cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/particle_loads/template_-8res.yml"
         "-l /cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/particle_loads/masks_list.txt "
-        "-p /cosma/home/dp004/dc-alta2/make_particle_load/particle_load/ "
+        "-p /cosma/home/dp004/dc-alta2/make_particle_load/particle_load/Generate_PL.py "
+        "-n 28 "
         "-s "
     ),
 )
@@ -38,6 +39,19 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    '-x',
+    '--template-slurm',
+    action='store',
+    required=True,
+    type=str,
+    help=(
+        "The master SLURM submission file to use as a template to generate object-specific ones. "
+        "It usually contains the hot keywords N_TASKS and RUN_NAME, which can be replaced "
+        "with object-dependent values."
+    )
+)
+
+parser.add_argument(
     '-l',
     '--listfile',
     action='store',
@@ -49,14 +63,6 @@ parser.add_argument(
         "The base-name of the masks files is used to replace the hot keywords PATH_TO_MASK and "
         "FILENAME in the template."
     )
-)
-
-parser.add_argument(
-    '-o',
-    '--only-calc-ntot',
-    action='store_true',
-    default=False,
-    required=False,
 )
 
 parser.add_argument(
@@ -76,11 +82,27 @@ parser.add_argument(
     '-p',
     '--particle-load-library',
     action='store',
-    default='.',
+    type=str,
+    default='./Generate_PL.py',
     required=False,
     help=(
         "If this script is not located in the same directory as the `Generate_PL.py` code, you can import "
         "the code as an external library by specifying the full path to the `Generate_PL.py` file."
+    )
+)
+
+parser.add_argument(
+    '-n',
+    '--ntasks',
+    action='store',
+    default=28,
+    type=int,
+    required=False,
+    help=(
+        "Number of MPI ranks to use for the generation of the particle load. NOTE: the particle load stored in "
+        "binary Fortran files is split into as many files as there are ranks. `IC_Gen.x` cannot allocate more "
+        "than 400^3 particles per MPI rank, therefore make sure to use enough MPI ranks such that each binary "
+        "file contains less that 400^3 = 64M particles."
     )
 )
 
@@ -150,65 +172,75 @@ def get_from_template(parameter: str) -> str:
 
 
 def make_particle_load_from_list() -> None:
+    out_dir = get_output_directory()
+    if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template))):
+        copyfile(
+            os.path.join(this_file_directory, args.template),
+            os.path.join(out_dir, os.path.basename(args.template))
+        )
+    if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template_slurm))):
+        copyfile(
+            os.path.join(this_file_directory, args.template_slurm),
+            os.path.join(out_dir, os.path.basename(args.template_slurm))
+        )
 
-    if comm_rank == 0:
-        out_dir = get_output_directory()
-        if not os.path.isfile(os.path.join(out_dir, os.path.basename(args.template))):
-            copyfile(
-                os.path.join(this_file_directory, args.template),
-                os.path.join(out_dir, os.path.basename(args.template))
+    for mask_filepath in get_mask_paths_list():
+
+        # Construct particle load parameter file name
+        mask_name = os.path.splitext(
+            os.path.split(mask_filepath)[-1]
+        )[0]
+
+        file_name = get_from_template('f_name').replace('FILENAME', str(mask_name))
+
+        # Edit parameter file
+        particle_load_paramfile = os.path.join(out_dir, f"{file_name}.yml")
+        copyfile(os.path.join(out_dir, os.path.basename(args.template)), particle_load_paramfile)
+        replace_pattern('PATH_TO_MASK', str(mask_filepath), particle_load_paramfile)
+        replace_pattern('FILENAME', str(mask_name), particle_load_paramfile)
+
+        # Edit SLURM submission file
+        particle_load_submit = os.path.join(out_dir, f"{file_name}.slurm")
+        copyfile(os.path.join(out_dir, os.path.basename(args.template_slurm)), particle_load_submit)
+        replace_pattern('N_TASKS', str(args.ntasks), particle_load_submit)
+        replace_pattern(
+            'RUN_NAME',
+            str(get_from_template('f_name')),
+            particle_load_submit
+        )
+        replace_pattern(
+            'PL_INVOKE',
+            (
+                f'cd {os.path.split(args.particle_load_library)[0]}\n'
+                f'mpirun -np $SLURM_NTASKS python3 Generate_PL.py {particle_load_paramfile}'
+            ),
+            particle_load_submit
+        )
+        print(f"ParticleLoad({particle_load_paramfile})")
+
+        if args.submit:
+
+            # Write IC_Gen.x submission command upon PL completion
+            replace_pattern(
+                'ICGEN_SUBMIT',
+                (
+                    f"cd {os.path.join(get_from_template('ic_dir'), 'ic_gen_submit_files', file_name)}\n"
+                    "sbatch submit.sh"
+                ),
+                particle_load_submit
             )
-        mask_paths_list = get_mask_paths_list()
-    else:
-        out_dir = None
-        mask_paths_list = None
-
-    out_dir = comm.bcast(out_dir, root=0)
-    mask_paths_list = comm.bcast(mask_paths_list, root=0)
-
-    for mask_filepath in mask_paths_list:
-
-        if comm_rank == 0:
-
-            # Construct particle load parameter file name
-            mask_name = os.path.splitext(
-                os.path.split(mask_filepath)[-1]
-            )[0]
-
-            file_name = get_from_template('f_name').replace('FILENAME', str(mask_name))
-            particle_load_paramfile = os.path.join(out_dir, f"{file_name}.yml")
-            copyfile(os.path.join(out_dir, os.path.basename(args.template)), particle_load_paramfile)
-
-            replace_pattern('PATH_TO_MASK', str(mask_filepath), particle_load_paramfile)
-            replace_pattern('FILENAME', str(mask_name), particle_load_paramfile)
-
-            print(f"ParticleLoad({particle_load_paramfile}, only_calc_ntot={args.only_calc_ntot})")
-
+            print(f"Submitting IC_Gen.x at {ic_submit_dir}")
         else:
-            particle_load_paramfile = None
-            file_name = None
-
-        particle_load_paramfile = comm.bcast(particle_load_paramfile, root=0)
-        file_name = comm.bcast(file_name, root=0)
+            replace_pattern(
+                'ICGEN_SUBMIT',
+                '',
+                particle_load_submit
+            )
 
         if not args.dry:
             old_cwd = os.getcwd()
-            os.chdir(os.path.split(args.particle_load_library)[0])
-            ParticleLoad(particle_load_paramfile, only_calc_ntot=args.only_calc_ntot)
-            os.chdir(old_cwd)
-
-        if args.submit and comm_rank == 0:
-            old_cwd = os.getcwd()
-            ic_submit_dir = os.path.join(
-                get_from_template('ic_dir'),
-                'ic_gen_submit_files',
-                file_name
-            )
-            print(f"Submitting IC_Gen.x at {ic_submit_dir}")
-            if not args.dry:
-                os.chdir(ic_submit_dir)
-                subprocess.call(["sbatch", "submit.sh"])
-
+            os.chdir(out_dir)
+            subprocess.call(["sbatch", f"{particle_load_submit}"])
             os.chdir(old_cwd)
 
 
