@@ -133,6 +133,13 @@ else:
         raise Exception("Make sure you have added the `Generate_PL.py` module directory to your $PYTHONPATH.")
 
 
+def print_parser_args() -> None:
+    print(f"{' PARSER ARGS ':-^60}")
+    for arg in vars(args):
+        print(arg, getattr(args, arg))
+    print(f"\n{' FILES ':-^60}")
+
+
 def get_mask_paths_list() -> List[str]:
     with open(args.listfile) as f:
         lines = f.read().splitlines()
@@ -216,23 +223,12 @@ def make_particle_load_from_list() -> None:
         print(f"ParticleLoad({particle_load_paramfile})")
 
         if args.submit:
-
             # Write IC_Gen.x submission command upon PL completion
-            replace_pattern(
-                'ICGEN_SUBMIT',
-                (
-                    f"cd {os.path.join(get_from_template('ic_dir'), 'ic_gen_submit_files', file_name)}\n"
-                    "sbatch submit.sh"
-                ),
-                particle_load_submit
-            )
+            ic_submit_dir = os.path.join(get_from_template('ic_dir'), 'ic_gen_submit_files', file_name)
+            replace_pattern('ICGEN_SUBMIT', f"cd {ic_submit_dir}\nsbatch submit.sh", particle_load_submit)
             print(f"Submitting IC_Gen.x at {ic_submit_dir}")
         else:
-            replace_pattern(
-                'ICGEN_SUBMIT',
-                '',
-                particle_load_submit
-            )
+            replace_pattern('ICGEN_SUBMIT', '', particle_load_submit)
 
         if not args.dry:
             old_cwd = os.getcwd()
@@ -242,4 +238,5 @@ def make_particle_load_from_list() -> None:
 
 
 if __name__ == '__main__':
+    print_parser_args()
     make_particle_load_from_list()
