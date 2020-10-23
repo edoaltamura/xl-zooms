@@ -7,82 +7,6 @@ gzip_level = 4
 if len(sys.argv) > 3:
     gzip_level = int(sys.argv[3])
 
-# First, we need to collect some information from the master file
-main_file_name = str(sys.argv[1])[:-7]
-print("Merging snapshots files with name", main_file_name)
-master_file_name = main_file_name + ".0.hdf5"
-print("Reading master information from", master_file_name)
-master_file = h5.File(master_file_name, "r")
-grp_header = master_file["/Header"]
-
-num_files = grp_header.attrs["NumFilesPerSnapshot"]
-tot_num_parts = grp_header.attrs["NumPart_Total"]
-tot_num_parts_high_word = grp_header.attrs["NumPart_Total_HighWord"]
-entropy_flag = grp_header.attrs["Flag_Entropy_ICs"]
-box_size = grp_header.attrs["BoxSize"]
-time = grp_header.attrs["Time"]
-LPT_Scaling_Factor = grp_header.attrs['2LPT_Scaling_Factor']
-ExpansionFactor = grp_header.attrs['ExpansionFactor']
-Flag_DoublePrecision = grp_header.attrs['Flag_DoublePrecision']
-HubbleParam = grp_header.attrs['HubbleParam']
-Omega0 = grp_header.attrs['Omega0']
-OmegaLambda = grp_header.attrs['OmegaLambda']
-Redshift = grp_header.attrs['Redshift']
-
-# Combine the low- and high-words
-tot_num_parts = tot_num_parts.astype(np.int64)
-for i in range(6):
-    tot_num_parts[i] += (np.int64(tot_num_parts_high_word[i]) << 32)
-
-# Some basic information
-print("Reading", tot_num_parts, "particles from", num_files, "files.")
-
-# Check whether there is a mass table
-DM_mass = 0.0
-mtable = grp_header.attrs.get("MassTable")
-if mtable is not None:
-    DM_mass = grp_header.attrs["MassTable"][1]
-if DM_mass != 0.0:
-    print("DM mass set to", DM_mass, "from the header mass table.")
-else:
-    print("Reading DM mass from the particles.")
-
-# Create the empty file
-output_file_name = sys.argv[2]
-output_file = h5.File(output_file_name, "w-")
-
-# Header
-grp = output_file.create_group("/Header")
-grp.attrs["NumFilesPerSnapshot"] = 1
-grp.attrs["NumPart_Total"] = tot_num_parts
-grp.attrs["NumPart_Total_HighWord"] = [0, 0, 0, 0, 0, 0]
-grp.attrs["NumPart_ThisFile"] = tot_num_parts
-grp.attrs["MassTable"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
-grp.attrs["BoxSize"] = box_size
-grp.attrs["Flag_Entropy_ICs"] = entropy_flag
-grp.attrs["Time"] = time
-grp.attrs["2LPT_Scaling_Factor"] = LPT_Scaling_Factor
-grp.attrs["ExpansionFactor"] = ExpansionFactor
-grp.attrs["Flag_DoublePrecision"] = Flag_DoublePrecision
-grp.attrs["HubbleParam"] = HubbleParam
-grp.attrs["Omega0"] = Omega0
-grp.attrs["OmegaLambda"] = OmegaLambda
-grp.attrs["Redshift"] = Redshift
-
-# Create the particle groups
-if tot_num_parts[0] > 0:
-    grp0 = output_file.create_group("/PartType0")
-if tot_num_parts[1] > 0:
-    grp1 = output_file.create_group("/PartType1")
-if tot_num_parts[2] > 0:
-    grp2 = output_file.create_group("/PartType2")
-if tot_num_parts[3] > 0:
-    grp3 = output_file.create_group("/PartType3")
-if tot_num_parts[4] > 0:
-    grp4 = output_file.create_group("/PartType4")
-if tot_num_parts[5] > 0:
-    grp5 = output_file.create_group("/PartType5")
-
 
 # Helper function to create the datasets we need
 def create_set(grp, name, size, dim, dtype):
@@ -112,140 +36,243 @@ def create_set(grp, name, size, dim, dtype):
         )
 
 
-# Create the required datasets
-if tot_num_parts[0] > 0:
-    create_set(grp0, "Coordinates", tot_num_parts[0], 3, "d")
-    create_set(grp0, "Velocities", tot_num_parts[0], 3, "f")
-    create_set(grp0, "Masses", tot_num_parts[0], 1, "f")
-    create_set(grp0, "ParticleIDs", tot_num_parts[0], 1, "l")
-    create_set(grp0, "InternalEnergy", tot_num_parts[0], 1, "f")
-    create_set(grp0, "SmoothingLength", tot_num_parts[0], 1, "f")
-
-if tot_num_parts[1] > 0:
-    create_set(grp1, "Coordinates", tot_num_parts[1], 3, "d")
-    create_set(grp1, "Velocities", tot_num_parts[1], 3, "f")
-    create_set(grp1, "Masses", tot_num_parts[1], 1, "f")
-    create_set(grp1, "ParticleIDs", tot_num_parts[1], 1, "l")
-
-if tot_num_parts[2] > 0:
-    create_set(grp2, "Coordinates", tot_num_parts[2], 3, "d")
-    create_set(grp2, "Velocities", tot_num_parts[2], 3, "f")
-    create_set(grp2, "Masses", tot_num_parts[2], 1, "f")
-    create_set(grp2, "ParticleIDs", tot_num_parts[2], 1, "l")
-
-if tot_num_parts[3] > 0:
-    create_set(grp3, "Coordinates", tot_num_parts[3], 3, "d")
-    create_set(grp3, "Velocities", tot_num_parts[3], 3, "f")
-    create_set(grp3, "Masses", tot_num_parts[3], 1, "f")
-    create_set(grp3, "ParticleIDs", tot_num_parts[3], 1, "l")
-
-if tot_num_parts[4] > 0:
-    create_set(grp4, "Coordinates", tot_num_parts[4], 3, "d")
-    create_set(grp4, "Velocities", tot_num_parts[4], 3, "f")
-    create_set(grp4, "Masses", tot_num_parts[4], 1, "f")
-    create_set(grp4, "ParticleIDs", tot_num_parts[4], 1, "l")
-
-if tot_num_parts[5] > 0:
-    create_set(grp5, "Coordinates", tot_num_parts[5], 3, "d")
-    create_set(grp5, "Velocities", tot_num_parts[5], 3, "f")
-    create_set(grp5, "Masses", tot_num_parts[5], 1, "f")
-    create_set(grp5, "ParticleIDs", tot_num_parts[5], 1, "l")
-
-# Heavy-lifting ahead. Leave a last message.
-print("Datasets created in output file")
-
-# Special case of the non-zero mass table
-if DM_mass != 0.0:
-    masses = np.ones(tot_num_parts[1], dtype=np.float) * DM_mass
-    grp1["Masses"][:] = masses
-
-# Cumulative number of particles read/written
-cumul_parts = [0, 0, 0, 0, 0, 0]
-
-# Loop over all the files that are part of the snapshots
-for f in range(num_files):
-
-    file_name = main_file_name + "." + str(f) + ".hdf5"
-    file = h5.File(file_name, "r")
-    file_header = file["/Header"]
-    num_parts = file_header.attrs["NumPart_ThisFile"]
-
-    print(
-        "Copying data from file",
-        f,
-        "/",
-        num_files,
-        ": num_parts = [",
-        num_parts[0],
-        num_parts[1],
-        num_parts[2],
-        num_parts[3],
-        num_parts[4],
-        num_parts[5],
-        "]",
-    )
-    sys.stdout.flush()
+# Helper function to copy data
+def copy_grp(name_new, name_old, ptype):
+    full_name_new = "/PartType" + str(ptype) + "/" + name_new
+    full_name_old = "/PartType" + str(ptype) + "/" + name_old
+    if full_name_old in file:
+        output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = file[full_name_old]
 
 
-    # Helper function to copy data
-    def copy_grp(name_new, name_old, ptype):
-        full_name_new = "/PartType" + str(ptype) + "/" + name_new
-        full_name_old = "/PartType" + str(ptype) + "/" + name_old
-        if full_name_old in file:
-            output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = file[full_name_old]
+def copy_grp_same_name(name, ptype):
+    copy_grp(name, name, ptype)
 
 
-    def copy_grp_same_name(name, ptype):
-        copy_grp(name, name, ptype)
+def combine_ics(first_ic_file: str, output_ic_file: str) -> None:
+    # First, we need to collect some information from the master file
+    main_file_name = str(first_ic_file)[:-7]
+    print("Merging snapshots files with name", main_file_name)
+    master_file_name = main_file_name + ".0.hdf5"
+    print("Reading master information from", master_file_name)
+    master_file = h5.File(master_file_name, "r")
+    grp_header = master_file["/Header"]
+
+    num_files = grp_header.attrs["NumFilesPerSnapshot"]
+    tot_num_parts = grp_header.attrs["NumPart_Total"]
+    tot_num_parts_high_word = grp_header.attrs["NumPart_Total_HighWord"]
+    entropy_flag = grp_header.attrs["Flag_Entropy_ICs"]
+    box_size = grp_header.attrs["BoxSize"]
+    time = grp_header.attrs["Time"]
+    LPT_Scaling_Factor = grp_header.attrs['2LPT_Scaling_Factor']
+    ExpansionFactor = grp_header.attrs['ExpansionFactor']
+    Flag_DoublePrecision = grp_header.attrs['Flag_DoublePrecision']
+    HubbleParam = grp_header.attrs['HubbleParam']
+    Omega0 = grp_header.attrs['Omega0']
+    OmegaLambda = grp_header.attrs['OmegaLambda']
+    Redshift = grp_header.attrs['Redshift']
+
+    # Combine the low- and high-words
+    tot_num_parts = tot_num_parts.astype(np.int64)
+    for i in range(6):
+        tot_num_parts[i] += (np.int64(tot_num_parts_high_word[i]) << 32)
+
+    # Some basic information
+    print("Reading", tot_num_parts, "particles from", num_files, "files.")
+
+    # Check whether there is a mass table
+    mtable = grp_header.attrs.get("MassTable")
+
+    DM_mass = 0.0
+    DM_mass_bkgr = 0.0
+    DM_mass_bkgr_2 = 0.0
+
+    if mtable is not None:
+        DM_mass = grp_header.attrs["MassTable"][1]
+        DM_mass_bkgr = grp_header.attrs["MassTable"][2]
+        DM_mass_bkgr_2 = grp_header.attrs["MassTable"][3]
+
+    if DM_mass != 0.0:
+        print("DM mass set to", DM_mass, "from the header mass table.")
+    else:
+        print("Reading DM mass from the particles.")
+
+    if DM_mass_bkgr != 0.0:
+        print("Background DM mass set to", DM_mass_bkgr, "from the header mass table.")
+    else:
+        print("Reading bckground DM mass from the particles.")
+
+    if DM_mass_bkgr_2 != 0.0:
+        print("Background(2) DM mass set to", DM_mass_bkgr_2, "from the header mass table.")
+    else:
+        print("Reading bckground(2) DM mass from the particles.")
+
+    # Create the empty file
+    output_file_name = output_ic_file
+    output_file = h5.File(output_file_name, "w-")
+
+    # Header
+    grp = output_file.create_group("/Header")
+    grp.attrs["NumFilesPerSnapshot"] = 1
+    grp.attrs["NumPart_Total"] = tot_num_parts
+    grp.attrs["NumPart_Total_HighWord"] = [0, 0, 0, 0, 0, 0]
+    grp.attrs["NumPart_ThisFile"] = tot_num_parts
+    grp.attrs["MassTable"] = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    grp.attrs["BoxSize"] = box_size
+    grp.attrs["Flag_Entropy_ICs"] = entropy_flag
+    grp.attrs["Time"] = time
+    grp.attrs["2LPT_Scaling_Factor"] = LPT_Scaling_Factor
+    grp.attrs["ExpansionFactor"] = ExpansionFactor
+    grp.attrs["Flag_DoublePrecision"] = Flag_DoublePrecision
+    grp.attrs["HubbleParam"] = HubbleParam
+    grp.attrs["Omega0"] = Omega0
+    grp.attrs["OmegaLambda"] = OmegaLambda
+    grp.attrs["Redshift"] = Redshift
+
+    # Create the particle groups
+    if tot_num_parts[0] > 0:
+        grp0 = output_file.create_group("/PartType0")
+    if tot_num_parts[1] > 0:
+        grp1 = output_file.create_group("/PartType1")
+    if tot_num_parts[2] > 0:
+        grp2 = output_file.create_group("/PartType2")
+    if tot_num_parts[3] > 0:
+        grp3 = output_file.create_group("/PartType3")
+    if tot_num_parts[4] > 0:
+        grp4 = output_file.create_group("/PartType4")
+    if tot_num_parts[5] > 0:
+        grp5 = output_file.create_group("/PartType5")
+
+    # Create the required datasets
+    if tot_num_parts[0] > 0:
+        create_set(grp0, "Coordinates", tot_num_parts[0], 3, "d")
+        create_set(grp0, "Velocities", tot_num_parts[0], 3, "f")
+        create_set(grp0, "Masses", tot_num_parts[0], 1, "f")
+        create_set(grp0, "ParticleIDs", tot_num_parts[0], 1, "l")
+        create_set(grp0, "InternalEnergy", tot_num_parts[0], 1, "f")
+        create_set(grp0, "SmoothingLength", tot_num_parts[0], 1, "f")
+
+    if tot_num_parts[1] > 0:
+        create_set(grp1, "Coordinates", tot_num_parts[1], 3, "d")
+        create_set(grp1, "Velocities", tot_num_parts[1], 3, "f")
+        create_set(grp1, "Masses", tot_num_parts[1], 1, "f")
+        create_set(grp1, "ParticleIDs", tot_num_parts[1], 1, "l")
+
+    if tot_num_parts[2] > 0:
+        create_set(grp2, "Coordinates", tot_num_parts[2], 3, "d")
+        create_set(grp2, "Velocities", tot_num_parts[2], 3, "f")
+        create_set(grp2, "Masses", tot_num_parts[2], 1, "f")
+        create_set(grp2, "ParticleIDs", tot_num_parts[2], 1, "l")
+
+    if tot_num_parts[3] > 0:
+        create_set(grp3, "Coordinates", tot_num_parts[3], 3, "d")
+        create_set(grp3, "Velocities", tot_num_parts[3], 3, "f")
+        create_set(grp3, "Masses", tot_num_parts[3], 1, "f")
+        create_set(grp3, "ParticleIDs", tot_num_parts[3], 1, "l")
+
+    if tot_num_parts[4] > 0:
+        create_set(grp4, "Coordinates", tot_num_parts[4], 3, "d")
+        create_set(grp4, "Velocities", tot_num_parts[4], 3, "f")
+        create_set(grp4, "Masses", tot_num_parts[4], 1, "f")
+        create_set(grp4, "ParticleIDs", tot_num_parts[4], 1, "l")
+
+    if tot_num_parts[5] > 0:
+        create_set(grp5, "Coordinates", tot_num_parts[5], 3, "d")
+        create_set(grp5, "Velocities", tot_num_parts[5], 3, "f")
+        create_set(grp5, "Masses", tot_num_parts[5], 1, "f")
+        create_set(grp5, "ParticleIDs", tot_num_parts[5], 1, "l")
+
+    # Heavy-lifting ahead. Leave a last message.
+    print("Datasets created in output file")
+
+    # Special case of the non-zero mass table
+    if DM_mass != 0.0:
+        masses = np.ones(tot_num_parts[1], dtype=np.float) * DM_mass
+        grp1["Masses"][:] = masses
+    if DM_mass_bkgr != 0.0:
+        masses = np.ones(tot_num_parts[2], dtype=np.float) * DM_mass_bkgr
+        grp2["Masses"][:] = masses
+    if DM_mass_bkgr_2 != 0.0:
+        masses = np.ones(tot_num_parts[3], dtype=np.float) * DM_mass_bkgr_2
+        grp3["Masses"][:] = masses
+
+    # Cumulative number of particles read/written
+    cumul_parts = [0, 0, 0, 0, 0, 0]
+
+    # Loop over all the files that are part of the snapshots
+    for f in range(num_files):
+
+        file_name = main_file_name + "." + str(f) + ".hdf5"
+        file = h5.File(file_name, "r")
+        file_header = file["/Header"]
+        num_parts = file_header.attrs["NumPart_ThisFile"]
+
+        print(
+            "Copying data from file",
+            (f + 1),
+            "/",
+            num_files,
+            ": num_parts = [",
+            num_parts[0],
+            num_parts[1],
+            num_parts[2],
+            num_parts[3],
+            num_parts[4],
+            num_parts[5],
+            "]",
+        )
+        sys.stdout.flush()
+
+        if num_parts[0] > 0:
+            copy_grp_same_name("Coordinates", 0)
+            copy_grp_same_name("Velocities", 0)
+            copy_grp_same_name("Masses", 0)
+            copy_grp_same_name("ParticleIDs", 0)
+            copy_grp_same_name("InternalEnergy", 0)
+            copy_grp_same_name("SmoothingLength", 0)
+
+        if num_parts[1] > 0:
+            copy_grp_same_name("Coordinates", 1)
+            copy_grp_same_name("Velocities", 1)
+            copy_grp_same_name("ParticleIDs", 1)
+            if DM_mass == 0.0:  # Do not overwrite values if there was a mass table
+                copy_grp_same_name("Masses", 1)
+
+        if num_parts[2] > 0:
+            copy_grp_same_name("Coordinates", 2)
+            copy_grp_same_name("Velocities", 2)
+            copy_grp_same_name("ParticleIDs", 2)
+            if DM_mass_bkgr == 0.0:  # Do not overwrite values if there was a mass table
+                copy_grp_same_name("Masses", 2)
+
+        if num_parts[3] > 0:
+            copy_grp_same_name("Coordinates", 3)
+            copy_grp_same_name("Velocities", 3)
+            copy_grp_same_name("ParticleIDs", 3)
+            if DM_mass_bkgr_2 == 0.0:  # Do not overwrite values if there was a mass table
+                copy_grp_same_name("Masses", 3)
+
+        if num_parts[4] > 0:
+            copy_grp_same_name("Coordinates", 4)
+            copy_grp_same_name("Velocities", 4)
+            copy_grp_same_name("Masses", 4)
+            copy_grp_same_name("ParticleIDs", 4)
+
+        if num_parts[5] > 0:
+            copy_grp_same_name("Coordinates", 5)
+            copy_grp_same_name("Velocities", 5)
+            copy_grp_same_name("Masses", 5)
+            copy_grp_same_name("ParticleIDs", 5)
+
+        cumul_parts[0] += num_parts[0]
+        cumul_parts[1] += num_parts[1]
+        cumul_parts[2] += num_parts[2]
+        cumul_parts[3] += num_parts[3]
+        cumul_parts[4] += num_parts[4]
+        cumul_parts[5] += num_parts[5]
+        file.close()
+
+    print("All done! SWIFT is waiting.")
 
 
-    if num_parts[0] > 0:
-        copy_grp_same_name("Coordinates", 0)
-        copy_grp_same_name("Velocities", 0)
-        copy_grp_same_name("Masses", 0)
-        copy_grp_same_name("ParticleIDs", 0)
-        copy_grp_same_name("InternalEnergy", 0)
-        copy_grp_same_name("SmoothingLength", 0)
-
-    if num_parts[1] > 0:
-        copy_grp_same_name("Coordinates", 1)
-        copy_grp_same_name("Velocities", 1)
-        copy_grp_same_name("ParticleIDs", 1)
-        if DM_mass == 0.0:  # Do not overwrite values if there was a mass table
-            copy_grp_same_name("Masses", 1)
-
-    if num_parts[2] > 0:
-        copy_grp_same_name("Coordinates", 2)
-        copy_grp_same_name("Velocities", 2)
-        copy_grp_same_name("ParticleIDs", 2)
-        if DM_mass == 0.0:  # Do not overwrite values if there was a mass table
-            copy_grp_same_name("Masses", 2)
-
-    if num_parts[3] > 0:
-        copy_grp_same_name("Coordinates", 3)
-        copy_grp_same_name("Velocities", 3)
-        copy_grp_same_name("ParticleIDs", 3)
-        if DM_mass == 0.0:  # Do not overwrite values if there was a mass table
-            copy_grp_same_name("Masses", 3)
-
-    if num_parts[4] > 0:
-        copy_grp_same_name("Coordinates", 4)
-        copy_grp_same_name("Velocities", 4)
-        copy_grp_same_name("Masses", 4)
-        copy_grp_same_name("ParticleIDs", 4)
-
-    if num_parts[5] > 0:
-        copy_grp_same_name("Coordinates", 5)
-        copy_grp_same_name("Velocities", 5)
-        copy_grp_same_name("Masses", 5)
-        copy_grp_same_name("ParticleIDs", 5)
-
-    cumul_parts[0] += num_parts[0]
-    cumul_parts[1] += num_parts[1]
-    cumul_parts[2] += num_parts[2]
-    cumul_parts[3] += num_parts[3]
-    cumul_parts[4] += num_parts[4]
-    cumul_parts[5] += num_parts[5]
-    file.close()
-
-print("All done! SWIFT is waiting.")
+if __name__ == '__main__':
+    combine_ics(sys.argv[1], sys.argv[2])
