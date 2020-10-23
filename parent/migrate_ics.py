@@ -106,6 +106,7 @@ for run in runs:
             assert isfile(join(ic_gen_dir, run, "ICs", run + ".0.hdf5")), \
                 f"Run {run} does not have output files in the IC_Gen directory."
 
+            print(f"Combining initial conditions: {run + '.x.hdf5'} >> {run + '.hdf5'}")
             combine(
                 join(ic_gen_dir, run, "ICs", run + ".0.hdf5"),
                 join(swift_runs, run, "ICs", run + ".hdf5")
@@ -117,6 +118,7 @@ for run in runs:
         # Handle the SWIFT parameter file
         assert isfile(join(swift_runs, run, "params.yml")), f"No SWIFT parameter file found for run {run}."
 
+        print(f"Adapting SWIFT parameter file for {run}")
         param_file = load_yaml(join(swift_runs, run, "params.yml"))
 
         new_param_file = create_new_parameter_file(
@@ -140,5 +142,6 @@ for run in runs:
 
         old_cwd = getcwd()
         chdir(join(swift_runs, run))
+        print(f"Submit job to queue: {run}")
         # subprocess.call(["sbatch", "submit"])
         chdir(old_cwd)
