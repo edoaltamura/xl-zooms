@@ -94,49 +94,51 @@ snap_outputs = ["# Redshift", "18.08", "15.28", "13.06", "11.26", "9.79", "8.57"
 
 for run in runs:
 
-    assert isdir(join(ic_gen_dir, run)), f"Run {run} not found in the IC_Gen directory."
-    assert isdir(join(swift_runs, run)), f"Run {run} not found in the SWIFT directory."
+    if "-8" in run:
 
-    if not isdir(join(swift_runs, run, "ics")):
-        mkdir(join(swift_runs, run, "ics"))
+        assert isdir(join(ic_gen_dir, run)), f"Run {run} not found in the IC_Gen directory."
+        assert isdir(join(swift_runs, run)), f"Run {run} not found in the SWIFT directory."
 
-    if not isfile(join(swift_runs, run, "ics", run + ".hdf5")):
-        assert isfile(join(ic_gen_dir, run, "ICs", run + ".0.hdf5")), \
-            f"Run {run} does not have output files in the IC_Gen directory."
+        if not isdir(join(swift_runs, run, "ics")):
+            mkdir(join(swift_runs, run, "ics"))
 
-        combine(
-            join(ic_gen_dir, run, "ICs", run + ".0.hdf5"),
-            join(swift_runs, run, "ICs", run + ".hdf5")
+        if not isfile(join(swift_runs, run, "ics", run + ".hdf5")):
+            assert isfile(join(ic_gen_dir, run, "ICs", run + ".0.hdf5")), \
+                f"Run {run} does not have output files in the IC_Gen directory."
+
+            combine(
+                join(ic_gen_dir, run, "ICs", run + ".0.hdf5"),
+                join(swift_runs, run, "ICs", run + ".hdf5")
+            )
+
+        if not isdir(join(swift_runs, run, "config")):
+            mkdir(join(swift_runs, run, "config"))
+
+        # Handle the SWIFT parameter file
+        assert isfile(join(swift_runs, run, "params.yml")), f"No SWIFT parameter file found for run {run}."
+
+        param_file = load_yaml(join(swift_runs, run, "params.yml"))
+
+        new_param_file = create_new_parameter_file(
+            param_file,
+            "InitialConditions:file_name",
+            f"./ics/{run}.hdf5"
+        )
+        new_param_file = create_new_parameter_file(
+            new_param_file,
+            "Snapshots:output_list",
+            f"./config/snap_redshifts.txt"
         )
 
-    if not isdir(join(swift_runs, run, "config")):
-        mkdir(join(swift_runs, run, "config"))
+        write_new_parameter_file(new_param_file, join(swift_runs, run, "params.yml"))
 
-    # Handle the SWIFT parameter file
-    assert isfile(join(swift_runs, run, "params.yml")), f"No SWIFT parameter file found for run {run}."
+        # Create Snapshot:output_list file into ./config if not present
+        if not isfile(join(swift_runs, run, "config", "snap_redshifts.txt")):
+            with open(join(swift_runs, run, "config", "snap_redshifts.txt"), 'w') as f:
+                for line in snap_outputs:
+                    print(line, file=f)
 
-    param_file = load_yaml(join(swift_runs, run, "params.yml"))
-
-    new_param_file = create_new_parameter_file(
-        param_file,
-        "InitialConditions:file_name",
-        f"./ics/{run}.hdf5"
-    )
-    new_param_file = create_new_parameter_file(
-        new_param_file,
-        "Snapshots:output_list",
-        f"./config/snap_redshifts.txt"
-    )
-
-    write_new_parameter_file(new_param_file, join(swift_runs, run, "params.yml"))
-
-    # Create Snapshot:output_list file into ./config if not present
-    if not isfile(join(swift_runs, run, "config", "snap_redshifts.txt")):
-        with open(join(swift_runs, run, "config", "snap_redshifts.txt"), 'w') as f:
-            for line in snap_outputs:
-                print(line, file=f)
-
-    old_cwd = getcwd()
-    chdir(join(swift_runs, run))
-    subprocess.call(["sbatch", "submit"])
-    chdir(old_cwd)
+        old_cwd = getcwd()
+        chdir(join(swift_runs, run))
+        # subprocess.call(["sbatch", "submit"])
+        chdir(old_cwd)
