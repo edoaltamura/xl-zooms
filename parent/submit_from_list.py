@@ -122,16 +122,13 @@ parser.add_argument(
 args = parser.parse_args()
 
 try:
-    from Generate_PL import ParticleLoad, comm, comm_rank
+    import Generate_PL
 except ImportError:
+    pass
+else:
+    sys.path.append(os.path.split(args.particle_load_library)[0])
     try:
-        if args.particle_load_library:
-            sys.path.append(
-                os.path.split(args.particle_load_library)[0]
-            )
-            from Generate_PL import ParticleLoad, comm, comm_rank
-        else:
-            raise Exception("The --particle-load-library argument is needed to import Generate_PL.py.")
+        import Generate_PL
     except ImportError:
         raise Exception("Make sure you have added the `Generate_PL.py` module directory to your $PYTHONPATH.")
 
