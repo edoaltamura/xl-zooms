@@ -109,7 +109,7 @@ for run in runs:
             print(f"Combining initial conditions: {run + '.x.hdf5'} >> {run + '.hdf5'}")
             combine(
                 join(ic_gen_dir, run, "ICs", run + ".0.hdf5"),
-                join(swift_runs, run, "ICs", run + ".hdf5")
+                join(swift_runs, run, "ics", run + ".hdf5")
             )
 
         if not isdir(join(swift_runs, run, "config")):
