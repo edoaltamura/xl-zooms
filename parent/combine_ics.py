@@ -36,18 +36,6 @@ def create_set(grp, name, size, dim, dtype):
         )
 
 
-# Helper function to copy data
-def copy_grp(name_new, name_old, ptype):
-    full_name_new = "/PartType" + str(ptype) + "/" + name_new
-    full_name_old = "/PartType" + str(ptype) + "/" + name_old
-    if full_name_old in file:
-        output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = file[full_name_old]
-
-
-def copy_grp_same_name(name, ptype):
-    copy_grp(name, name, ptype)
-
-
 def combine_ics(first_ic_file: str, output_ic_file: str) -> None:
     # First, we need to collect some information from the master file
     main_file_name = str(first_ic_file)[:-7]
@@ -221,6 +209,17 @@ def combine_ics(first_ic_file: str, output_ic_file: str) -> None:
             "]",
         )
         sys.stdout.flush()
+
+        # Helper function to copy data
+        def copy_grp(name_new, name_old, ptype):
+            full_name_new = "/PartType" + str(ptype) + "/" + name_new
+            full_name_old = "/PartType" + str(ptype) + "/" + name_old
+            if full_name_old in file:
+                output_file[full_name_new][cumul_parts[ptype]: cumul_parts[ptype] + num_parts[ptype]] = file[
+                    full_name_old]
+
+        def copy_grp_same_name(name, ptype):
+            copy_grp(name, name, ptype)
 
         if num_parts[0] > 0:
             copy_grp_same_name("Coordinates", 0)
