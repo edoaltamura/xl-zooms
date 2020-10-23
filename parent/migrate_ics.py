@@ -18,8 +18,8 @@ def create_new_parameter_file(parameter_file: dict, row: str, value) -> dict:
     return new_parameter_file
 
 
-def write_new_parameter_file(parameter_file: dict, run_id: str, filename: str) -> None:
-    with open(f"{run_id}/{os.path.basename(filename)}", "w") as handle:
+def write_new_parameter_file(parameter_file: dict, filename: str) -> None:
+    with open(filename, "w") as handle:
         yaml.dump(parameter_file, handle, default_flow_style=False)
     return
 
@@ -128,7 +128,7 @@ for run in runs:
         f"./config/snap_redshifts.txt"
     )
 
-    write_new_parameter_file(new_param_file, join(swift_runs, run), "params.yml")
+    write_new_parameter_file(new_param_file, join(swift_runs, run, "params.yml"))
 
     # Create Snapshot:output_list file into ./config if not present
     if not isfile(join(swift_runs, run, "config", "snap_redshifts.txt")):
