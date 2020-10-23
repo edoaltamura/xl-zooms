@@ -1,6 +1,7 @@
 from os import mkdir, getcwd, chdir
 from os.path import isdir, isfile, join
 import subprocess
+import yaml
 
 from combine_ics import combine_ics as combine
 
