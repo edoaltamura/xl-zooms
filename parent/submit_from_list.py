@@ -207,11 +207,7 @@ def make_particle_load_from_list() -> None:
         particle_load_submit = os.path.join(out_dir, f"{file_name}.slurm")
         copyfile(os.path.join(out_dir, os.path.basename(args.template_slurm)), particle_load_submit)
         replace_pattern('N_TASKS', str(args.ntasks), particle_load_submit)
-        replace_pattern(
-            'RUN_NAME',
-            str(get_from_template('f_name')),
-            particle_load_submit
-        )
+        replace_pattern('RUN_NAME', f"{file_name}", particle_load_submit)
         replace_pattern(
             'PL_INVOKE',
             (
