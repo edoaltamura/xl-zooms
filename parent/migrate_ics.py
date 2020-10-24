@@ -94,7 +94,7 @@ snap_outputs = ["# Redshift", "18.08", "15.28", "13.06", "11.26", "9.79", "8.57"
 
 for run in runs:
 
-    if "-8" in run:
+    if "+1" in run and "VR93_" not in run:
 
         assert isdir(join(ic_gen_dir, run)), f"Run {run} not found in the IC_Gen directory."
         assert isdir(join(swift_runs, run)), f"Run {run} not found in the SWIFT directory."
