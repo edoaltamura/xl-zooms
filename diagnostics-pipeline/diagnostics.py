@@ -19,11 +19,11 @@ velociraptor_properties_parent = (
 )
 
 snap_filepath_zoom = [
-    "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
+    f"/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name}/snapshots/{run_name}_0199.hdf5"
 ]
 
 velociraptor_properties_zoom = [
-    "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
+    f"/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name}/properties"
 ]
 
 out_to_radius = (5, 'R200c')
