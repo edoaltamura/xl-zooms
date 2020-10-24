@@ -143,5 +143,5 @@ for run in runs:
         old_cwd = getcwd()
         chdir(join(swift_runs, run))
         print(f"Submit job to queue: {run}")
-        subprocess.call(["sbatch", "submit"])
+        # subprocess.call(["sbatch", "submit"])
         chdir(old_cwd)
