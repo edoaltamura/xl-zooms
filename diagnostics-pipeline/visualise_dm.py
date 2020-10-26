@@ -37,19 +37,6 @@ def wrap(dx, box):
 
 def dm_render(swio_data, region: list = None, resolution: int = 1024):
 
-    swio_data.dark_matter.coordinates[:, 0] = wrap(
-        swio_data.dark_matter.coordinates[:, 0] - xCen,
-        swio_data.metadata.boxsize[0]
-    )
-    swio_data.dark_matter.coordinates[:, 1] = wrap(
-        swio_data.dark_matter.coordinates[:, 1] - xCen,
-        swio_data.metadata.boxsize[1]
-    )
-    swio_data.dark_matter.coordinates[:, 2] = wrap(
-        swio_data.dark_matter.coordinates[:, 2] - xCen,
-        swio_data.metadata.boxsize[2]
-    )
-
     # Generate smoothing lengths for the dark matter
     swio_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
         swio_data.dark_matter.coordinates,
@@ -125,6 +112,18 @@ def dm_map_parent(
     ]
     mask.constrain_spatial(region)
     data = sw.load(snap_filepath_parent, mask=mask)
+    data.dark_matter.coordinates[:, 0] = wrap(
+        data.dark_matter.coordinates[:, 0] - xCen,
+        data.metadata.boxsize[0]
+    )
+    data.dark_matter.coordinates[:, 1] = wrap(
+        data.dark_matter.coordinates[:, 1] - xCen,
+        data.metadata.boxsize[1]
+    )
+    data.dark_matter.coordinates[:, 2] = wrap(
+        data.dark_matter.coordinates[:, 2] - xCen,
+        data.metadata.boxsize[2]
+    )
     dm_mass = dm_render(data, region=(region[0] + region[1]), resolution=resolution)
 
     # Make figure
@@ -222,6 +221,18 @@ def dm_map_zoom(
     ]
     mask.constrain_spatial(region)
     data = sw.load(snap_filepath_zoom, mask=mask)
+    data.dark_matter.coordinates[:, 0] = wrap(
+        data.dark_matter.coordinates[:, 0] - xCen,
+        data.metadata.boxsize[0]
+    )
+    data.dark_matter.coordinates[:, 1] = wrap(
+        data.dark_matter.coordinates[:, 1] - xCen,
+        data.metadata.boxsize[1]
+    )
+    data.dark_matter.coordinates[:, 2] = wrap(
+        data.dark_matter.coordinates[:, 2] - xCen,
+        data.metadata.boxsize[2]
+    )
     dm_mass = dm_render(data, region=(region[0] + region[1]), resolution=resolution)
 
     # Make figure
