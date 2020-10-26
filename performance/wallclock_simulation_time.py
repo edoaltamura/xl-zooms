@@ -8,6 +8,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 from swiftsimio import load
 from glob import glob
+import os
+
 
 try:
     plt.style.use("../mnras.mplstyle")

@@ -2,6 +2,7 @@
 Plots wallclock v.s. simulation time.
 """
 import unyt
+import os
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
