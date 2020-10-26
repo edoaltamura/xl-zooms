@@ -27,6 +27,15 @@ cmap_name = 'BuPu_r'
 resolution = 2048
 
 
+def wrap(dx, box):
+    result = dx
+    index = np.where(dx > (0.5 * box))[0]
+    result[index] -= box
+    index = np.where(dx < (-0.5 * box))[0]
+    result[index] += box
+    return result
+
+
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
     if "e" in float_str:
@@ -93,8 +102,8 @@ def cumulative_mass_compare_plot(
     assert output_directory
 
     fig, (ax, ax_residual) = plt.subplots(
-        nrows=2, 
-        ncols=1, 
+        nrows=2,
+        ncols=1,
         figsize=(7, 8),
         dpi=resolution // 8,
         sharex=True,
@@ -103,10 +112,8 @@ def cumulative_mass_compare_plot(
 
     # PARENT #
     if snap_filepath_parent:
-
         # Rendezvous over parent VR catalogue using zoom information
         with h5py.File(velociraptor_properties_zoom[0], 'r') as vr_file:
-
             idx, M200c, R200c, Xcminpot, Ycminpot, Zcminpot = find_object(
                 vr_properties_catalog=velociraptor_properties_parent,
                 sample_mass_lower_lim=vr_file['/Mass_200crit'][0] * 1e10 * 0.9,
@@ -134,6 +141,9 @@ def cumulative_mass_compare_plot(
 
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
         posDM = data.dark_matter.coordinates / data.metadata.a
+        posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
+        posDM[:, 1] = wrap(posDM[:, 1] - xCen, data.metadata.boxsize[1])
+        posDM[:, 2] = wrap(posDM[:, 2] - xCen, data.metadata.boxsize[2])
         r = np.sqrt(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
@@ -174,11 +184,11 @@ def cumulative_mass_compare_plot(
         ax.axvline(conv_radius, color='grey', linestyle='--')
         ax_residual.axvline(conv_radius, color='grey', linestyle='--')
         t = ax.text(
-            conv_radius, 
-            ax.get_ylim()[1], 
-            'Convergence radius', 
-            ha='center', 
-            va='top', 
+            conv_radius,
+            ax.get_ylim()[1],
+            'Convergence radius',
+            ha='center',
+            va='top',
             rotation='vertical',
             alpha=0.6
         )
@@ -220,6 +230,9 @@ def cumulative_mass_compare_plot(
 
             # Get DM particle coordinates and compute radial distance from CoP in R200 units
             posDM = data.dark_matter.coordinates / data.metadata.a
+            posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
+            posDM[:, 1] = wrap(posDM[:, 1] - xCen, data.metadata.boxsize[1])
+            posDM[:, 2] = wrap(posDM[:, 2] - xCen, data.metadata.boxsize[2])
             r = np.sqrt(
                 (posDM[:, 0] - xCen) ** 2 +
                 (posDM[:, 1] - yCen) ** 2 +
@@ -255,11 +268,11 @@ def cumulative_mass_compare_plot(
             conv_radius = convergence_radius(r, particleMasses, rho_crit) / R200c
             ax.axvline(conv_radius, color=color, linestyle='--')
             t = ax.text(
-                conv_radius, 
-                ax.get_ylim()[1], 
-                'Convergence radius', 
-                ha='center', 
-                va='top', 
+                conv_radius,
+                ax.get_ylim()[1],
+                'Convergence radius',
+                ha='center',
+                va='top',
                 rotation='vertical',
                 alpha=0.5
             )

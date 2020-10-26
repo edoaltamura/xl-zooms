@@ -24,9 +24,32 @@ def latex_float(f):
         return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
     else:
         return float_str
+    
+
+def wrap(dx, box):
+    result = dx
+    index = np.where(dx > (0.5 * box))[0]
+    result[index] -= box
+    index = np.where(dx < (-0.5 * box))[0]
+    result[index] += box
+    return result
 
 
 def dm_render(swio_data, region: list = None, resolution: int = 1024):
+
+    swio_data.dark_matter.coordinates[:, 0] = wrap(
+        swio_data.dark_matter.coordinates[:, 0] - xCen,
+        swio_data.metadata.boxsize[0]
+    )
+    swio_data.dark_matter.coordinates[:, 1] = wrap(
+        swio_data.dark_matter.coordinates[:, 1] - xCen,
+        swio_data.metadata.boxsize[1]
+    )
+    swio_data.dark_matter.coordinates[:, 2] = wrap(
+        swio_data.dark_matter.coordinates[:, 2] - xCen,
+        swio_data.metadata.boxsize[2]
+    )
+
     # Generate smoothing lengths for the dark matter
     swio_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
         swio_data.dark_matter.coordinates,

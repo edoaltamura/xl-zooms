@@ -36,6 +36,15 @@ def latex_float(f):
         return float_str
 
 
+def wrap(dx, box):
+    result = dx
+    index = np.where(dx > (0.5 * box))[0]
+    result[index] -= box
+    index = np.where(dx < (-0.5 * box))[0]
+    result[index] += box
+    return result
+
+
 def density_profile_compare_plot(
         run_name: str,
         snap_filepath_parent: str = None,
@@ -134,6 +143,9 @@ def density_profile_compare_plot(
 
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
         posDM = data.dark_matter.coordinates / data.metadata.a
+        posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
+        posDM[:, 1] = wrap(posDM[:, 1] - xCen, data.metadata.boxsize[1])
+        posDM[:, 2] = wrap(posDM[:, 2] - xCen, data.metadata.boxsize[2])
         r = np.sqrt(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
@@ -223,6 +235,9 @@ def density_profile_compare_plot(
 
             # Get DM particle coordinates and compute radial distance from CoP in R200 units
             posDM = data.dark_matter.coordinates / data.metadata.a
+            posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
+            posDM[:, 1] = wrap(posDM[:, 1] - xCen, data.metadata.boxsize[1])
+            posDM[:, 2] = wrap(posDM[:, 2] - xCen, data.metadata.boxsize[2])
             r = np.sqrt(
                 (posDM[:, 0] - xCen) ** 2 +
                 (posDM[:, 1] - yCen) ** 2 +
