@@ -25,7 +25,7 @@ def dmo_diagnostics(run_name: str) -> None:
     ]
 
     velociraptor_properties_zoom = [
-        f"/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name}/properties"
+        f"/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name}/stf/{run_name}_0036/{run_name}_0036.properties"
     ]
 
     out_to_radius = (5, 'R200c')
@@ -96,6 +96,32 @@ def dmo_diagnostics(run_name: str) -> None:
             out_to_radius=out_to_radius,
             highres_radius=highres_radius,
             output_directory=output_directory,
+        )
+
+        os.system(
+            f"""python3 ../performance/number_of_steps_simulation_time.py \
+{run_name} \
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
+{zoom_snap} \
+{output_directory}
+
+python3 ../performance/particle_updates_step_cost.py \
+{run_name} \
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
+{zoom_snap} \
+{output_directory}
+
+python3 ../performance/wallclock_number_of_steps.py \
+{run_name} \
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
+{zoom_snap} \
+{output_directory}
+
+python3 ../performance/wallclock_simulation_time.py \
+{run_name} \
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
+{zoom_snap} \
+{output_directory}"""
         )
 
 
