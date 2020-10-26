@@ -37,15 +37,6 @@ def wrap(dx, box):
 
 def dm_render(swio_data, region: list = None, resolution: int = 1024):
 
-    # Generate smoothing lengths for the dark matter
-    swio_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
-        swio_data.dark_matter.coordinates,
-        swio_data.metadata.boxsize,
-        kernel_gamma=1.8,
-        neighbours=57,
-        speedup_fac=2,
-        dimension=3,
-    )
     # Project the dark matter mass
     dm_map = project_pixel_grid(
         # Note here that we pass in the dark matter dataset not the whole
@@ -112,6 +103,17 @@ def dm_map_parent(
     ]
     mask.constrain_spatial(region)
     data = sw.load(snap_filepath_parent, mask=mask)
+
+    # Generate smoothing lengths for the dark matter
+    data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
+        data.dark_matter.coordinates,
+        data.metadata.boxsize,
+        kernel_gamma=1.8,
+        neighbours=57,
+        speedup_fac=2,
+        dimension=3,
+    )
+
     data.dark_matter.coordinates[:, 0] = wrap(
         data.dark_matter.coordinates[:, 0] - xCen,
         data.metadata.boxsize[0]
@@ -221,6 +223,17 @@ def dm_map_zoom(
     ]
     mask.constrain_spatial(region)
     data = sw.load(snap_filepath_zoom, mask=mask)
+
+    # Generate smoothing lengths for the dark matter
+    data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
+        data.dark_matter.coordinates,
+        data.metadata.boxsize,
+        kernel_gamma=1.8,
+        neighbours=57,
+        speedup_fac=2,
+        dimension=3,
+    )
+
     data.dark_matter.coordinates[:, 0] = wrap(
         data.dark_matter.coordinates[:, 0] - xCen,
         data.metadata.boxsize[0]
