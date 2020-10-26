@@ -1,3 +1,43 @@
+#!/usr/bin/env python
+"""
+Usage:
+    combine_ics.py input_file.0.hdf5 merged_file.hdf5 gzip_level
+
+This file combines Gadget-2 type 2 (i.e. hdf5) initial condition files
+into a single file that can be digested by SWIFT.
+This has mainly be tested for DM-only (parttype1) files but also works
+smoothly for ICs including gas. The special case of a mass-table for
+the DM particles is handled. No unit conversions are applied nor are
+any scale-factors or h-factors changed.
+The script applies some compression and checksum filters to the output
+to save disk space.
+(Edo Altamura): The script has been updated to work for all partTypes,
+including zoom-in initial conditions and hydro.
+The last argument `gzip_level` is used to specify the level of compression
+to apply to all the fields in the file. Use 0 to cancel all coompression.
+The default value is `4`.
+
+This file is part of SWIFT.
+Copyright (C) 2016 Matthieu Schaller (matthieu.schaller@durham.ac.uk)
+              2020 Edo Altamura (edoardo.altamura@manchester.ac.uk)
+
+All Rights Reserved.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+"""
+
+
 import sys
 import h5py as h5
 import numpy as np
