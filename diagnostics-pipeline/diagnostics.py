@@ -1,9 +1,17 @@
 import os
+import sys
 
 from compare_density_profiles import density_profile_compare_plot
 from contamination_mass import contamination_map, contamination_radial_histogram
 from visualise_dm import dm_map_parent, dm_map_zoom
 from compare_cumulative_mass import cumulative_mass_compare_plot
+
+sys.path.append(os.path.join(os.path.dirname(__file__), os.pardir))
+
+from performance.wallclock_simulation_time import wallclock_simulation_time
+from performance.number_of_steps_simulation_time import number_of_steps_simulation_time
+from performance.particle_updates_step_cost import particle_updates_step_cost
+from performance.wallclock_number_of_steps import wallclock_number_of_steps
 
 dmo_repository = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo"
 
@@ -98,30 +106,28 @@ def dmo_diagnostics(run_name: str) -> None:
             output_directory=output_directory,
         )
 
-        os.system(
-            f"""python3 ../performance/number_of_steps_simulation_time.py \
-{run_name} \
-/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
-{zoom_snap} \
-{output_directory}
+        wallclock_simulation_time(
+            run_name=run_name,
+            snap_filepath_zoom=zoom_snap,
+            output_directory=output_directory,
+        )
 
-python3 ../performance/particle_updates_step_cost.py \
-{run_name} \
-/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
-{zoom_snap} \
-{output_directory}
+        number_of_steps_simulation_time(
+            run_name=run_name,
+            snap_filepath_zoom=zoom_snap,
+            output_directory=output_directory,
+        )
 
-python3 ../performance/wallclock_number_of_steps.py \
-{run_name} \
-/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
-{zoom_snap} \
-{output_directory}
+        particle_updates_step_cost(
+            run_name=run_name,
+            snap_filepath_zoom=zoom_snap,
+            output_directory=output_directory,
+        )
 
-python3 ../performance/wallclock_simulation_time.py \
-{run_name} \
-/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name} \
-{zoom_snap} \
-{output_directory}"""
+        wallclock_number_of_steps(
+            run_name=run_name,
+            snap_filepath_zoom=zoom_snap,
+            output_directory=output_directory,
         )
 
 
