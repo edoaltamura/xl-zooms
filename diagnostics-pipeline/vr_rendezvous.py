@@ -2,6 +2,7 @@ import numpy as np
 import h5py as h5
 from typing import Tuple
 from warnings import warn
+from functools import reduce
 
 
 def find_nearest(array: np.ndarray, value: float) -> Tuple[float, int]:
@@ -52,6 +53,7 @@ def find_object(
     finder_result['value'] = []
     finder_result['index'] = []
     finder_result['error'] = []
+    finder_result['neighbors'] = []
 
     if sample_M200c is not None:
         assert sample_M200c > sample_mass_lower_lim, (
@@ -63,6 +65,11 @@ def find_object(
         finder_result['value'].append(_M200c_tuple[0])
         finder_result['index'].append(_M200c_tuple[1])
         finder_result['error'].append(np.abs((_M200c_tuple[0] - sample_M200c) / sample_M200c))
+        finder_result['neighbors'].append(
+            np.where(
+                np.abs((M200c[index] - _M200c_tuple[0]) / _M200c_tuple[0]) < tolerance
+            )[0]
+        )
         del _M200c_tuple
     if sample_x is not None:
         _x_tuple = find_nearest(xPotMin[index], sample_x)
@@ -70,6 +77,11 @@ def find_object(
         finder_result['value'].append(_x_tuple[0])
         finder_result['index'].append(_x_tuple[1])
         finder_result['error'].append(np.abs((_x_tuple[0] - sample_x) / sample_x))
+        finder_result['neighbors'].append(
+            np.where(
+                np.abs((xPotMin[index] - _x_tuple[0]) / _x_tuple[0]) < tolerance
+            )[0]
+        )
         del _x_tuple
     if sample_y is not None:
         _y_tuple = find_nearest(yPotMin[index], sample_y)
@@ -77,6 +89,11 @@ def find_object(
         finder_result['value'].append(_y_tuple[0])
         finder_result['index'].append(_y_tuple[1])
         finder_result['error'].append(np.abs((_y_tuple[0] - sample_y) / sample_y))
+        finder_result['neighbors'].append(
+            np.where(
+                np.abs((yPotMin[index] - _y_tuple[0]) / _y_tuple[0]) < tolerance
+            )[0]
+        )
         del _y_tuple
     if sample_z is not None:
         _z_tuple = find_nearest(zPotMin[index], sample_z)
@@ -84,7 +101,18 @@ def find_object(
         finder_result['value'].append(_z_tuple[0])
         finder_result['index'].append(_z_tuple[1])
         finder_result['error'].append(np.abs((_z_tuple[0] - sample_z) / sample_z))
+        finder_result['neighbors'].append(
+            np.where(
+                np.abs((zPotMin[index] - _z_tuple[0]) / _z_tuple[0]) < tolerance
+            )[0]
+        )
         del _z_tuple
+
+    if len(set(finder_result['index'])) != 1:
+        print("More than 1 match found in simple search. Initialising advanced query with cross-matching...")
+
+        matching_neighbor = reduce(np.intersect1d, tuple(finder_result['neighbors']))
+        print(matching_neighbor)
 
 
 
