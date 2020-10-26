@@ -62,29 +62,31 @@ def find_object(
         finder_result['name'].append('M200c')
         finder_result['value'].append(_M200c_tuple[0])
         finder_result['index'].append(_M200c_tuple[1])
-        finder_result['error'].append(np.abs((_M200c_tuple[1] - sample_M200c) / sample_M200c))
+        finder_result['error'].append(np.abs((_M200c_tuple[0] - sample_M200c) / sample_M200c))
         del _M200c_tuple
     if sample_x is not None:
         _x_tuple = find_nearest(xPotMin[index], sample_x)
         finder_result['name'].append('x')
         finder_result['value'].append(_x_tuple[0])
         finder_result['index'].append(_x_tuple[1])
-        finder_result['error'].append(np.abs((_x_tuple[1] - sample_x) / sample_x))
+        finder_result['error'].append(np.abs((_x_tuple[0] - sample_x) / sample_x))
         del _x_tuple
     if sample_y is not None:
         _y_tuple = find_nearest(yPotMin[index], sample_y)
         finder_result['name'].append('y')
         finder_result['value'].append(_y_tuple[0])
         finder_result['index'].append(_y_tuple[1])
-        finder_result['error'].append(np.abs((_y_tuple[1] - sample_y) / sample_y))
+        finder_result['error'].append(np.abs((_y_tuple[0] - sample_y) / sample_y))
         del _y_tuple
     if sample_z is not None:
         _z_tuple = find_nearest(zPotMin[index], sample_z)
         finder_result['name'].append('z')
         finder_result['value'].append(_z_tuple[0])
         finder_result['index'].append(_z_tuple[1])
-        finder_result['error'].append(np.abs((_z_tuple[1] - sample_z) / sample_z))
+        finder_result['error'].append(np.abs((_z_tuple[0] - sample_z) / sample_z))
         del _z_tuple
+
+
 
     # Check that all queries return the same index
     assert len(set(finder_result['index'])) == 1, (
