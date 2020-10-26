@@ -19,7 +19,7 @@ def find_object(
         sample_x: float = None,
         sample_y: float = None,
         sample_z: float = None,
-        tolerance: float = 0.02,
+        tolerance: float = 0.01,
 ) -> Tuple[int, float, float, float, float, float]:
 
     # Check that you have enough information for the queries
@@ -108,22 +108,28 @@ def find_object(
         )
         del _z_tuple
 
-    if len(set(finder_result['index'])) != 1:
+    matched_index = finder_result['index'][0]
+
+    if len(set(finder_result['index'])) > 1:
+
         print("More than 1 match found in simple search. Initialising advanced query with cross-matching...")
 
+        # Intersect the input neighbours to find the matching candidate
         matching_neighbor = reduce(np.intersect1d, tuple(finder_result['neighbors']))
-        print(matching_neighbor)
+        print(f"Found {len(matching_neighbor):d} matching objects")
+
+        # Check that all queries return the same index
+        assert len(matching_neighbor) == 1, (
+            f"Not all the queries returned the same output index for the VR catalogue. Found "
+            f"{len(set(finder_result['index'])):d} different values ({set(finder_result['index'])}). "
+            "Check that the inputs are correct, that their precision is sufficient and that you are "
+            "providing enough data to match queries. \n"
+            f"finder_result: {finder_result}"
+        )
+        matched_index = matching_neighbor[0]
 
 
 
-    # Check that all queries return the same index
-    assert len(set(finder_result['index'])) == 1, (
-        f"Not all the queries returned the same output index for the VR catalogue. Found "
-        f"{len(set(finder_result['index'])):d} different values ({set(finder_result['index'])}). "
-        "Check that the inputs are correct, that their precision is sufficient and that you are "
-        "providing enough data to match queries. \n"
-        f"finder_result: {finder_result}"
-    )
     max_error = max(finder_result['error'])
     max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
     max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
@@ -135,9 +141,9 @@ def find_object(
 
     # Retrieve the index of the halo in the unfiltered VR catalogue
     full_index_key = np.argwhere(
-        (xPotMin == xPotMin[index][finder_result['index'][0]]) &
-        (yPotMin == yPotMin[index][finder_result['index'][0]]) &
-        (zPotMin == zPotMin[index][finder_result['index'][0]])
+        (xPotMin == xPotMin[index][matched_index]) &
+        (yPotMin == yPotMin[index][matched_index]) &
+        (zPotMin == zPotMin[index][matched_index])
     )[0]
     assert len(full_index_key) == 1, "Ambiguity in finding a unique object given its centre of potential coordinates."
     full_index_key = full_index_key[0]
