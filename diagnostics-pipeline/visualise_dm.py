@@ -129,10 +129,10 @@ def dm_map_parent(
     
     dm_mass = dm_render(data, region=(
         [
-            wrap(xCen - size, data.metadata.boxsize[0]),
-            wrap(xCen + size, data.metadata.boxsize[0]),
-            wrap(yCen - size, data.metadata.boxsize[1]),
-            wrap(yCen + size, data.metadata.boxsize[1])
+            xCen - size,
+            xCen + size,
+            yCen - size,
+            yCen + size
         ]
     ), resolution=resolution)
 
@@ -256,10 +256,10 @@ def dm_map_zoom(
     )
     dm_mass = dm_render(data, region=(
         [
-            wrap(xCen - size, data.metadata.boxsize[0]),
-            wrap(xCen + size, data.metadata.boxsize[0]),
-            wrap(yCen - size, data.metadata.boxsize[1]),
-            wrap(yCen + size, data.metadata.boxsize[1])
+            xCen - size,
+            xCen + size,
+            yCen - size,
+            yCen + size
         ]
     ), resolution=resolution)
 
