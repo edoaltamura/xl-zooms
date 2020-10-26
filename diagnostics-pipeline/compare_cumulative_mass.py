@@ -142,8 +142,8 @@ def cumulative_mass_compare_plot(
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
         posDM = data.dark_matter.coordinates / data.metadata.a
         posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
-        posDM[:, 1] = wrap(posDM[:, 1] - xCen, data.metadata.boxsize[1])
-        posDM[:, 2] = wrap(posDM[:, 2] - xCen, data.metadata.boxsize[2])
+        posDM[:, 1] = wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1])
+        posDM[:, 2] = wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2])
         r = np.sqrt(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
@@ -231,8 +231,8 @@ def cumulative_mass_compare_plot(
             # Get DM particle coordinates and compute radial distance from CoP in R200 units
             posDM = data.dark_matter.coordinates / data.metadata.a
             posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
-            posDM[:, 1] = wrap(posDM[:, 1] - xCen, data.metadata.boxsize[1])
-            posDM[:, 2] = wrap(posDM[:, 2] - xCen, data.metadata.boxsize[2])
+            posDM[:, 1] = wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1])
+            posDM[:, 2] = wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2])
             r = np.sqrt(
                 (posDM[:, 0] - xCen) ** 2 +
                 (posDM[:, 1] - yCen) ** 2 +
