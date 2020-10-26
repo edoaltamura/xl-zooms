@@ -126,7 +126,15 @@ def dm_map_parent(
         data.dark_matter.coordinates[:, 2] - xCen,
         data.metadata.boxsize[2]
     )
-    dm_mass = dm_render(data, region=(region[0] + region[1]), resolution=resolution)
+    
+    dm_mass = dm_render(data, region=(
+        [
+            wrap(xCen - size, data.metadata.boxsize[0]),
+            wrap(xCen + size, data.metadata.boxsize[0]),
+            wrap(yCen - size, data.metadata.boxsize[1]),
+            wrap(yCen + size, data.metadata.boxsize[1])
+        ]
+    ), resolution=resolution)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
@@ -246,7 +254,14 @@ def dm_map_zoom(
         data.dark_matter.coordinates[:, 2] - xCen,
         data.metadata.boxsize[2]
     )
-    dm_mass = dm_render(data, region=(region[0] + region[1]), resolution=resolution)
+    dm_mass = dm_render(data, region=(
+        [
+            wrap(xCen - size, data.metadata.boxsize[0]),
+            wrap(xCen + size, data.metadata.boxsize[0]),
+            wrap(yCen - size, data.metadata.boxsize[1]),
+            wrap(yCen + size, data.metadata.boxsize[1])
+        ]
+    ), resolution=resolution)
 
     # Make figure
     fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
