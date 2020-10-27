@@ -27,6 +27,14 @@ cmap_name = 'BuPu_r'
 resolution = 2048
 
 
+def wrap(dx, box):
+    result = dx
+    index = np.where(dx > (0.5 * box))[0]
+    result[index] -= box
+    index = np.where(dx < (-0.5 * box))[0]
+    result[index] += box
+    return result
+
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -134,11 +142,9 @@ def cumulative_mass_compare_plot(
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
         posDM = data.dark_matter.coordinates / data.metadata.a
 
-        r = np.sqrt(
-            (posDM[:, 0] - xCen) ** 2 +
-            (posDM[:, 1] - yCen) ** 2 +
-            (posDM[:, 2] - zCen) ** 2
-        )
+        r = np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
+                    wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
+                    wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
 
         # Calculate particle mass and rho_crit
         unitLength = data.metadata.units.length
@@ -221,11 +227,9 @@ def cumulative_mass_compare_plot(
             # Get DM particle coordinates and compute radial distance from CoP in R200 units
             posDM = data.dark_matter.coordinates / data.metadata.a
 
-            r = np.sqrt(
-                (posDM[:, 0] - xCen) ** 2 +
-                (posDM[:, 1] - yCen) ** 2 +
-                (posDM[:, 2] - zCen) ** 2
-            )
+            r = np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
+                        wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
+                        wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
 
             # Calculate particle mass and rho_crit
             unitLength = data.metadata.units.length
