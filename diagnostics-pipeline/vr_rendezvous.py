@@ -120,7 +120,7 @@ def find_object(
         if len(matching_neighbor) > 1:
             matching_neighbor = np.intersect1d(
                 matching_neighbor,
-                chain(*tuple(finder_result['neighbors']))
+                list(chain(*tuple(finder_result['neighbors'])))
             )
 
         # Check that all queries return the same index
