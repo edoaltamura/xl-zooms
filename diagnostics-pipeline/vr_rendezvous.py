@@ -118,10 +118,8 @@ def find_object(
         print(f"Found {len(matching_neighbor):d} matching objects")
 
         if len(matching_neighbor) > 1:
-            matching_neighbor = np.intersect1d(
-                matching_neighbor,
-                list(chain(*tuple(finder_result['neighbors'])))
-            )
+            # If more matches found, cross check with the original guess
+            matching_neighbor = np.intersect1d(matching_neighbor, finder_result['index'])
 
         # Check that all queries return the same index
         assert len(matching_neighbor) == 1, (
