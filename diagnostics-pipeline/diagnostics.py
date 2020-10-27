@@ -132,7 +132,7 @@ def dmo_diagnostics(run_name: str) -> None:
 
 
 if __name__ == '__main__':
-    dmo_diagnostics(sys.args[1])
+    dmo_diagnostics(sys.argv[1])
 
     # for run_id in os.listdir(dmo_repository):
     #     if (
