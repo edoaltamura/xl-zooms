@@ -34,6 +34,6 @@ export OMP_NUM_THREADS=64
 
 for i in "${runs[@]}"
 do
-   python3 disgnostics.py "$i"
+   python3 diagnostics.py "$i"
 
 done
