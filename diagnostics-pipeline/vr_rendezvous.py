@@ -3,6 +3,7 @@ import h5py as h5
 from typing import Tuple
 from warnings import warn
 from functools import reduce
+from itertools import chain
 
 
 def find_nearest(array: np.ndarray, value: float) -> Tuple[float, int]:
@@ -115,6 +116,12 @@ def find_object(
         # Intersect the input neighbours to find the matching candidate
         matching_neighbor = reduce(np.intersect1d, tuple(finder_result['neighbors']))
         print(f"Found {len(matching_neighbor):d} matching objects")
+
+        if len(matching_neighbor) > 1:
+            matching_neighbor = np.intersect1d(
+                matching_neighbor,
+                chain(*tuple(finder_result['neighbors']))
+            )
 
         # Check that all queries return the same index
         assert len(matching_neighbor) == 1, (
