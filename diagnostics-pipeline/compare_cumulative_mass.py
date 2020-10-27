@@ -27,13 +27,13 @@ cmap_name = 'BuPu_r'
 resolution = 2048
 
 
-def wrap(dx, box):
-    result = dx
-    index = np.where(dx > (0.5 * box))[0]
-    result[index] -= box
-    index = np.where(dx < (-0.5 * box))[0]
-    result[index] += box
-    return result
+def wrap(dx: unyt.unyt_array, box: unyt.unyt_quantity):
+    result = dx.value
+    index = np.where(dx.value > (0.5 * box.value))[0]
+    result[index] -= box.value
+    index = np.where(dx.value < (-0.5 * box.value))[0]
+    result[index] += box.value
+    return result * dx.units
 
 
 def latex_float(f):
