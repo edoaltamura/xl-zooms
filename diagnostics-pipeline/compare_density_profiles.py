@@ -118,6 +118,7 @@ def density_profile_compare_plot(
 
             idx, M200c, R200c, Xcminpot, Ycminpot, Zcminpot = find_object(
                 vr_properties_catalog=velociraptor_properties_parent,
+                sample_structType=10,
                 sample_mass_lower_lim=vr_file['/Mass_200crit'][0] * 1e10 * 0.9,
                 sample_x=vr_file['/Xcminpot'][0],
                 sample_y=vr_file['/Ycminpot'][0],
