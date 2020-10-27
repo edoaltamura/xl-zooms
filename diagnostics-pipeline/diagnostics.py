@@ -132,7 +132,13 @@ def dmo_diagnostics(run_name: str) -> None:
 
 
 if __name__ == '__main__':
+
     for run_id in os.listdir(dmo_repository):
-        if run_id.startswith('L0300N0564_VR') and run_id.endswith('-8res'):
+        if (
+                run_id.startswith('L0300N0564_VR') and
+                run_id.endswith('-8res') and
+                '1079' not in run_id and
+                run_id not in os.listdir(os.path.join(output_directory, os.pardir))
+        ):
             print(run_id)
             dmo_diagnostics(run_id)
