@@ -194,6 +194,7 @@ def contamination_map(
     fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
     print(f"Saved: {output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
     plt.close(fig)
+    plt.close('all')
 
 
 def contamination_radial_histogram(
@@ -328,6 +329,7 @@ def contamination_radial_histogram(
     fig.savefig(f"{output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
     print(f"Saved: {output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
     plt.close(fig)
+    plt.close('all')
 
 
 if __name__ == "__main__":

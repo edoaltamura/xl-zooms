@@ -318,6 +318,7 @@ def density_profile_compare_plot(
     fig.savefig(f"{output_directory}/{run_name}_density_profile_compare.png")
     plt.close(fig)
     print(f"Saved: {output_directory}/{run_name}_density_profile_compare.png")
+    plt.close('all')
 
     return
 
