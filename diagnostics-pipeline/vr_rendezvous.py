@@ -126,15 +126,15 @@ def find_object(
         )
         matched_index = matching_neighbor[0]
 
-    else:
-        max_error = max(finder_result['error'])
-        max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
-        max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
-        assert max(finder_result['error']) > tolerance, (
-            f"At least one of the matched values deviates from the input more than {tolerance * 100:.2f}%. "
-            "Large discrepancies can lead to the selection of the wrong object in the box.\n"
-            f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
-        )
+    # else:
+    #     max_error = max(finder_result['error'])
+    #     max_error_name = finder_result['name'][finder_result['error'].index(max(finder_result['error']))]
+    #     max_error_index = finder_result['index'][finder_result['error'].index(max(finder_result['error']))]
+    #     assert max(finder_result['error']) > tolerance, (
+    #         f"At least one of the matched values deviates from the input more than {tolerance * 100:.2f}%. "
+    #         "Large discrepancies can lead to the selection of the wrong object in the box.\n"
+    #         f"Maximum error found >> name: {max_error_name:s} error: {max_error:.2f} index: {max_error_index:d}"
+    #     )
 
     # Retrieve the index of the halo in the unfiltered VR catalogue
     full_index_key = np.argwhere(
