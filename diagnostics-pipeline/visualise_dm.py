@@ -114,18 +114,18 @@ def dm_map_parent(
         dimension=3,
     )
 
-    data.dark_matter.coordinates[:, 0] = wrap(
-        data.dark_matter.coordinates[:, 0] - xCen,
-        data.metadata.boxsize[0]
-    )
-    data.dark_matter.coordinates[:, 1] = wrap(
-        data.dark_matter.coordinates[:, 1] - yCen,
-        data.metadata.boxsize[1]
-    )
-    data.dark_matter.coordinates[:, 2] = wrap(
-        data.dark_matter.coordinates[:, 2] - zCen,
-        data.metadata.boxsize[2]
-    )
+    # data.dark_matter.coordinates[:, 0] = wrap(
+    #     data.dark_matter.coordinates[:, 0] - xCen,
+    #     data.metadata.boxsize[0]
+    # )
+    # data.dark_matter.coordinates[:, 1] = wrap(
+    #     data.dark_matter.coordinates[:, 1] - yCen,
+    #     data.metadata.boxsize[1]
+    # )
+    # data.dark_matter.coordinates[:, 2] = wrap(
+    #     data.dark_matter.coordinates[:, 2] - zCen,
+    #     data.metadata.boxsize[2]
+    # )
     
     dm_mass = dm_render(data, region=(
         [
@@ -242,18 +242,18 @@ def dm_map_zoom(
         dimension=3,
     )
 
-    data.dark_matter.coordinates[:, 0] = wrap(
-        data.dark_matter.coordinates[:, 0] - xCen,
-        data.metadata.boxsize[0]
-    )
-    data.dark_matter.coordinates[:, 1] = wrap(
-        data.dark_matter.coordinates[:, 1] - yCen,
-        data.metadata.boxsize[1]
-    )
-    data.dark_matter.coordinates[:, 2] = wrap(
-        data.dark_matter.coordinates[:, 2] - zCen,
-        data.metadata.boxsize[2]
-    )
+    # data.dark_matter.coordinates[:, 0] = wrap(
+    #     data.dark_matter.coordinates[:, 0] - xCen,
+    #     data.metadata.boxsize[0]
+    # )
+    # data.dark_matter.coordinates[:, 1] = wrap(
+    #     data.dark_matter.coordinates[:, 1] - yCen,
+    #     data.metadata.boxsize[1]
+    # )
+    # data.dark_matter.coordinates[:, 2] = wrap(
+    #     data.dark_matter.coordinates[:, 2] - zCen,
+    #     data.metadata.boxsize[2]
+    # )
     dm_mass = dm_render(data, region=(
         [
             xCen - size,

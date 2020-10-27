@@ -27,14 +27,6 @@ cmap_name = 'BuPu_r'
 resolution = 2048
 
 
-def wrap(dx: unyt.unyt_array, box: unyt.unyt_quantity):
-    result = dx.value
-    index = np.where(dx.value > (0.5 * box.value))[0]
-    result[index] -= box.value
-    index = np.where(dx.value < (-0.5 * box.value))[0]
-    result[index] += box.value
-    return result * dx.units
-
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -141,9 +133,7 @@ def cumulative_mass_compare_plot(
 
         # Get DM particle coordinates and compute radial distance from CoP in R200 units
         posDM = data.dark_matter.coordinates / data.metadata.a
-        posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
-        posDM[:, 1] = wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1])
-        posDM[:, 2] = wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2])
+
         r = np.sqrt(
             (posDM[:, 0] - xCen) ** 2 +
             (posDM[:, 1] - yCen) ** 2 +
@@ -230,9 +220,7 @@ def cumulative_mass_compare_plot(
 
             # Get DM particle coordinates and compute radial distance from CoP in R200 units
             posDM = data.dark_matter.coordinates / data.metadata.a
-            posDM[:, 0] = wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0])
-            posDM[:, 1] = wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1])
-            posDM[:, 2] = wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2])
+
             r = np.sqrt(
                 (posDM[:, 0] - xCen) ** 2 +
                 (posDM[:, 1] - yCen) ** 2 +
