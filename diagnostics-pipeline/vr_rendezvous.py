@@ -123,7 +123,7 @@ def find_object(
             "Check that the inputs are correct, that their precision is sufficient and that you are "
             "providing enough data to match queries. \n"
             f"Test values: [{sample_M200c}, {sample_x:.3f}, {sample_y:.3f}, {sample_z:.3f}]\n"
-            f"finder_result: {finder_result}"
+            f"finder_result: {finder_result}\nmatching_neighbor: {matching_neighbor}"
         )
         matched_index = matching_neighbor[0]
 
