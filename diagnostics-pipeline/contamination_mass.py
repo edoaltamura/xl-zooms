@@ -322,7 +322,7 @@ def contamination_radial_histogram(
 
     ax.axvline(1, color="grey", linestyle='--')
     ax.axvline(_highres_radius / R200c, color="red", linestyle='--')
-    ax.set_xlim([0, size.value])
+    # ax.set_xlim([0, size.value])
     plt.legend(loc="upper right")
     fig.tight_layout()
     fig.savefig(f"{output_directory}/{run_name}_contamination_hist{out_to_radius[0]}{out_to_radius[1]}.png")
