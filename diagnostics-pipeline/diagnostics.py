@@ -47,23 +47,23 @@ def dmo_diagnostics(run_name: str) -> None:
         os.mkdir(os.path.join(output_directory, run_name))
     output_directory = os.path.join(output_directory, run_name)
 
-    density_profile_compare_plot(
-        run_name=run_name,
-        snap_filepath_parent=snap_filepath_parent,
-        velociraptor_properties_parent=velociraptor_properties_parent,
-        snap_filepath_zoom=snap_filepath_zoom,
-        velociraptor_properties_zoom=velociraptor_properties_zoom,
-        output_directory=output_directory
-    )
-
-    cumulative_mass_compare_plot(
-        run_name=run_name,
-        snap_filepath_parent=snap_filepath_parent,
-        velociraptor_properties_parent=velociraptor_properties_parent,
-        snap_filepath_zoom=snap_filepath_zoom,
-        velociraptor_properties_zoom=velociraptor_properties_zoom,
-        output_directory=output_directory
-    )
+    # density_profile_compare_plot(
+    #     run_name=run_name,
+    #     snap_filepath_parent=snap_filepath_parent,
+    #     velociraptor_properties_parent=velociraptor_properties_parent,
+    #     snap_filepath_zoom=snap_filepath_zoom,
+    #     velociraptor_properties_zoom=velociraptor_properties_zoom,
+    #     output_directory=output_directory
+    # )
+    #
+    # cumulative_mass_compare_plot(
+    #     run_name=run_name,
+    #     snap_filepath_parent=snap_filepath_parent,
+    #     velociraptor_properties_parent=velociraptor_properties_parent,
+    #     snap_filepath_zoom=snap_filepath_zoom,
+    #     velociraptor_properties_zoom=velociraptor_properties_zoom,
+    #     output_directory=output_directory
+    # )
 
     for zoom_snap, zoom_vr in zip(
             snap_filepath_zoom,
@@ -78,57 +78,57 @@ def dmo_diagnostics(run_name: str) -> None:
             output_directory=output_directory,
         )
 
-        contamination_radial_histogram(
-            run_name=run_name,
-            velociraptor_properties_zoom=zoom_vr,
-            snap_filepath_zoom=zoom_snap,
-            out_to_radius=out_to_radius,
-            highres_radius=highres_radius,
-            output_directory=output_directory,
-        )
-
-        dm_map_parent(
-            run_name=run_name,
-            velociraptor_properties_parent=velociraptor_properties_parent,
-            snap_filepath_parent=snap_filepath_parent,
-            velociraptor_properties_zoom=zoom_vr,
-            out_to_radius=out_to_radius,
-            highres_radius=highres_radius,
-            output_directory=output_directory,
-        )
-
-        dm_map_zoom(
-            run_name=run_name,
-            snap_filepath_zoom=zoom_snap,
-            velociraptor_properties_zoom=zoom_vr,
-            out_to_radius=out_to_radius,
-            highres_radius=highres_radius,
-            output_directory=output_directory,
-        )
-
-        wallclock_simulation_time(
-            run_name=run_name,
-            snap_filepath_zoom=zoom_snap,
-            output_directory=output_directory,
-        )
-
-        number_of_steps_simulation_time(
-            run_name=run_name,
-            snap_filepath_zoom=zoom_snap,
-            output_directory=output_directory,
-        )
-
-        particle_updates_step_cost(
-            run_name=run_name,
-            snap_filepath_zoom=zoom_snap,
-            output_directory=output_directory,
-        )
-
-        wallclock_number_of_steps(
-            run_name=run_name,
-            snap_filepath_zoom=zoom_snap,
-            output_directory=output_directory,
-        )
+        # contamination_radial_histogram(
+        #     run_name=run_name,
+        #     velociraptor_properties_zoom=zoom_vr,
+        #     snap_filepath_zoom=zoom_snap,
+        #     out_to_radius=out_to_radius,
+        #     highres_radius=highres_radius,
+        #     output_directory=output_directory,
+        # )
+        #
+        # dm_map_parent(
+        #     run_name=run_name,
+        #     velociraptor_properties_parent=velociraptor_properties_parent,
+        #     snap_filepath_parent=snap_filepath_parent,
+        #     velociraptor_properties_zoom=zoom_vr,
+        #     out_to_radius=out_to_radius,
+        #     highres_radius=highres_radius,
+        #     output_directory=output_directory,
+        # )
+        #
+        # dm_map_zoom(
+        #     run_name=run_name,
+        #     snap_filepath_zoom=zoom_snap,
+        #     velociraptor_properties_zoom=zoom_vr,
+        #     out_to_radius=out_to_radius,
+        #     highres_radius=highres_radius,
+        #     output_directory=output_directory,
+        # )
+        #
+        # wallclock_simulation_time(
+        #     run_name=run_name,
+        #     snap_filepath_zoom=zoom_snap,
+        #     output_directory=output_directory,
+        # )
+        #
+        # number_of_steps_simulation_time(
+        #     run_name=run_name,
+        #     snap_filepath_zoom=zoom_snap,
+        #     output_directory=output_directory,
+        # )
+        #
+        # particle_updates_step_cost(
+        #     run_name=run_name,
+        #     snap_filepath_zoom=zoom_snap,
+        #     output_directory=output_directory,
+        # )
+        #
+        # wallclock_number_of_steps(
+        #     run_name=run_name,
+        #     snap_filepath_zoom=zoom_snap,
+        #     output_directory=output_directory,
+        # )
 
 
 if __name__ == '__main__':

@@ -112,7 +112,7 @@ def contamination_map(
     print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
 
     # Make particle maps
-    fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(6, 18), dpi=resolution // 6)
+    fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(18, 6), dpi=resolution // 6)
     
     for ax in axs:
         ax.set_aspect('equal')
