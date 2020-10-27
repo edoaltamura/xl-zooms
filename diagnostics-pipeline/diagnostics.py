@@ -137,8 +137,7 @@ if __name__ == '__main__':
         if (
                 run_id.startswith('L0300N0564_VR') and
                 run_id.endswith('-8res') and
-                '1079' not in run_id and
-                '55' not in run_id
+                '1857' in run_id
         ):
             print(run_id)
             dmo_diagnostics(run_id)
