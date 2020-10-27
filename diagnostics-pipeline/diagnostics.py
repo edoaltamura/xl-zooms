@@ -87,24 +87,24 @@ def dmo_diagnostics(run_name: str) -> None:
             output_directory=output_directory,
         )
 
-        dm_map_parent(
-            run_name=run_name,
-            velociraptor_properties_parent=velociraptor_properties_parent,
-            snap_filepath_parent=snap_filepath_parent,
-            velociraptor_properties_zoom=zoom_vr,
-            out_to_radius=out_to_radius,
-            highres_radius=highres_radius,
-            output_directory=output_directory,
-        )
-
-        dm_map_zoom(
-            run_name=run_name,
-            snap_filepath_zoom=zoom_snap,
-            velociraptor_properties_zoom=zoom_vr,
-            out_to_radius=out_to_radius,
-            highres_radius=highres_radius,
-            output_directory=output_directory,
-        )
+        # dm_map_parent(
+        #     run_name=run_name,
+        #     velociraptor_properties_parent=velociraptor_properties_parent,
+        #     snap_filepath_parent=snap_filepath_parent,
+        #     velociraptor_properties_zoom=zoom_vr,
+        #     out_to_radius=out_to_radius,
+        #     highres_radius=highres_radius,
+        #     output_directory=output_directory,
+        # )
+        #
+        # dm_map_zoom(
+        #     run_name=run_name,
+        #     snap_filepath_zoom=zoom_snap,
+        #     velociraptor_properties_zoom=zoom_vr,
+        #     out_to_radius=out_to_radius,
+        #     highres_radius=highres_radius,
+        #     output_directory=output_directory,
+        # )
 
         wallclock_simulation_time(
             run_name=run_name,
