@@ -112,21 +112,68 @@ def contamination_map(
     print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
 
     # Make particle maps
-    fig, ax = plt.subplots(figsize=(8, 8), dpi=resolution // 8)
+    fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(6, 18), dpi=resolution // 6)
+    
+    for ax in axs:
+        ax.set_aspect('equal')
+        
+        ax.text(
+            0.025,
+            0.025,
+            (
+                f"Halo {run_name:s} DMO\n"
+                f"$z={data.metadata.z:3.3f}$\n"
+                f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
+                f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
+                f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
+            ),
+            color="black",
+            ha="left",
+            va="bottom",
+            transform=ax.transAxes,
+        )
+        ax.text(
+            0,
+            0 + 1.05 * R200c,
+            r"$R_{200c}$",
+            color="black",
+            ha="center",
+            va="bottom"
+        )
+        ax.text(
+            0,
+            0 + 1.002 * 5 * R200c,
+            r"$5 \times R_{200c}$",
+            color="grey",
+            ha="center",
+            va="bottom"
+        )
+        ax.text(
+            0,
+            0 + 1.02 * _highres_radius,
+            r"$R_\mathrm{clean}$",
+            color="red",
+            ha="center",
+            va="bottom"
+        )
+        circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
+        circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
+        circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
+        ax.add_artist(circle_r200)
+        ax.add_artist(circle_5r200)
+        ax.add_artist(circle_clean)
+        ax.set_xlim([-size.value, size.value])
+        ax.set_ylim([-size.value, size.value])
 
-    ax.set_aspect('equal')
-    ax.set_ylabel(r"$y$ [Mpc]")
-    ax.set_xlabel(r"$x$ [Mpc]")
-
-    ax.plot(
-        highres_coordinates['x'][::4],
-        highres_coordinates['y'][::4],
+    axs[0].plot(
+        highres_coordinates['x'][::2],
+        highres_coordinates['y'][::2],
         ',',
         c="C0",
         alpha=0.1,
         label='Highres'
     )
-    ax.plot(
+    axs[0].plot(
         lowres_coordinates['x'][contaminated_idx],
         lowres_coordinates['y'][contaminated_idx],
         'x',
@@ -134,7 +181,7 @@ def contamination_map(
         alpha=1,
         label='Lowres contaminating'
     )
-    ax.plot(
+    axs[0].plot(
         lowres_coordinates['x'][~contaminated_idx],
         lowres_coordinates['y'][~contaminated_idx],
         '.',
@@ -142,54 +189,63 @@ def contamination_map(
         alpha=0.2,
         label='Lowres clean'
     )
+    axs[0].set_ylabel(r"$y$ [Mpc]")
+    axs[0].set_xlabel(r"$x$ [Mpc]")
 
-    ax.text(
-        0.025,
-        0.025,
-        (
-            f"Halo {run_name:s} DMO\n"
-            f"$z={data.metadata.z:3.3f}$\n"
-            f"$M_{{200c}}={latex_float(M200c.value)}$ M$_\odot$\n"
-            f"$R_{{200c}}={latex_float(R200c.value)}$ Mpc\n"
-            f"$R_{{\\rm clean}}={latex_float(_highres_radius.value)}$ Mpc"
-        ),
-        color="black",
-        ha="left",
-        va="bottom",
-        transform=ax.transAxes,
+    axs[1].plot(
+        highres_coordinates['y'][::2],
+        highres_coordinates['z'][::2],
+        ',',
+        c="C0",
+        alpha=0.1,
+        label='Highres'
     )
-    ax.text(
-        0,
-        0 + 1.05 * R200c,
-        r"$R_{200c}$",
-        color="black",
-        ha="center",
-        va="bottom"
+    axs[1].plot(
+        lowres_coordinates['y'][contaminated_idx],
+        lowres_coordinates['z'][contaminated_idx],
+        'x',
+        c="red",
+        alpha=1,
+        label='Lowres contaminating'
     )
-    ax.text(
-        0,
-        0 + 1.002 * 5 * R200c,
-        r"$5 \times R_{200c}$",
-        color="grey",
-        ha="center",
-        va="bottom"
+    axs[1].plot(
+        lowres_coordinates['y'][~contaminated_idx],
+        lowres_coordinates['z'][~contaminated_idx],
+        '.',
+        c="green",
+        alpha=0.2,
+        label='Lowres clean'
     )
-    ax.text(
-        0,
-        0 + 1.02 * _highres_radius,
-        r"$R_\mathrm{clean}$",
-        color="red",
-        ha="center",
-        va="bottom"
+    axs[1].set_ylabel(r"$z$ [Mpc]")
+    axs[1].set_xlabel(r"$y$ [Mpc]")
+
+    axs[2].plot(
+        highres_coordinates['x'][::2],
+        highres_coordinates['z'][::2],
+        ',',
+        c="C0",
+        alpha=0.1,
+        label='Highres'
     )
-    circle_r200 = plt.Circle((0, 0), R200c, color="black", fill=False, linestyle='-')
-    circle_5r200 = plt.Circle((0, 0), 5 * R200c, color="grey", fill=False, linestyle='--')
-    circle_clean = plt.Circle((0, 0), _highres_radius.value, color="red", fill=False, linestyle=':')
-    ax.add_artist(circle_r200)
-    ax.add_artist(circle_5r200)
-    ax.add_artist(circle_clean)
-    ax.set_xlim([-size.value, size.value])
-    ax.set_ylim([-size.value, size.value])
+    axs[2].plot(
+        lowres_coordinates['x'][contaminated_idx],
+        lowres_coordinates['z'][contaminated_idx],
+        'x',
+        c="red",
+        alpha=1,
+        label='Lowres contaminating'
+    )
+    axs[2].plot(
+        lowres_coordinates['x'][~contaminated_idx],
+        lowres_coordinates['z'][~contaminated_idx],
+        '.',
+        c="green",
+        alpha=0.2,
+        label='Lowres clean'
+    )
+    axs[2].set_ylabel(r"$z$ [Mpc]")
+    axs[2].set_xlabel(r"$x$ [Mpc]")
+    
     plt.legend(loc="upper right")
     fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
     print(f"Saved: {output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")

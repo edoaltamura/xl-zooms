@@ -117,7 +117,7 @@ def cumulative_mass_compare_plot(
             idx, M200c, R200c, Xcminpot, Ycminpot, Zcminpot = find_object(
                 sample_structType=10,
                 vr_properties_catalog=velociraptor_properties_parent,
-                sample_mass_lower_lim=vr_file['/Mass_200crit'][0] * 1e10 * 0.9,
+                sample_mass_lower_lim=vr_file['/Mass_200crit'][0] * 1e10 * 0.8,
                 sample_x=vr_file['/Xcminpot'][0],
                 sample_y=vr_file['/Ycminpot'][0],
                 sample_z=vr_file['/Zcminpot'][0],
