@@ -69,14 +69,14 @@ def dmo_diagnostics(run_name: str) -> None:
             snap_filepath_zoom,
             velociraptor_properties_zoom
     ):
-        contamination_map(
-            run_name=run_name,
-            velociraptor_properties_zoom=zoom_vr,
-            snap_filepath_zoom=zoom_snap,
-            out_to_radius=out_to_radius,
-            highres_radius=highres_radius,
-            output_directory=output_directory,
-        )
+        # contamination_map(
+        #     run_name=run_name,
+        #     velociraptor_properties_zoom=zoom_vr,
+        #     snap_filepath_zoom=zoom_snap,
+        #     out_to_radius=out_to_radius,
+        #     highres_radius=highres_radius,
+        #     output_directory=output_directory,
+        # )
 
         # contamination_radial_histogram(
         #     run_name=run_name,
@@ -97,14 +97,14 @@ def dmo_diagnostics(run_name: str) -> None:
         #     output_directory=output_directory,
         # )
         #
-        # dm_map_zoom(
-        #     run_name=run_name,
-        #     snap_filepath_zoom=zoom_snap,
-        #     velociraptor_properties_zoom=zoom_vr,
-        #     out_to_radius=out_to_radius,
-        #     highres_radius=highres_radius,
-        #     output_directory=output_directory,
-        # )
+        dm_map_zoom(
+            run_name=run_name,
+            snap_filepath_zoom=zoom_snap,
+            velociraptor_properties_zoom=zoom_vr,
+            out_to_radius=out_to_radius,
+            highres_radius=highres_radius,
+            output_directory=output_directory,
+        )
         #
         # wallclock_simulation_time(
         #     run_name=run_name,
