@@ -137,8 +137,7 @@ if __name__ == '__main__':
         if (
                 run_id.startswith('L0300N0564_VR') and
                 run_id.endswith('-8res') and
-                '1079' not in run_id and
-                run_id not in os.listdir("/cosma7/data/dp004/dc-alta2/xl-zooms/analysis")
+                '1079' not in run_id
         ):
             print(run_id)
             dmo_diagnostics(run_id)
