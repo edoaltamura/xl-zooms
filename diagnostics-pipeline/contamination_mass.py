@@ -4,10 +4,14 @@ matplotlib.use('Agg')
 
 import numpy as np
 import unyt
+import sys
 import h5py
 from typing import Tuple
 import matplotlib.pyplot as plt
 import swiftsimio as sw
+
+sys.path.append("/cosma/home/dp004/dc-alta2/make_particle_load/modules")
+from peano import peano_hilbert_key_inverses
 
 try:
     plt.style.use("mnras.mplstyle")
@@ -15,6 +19,7 @@ except:
     pass
 
 resolution = 2048
+ph_bits = 21
 
 
 def wrap(dx, box):
@@ -35,12 +40,21 @@ def latex_float(f):
         return float_str
 
 
+def coordinate_traceback(ids: np.ndarray) -> np.ndarray:
+    """ Compute the positions at ICs. """
+    X, Y, Z = peano_hilbert_key_inverses(ids, ph_bits)
+    ic_coords = np.vstack((X, Y, Z)).T
+    assert 0 <= np.all(ic_coords) < 2 ** ph_bits, 'Initial coords out of range'
+    return np.array(ic_coords, dtype='f8')
+
+
 def contamination_map(
         run_name: str,
         velociraptor_properties_zoom: str,
         snap_filepath_zoom: str,
         out_to_radius: Tuple[int, str] = (5, 'R200c'),
         highres_radius: Tuple[int, str] = (6, 'R500c'),
+        traceback: bool = False,
         output_directory: str = '.'
 ) -> None:
     # Rendezvous over parent VR catalogue using zoom information
@@ -90,7 +104,8 @@ def contamination_map(
         'z': wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]),
         'r': np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
                      wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
-                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
+                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2),
+        'ids': data.dark_matter.particle_ids.value
     }
     del posDM
     posDM = data.boundary.coordinates / data.metadata.a
@@ -100,7 +115,8 @@ def contamination_map(
         'z': wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]),
         'r': np.sqrt(wrap(posDM[:, 0] - xCen, data.metadata.boxsize[0]) ** 2 +
                      wrap(posDM[:, 1] - yCen, data.metadata.boxsize[1]) ** 2 +
-                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2)
+                     wrap(posDM[:, 2] - zCen, data.metadata.boxsize[2]) ** 2),
+        'ids': data.boundary.particle_ids.value
     }
     del posDM
 
@@ -110,6 +126,15 @@ def contamination_map(
     print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
     print(f"Contaminating low-res DM (< R_clean): {len(contaminated_idx)} particles detected")
     print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
+    
+    # If want traceback of the particles, use Peano-Hilbert indices from Stu's code
+    if traceback:
+        highres_coordinates['x'], highres_coordinates['y'], highres_coordinates['y'] = coordinate_traceback(
+            highres_coordinates['ids']
+        ).T
+        lowres_coordinates['x'], lowres_coordinates['y'], lowres_coordinates['y'] = coordinate_traceback(
+            lowres_coordinates['ids']
+        ).T
 
     # Make particle maps
     fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(18, 6), dpi=resolution // 6)
