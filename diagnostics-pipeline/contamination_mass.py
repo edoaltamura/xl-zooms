@@ -20,6 +20,7 @@ except:
 
 resolution = 2048
 ph_bits = 21
+z_initial = 127.
 
 
 def wrap(dx, box):
@@ -129,12 +130,13 @@ def contamination_map(
     
     # If want traceback of the particles, use Peano-Hilbert indices from Stu's code
     if traceback:
+        a_initial = 1 / (z_initial + 1)
         highres_coordinates['x'], highres_coordinates['y'], highres_coordinates['y'] = coordinate_traceback(
             highres_coordinates['ids']
-        ).T
+        ).T / a_initial
         lowres_coordinates['x'], lowres_coordinates['y'], lowres_coordinates['y'] = coordinate_traceback(
             lowres_coordinates['ids']
-        ).T
+        ).T / a_initial
 
     # Make particle maps
     fig, axs = plt.subplots(nrows=1, ncols=3, figsize=(18, 6), dpi=resolution // 6)
@@ -187,8 +189,9 @@ def contamination_map(
         ax.add_artist(circle_r200)
         ax.add_artist(circle_5r200)
         ax.add_artist(circle_clean)
-        ax.set_xlim([-size.value, size.value])
-        ax.set_ylim([-size.value, size.value])
+        if not traceback:
+            ax.set_xlim([-size.value, size.value])
+            ax.set_ylim([-size.value, size.value])
 
     axs[0].plot(
         highres_coordinates['x'][::2],
@@ -272,8 +275,13 @@ def contamination_map(
     axs[2].set_xlabel(r"$x$ [Mpc]")
     
     plt.legend(loc="upper right")
-    fig.savefig(f"{output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
-    print(f"Saved: {output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png")
+
+    out_filename = f"{output_directory}/{run_name}_contamination_map{out_to_radius[0]}{out_to_radius[1]}.png"
+    if traceback:
+        out_filename = f"{output_directory}/{run_name}_contamination_map_traceback{out_to_radius[0]}{out_to_radius[1]}.png"
+
+    fig.savefig(out_filename)
+    print(f"Saved: {out_filename}")
     plt.close(fig)
     plt.close('all')
 
