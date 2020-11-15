@@ -10,3 +10,155 @@
 /cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR918.hdf5
 
 [1236,2272,2414,2766,2905,2915,3032,801,813,918]
+
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR1079.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR1857.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR645.hdf5
+
+
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR121.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR130.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR139.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR155.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR187.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR18.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR23.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR340.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR36.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR37.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR470.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR485.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR55.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR666.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR680.hdf5
+/cosma/home/dp004/dc-alta2/data7/xl-zooms/ics/masks/accepted/L0300N0564_VR775.hdf5
+
+"121"
+"130"
+"139"
+"155"
+"187"
+"18"
+"23"
+"340"
+"36"
+"37"
+"470"
+"485"
+"55"
+"666"
+"680"
+"775"
+
+"L0300N0564_VR121_-8res_Ref"
+"L0300N0564_VR1236_-8res_Ref"
+"L0300N0564_VR130_-8res_Ref"
+"L0300N0564_VR139_-8res_Ref"
+"L0300N0564_VR155_-8res_Ref"
+"L0300N0564_VR187_-8res_Ref"
+"L0300N0564_VR18_-8res_Ref"
+"L0300N0564_VR2272_-8res_Ref"
+"L0300N0564_VR23_-8res_Ref"
+"L0300N0564_VR2414_-8res_Ref"
+"L0300N0564_VR2766_-8res_Ref"
+"L0300N0564_VR2905_-8res_Ref"
+"L0300N0564_VR2915_-8res_Ref"
+"L0300N0564_VR3032_-8res_Ref"
+"L0300N0564_VR340_-8res_Ref"
+"L0300N0564_VR36_-8res_Ref"
+"L0300N0564_VR37_-8res_Ref"
+"L0300N0564_VR470_-8res_Ref"
+"L0300N0564_VR485_-8res_Ref"
+"L0300N0564_VR55_-8res_Ref"
+"L0300N0564_VR666_-8res_Ref"
+"L0300N0564_VR680_-8res_Ref"
+"L0300N0564_VR775_-8res_Ref"
+"L0300N0564_VR801_-8res_Ref"
+"L0300N0564_VR813_-8res_Ref"
+"L0300N0564_VR918_-8res_Ref"
+"L0300N0564_VR93_-8res_Ref"
+
+
+declare -a arr=("L0300N0564_VR121_-8res_Ref"
+"L0300N0564_VR1236_-8res_Ref"
+"L0300N0564_VR130_-8res_Ref"
+"L0300N0564_VR139_-8res_Ref"
+"L0300N0564_VR155_-8res_Ref"
+"L0300N0564_VR187_-8res_Ref"
+"L0300N0564_VR18_-8res_Ref"
+"L0300N0564_VR2272_-8res_Ref"
+"L0300N0564_VR23_-8res_Ref"
+"L0300N0564_VR2414_-8res_Ref"
+"L0300N0564_VR2766_-8res_Ref"
+"L0300N0564_VR2905_-8res_Ref"
+"L0300N0564_VR2915_-8res_Ref"
+"L0300N0564_VR3032_-8res_Ref"
+"L0300N0564_VR340_-8res_Ref"
+"L0300N0564_VR36_-8res_Ref"
+"L0300N0564_VR37_-8res_Ref"
+"L0300N0564_VR470_-8res_Ref"
+"L0300N0564_VR485_-8res_Ref"
+"L0300N0564_VR55_-8res_Ref"
+"L0300N0564_VR666_-8res_Ref"
+"L0300N0564_VR680_-8res_Ref"
+"L0300N0564_VR775_-8res_Ref"
+"L0300N0564_VR801_-8res_Ref"
+"L0300N0564_VR813_-8res_Ref"
+"L0300N0564_VR918_-8res_Ref"
+"L0300N0564_VR93_-8res_Ref")
+
+for i in "${arr[@]}"
+do
+   cp ./run_vr.slurm $i
+   cd $i
+   sbatch ./run_vr.slurm
+   cd ..
+done
+
+
+export OMP_NUM_THREADS=28
+module purge
+module load intel_comp/2020-update2
+module load intel_mpi/2020-update2
+module load ucx/1.8.1
+module load parmetis/4.0.3-64bit
+module load parallel_hdf5/1.10.6
+module load fftw/3.3.8cosma7
+module load gsl/2.5
+mkdir -p stf
+/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF/stf \
+   -i ./snapshots/L0300N0564_VR121_-8res_Ref_task_debug_2749 \
+   -I 2 \
+   -o ./stf/VR_redshift_0 \
+   -C ../vr_config_zoom_hydro.cfg
+
+
+
+
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR121_-8res_Ref/snapshots/L0300N0564_VR121_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Ref/snapshots/L0300N0564_VR1236_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR130_-8res_Ref/snapshots/L0300N0564_VR130_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Ref/snapshots/L0300N0564_VR139_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR155_-8res_Ref/snapshots/L0300N0564_VR155_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Ref/snapshots/L0300N0564_VR187_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2272_-8res_Ref/snapshots/L0300N0564_VR2272_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR23_-8res_Ref/snapshots/L0300N0564_VR23_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Ref/snapshots/L0300N0564_VR2414_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2766_-8res_Ref/snapshots/L0300N0564_VR2766_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Ref/snapshots/L0300N0564_VR2905_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2915_-8res_Ref/snapshots/L0300N0564_VR2915_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Ref/snapshots/L0300N0564_VR3032_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR340_-8res_Ref/snapshots/L0300N0564_VR340_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR36_-8res_Ref/snapshots/L0300N0564_VR36_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR37_-8res_Ref/snapshots/L0300N0564_VR37_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Ref/snapshots/L0300N0564_VR470_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR485_-8res_Ref/snapshots/L0300N0564_VR485_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Ref/snapshots/L0300N0564_VR55_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Ref/snapshots/L0300N0564_VR666_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR680_-8res_Ref/snapshots/L0300N0564_VR680_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR775_-8res_Ref/snapshots/L0300N0564_VR775_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR801_-8res_Ref/snapshots/L0300N0564_VR801_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Ref/snapshots/L0300N0564_VR813_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR918_-8res_Ref/snapshots/L0300N0564_VR918_-8res_Ref_2749.hdf5",
+"/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref/snapshots/L0300N0564_VR93_-8res_Ref_2749.hdf5",
