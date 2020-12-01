@@ -79,33 +79,39 @@
 "L0300N0564_VR93_-8res_Ref"
 
 
-declare -a arr=("L0300N0564_VR121_-8res_Ref"
-"L0300N0564_VR1236_-8res_Ref"
-"L0300N0564_VR130_-8res_Ref"
-"L0300N0564_VR139_-8res_Ref"
-"L0300N0564_VR155_-8res_Ref"
-"L0300N0564_VR187_-8res_Ref"
-"L0300N0564_VR18_-8res_Ref"
-"L0300N0564_VR2272_-8res_Ref"
-"L0300N0564_VR23_-8res_Ref"
-"L0300N0564_VR2414_-8res_Ref"
-"L0300N0564_VR2766_-8res_Ref"
-"L0300N0564_VR2905_-8res_Ref"
-"L0300N0564_VR2915_-8res_Ref"
-"L0300N0564_VR3032_-8res_Ref"
-"L0300N0564_VR340_-8res_Ref"
-"L0300N0564_VR36_-8res_Ref"
-"L0300N0564_VR37_-8res_Ref"
-"L0300N0564_VR470_-8res_Ref"
-"L0300N0564_VR485_-8res_Ref"
-"L0300N0564_VR55_-8res_Ref"
-"L0300N0564_VR666_-8res_Ref"
-"L0300N0564_VR680_-8res_Ref"
-"L0300N0564_VR775_-8res_Ref"
-"L0300N0564_VR801_-8res_Ref"
-"L0300N0564_VR813_-8res_Ref"
-"L0300N0564_VR918_-8res_Ref"
-"L0300N0564_VR93_-8res_Ref")
+declare -a arr=("L0300N0564_VR121_-8res_"
+"L0300N0564_VR1236_-8res_"
+"L0300N0564_VR130_-8res_"
+"L0300N0564_VR139_-8res_"
+"L0300N0564_VR155_-8res_"
+"L0300N0564_VR187_-8res_"
+"L0300N0564_VR18_-8res_"
+"L0300N0564_VR2272_-8res_"
+"L0300N0564_VR23_-8res_"
+"L0300N0564_VR2414_-8res_"
+"L0300N0564_VR2766_-8res_"
+"L0300N0564_VR2905_-8res_"
+"L0300N0564_VR2915_-8res_"
+"L0300N0564_VR3032_-8res_"
+"L0300N0564_VR340_-8res_"
+"L0300N0564_VR36_-8res_"
+"L0300N0564_VR37_-8res_"
+"L0300N0564_VR470_-8res_"
+"L0300N0564_VR485_-8res_"
+"L0300N0564_VR55_-8res_"
+"L0300N0564_VR666_-8res_"
+"L0300N0564_VR680_-8res_"
+"L0300N0564_VR775_-8res_"
+"L0300N0564_VR801_-8res_"
+"L0300N0564_VR813_-8res_"
+"L0300N0564_VR918_-8res_"
+"L0300N0564_VR93_-8res_")
+
+for i in "${arr[@]}"
+do
+   cp ./"$i"Ref/ics/"$i"Ref.hdf5 ./"$i"Mindist/ics/"$i"Mindist.hdf5
+   cp ./"$i"Ref/ics/"$i"Ref.hdf5 ./"$i"Isotropic/ics/"$i"Isotropic.hdf5
+done
 
 for i in "${arr[@]}"
 do
@@ -162,3 +168,223 @@ mkdir -p stf
 "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Ref/snapshots/L0300N0564_VR813_-8res_Ref_2749.hdf5",
 "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR918_-8res_Ref/snapshots/L0300N0564_VR918_-8res_Ref_2749.hdf5",
 "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref/snapshots/L0300N0564_VR93_-8res_Ref_2749.hdf5",
+
+
+
+new = {'Engine Launch (Tasks)                   ' :  29016.4311,
+ 'Space Rebuild                           ' : 6754.0026,
+ 'Engine Unskip                           ' :  5696.0435,
+ 'Writing Particle Properties             ' : 5297.8006,
+ 'Engine Drift All                        ' : 3159.6163,
+ 'Scheduler Reweight                      ' : 436.0456,
+ 'Ranking The Tasks                       ' : 377.7960,
+ 'Gpart Mesh Forces                       ' : 288.6281,
+ 'Engine Launch (Fof)                     ' : 272.8805,
+ 'Engine Collect End Of Step              ' :  266.3394,
+ 'Making Gravity Tasks                    ' : 255.4599,
+ 'Counting And Linking Tasks              ' : 215.9476,
+ 'Backwards Fourier Transform             ' : 199.1934,
+ 'Gpart Assignment                        ' : 192.2412,
+ 'Linking Gravity Tasks                   ' : 191.2098,
+ 'Forward Fourier Transform               ' : 186.0481,
+ 'Setting Unlocks                         ' : 151.5782,
+ 'Making Extra Hydroloop Tasks            ' : 139.8396,
+ 'Engine Drift Top Multipoles             ' :  106.3916,
+ 'Engine Split Gas Particles              ' : 89.4365,
+ 'Splitting Tasks                         ' : 80.3224,
+ 'Fof Search Tree                         ' : 69.6890,
+ 'Task Dump All                           ' : 68.9088,
+ 'Setting Super-Pointers                  ' : 60.8764,
+ 'Engine Marktasks                        ' : 43.0842,
+ 'Task Dump Stats                         ' : 29.7192,
+ 'Green Function                          ' : 22.7024,
+ 'Space List Useful Top Level Cells       ' : 19.0960,
+ 'Scheduler Report Task Times             ' : 13.1039,
+ 'Dumping Restart Files                   ' : 12.0262,
+ 'Engine Print Task Counts                ' : 11.4436,
+ 'Writing Step Info To Files              ' :  7.4365,
+ 'Engine Print Stats                      ' : 7.4197,
+ 'Engine Activate Fof Tasks               ' : 6.1570,
+ 'Making Hydro Tasks                      ' : 5.3769,
+ 'Fof Allocate                            ' : 3.1651,
+ 'Engine Make Fof Tasks                   ' : 1.2710,
+ 'Reading Initial Conditions              ' : 0.7501,
+ 'Space Init                              ' : 0.6152,
+ 'Updating General Quantities             ' :  0.4285,
+ 'Communicating Rebuild Flag              ' :  0.3782,
+ 'Engine Init                             ' : 0.0527,
+ 'Updating Particle Counts                ' : 0.0212,
+ 'Engine Recompute Displacement Constraint' : 0.0120,}
+
+
+old = {'Engine Launch (Tasks)                   ' :  27687.4903,
+'Space Rebuild                           ' : 6705.1026,
+'Engine Unskip                           ' :  5572.7758,
+'Writing Particle Properties             ' : 5446.2062,
+'Engine Drift All                        ' : 3137.3981,
+'Counting And Linking Tasks              ' : 717.1023,
+'Scheduler Reweight                      ' : 606.7406,
+'Ranking The Tasks                       ' : 558.6264,
+'Splitting Tasks                         ' : 519.6988,
+'Linking Gravity Tasks                   ' : 387.9255,
+'Gpart Mesh Forces                       ' : 289.6065,
+'Engine Collect End Of Step              ' :  262.9178,
+'Making Gravity Tasks                    ' : 252.7588,
+'Setting Unlocks                         ' : 251.9335,
+'Engine Launch (Fof)                     ' : 243.3365,
+'Backwards Fourier Transform             ' : 200.3556,
+'Gpart Assignment                        ' : 192.0414,
+'Forward Fourier Transform               ' : 187.1585,
+'Making Extra Hydroloop Tasks            ' : 164.2226,
+'Engine Drift Top Multipoles             ' :  109.8548,
+'Task Dump All                           ' : 102.0122,
+'Engine Split Gas Particles              ' : 89.4629,
+'Fof Search Tree                         ' : 68.3748,
+'Setting Super-Pointers                  ' : 61.9420,
+'Task Dump Stats                         ' : 36.4361,
+'Engine Marktasks                        ' : 31.0374,
+'Green Function                          ' : 22.7911,
+'Space List Useful Top Level Cells       ' : 18.7682,
+'Writing Step Info To Files              ' :  15.9003,
+'Scheduler Report Task Times             ' : 15.7096,
+'Engine Print Task Counts                ' : 14.0513,
+'Dumping Restart Files                   ' : 11.4881,
+'Engine Print Stats                      ' : 7.5120,
+'Engine Activate Fof Tasks               ' : 6.7137,
+'Making Hydro Tasks                      ' : 5.2427,
+'Fof Allocate                            ' : 4.0340,
+'Engine Make Fof Tasks                   ' : 2.0797,
+'Reading Initial Conditions              ' : 0.7351,
+'Space Init                              ' : 0.6055,
+'Updating General Quantities             ' :  0.4252,
+'Communicating Rebuild Flag              ' :  0.3715,
+'Engine Init                             ' : 0.0522,
+'Updating Particle Counts                ' : 0.0213,
+'Engine Recompute Displacement Constraint' : 0.0094,}
+
+for key in old:
+    print(key, new[key]-old[key])
+
+
+[1236,130,139,155,187,18,2272,23,2414,2766,2905,2915,3032,340,36,37,470,485,55,666,680,775,801,813,918,93]
+
+Objects to re-run (12)
+[
+"3032",
+"2905",
+"2414",
+"1236",
+"813",
+"666",
+"470",
+"187",
+"139",
+"93",
+"55",
+"18"]
+
+declare -a arr=("3032"
+"2905"
+"2414"
+"1236"
+"813"
+"666"
+"470"
+"187"
+"139"
+"93"
+"55"
+"18")
+
+declare -a arr=("470")
+
+for i in "${arr[@]}"
+do
+   mkdir L0300N0564_VR"$i"_+1res_MinimumDistance/ics
+   python3 /cosma/home/dp004/dc-alta2/xl-zooms/parent/combine_ics.py ../ics/ic_gen/run/ic_gen_submit_files/1LPT_8bitID/L0300N0564_VR"$i"_+1res/ICs/L0300N0564_VR"$i"_+1res.0.hdf5 L0300N0564_VR"$i"_+1res_MinimumDistance/ics/L0300N0564_VR"$i"_+1res_MinimumDistance.hdf5
+   cp select_output.yml snap_redshifts.txt stf_redshifts.txt L0300N0564_VR"$i"_+1res_MinimumDistance/
+
+   mkdir L0300N0564_VR"$i"_+1res_Isotropic/ics
+   cp L0300N0564_VR"$i"_+1res_MinimumDistance/ics/L0300N0564_VR"$i"_+1res_MinimumDistance.hdf5 L0300N0564_VR"$i"_+1res_Isotropic/ics/L0300N0564_VR"$i"_+1res_Isotropic.hdf5
+   cp select_output.yml snap_redshifts.txt stf_redshifts.txt L0300N0564_VR"$i"_+1res_Isotropic/
+done
+
+for i in "${arr[@]}"
+do
+   mkdir L0300N0564_VR"$i"_-8res_MinimumDistance/ics
+   cp L0300N0564_VR"$i"_-8res_Ref/ics/L0300N0564_VR"$i"_-8res_Ref.hdf5 L0300N0564_VR"$i"_-8res_MinimumDistance/ics/L0300N0564_VR"$i"_-8res_MinimumDistance.hdf5
+   cp select_output.yml snap_redshifts.txt stf_redshifts.txt L0300N0564_VR"$i"_-8res_MinimumDistance/
+   mkdir L0300N0564_VR"$i"_-8res_Isotropic/ics
+   cp L0300N0564_VR"$i"_-8res_Ref/ics/L0300N0564_VR"$i"_-8res_Ref.hdf5 L0300N0564_VR"$i"_-8res_Isotropic/ics/L0300N0564_VR"$i"_-8res_Isotropic.hdf5
+   cp select_output.yml snap_redshifts.txt stf_redshifts.txt L0300N0564_VR"$i"_-8res_Isotropic/
+done
+
+for i in "${arr[@]}"
+do
+   cd L0300N0564_VR"$i"_-8res_MinimumDistance
+   sbatch ./submit
+   cd ..
+   cd L0300N0564_VR"$i"_-8res_Isotropic
+   sbatch ./submit
+   cd ..
+done
+
+for i in L0300N0564_VR*_-8res_Mindist
+do
+   sed -i "s/./yieldtables//../yieldtables//" "$i"/params.yml
+done
+for t in L0300N0564_VR*_-8res_Isotropic
+do
+   sed -i "s/.\/yieldt/..\/yieldt/" ./"$t"/params.yml
+done
+
+for i in L0300N0564_VR*_-8res_Mindist
+do
+   rm "$i"/out_files/*
+done
+for t in L0300N0564_VR*_-8res_Isotropic
+do
+   rm "$i"/out_files/*
+done
+
+
+declare -a arr=("187"
+"139"
+"93")
+
+for i in "${arr[@]}"
+do
+   cd L0300N0564_VR"$i"_+1res_MinimumDistance
+   sbatch ./submit
+   cd ..
+   cd L0300N0564_VR"$i"_+1res_Isotropic
+   sbatch ./submit
+   cd ..
+done
+
+
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance/stf/L0300N0564_VR1236_-8res_MinimumDistance_2749/L0300N0564_VR1236_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance/stf/L0300N0564_VR139_-8res_MinimumDistance_2749/L0300N0564_VR139_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_MinimumDistance/stf/L0300N0564_VR187_-8res_MinimumDistance_2749/L0300N0564_VR187_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance/stf/L0300N0564_VR18_-8res_MinimumDistance_2749/L0300N0564_VR18_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_MinimumDistance/stf/L0300N0564_VR2414_-8res_MinimumDistance_2749/L0300N0564_VR2414_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_MinimumDistance/stf/L0300N0564_VR2905_-8res_MinimumDistance_2749/L0300N0564_VR2905_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance/stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_MinimumDistance/stf/L0300N0564_VR470_-8res_MinimumDistance_2749/L0300N0564_VR470_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_MinimumDistance/stf/L0300N0564_VR55_-8res_MinimumDistance_2749/L0300N0564_VR55_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_MinimumDistance/stf/L0300N0564_VR666_-8res_MinimumDistance_2749/L0300N0564_VR666_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_MinimumDistance/stf/L0300N0564_VR813_-8res_MinimumDistance_2749/L0300N0564_VR813_-8res_MinimumDistance_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance/stf/L0300N0564_VR93_-8res_MinimumDistance_2749/L0300N0564_VR93_-8res_MinimumDistance_2749.properties",
+
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Isotropic/stf/L0300N0564_VR1236_-8res_Isotropic_2749/L0300N0564_VR1236_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Isotropic/stf/L0300N0564_VR139_-8res_Isotropic_2749/L0300N0564_VR139_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Isotropic/stf/L0300N0564_VR187_-8res_Isotropic_2749/L0300N0564_VR187_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Isotropic/stf/L0300N0564_VR18_-8res_Isotropic_2749/L0300N0564_VR18_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Isotropic/stf/L0300N0564_VR2414_-8res_Isotropic_2749/L0300N0564_VR2414_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Isotropic/stf/L0300N0564_VR2905_-8res_Isotropic_2749/L0300N0564_VR2905_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic/stf/L0300N0564_VR3032_-8res_Isotropic_2749/L0300N0564_VR3032_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Isotropic/stf/L0300N0564_VR470_-8res_Isotropic_2749/L0300N0564_VR470_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Isotropic/stf/L0300N0564_VR55_-8res_Isotropic_2749/L0300N0564_VR55_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Isotropic/stf/L0300N0564_VR666_-8res_Isotropic_2749/L0300N0564_VR666_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Isotropic/stf/L0300N0564_VR813_-8res_Isotropic_2749/L0300N0564_VR813_-8res_Isotropic_2749.properties",
+"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Isotropic/stf/L0300N0564_VR93_-8res_Isotropic_2749/L0300N0564_VR93_-8res_Isotropic_2749.properties",
