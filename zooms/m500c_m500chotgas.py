@@ -93,12 +93,12 @@ def make_single_image():
     Mhot500c = np.zeros(len(zooms_register), dtype=np.float64)
     fhot500c = np.zeros(len(zooms_register), dtype=np.float64)
 
-    print((
-        f"{'Run name':<40s} "
-        f"{'M_500crit':<15s} "
-        f"{'M_hotgas(< R_500crit)':<25s} "
-        f"{'f_hotgas(< R_500crit)':<20s} "
-    ))
+    # print((
+    #     f"{'Run name':<40s} "
+    #     f"{'M_500crit':<15s} "
+    #     f"{'M_hotgas(< R_500crit)':<25s} "
+    #     f"{'f_hotgas(< R_500crit)':<20s} "
+    # ))
 
     for i in prange(len(zooms_register)):
         zoom = zooms_register[i]
