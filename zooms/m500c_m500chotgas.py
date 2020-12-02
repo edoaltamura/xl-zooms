@@ -33,7 +33,7 @@ def process_single_halo(
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
-    print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
+    # print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
 
     # Read in gas particles
     mask = sw.mask(f'{path_to_snap}', spatial_only=False)
@@ -96,6 +96,7 @@ def make_single_image():
     for i, zoom in enumerate(zooms_register):
         # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
         results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+        results = list(results)
 
         h70_XL = H0_XL / 70.
         results[0] *= h70_XL
