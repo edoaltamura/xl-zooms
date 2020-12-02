@@ -53,7 +53,7 @@ def process_single_halo(
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
     index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
-    fhot500c = Mhot500c.value / M500c.value
+    fhot500c = Mhot500c / M500c
 
     return M500c, Mhot500c, fhot500c
 
