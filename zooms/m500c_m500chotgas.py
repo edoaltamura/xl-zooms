@@ -58,7 +58,7 @@ def process_single_halo(
     print(M500c, Mhot500c, fhot500c)
     return M500c, Mhot500c, fhot500c
 
-def _process_single_halo(zoom):
+def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
 def make_single_image():
@@ -102,7 +102,7 @@ def make_single_image():
     ))
 
     with Pool() as pool:
-        results = zip(*pool.map(_process_single_halo, iter(zooms_register)))
+        results = pool.map(_process_single_halo, iter(zooms_register))
     print(results)
 
     # for i in range(len(zooms_register)):
