@@ -58,37 +58,39 @@ def process_single_halo(
 
     return M500c, Mhot500c, fhot500c
 
+
 def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
+
+# Sun et al. 2009
+M500_Sun = np.array(
+    [3.18, 4.85, 3.90, 1.48, 4.85, 5.28, 8.49, 10.3, 2.0, 7.9, 5.6, 12.9, 8.0, 14.1, 3.22, 14.9, 13.4, 6.9, 8.95,
+     8.8, 8.3, 9.7, 7.9]
+)
+f500_Sun = np.array(
+    [0.097, 0.086, 0.068, 0.049, 0.069, 0.060, 0.076, 0.081, 0.108, 0.086, 0.056, 0.076, 0.075, 0.114, 0.074, 0.088,
+     0.094, 0.094, 0.078, 0.099, 0.065, 0.090, 0.093]
+)
+Mgas500_Sun = M500_Sun * f500_Sun
+
+# Lovisari et al. 2015 (in h_70 units already)
+M500_Lov = np.array(
+    [2.07, 4.67, 2.39, 2.22, 2.95, 2.83, 3.31, 3.53, 3.49, 3.35, 14.4, 2.34, 4.78, 8.59, 9.51, 6.96, 10.8, 4.37,
+     8.00, 12.1]
+)
+Mgas500_Lov = np.array(
+    [0.169, 0.353, 0.201, 0.171, 0.135, 0.272, 0.171, 0.271, 0.306, 0.247, 1.15, 0.169, 0.379, 0.634, 0.906, 0.534,
+     0.650, 0.194, 0.627, 0.817]
+)
+# Convert units
+h70_Sun = 73. / 70.
+M500_Sun *= h70_Sun
+Mgas500_Sun *= (h70_Sun ** 2.5)
+
+
 def make_single_image():
     fig, ax = plt.subplots()
-
-    # Sun et al. 2009
-    M500_Sun = np.array(
-        [3.18, 4.85, 3.90, 1.48, 4.85, 5.28, 8.49, 10.3, 2.0, 7.9, 5.6, 12.9, 8.0, 14.1, 3.22, 14.9, 13.4, 6.9, 8.95,
-         8.8, 8.3, 9.7, 7.9]
-    )
-    f500_Sun = np.array(
-        [0.097, 0.086, 0.068, 0.049, 0.069, 0.060, 0.076, 0.081, 0.108, 0.086, 0.056, 0.076, 0.075, 0.114, 0.074, 0.088,
-         0.094, 0.094, 0.078, 0.099, 0.065, 0.090, 0.093]
-    )
-    Mgas500_Sun = M500_Sun * f500_Sun
-
-    # Lovisari et al. 2015 (in h_70 units already)
-    M500_Lov = np.array(
-        [2.07, 4.67, 2.39, 2.22, 2.95, 2.83, 3.31, 3.53, 3.49, 3.35, 14.4, 2.34, 4.78, 8.59, 9.51, 6.96, 10.8, 4.37,
-         8.00, 12.1]
-    )
-    Mgas500_Lov = np.array(
-        [0.169, 0.353, 0.201, 0.171, 0.135, 0.272, 0.171, 0.271, 0.306, 0.247, 1.15, 0.169, 0.379, 0.634, 0.906, 0.534,
-         0.650, 0.194, 0.627, 0.817]
-    )
-
-    # Convert units
-    h70_Sun = 73. / 70.
-    M500_Sun *= h70_Sun
-    Mgas500_Sun *= (h70_Sun ** 2.5)
 
     M500c = np.zeros(len(zooms_register), dtype=np.float64)
     Mhot500c = np.zeros(len(zooms_register), dtype=np.float64)
@@ -101,8 +103,9 @@ def make_single_image():
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
 
+    # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
-        results = pool.imap(_process_single_halo, iter(zooms_register))
+        results = pool.map(_process_single_halo, iter(zooms_register))
 
     for i, data in enumerate(results):
         # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
@@ -148,5 +151,67 @@ def make_single_image():
 
     return
 
+def fb():
+    fig, ax = plt.subplots()
+
+    M500c = np.zeros(len(zooms_register), dtype=np.float64)
+    Mhot500c = np.zeros(len(zooms_register), dtype=np.float64)
+    fhot500c = np.zeros(len(zooms_register), dtype=np.float64)
+
+    print((
+        f"{'Run name':<40s} "
+        f"{'M_500crit':<15s} "
+        f"{'M_hotgas(< R_500crit)':<25s} "
+        f"{'f_hotgas(< R_500crit)':<20s} "
+    ))
+
+    # The results of the multiprocessing Pool are returned in the same order as inputs
+    with Pool() as pool:
+        results = pool.map(_process_single_halo, iter(zooms_register))
+
+    for i, data in enumerate(results):
+        # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
+        # Results returned as tuples, which are immutable. Convert to list to update.
+        data = list(data)
+
+        h70_XL = H0_XL / 70.
+        data[0] = data[0] * h70_XL
+        data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
+        M500c[i] = data[0].value
+        Mhot500c[i] = data[1].value
+        fhot500c[i] = data[2].value
+
+        print((
+            f"{zooms_register[i].run_name:<40s} "
+            f"{(data[0].value / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(data[1].value / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(data[2].value / 1.e13):<6.4f} "
+        ))
+
+    ax.scatter(M500c, Mhot500c/M500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
+    ax.scatter(M500_Sun * 1.e13, Mgas500_Sun/M500_Sun, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
+               edgecolors='none')
+    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov/M500_Lov, marker='*', s=10, alpha=0.7, c='gray',
+               label='Lovisari et al. (2015)', edgecolors='none')
+
+    ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
+    ax.set_ylabel(r'$f_B$')
+    ax.set_xscale('log')
+    ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
+
+    # Build legend
+    handles = [
+        mlines.Line2D([], [], color='black', marker='.', linestyle='None', markersize=10, label='Random AGN (Ref)'),
+        mlines.Line2D([], [], color='orange', marker='.', linestyle='None', markersize=10, label='MinimumDistance'),
+        mlines.Line2D([], [], color='lime', marker='.', linestyle='None', markersize=10, label='Isotropic')
+    ]
+    plt.legend(handles=handles)
+    fig.savefig(f'{zooms_register[0].output_directory}/m500c_mhotgas.png', dpi=300)
+    plt.show()
+    plt.close()
+
+    return
+
 
 make_single_image()
+fb()
