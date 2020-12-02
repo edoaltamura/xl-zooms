@@ -59,7 +59,7 @@ def process_single_halo(
     return M500c, Mhot500c, fhot500c
 
 
-@jit(nopython=True, parallel=True)
+@jit(nopython=False, parallel=True)
 def make_single_image():
     fig, ax = plt.subplots()
 
