@@ -113,16 +113,8 @@ def make_single_image():
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
 
-    # pool = Pool(os.cpu_count())  # Create a multiprocessing Pool
-    # pool.map(data_worker, iter(zooms_register))  # process data_inputs iterable with pool
-
-    for zoom in zooms_register:
-        pool = Pool(os.cpu_count())
-        pool.apply_async(data_worker, args=(zoom,))
-        # worker = Process(target=data_worker, args=(zoom,))
-        # worker.start()
-        # # worker.join()
-    pool.close()
+    pool = Pool(os.cpu_count())  # Create a multiprocessing Pool
+    pool.map(data_worker, iter(zooms_register))  # process data_inputs iterable with pool
     pool.join()
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
