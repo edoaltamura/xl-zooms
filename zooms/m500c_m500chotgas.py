@@ -7,8 +7,9 @@ import h5py as h5
 import swiftsimio as sw
 import unyt
 from typing import List, Tuple
+from multiprocessing import Pool
 
-from register import zooms_register
+from register import zooms_register, Zoom
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -58,6 +59,24 @@ def process_single_halo(
     return M500c, Mhot500c, fhot500c
 
 
+def data_worker(zoom: Zoom) -> None:
+    # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
+    results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+    results = list(results)
+
+    h70_XL = H0_XL / 70.
+    results[0] = results[0] * h70_XL
+    results[1] = results[1] * (h70_XL ** 2.5)  # * 1.e10)
+
+    plt.gca().scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name, alpha=0.7, s=10,
+               edgecolors='none')
+    print((
+        f"{zoom.run_name:<35s} "
+        f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
+        f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
+        f"{(results[2].value / 1.e13):<7.2f} "
+    ))
+
 def make_single_image():
     fig, ax = plt.subplots()
 
@@ -93,27 +112,13 @@ def make_single_image():
         f"{'M_hotgas(< R_500crit)':<25s} "
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
-    for i, zoom in enumerate(zooms_register):
-        # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
-        results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
-        results = list(results)
 
-        h70_XL = H0_XL / 70.
-        results[0] = results[0] * h70_XL
-        results[1] = results[1] * (h70_XL ** 2.5)# * 1.e10)
-
-        ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name, alpha=0.7, s=10,
-                   edgecolors='none')
-        print((
-            f"{zoom.run_name:<35s} "
-            f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
-            f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
-            f"{(results[2].value / 1.e13):<7.2f} "
-        ))
+    pool = Pool()  # Create a multiprocessing Pool
+    pool.map(data_worker, iter(zooms_register))  # process data_inputs iterable with pool
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
                edgecolors='none')
-    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov * 1.e13, marker='*', s=5, alpha=0.7, c='gray',
+    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov * 1.e13, marker='*', s=10, alpha=0.7, c='gray',
                label='Lovisari et al. (2015)', edgecolors='none')
 
     ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
