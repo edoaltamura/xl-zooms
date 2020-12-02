@@ -119,7 +119,7 @@ def make_single_image():
     for zoom in zooms_register:
         worker = Process(target=data_worker, args=(zoom,))
         worker.start()
-        worker.join()
+        # worker.join()
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
                edgecolors='none')
