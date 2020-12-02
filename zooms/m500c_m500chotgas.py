@@ -3,8 +3,7 @@ import os
 import unyt
 import numpy as np
 from typing import List, Tuple
-from multiprocessing import Pool, Process
-from itertools import product
+from numba import jit, prange
 import h5py as h5
 import swiftsimio as sw
 import matplotlib.pyplot as plt
@@ -60,6 +59,7 @@ def process_single_halo(
     return M500c, Mhot500c, fhot500c
 
 
+@jit(nopython=True, parallel=True)
 def make_single_image():
     fig, ax = plt.subplots()
 
@@ -100,7 +100,8 @@ def make_single_image():
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
 
-    def data_worker(zoom: Zoom) -> None:
+    for i in prange(len(zooms_register)):
+        zoom = zooms_register[i]
         # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
         results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
         results = list(results)
@@ -119,9 +120,6 @@ def make_single_image():
             f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
             f"{(results[2].value / 1.e13):<7.2f} "
         ))
-
-    with Pool(os.cpu_count()) as pool:
-        pool.map(data_worker, iter(zooms_register))
 
     ax.scatter(M500c, Mhot500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
