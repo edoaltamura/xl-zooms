@@ -102,13 +102,13 @@ def make_single_image():
     ))
 
     with Pool() as pool:
-        results = pool.map(_process_single_halo, iter(zooms_register))
-    print(results)
+        results = pool.map_async(_process_single_halo, iter(zooms_register))
 
     for i, data in enumerate(results):
-        # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
-        # results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+        # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
+        # Results returned as tuples, which are immutable. Convert to list to update.
         data = list(data)
+
         h70_XL = H0_XL / 70.
         data[0] = data[0] * h70_XL
         data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
@@ -118,9 +118,9 @@ def make_single_image():
 
         print((
             f"{zooms_register[i].run_name:<40s} "
-            f"{(data[0].value / 1.e13):<7.2f} * 1e13 Msun "
-            f"{(data[1].value / 1.e13):<7.2f} * 1e13 Msun "
-            f"{(data[2].value / 1.e13):<7.2f} "
+            f"{(data[0].value / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(data[1].value / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(data[2].value / 1.e13):<6.4f} "
         ))
 
     ax.scatter(M500c, Mhot500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
