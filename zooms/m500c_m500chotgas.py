@@ -71,7 +71,7 @@ def data_worker(zoom: Zoom) -> None:
     plt.gca().scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name, alpha=0.7, s=10,
                edgecolors='none')
     print((
-        f"{zoom.run_name:<35s} "
+        f"{zoom.run_name:<40s} "
         f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
         f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
         f"{(results[2].value / 1.e13):<7.2f} "
@@ -107,7 +107,7 @@ def make_single_image():
     Mgas500_Sun *= (h70_Sun ** 2.5)
 
     print((
-        f"{'Run name':<35s} "
+        f"{'Run name':<40s} "
         f"{'M_500crit':<15s} "
         f"{'M_hotgas(< R_500crit)':<25s} "
         f"{'f_hotgas(< R_500crit)':<20s} "
@@ -118,7 +118,7 @@ def make_single_image():
 
     for zoom in zooms_register:
         pool = Pool(os.cpu_count())
-        pool.apply_async(target=data_worker, args=(zoom,))
+        pool.apply_async(data_worker, args=(zoom,))
         # worker = Process(target=data_worker, args=(zoom,))
         # worker.start()
         # # worker.join()
