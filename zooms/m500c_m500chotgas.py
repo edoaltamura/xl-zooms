@@ -2,17 +2,20 @@
 
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 import h5py as h5
 import swiftsimio as sw
 import unyt
 from typing import List, Tuple
+
+from register import zooms_register
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
 
-THOT = 1.e5  # Hot gas temperature threshold in K
+Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
 
 fbary = 0.15741  # Cosmic baryon fraction
 H0_XL = 67.66  # Hubble constant in km/s/Mpc
@@ -22,7 +25,6 @@ def process_single_halo(
         path_to_snap: str,
         path_to_catalogue: str
 ) -> Tuple[float]:
-
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -34,47 +36,30 @@ def process_single_halo(
     print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
 
     # Read in gas particles
-    mask = sw.mask(f'{path_to_snap}')
+    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
     region = [[XPotMin - R500c, XPotMin + R500c],
               [YPotMin - R500c, YPotMin + R500c],
               [ZPotMin - R500c, ZPotMin + R500c]]
     mask.constrain_spatial(region)
+    mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e20 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
-    tempGas = data.gas.temperatures
 
     # Select hot gas within sphere
     deltaX = posGas[:, 0] - XPotMin
     deltaY = posGas[:, 1] - YPotMin
     deltaZ = posGas[:, 2] - ZPotMin
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
-    index = np.where((deltaR < R500c) & (tempGas > THOT))[0]
+    index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
     fhot500c = Mhot500c / M500c
 
     return M500c, Mhot500c, fhot500c
 
 
-def make_single_image(
-        name_list: List[str] = None,
-        paths_to_snap: List[str] = None,
-        paths_to_catalogue: List[str] = None,
-        output_path: str = None
-) -> None:
-
-    assert len(paths_to_snap) == len(paths_to_catalogue)
-
-    numZooms = len(paths_to_snap)
-    M500c = np.zeros(numZooms)
-    Mhot500c = np.zeros(numZooms)
-    fhot500c = np.zeros(numZooms)
-
-    for i, (snap, catalogue) in enumerate(zip(paths_to_snap, paths_to_catalogue)):
-        results = process_single_halo(snap, catalogue)
-        M500c[i] = results[0]
-        Mhot500c[i] = results[1]
-        fhot500c[i] = results[2]
+def make_single_image():
+    fig, ax = plt.subplots()
 
     # Sun et al. 2009
     M500_Sun = np.array(
@@ -102,236 +87,52 @@ def make_single_image(
     M500_Sun *= h70_Sun
     Mgas500_Sun *= (h70_Sun ** 2.5)
 
-    h70_XL = H0_XL / 70.
-    M500c *= h70_XL
-    Mhot500c *= ((h70_XL ** 2.5) * 1.e10)
+    print((
+        f"{'Run name':<25s} "
+        f"{'M_500crit':<20f} "
+        f"{'M_hotgas(< R_500crit)':<20s} "
+        f"{'f_hotgas(< R_500crit)':<20s} "
+    ))
+    for i, zoom in enumerate(zooms_register):
+        # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
+        results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
-    colours = [
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-    ] + ["red"] * 12 + ["lime"] * 12
+        h70_XL = H0_XL / 70.
+        results[0] *= h70_XL
+        results[0] *= ((h70_XL ** 2.5) * 1.e10)
 
-    fig, ax = plt.subplots(figsize=(5, 3))
-    ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)')
-    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov * 1.e13, marker='*', s=5, alpha=0.7, c='gray', label='Lovisari et al. (2015)')
+        ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name[i], alpha=0.7, s=10,
+                   edgecolors='none')
+        print((
+            f"{zoom.run_name:<25s} "
+            f"{(results[0] / 1.e13):<5.2f} * 1e13 Msun "
+            f"{(results[1] / 1.e13):<5.2f} * 1e13 Msun "
+            f"{(results[2] / 1.e13):<5.2f} "
+        ))
 
-    print(f"\n{'Run name':<25s} {'M500c             ':<15s} {'Mhot500c           ':<15s}")
-    for i in range(numZooms):
-        print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<5.3f} * 1e13 Msun {(Mhot500c[i] / 1.e13):<5.3f} * 1e13 Msun")
-        ax.scatter(M500c[i], Mhot500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
+    ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
+               edgecolors='none')
+    ax.scatter(M500_Lov * 1.e13, Mgas500_Lov * 1.e13, marker='*', s=5, alpha=0.7, c='gray',
+               label='Lovisari et al. (2015)', edgecolors='none')
 
     ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
     ax.set_ylabel(r'$M_{{\rm gas},500{\rm c}}/h_{70}^{-5/2}{\rm M}_{\odot}$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    # ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
-    fig.savefig(f'{output_path}/m500c_m500chotgas.png', dpi=500)
+
+    # Build legend
+    handles = [
+        mlines.Line2D([], [], color='black', marker='.', linestyle='None', markersize=10, label='Random AGN (Ref)'),
+        mlines.Line2D([], [], color='orange', marker='.', linestyle='None', markersize=10, label='MinimumDistance'),
+        mlines.Line2D([], [], color='lime', marker='.', linestyle='None', markersize=10, label='Isotropic')
+    ]
+    plt.legend(handles=handles)
+    fig.savefig(f'{zooms_register[0].output_directory}/m500c_mhotgas.png', dpi=300)
     plt.show()
     plt.close()
 
     return
 
 
-if __name__ == "__main__":
-
-    name_list = [
-        "L0300N0564_VR121_-8res_Ref",
-        "L0300N0564_VR1236_-8res_Ref",
-        "L0300N0564_VR130_-8res_Ref",
-        "L0300N0564_VR139_-8res_Ref",
-        "L0300N0564_VR155_-8res_Ref",
-        "L0300N0564_VR187_-8res_Ref",
-        "L0300N0564_VR18_-8res_Ref",
-        "L0300N0564_VR2272_-8res_Ref",
-        "L0300N0564_VR23_-8res_Ref",
-        "L0300N0564_VR2414_-8res_Ref",
-        "L0300N0564_VR2766_-8res_Ref",
-        "L0300N0564_VR2905_-8res_Ref",
-        "L0300N0564_VR2915_-8res_Ref",
-        "L0300N0564_VR3032_-8res_Ref",
-        "L0300N0564_VR340_-8res_Ref",
-        "L0300N0564_VR36_-8res_Ref",
-        "L0300N0564_VR37_-8res_Ref",
-        "L0300N0564_VR470_-8res_Ref",
-        "L0300N0564_VR485_-8res_Ref",
-        "L0300N0564_VR55_-8res_Ref",
-        "L0300N0564_VR666_-8res_Ref",
-        "L0300N0564_VR680_-8res_Ref",
-        "L0300N0564_VR775_-8res_Ref",
-        "L0300N0564_VR801_-8res_Ref",
-        "L0300N0564_VR813_-8res_Ref",
-        "L0300N0564_VR918_-8res_Ref",
-        "L0300N0564_VR93_-8res_Ref",
-
-        "L0300N0564_VR1236_-8res_MinimumDistance",
-        "L0300N0564_VR139_-8res_MinimumDistance",
-        "L0300N0564_VR187_-8res_MinimumDistance",
-        "L0300N0564_VR18_-8res_MinimumDistance",
-        "L0300N0564_VR2414_-8res_MinimumDistance",
-        "L0300N0564_VR2905_-8res_MinimumDistance",
-        "L0300N0564_VR3032_-8res_MinimumDistance",
-        "L0300N0564_VR470_-8res_MinimumDistance",
-        "L0300N0564_VR55_-8res_MinimumDistance",
-        "L0300N0564_VR666_-8res_MinimumDistance",
-        "L0300N0564_VR813_-8res_MinimumDistance",
-        "L0300N0564_VR93_-8res_MinimumDistance",
-
-        "L0300N0564_VR1236_-8res_Isotropic",
-        "L0300N0564_VR139_-8res_Isotropic",
-        "L0300N0564_VR187_-8res_Isotropic",
-        "L0300N0564_VR18_-8res_Isotropic",
-        "L0300N0564_VR2414_-8res_Isotropic",
-        "L0300N0564_VR2905_-8res_Isotropic",
-        "L0300N0564_VR3032_-8res_Isotropic",
-        "L0300N0564_VR470_-8res_Isotropic",
-        "L0300N0564_VR55_-8res_Isotropic",
-        "L0300N0564_VR666_-8res_Isotropic",
-        "L0300N0564_VR813_-8res_Isotropic",
-        "L0300N0564_VR93_-8res_Isotropic",
-    ]
-    snapshot_filenames = [
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR121_-8res_Ref/snapshots/L0300N0564_VR121_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Ref/snapshots/L0300N0564_VR1236_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR130_-8res_Ref/snapshots/L0300N0564_VR130_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Ref/snapshots/L0300N0564_VR139_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR155_-8res_Ref/snapshots/L0300N0564_VR155_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Ref/snapshots/L0300N0564_VR187_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2272_-8res_Ref/snapshots/L0300N0564_VR2272_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR23_-8res_Ref/snapshots/L0300N0564_VR23_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Ref/snapshots/L0300N0564_VR2414_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2766_-8res_Ref/snapshots/L0300N0564_VR2766_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Ref/snapshots/L0300N0564_VR2905_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2915_-8res_Ref/snapshots/L0300N0564_VR2915_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Ref/snapshots/L0300N0564_VR3032_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR340_-8res_Ref/snapshots/L0300N0564_VR340_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR36_-8res_Ref/snapshots/L0300N0564_VR36_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR37_-8res_Ref/snapshots/L0300N0564_VR37_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Ref/snapshots/L0300N0564_VR470_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR485_-8res_Ref/snapshots/L0300N0564_VR485_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Ref/snapshots/L0300N0564_VR55_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Ref/snapshots/L0300N0564_VR666_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR680_-8res_Ref/snapshots/L0300N0564_VR680_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR775_-8res_Ref/snapshots/L0300N0564_VR775_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR801_-8res_Ref/snapshots/L0300N0564_VR801_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Ref/snapshots/L0300N0564_VR813_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR918_-8res_Ref/snapshots/L0300N0564_VR918_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref/snapshots/L0300N0564_VR93_-8res_Ref_2749.hdf5",
-
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance/snapshots/L0300N0564_VR1236_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance/snapshots/L0300N0564_VR139_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_MinimumDistance/snapshots/L0300N0564_VR187_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance/snapshots/L0300N0564_VR18_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_MinimumDistance/snapshots/L0300N0564_VR2414_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_MinimumDistance/snapshots/L0300N0564_VR2905_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance/snapshots/L0300N0564_VR3032_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_MinimumDistance/snapshots/L0300N0564_VR470_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_MinimumDistance/snapshots/L0300N0564_VR55_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_MinimumDistance/snapshots/L0300N0564_VR666_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_MinimumDistance/snapshots/L0300N0564_VR813_-8res_MinimumDistance_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance/snapshots/L0300N0564_VR93_-8res_MinimumDistance_2749.hdf5",
-
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Isotropic/snapshots/L0300N0564_VR1236_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Isotropic/snapshots/L0300N0564_VR139_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Isotropic/snapshots/L0300N0564_VR187_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Isotropic/snapshots/L0300N0564_VR18_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Isotropic/snapshots/L0300N0564_VR2414_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Isotropic/snapshots/L0300N0564_VR2905_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic/snapshots/L0300N0564_VR3032_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Isotropic/snapshots/L0300N0564_VR470_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Isotropic/snapshots/L0300N0564_VR55_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Isotropic/snapshots/L0300N0564_VR666_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Isotropic/snapshots/L0300N0564_VR813_-8res_Isotropic_2749.hdf5",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Isotropic/snapshots/L0300N0564_VR93_-8res_Isotropic_2749.hdf5",
-    ]
-    catalogue_filenames = [
-
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR121_-8res_Ref/stf/L0300N0564_VR121_-8res_Ref_2749/L0300N0564_VR121_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Ref/stf/L0300N0564_VR1236_-8res_Ref_2749/L0300N0564_VR1236_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR130_-8res_Ref/stf/L0300N0564_VR130_-8res_Ref_2749/L0300N0564_VR130_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Ref/stf/L0300N0564_VR139_-8res_Ref_2749/L0300N0564_VR139_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR155_-8res_Ref/stf/L0300N0564_VR155_-8res_Ref_2749/L0300N0564_VR155_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Ref/stf/L0300N0564_VR187_-8res_Ref_2749/L0300N0564_VR187_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2272_-8res_Ref/stf/L0300N0564_VR2272_-8res_Ref_2749/L0300N0564_VR2272_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR23_-8res_Ref/stf/L0300N0564_VR23_-8res_Ref_2749/L0300N0564_VR23_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Ref/stf/L0300N0564_VR2414_-8res_Ref_2749/L0300N0564_VR2414_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2766_-8res_Ref/stf/L0300N0564_VR2766_-8res_Ref_2749/L0300N0564_VR2766_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Ref/stf/L0300N0564_VR2905_-8res_Ref_2749/L0300N0564_VR2905_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2915_-8res_Ref/stf/L0300N0564_VR2915_-8res_Ref_2749/L0300N0564_VR2915_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Ref/stf/L0300N0564_VR3032_-8res_Ref_2749/L0300N0564_VR3032_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR340_-8res_Ref/stf/L0300N0564_VR340_-8res_Ref_2749/L0300N0564_VR340_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR36_-8res_Ref/stf/L0300N0564_VR36_-8res_Ref_2749/L0300N0564_VR36_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR37_-8res_Ref/stf/L0300N0564_VR37_-8res_Ref_2749/L0300N0564_VR37_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Ref/stf/L0300N0564_VR470_-8res_Ref_2749/L0300N0564_VR470_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR485_-8res_Ref/stf/L0300N0564_VR485_-8res_Ref_2749/L0300N0564_VR485_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Ref/stf/L0300N0564_VR55_-8res_Ref_2749/L0300N0564_VR55_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Ref/stf/L0300N0564_VR666_-8res_Ref_2749/L0300N0564_VR666_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR680_-8res_Ref/stf/L0300N0564_VR680_-8res_Ref_2749/L0300N0564_VR680_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR775_-8res_Ref/stf/L0300N0564_VR775_-8res_Ref_2749/L0300N0564_VR775_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR801_-8res_Ref/stf/L0300N0564_VR801_-8res_Ref_2749/L0300N0564_VR801_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Ref/stf/L0300N0564_VR813_-8res_Ref_2749/L0300N0564_VR813_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR918_-8res_Ref/stf/L0300N0564_VR918_-8res_Ref_2749/L0300N0564_VR918_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref/stf/L0300N0564_VR93_-8res_Ref_2749/L0300N0564_VR93_-8res_Ref_2749.properties",
-
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance/stf/L0300N0564_VR1236_-8res_MinimumDistance_2749/L0300N0564_VR1236_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance/stf/L0300N0564_VR139_-8res_MinimumDistance_2749/L0300N0564_VR139_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_MinimumDistance/stf/L0300N0564_VR187_-8res_MinimumDistance_2749/L0300N0564_VR187_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance/stf/L0300N0564_VR18_-8res_MinimumDistance_2749/L0300N0564_VR18_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_MinimumDistance/stf/L0300N0564_VR2414_-8res_MinimumDistance_2749/L0300N0564_VR2414_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_MinimumDistance/stf/L0300N0564_VR2905_-8res_MinimumDistance_2749/L0300N0564_VR2905_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance/stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_MinimumDistance/stf/L0300N0564_VR470_-8res_MinimumDistance_2749/L0300N0564_VR470_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_MinimumDistance/stf/L0300N0564_VR55_-8res_MinimumDistance_2749/L0300N0564_VR55_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_MinimumDistance/stf/L0300N0564_VR666_-8res_MinimumDistance_2749/L0300N0564_VR666_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_MinimumDistance/stf/L0300N0564_VR813_-8res_MinimumDistance_2749/L0300N0564_VR813_-8res_MinimumDistance_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance/stf/L0300N0564_VR93_-8res_MinimumDistance_2749/L0300N0564_VR93_-8res_MinimumDistance_2749.properties",
-
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Isotropic/stf/L0300N0564_VR1236_-8res_Isotropic_2749/L0300N0564_VR1236_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Isotropic/stf/L0300N0564_VR139_-8res_Isotropic_2749/L0300N0564_VR139_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Isotropic/stf/L0300N0564_VR187_-8res_Isotropic_2749/L0300N0564_VR187_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Isotropic/stf/L0300N0564_VR18_-8res_Isotropic_2749/L0300N0564_VR18_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Isotropic/stf/L0300N0564_VR2414_-8res_Isotropic_2749/L0300N0564_VR2414_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Isotropic/stf/L0300N0564_VR2905_-8res_Isotropic_2749/L0300N0564_VR2905_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic/stf/L0300N0564_VR3032_-8res_Isotropic_2749/L0300N0564_VR3032_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Isotropic/stf/L0300N0564_VR470_-8res_Isotropic_2749/L0300N0564_VR470_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Isotropic/stf/L0300N0564_VR55_-8res_Isotropic_2749/L0300N0564_VR55_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Isotropic/stf/L0300N0564_VR666_-8res_Isotropic_2749/L0300N0564_VR666_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Isotropic/stf/L0300N0564_VR813_-8res_Isotropic_2749/L0300N0564_VR813_-8res_Isotropic_2749.properties",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Isotropic/stf/L0300N0564_VR93_-8res_Isotropic_2749/L0300N0564_VR93_-8res_Isotropic_2749.properties",
-    ]
-    output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
-
-
-    make_single_image(
-        name_list=name_list,
-        paths_to_snap=snapshot_filenames,
-        paths_to_catalogue=catalogue_filenames,
-        output_path=output_directory,
-    )
+make_single_image()
