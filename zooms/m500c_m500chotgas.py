@@ -89,8 +89,8 @@ def make_single_image():
 
     print((
         f"{'Run name':<35s} "
-        f"{'M_500crit':<20s} "
-        f"{'M_hotgas(< R_500crit)':<20s} "
+        f"{'M_500crit':<15s} "
+        f"{'M_hotgas(< R_500crit)':<25s} "
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
     for i, zoom in enumerate(zooms_register):
@@ -102,13 +102,13 @@ def make_single_image():
         results[0] = results[0] * h70_XL
         results[1] = results[1] * (h70_XL ** 2.5)# * 1.e10)
 
-        ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name[i], alpha=0.7, s=10,
+        ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name, alpha=0.7, s=10,
                    edgecolors='none')
         print((
             f"{zoom.run_name:<35s} "
-            f"{(results[0].value / 1.e13):<10.2f} * 1e13 Msun "
-            f"{(results[1].value / 1.e13):<10.2f} * 1e13 Msun "
-            f"{(results[2].value / 1.e13):<10.2f} "
+            f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
+            f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
+            f"{(results[2].value / 1.e13):<7.2f} "
         ))
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
