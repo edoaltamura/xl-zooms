@@ -114,8 +114,7 @@ def make_single_image():
     Mhot500c *= (h70_XL ** 2.5)
     Mstar500c *= (h70_XL ** 2.5)
 
-    ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)',
-            edgecolors='none')
+    ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)')
     ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray',
                label='Kravtsov et al. (2018)', edgecolors='none')
 
