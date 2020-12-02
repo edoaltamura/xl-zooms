@@ -99,16 +99,16 @@ def make_single_image():
         results = list(results)
 
         h70_XL = H0_XL / 70.
-        results[0] *= h70_XL
-        results[1] *= ((h70_XL ** 2.5) * 1.e10)
+        results[0] = results[0] * h70_XL
+        results[1] = results[1] * ((h70_XL ** 2.5) * 1.e10)
 
         ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name[i], alpha=0.7, s=10,
                    edgecolors='none')
         print((
             f"{zoom.run_name:<25s} "
-            f"{(results[0] / 1.e13):<5.2f} * 1e13 Msun "
-            f"{(results[1] / 1.e13):<5.2f} * 1e13 Msun "
-            f"{(results[2] / 1.e13):<5.2f} "
+            f"{(results[0].value / 1.e13):<5.2f} * 1e13 Msun "
+            f"{(results[1].value / 1.e13):<5.2f} * 1e13 Msun "
+            f"{(results[2].value / 1.e13):<5.2f} "
         ))
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
