@@ -2,7 +2,7 @@
 import os
 import unyt
 import numpy as np
-from typing import List, Tuple
+from typing import Tuple
 from multiprocessing import Pool
 import h5py as h5
 import swiftsimio as sw
@@ -55,7 +55,7 @@ def process_single_halo(
     index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
     fhot500c = Mhot500c / M500c
-    print(M500c, Mhot500c, fhot500c)
+
     return M500c, Mhot500c, fhot500c
 
 def _process_single_halo(zoom: Zoom):
@@ -108,7 +108,7 @@ def make_single_image():
     for i, data in enumerate(results):
         # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
         # results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
-        # results = list(results)
+        data = list(data)
         h70_XL = H0_XL / 70.
         data[0] = data[0] * h70_XL
         data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
