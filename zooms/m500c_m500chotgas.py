@@ -41,7 +41,7 @@ def process_single_halo(
               [YPotMin - R500c, YPotMin + R500c],
               [ZPotMin - R500c, ZPotMin + R500c]]
     mask.constrain_spatial(region)
-    mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature)
+    mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
