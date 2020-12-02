@@ -59,7 +59,7 @@ def process_single_halo(
     return M500c, Mhot500c, fhot500c
 
 
-def data_worker(zoom: Zoom) -> None:
+def data_worker(zoom: Zoom, ax) -> None:
     # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
     results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
     results = list(results)
@@ -68,7 +68,7 @@ def data_worker(zoom: Zoom) -> None:
     results[0] = results[0] * h70_XL
     results[1] = results[1] * (h70_XL ** 2.5)  # * 1.e10)
 
-    plt.gca().scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name, alpha=0.7, s=10,
+    ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name, alpha=0.7, s=10,
                edgecolors='none')
     print((
         f"{zoom.run_name:<40s} "
@@ -114,7 +114,7 @@ def make_single_image():
     ))
 
     pool = Pool(os.cpu_count())  # Create a multiprocessing Pool
-    pool.map_async(data_worker, iter(zooms_register))  # process data_inputs iterable with pool
+    pool.imap_unordered(data_worker, (iter(zooms_register), ax))  # process data_inputs iterable with pool
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
                edgecolors='none')
