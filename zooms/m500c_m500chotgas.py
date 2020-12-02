@@ -100,7 +100,7 @@ def make_single_image():
 
         h70_XL = H0_XL / 70.
         results[0] *= h70_XL
-        results[0] *= ((h70_XL ** 2.5) * 1.e10)
+        results[1] *= ((h70_XL ** 2.5) * 1.e10)
 
         ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name[i], alpha=0.7, s=10,
                    edgecolors='none')
