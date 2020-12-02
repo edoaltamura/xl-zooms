@@ -102,7 +102,7 @@ def make_single_image():
     ))
 
     with Pool() as pool:
-        results = pool.map_async(_process_single_halo, iter(zooms_register))
+        results = pool.imap(_process_single_halo, iter(zooms_register))
 
     for i, data in enumerate(results):
         # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
