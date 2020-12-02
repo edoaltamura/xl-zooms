@@ -114,12 +114,12 @@ def make_single_image():
         Mhot500c[zoom_index] = results[1].value
         fhot500c[zoom_index] = results[2].value
 
-        print((
-            f"{zoom.run_name:<40s} "
-            f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
-            f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
-            f"{(results[2].value / 1.e13):<7.2f} "
-        ))
+        # print((
+        #     f"{zoom.run_name:<40s} "
+        #     f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
+        #     f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
+        #     f"{(results[2].value / 1.e13):<7.2f} "
+        # ))
 
     ax.scatter(M500c, Mhot500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
