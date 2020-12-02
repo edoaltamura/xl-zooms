@@ -3,7 +3,7 @@ import os
 import unyt
 import numpy as np
 from typing import List, Tuple
-from numba import jit, prange
+from multiprocessing import Pool
 import h5py as h5
 import swiftsimio as sw
 import matplotlib.pyplot as plt
@@ -58,8 +58,15 @@ def process_single_halo(
 
     return M500c, Mhot500c, fhot500c
 
+def loop(zoom):
+    return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
-@jit(nopython=False, parallel=True)
+def loop_work():
+    with Pool() as pool:
+        results = zip(*pool.map(loop, iter(zooms_register)))
+    print(results)
+    return results
+
 def make_single_image():
     fig, ax = plt.subplots()
 
@@ -93,33 +100,35 @@ def make_single_image():
     Mhot500c = np.zeros(len(zooms_register), dtype=np.float64)
     fhot500c = np.zeros(len(zooms_register), dtype=np.float64)
 
-    # print((
-    #     f"{'Run name':<40s} "
-    #     f"{'M_500crit':<15s} "
-    #     f"{'M_hotgas(< R_500crit)':<25s} "
-    #     f"{'f_hotgas(< R_500crit)':<20s} "
-    # ))
+    print((
+        f"{'Run name':<40s} "
+        f"{'M_500crit':<15s} "
+        f"{'M_hotgas(< R_500crit)':<25s} "
+        f"{'f_hotgas(< R_500crit)':<20s} "
+    ))
 
-    for i in prange(len(zooms_register)):
-        zoom = zooms_register[i]
-        # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
-        results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
-        results = list(results)
+    results = loop_work()
 
-        h70_XL = H0_XL / 70.
-        results[0] = results[0] * h70_XL
-        results[1] = results[1] * (h70_XL ** 2.5)  # * 1.e10)
-        zoom_index = zooms_register.index(zoom)
-        M500c[zoom_index] = results[0].value
-        Mhot500c[zoom_index] = results[1].value
-        fhot500c[zoom_index] = results[2].value
-
-        # print((
-        #     f"{zoom.run_name:<40s} "
-        #     f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
-        #     f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
-        #     f"{(results[2].value / 1.e13):<7.2f} "
-        # ))
+    # for i in range(len(zooms_register)):
+    #     zoom = zooms_register[i]
+    #     # `results` is a tuple with (M_500crit, M_hotgas, f_hotgas)
+    #     results = process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+    #     results = list(results)
+    #
+    #     h70_XL = H0_XL / 70.
+    #     results[0] = results[0] * h70_XL
+    #     results[1] = results[1] * (h70_XL ** 2.5)  # * 1.e10)
+    #     zoom_index = zooms_register.index(zoom)
+    #     M500c[zoom_index] = results[0].value
+    #     Mhot500c[zoom_index] = results[1].value
+    #     fhot500c[zoom_index] = results[2].value
+    #
+    #     print((
+    #         f"{zoom.run_name:<40s} "
+    #         f"{(results[0].value / 1.e13):<7.2f} * 1e13 Msun "
+    #         f"{(results[1].value / 1.e13):<7.2f} * 1e13 Msun "
+    #         f"{(results[2].value / 1.e13):<7.2f} "
+    #     ))
 
     ax.scatter(M500c, Mhot500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
