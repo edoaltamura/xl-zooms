@@ -89,7 +89,7 @@ def make_single_image():
 
     print((
         f"{'Run name':<25s} "
-        f"{'M_500crit':<20f} "
+        f"{'M_500crit':<20s} "
         f"{'M_hotgas(< R_500crit)':<20s} "
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
