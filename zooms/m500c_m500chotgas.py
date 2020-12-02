@@ -53,7 +53,7 @@ def process_single_halo(
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
     index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
-    fhot500c = Mhot500c / M500c
+    fhot500c = Mhot500c.value / M500c.value
 
     return M500c, Mhot500c, fhot500c
 
@@ -88,7 +88,7 @@ def make_single_image():
     Mgas500_Sun *= (h70_Sun ** 2.5)
 
     print((
-        f"{'Run name':<25s} "
+        f"{'Run name':<35s} "
         f"{'M_500crit':<20s} "
         f"{'M_hotgas(< R_500crit)':<20s} "
         f"{'f_hotgas(< R_500crit)':<20s} "
@@ -105,10 +105,10 @@ def make_single_image():
         ax.scatter(results[0], results[1], c=zoom.plot_color, label=zoom.run_name[i], alpha=0.7, s=10,
                    edgecolors='none')
         print((
-            f"{zoom.run_name:<25s} "
-            f"{(results[0].value / 1.e13):<5.2f} * 1e13 Msun "
-            f"{(results[1].value / 1.e13):<5.2f} * 1e13 Msun "
-            f"{(results[2].value / 1.e13):<5.2f} "
+            f"{zoom.run_name:<35s} "
+            f"{(results[0].value / 1.e13):<10.2f} * 1e13 Msun "
+            f"{(results[1].value / 1.e13):<10.2f} * 1e13 Msun "
+            f"{(results[2].value / 1.e13):<10.2f} "
         ))
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
