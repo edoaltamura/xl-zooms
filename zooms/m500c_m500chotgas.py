@@ -55,17 +55,11 @@ def process_single_halo(
     index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
     fhot500c = Mhot500c / M500c
-
+    print(M500c, Mhot500c, fhot500c)
     return M500c, Mhot500c, fhot500c
 
-def loop(zoom):
+def _process_single_halo(zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
-
-def loop_work():
-    with Pool() as pool:
-        results = zip(*pool.map(loop, iter(zooms_register)))
-    print(results)
-    return results
 
 def make_single_image():
     fig, ax = plt.subplots()
@@ -107,7 +101,9 @@ def make_single_image():
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
 
-    results = loop_work()
+    with Pool() as pool:
+        results = zip(*pool.map(_process_single_halo, iter(zooms_register)))
+    print(results)
 
     # for i in range(len(zooms_register)):
     #     zoom = zooms_register[i]
