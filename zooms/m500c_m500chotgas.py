@@ -1,13 +1,13 @@
 # Plot scaling relations for EAGLE-XL tests
-
+import os
+import unyt
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.lines as mlines
+from typing import List, Tuple
+from multiprocessing import Pool, Process
 import h5py as h5
 import swiftsimio as sw
-import unyt
-from typing import List, Tuple
-from multiprocessing import Pool
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
 
 from register import zooms_register, Zoom
 
@@ -113,8 +113,13 @@ def make_single_image():
         f"{'f_hotgas(< R_500crit)':<20s} "
     ))
 
-    pool = Pool()  # Create a multiprocessing Pool
-    pool.map(data_worker, iter(zooms_register))  # process data_inputs iterable with pool
+    # pool = Pool(os.cpu_count())  # Create a multiprocessing Pool
+    # pool.map(data_worker, iter(zooms_register))  # process data_inputs iterable with pool
+
+    for zoom in zooms_register:
+        worker = Process(target=data_worker, args=(zoom,))
+        worker.start()
+        worker.join()
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
                edgecolors='none')
