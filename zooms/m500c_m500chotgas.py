@@ -4,6 +4,7 @@ import unyt
 import numpy as np
 from typing import List, Tuple
 from multiprocessing import Pool, Process
+from itertools import product
 import h5py as h5
 import swiftsimio as sw
 import matplotlib.pyplot as plt
@@ -114,7 +115,7 @@ def make_single_image():
     ))
 
     pool = Pool(os.cpu_count())  # Create a multiprocessing Pool
-    pool.map(data_worker, (iter(zooms_register), ax))  # process data_inputs iterable with pool
+    pool.starmap(data_worker, product(iter(zooms_register), iter([ax]*len(zooms_register))))  # process data_inputs iterable with pool
 
     ax.scatter(M500_Sun * 1.e13, Mgas500_Sun * 1.e13, marker='s', s=5, alpha=0.7, c='gray', label='Sun et al. (2009)',
                edgecolors='none')
