@@ -1,11 +1,15 @@
 # Plot scaling relations for EAGLE-XL tests
-
+import os
+import unyt
 import numpy as np
-import matplotlib.pyplot as plt
+from typing import Tuple
+from multiprocessing import Pool
 import h5py as h5
 import swiftsimio as sw
-import unyt
-from typing import List, Tuple
+import matplotlib.pyplot as plt
+import matplotlib.lines as mlines
+
+from register import zooms_register, Zoom
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -22,7 +26,6 @@ def process_single_halo(
         path_to_snap: str,
         path_to_catalogue: str
 ) -> Tuple[float]:
-
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -56,26 +59,48 @@ def process_single_halo(
     return M500c, Mstar500c, Mhot500c
 
 
-def make_single_image(
-        name_list: List[str] = None,
-        paths_to_snap: List[str] = None,
-        paths_to_catalogue: List[str] = None,
-        output_path: str = None
-) -> None:
+def _process_single_halo(zoom: Zoom):
+    return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
-    assert len(paths_to_snap) == len(paths_to_catalogue)
 
-    numZooms = len(paths_to_snap)
-    M500c = np.zeros(numZooms)
-    Mstar500c = np.zeros(numZooms)
-    Mhot500c = np.zeros(numZooms)
+def make_single_image():
+    fig, ax = plt.subplots()
 
-    for i, (snap, catalogue) in enumerate(zip(paths_to_snap, paths_to_catalogue)):
-        results = process_single_halo(snap, catalogue)
-        M500c[i] = results[0]
-        Mstar500c[i] = results[1]
-        Mhot500c[i] = results[2]
+    M500c = np.zeros(len(zooms_register), dtype=np.float64)
+    Mstar500c = np.zeros(len(zooms_register), dtype=np.float64)
+    Mhot500c = np.zeros(len(zooms_register), dtype=np.float64)
 
+    print((
+        f"{'Run name':<40s} "
+        f"{'M_500crit':<15s} "
+        f"{'M_star(< R_500crit)':<25s} "
+        f"{'M_hot(< R_500crit)':<20s} "
+    ))
+
+    # The results of the multiprocessing Pool are returned in the same order as inputs
+    with Pool() as pool:
+        results = pool.map(_process_single_halo, iter(zooms_register))
+
+    for i, data in enumerate(results):
+        # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
+        # Results returned as tuples, which are immutable. Convert to list to update.
+        data = list(data)
+
+        h70_XL = H0_XL / 70.
+        data[0] = data[0] * h70_XL
+        data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
+        M500c[i] = data[0].value
+        Mstar500c[i] = data[1].value
+        Mhot500c[i] = data[2].value
+
+        print((
+            f"{zooms_register[i].run_name:<40s} "
+            f"{(data[0].value / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(data[1].value / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(data[2].value / 1.e13):<6.4f} "
+        ))
+
+    ax.scatter(M500c, Mstar500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
     # Budzynski et al. 2014
     M500_Bud = np.array([5., 100.])
     Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 30.) - 0.56)
@@ -89,220 +114,120 @@ def make_single_image(
     Mhot500c *= (h70_XL ** 2.5)
     Mstar500c *= (h70_XL ** 2.5)
 
-    colours = [
-        'blue', 'blue', 'blue', 'cyan',
-        'purple', 'purple', 'purple', 'red',
-        'orange', 'orange', 'orange', 'yellow',
-        'green', 'green', 'green', 'lime',
-        'brown',
-
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-        "black",
-    ]
-
-    fig, ax = plt.subplots(figsize=(5, 3))
-    ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)')
-    ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray', label='Kravtsov et al. (2018)')
-
-    print(f"\n{'Run name':<25s} {'M500c             ':<15s} {'Mhot500c           ':<15s}")
-    for i in range(numZooms):
-        print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<5.3f} * 1e13 Msun {(Mhot500c[i] / 1.e13):<5.3f} * 1e13 Msun")
-        ax.scatter(M500c[i], Mstar500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
+    ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)',
+            edgecolors='none')
+    ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray',
+               label='Kravtsov et al. (2018)', edgecolors='none')
 
     ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
     ax.set_ylabel(r'$M_{{\rm star},500{\rm c}}/h_{70}^{-5/2}{\rm M}_{\odot}$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-    fig.savefig(f'{output_path}/m500c_mstar500c.png', dpi=500)
+
+    # Build legend
+    handles = [
+        mlines.Line2D([], [], color='black', marker='.', linestyle='None', markersize=10, label='Random AGN (Ref)'),
+        mlines.Line2D([], [], color='orange', marker='.', linestyle='None', markersize=10, label='MinimumDistance'),
+        mlines.Line2D([], [], color='lime', marker='.', linestyle='None', markersize=10, label='Isotropic')
+    ]
+    plt.legend(handles=handles)
+    fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
     plt.show()
     plt.close()
 
     return
 
 
-if __name__ == "__main__":
-    name_list = [
-        "SK0_-8res_AGN1",
-        "SK1_-8res_AGN1",
-        "SK2_-8res_AGN1",
-        "SK0_+1res_AGN1",
+make_single_image()
 
-        "SK0_-8res_AGN1_AGNseed1e4",
-        "SK1_-8res_AGN1_AGNseed1e4",
-        "SK2_-8res_AGN1_AGNseed1e4",
-        "SK0_+1res_AGN8_AGNseed1e4",
-
-        "SK0_-8res_AGN1",
-        "SK1_-8res_AGN1",
-        "SK2_-8res_AGN1",
-        "SK0_+1res_AGN1",
-
-        "SK0_-8res_AGN1_DefSep",
-        "SK1_-8res_AGN1_DefSep",
-        "SK2_-8res_AGN1_DefSep",
-        "SK0_+1res_AGN1_DefSep",
-        "SK0_+1res_AGN8_DefSep",
-
-        "L0300N0564_VR121_-8res_Ref",
-        "L0300N0564_VR1236_-8res_Ref",
-        "L0300N0564_VR130_-8res_Ref",
-        "L0300N0564_VR139_-8res_Ref",
-        "L0300N0564_VR155_-8res_Ref",
-        "L0300N0564_VR187_-8res_Ref",
-        "L0300N0564_VR18_-8res_Ref",
-        "L0300N0564_VR2272_-8res_Ref",
-        "L0300N0564_VR23_-8res_Ref",
-        "L0300N0564_VR2414_-8res_Ref",
-        "L0300N0564_VR2766_-8res_Ref",
-        "L0300N0564_VR2905_-8res_Ref",
-        "L0300N0564_VR2915_-8res_Ref",
-        "L0300N0564_VR3032_-8res_Ref",
-        "L0300N0564_VR340_-8res_Ref",
-        "L0300N0564_VR36_-8res_Ref",
-        "L0300N0564_VR37_-8res_Ref",
-        "L0300N0564_VR470_-8res_Ref",
-        "L0300N0564_VR485_-8res_Ref",
-        "L0300N0564_VR55_-8res_Ref",
-        "L0300N0564_VR666_-8res_Ref",
-        "L0300N0564_VR680_-8res_Ref",
-        "L0300N0564_VR775_-8res_Ref",
-        "L0300N0564_VR801_-8res_Ref",
-        "L0300N0564_VR813_-8res_Ref",
-        "L0300N0564_VR918_-8res_Ref",
-        "L0300N0564_VR93_-8res_Ref",
-    ]
-    snapshot_filenames = [
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/snapshots/EAGLE-XL_ClusterSK0_-8res_0036.hdf5",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res/snapshots/EAGLE-XL_ClusterSK1_-8res_0036.hdf5",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res/snapshots/EAGLE-XL_ClusterSK2_-8res_0036.hdf5",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res/snapshots/EAGLE-XL_ClusterSK0_+1res_0036.hdf5",
-
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/snapshots/snap_2749.hdf5",
-
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res/snapshots/EAGLE-XL_ClusterSK1_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res/snapshots/EAGLE-XL_ClusterSK2_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
-
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res_DefSep/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res_DefSep/snapshots/EAGLE-XL_ClusterSK1_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res_DefSep/snapshots/EAGLE-XL_ClusterSK2_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep_AGN8/snapshots/EAGLE-XL_ClusterSK0_HYDRO_0036.hdf5",
-
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR121_-8res_Ref/snapshots/L0300N0564_VR121_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Ref/snapshots/L0300N0564_VR1236_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR130_-8res_Ref/snapshots/L0300N0564_VR130_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Ref/snapshots/L0300N0564_VR139_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR155_-8res_Ref/snapshots/L0300N0564_VR155_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Ref/snapshots/L0300N0564_VR187_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2272_-8res_Ref/snapshots/L0300N0564_VR2272_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR23_-8res_Ref/snapshots/L0300N0564_VR23_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Ref/snapshots/L0300N0564_VR2414_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2766_-8res_Ref/snapshots/L0300N0564_VR2766_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Ref/snapshots/L0300N0564_VR2905_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2915_-8res_Ref/snapshots/L0300N0564_VR2915_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Ref/snapshots/L0300N0564_VR3032_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR340_-8res_Ref/snapshots/L0300N0564_VR340_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR36_-8res_Ref/snapshots/L0300N0564_VR36_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR37_-8res_Ref/snapshots/L0300N0564_VR37_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Ref/snapshots/L0300N0564_VR470_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR485_-8res_Ref/snapshots/L0300N0564_VR485_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Ref/snapshots/L0300N0564_VR55_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Ref/snapshots/L0300N0564_VR666_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR680_-8res_Ref/snapshots/L0300N0564_VR680_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR775_-8res_Ref/snapshots/L0300N0564_VR775_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR801_-8res_Ref/snapshots/L0300N0564_VR801_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Ref/snapshots/L0300N0564_VR813_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR918_-8res_Ref/snapshots/L0300N0564_VR918_-8res_Ref_2749.hdf5",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref/snapshots/L0300N0564_VR93_-8res_Ref_2749.hdf5",
-    ]
-    catalogue_filenames = [
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res/stf/EAGLE-XL_ClusterSK0_-8res_0036/EAGLE-XL_ClusterSK0_-8res_0036.properties",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res/stf/EAGLE-XL_ClusterSK1_-8res_0036/EAGLE-XL_ClusterSK1_-8res_0036.properties",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res/stf/EAGLE-XL_ClusterSK2_-8res_0036/EAGLE-XL_ClusterSK2_-8res_0036.properties",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res/stf/EAGLE-XL_ClusterSK0_+1res_0036/EAGLE-XL_ClusterSK0_+1res_0036.properties",
-
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK1_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK2_-8res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/SK0_+1res_AGNseedmass1e4/stf/snap_2749/snap_2749.properties",
-
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res/stf/EAGLE-XL_ClusterSK1_HYDRO_0036/EAGLE-XL_ClusterSK1_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res/stf/EAGLE-XL_ClusterSK2_HYDRO_0036/EAGLE-XL_ClusterSK2_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
-
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_-8res_DefSep/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK1_-8res_DefSep/stf/EAGLE-XL_ClusterSK1_HYDRO_0036/EAGLE-XL_ClusterSK1_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK2_-8res_DefSep/stf/EAGLE-XL_ClusterSK2_HYDRO_0036/EAGLE-XL_ClusterSK2_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
-        "/cosma7/data/dp004/stk/SwiftRuns/EAGLE-XL/GroupZooms/ClusterSK0_+1res_DefSep_AGN8/stf/EAGLE-XL_ClusterSK0_HYDRO_0036/EAGLE-XL_ClusterSK0_HYDRO_0036.properties",
-
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR121_-8res_Ref/stf/L0300N0564_VR121_-8res_Ref_2749/L0300N0564_VR121_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Ref/stf/L0300N0564_VR1236_-8res_Ref_2749/L0300N0564_VR1236_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR130_-8res_Ref/stf/L0300N0564_VR130_-8res_Ref_2749/L0300N0564_VR130_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Ref/stf/L0300N0564_VR139_-8res_Ref_2749/L0300N0564_VR139_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR155_-8res_Ref/stf/L0300N0564_VR155_-8res_Ref_2749/L0300N0564_VR155_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Ref/stf/L0300N0564_VR187_-8res_Ref_2749/L0300N0564_VR187_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2272_-8res_Ref/stf/L0300N0564_VR2272_-8res_Ref_2749/L0300N0564_VR2272_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR23_-8res_Ref/stf/L0300N0564_VR23_-8res_Ref_2749/L0300N0564_VR23_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Ref/stf/L0300N0564_VR2414_-8res_Ref_2749/L0300N0564_VR2414_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2766_-8res_Ref/stf/L0300N0564_VR2766_-8res_Ref_2749/L0300N0564_VR2766_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Ref/stf/L0300N0564_VR2905_-8res_Ref_2749/L0300N0564_VR2905_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2915_-8res_Ref/stf/L0300N0564_VR2915_-8res_Ref_2749/L0300N0564_VR2915_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Ref/stf/L0300N0564_VR3032_-8res_Ref_2749/L0300N0564_VR3032_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR340_-8res_Ref/stf/L0300N0564_VR340_-8res_Ref_2749/L0300N0564_VR340_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR36_-8res_Ref/stf/L0300N0564_VR36_-8res_Ref_2749/L0300N0564_VR36_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR37_-8res_Ref/stf/L0300N0564_VR37_-8res_Ref_2749/L0300N0564_VR37_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Ref/stf/L0300N0564_VR470_-8res_Ref_2749/L0300N0564_VR470_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR485_-8res_Ref/stf/L0300N0564_VR485_-8res_Ref_2749/L0300N0564_VR485_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Ref/stf/L0300N0564_VR55_-8res_Ref_2749/L0300N0564_VR55_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Ref/stf/L0300N0564_VR666_-8res_Ref_2749/L0300N0564_VR666_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR680_-8res_Ref/stf/L0300N0564_VR680_-8res_Ref_2749/L0300N0564_VR680_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR775_-8res_Ref/stf/L0300N0564_VR775_-8res_Ref_2749/L0300N0564_VR775_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR801_-8res_Ref/stf/L0300N0564_VR801_-8res_Ref_2749/L0300N0564_VR801_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Ref/stf/L0300N0564_VR813_-8res_Ref_2749/L0300N0564_VR813_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR918_-8res_Ref/stf/L0300N0564_VR918_-8res_Ref_2749/L0300N0564_VR918_-8res_Ref_2749.properties",
-        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref/stf/L0300N0564_VR93_-8res_Ref_2749/L0300N0564_VR93_-8res_Ref_2749.properties",
-    ]
-    output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
+# def make_single_image(
+#         name_list: List[str] = None,
+#         paths_to_snap: List[str] = None,
+#         paths_to_catalogue: List[str] = None,
+#         output_path: str = None
+# ) -> None:
+#
+#     assert len(paths_to_snap) == len(paths_to_catalogue)
+#
+#     numZooms = len(paths_to_snap)
+#     M500c = np.zeros(numZooms)
+#     Mstar500c = np.zeros(numZooms)
+#     Mhot500c = np.zeros(numZooms)
+#
+#     for i, (snap, catalogue) in enumerate(zip(paths_to_snap, paths_to_catalogue)):
+#         results = process_single_halo(snap, catalogue)
+#         M500c[i] = results[0]
+#         Mstar500c[i] = results[1]
+#         Mhot500c[i] = results[2]
+#
+#     # Budzynski et al. 2014
+#     M500_Bud = np.array([5., 100.])
+#     Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 30.) - 0.56)
+#
+#     # Kravtsov et al. 2018
+#     M500_Kra = np.array([15.60, 10.30, 7.00, 5.34, 2.35, 1.86, 1.34, 0.46, 0.47]) * 10.
+#     Mstar500_Kra = np.array([15.34, 12.35, 8.34, 5.48, 2.68, 3.48, 2.86, 1.88, 1.85]) * 0.1
+#
+#     h70_XL = H0_XL / 70.
+#     M500c *= h70_XL
+#     Mhot500c *= (h70_XL ** 2.5)
+#     Mstar500c *= (h70_XL ** 2.5)
+#
+#     colours = [
+#         'blue', 'blue', 'blue', 'cyan',
+#         'purple', 'purple', 'purple', 'red',
+#         'orange', 'orange', 'orange', 'yellow',
+#         'green', 'green', 'green', 'lime',
+#         'brown',
+#
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#         "black",
+#     ]
+#
+#     fig, ax = plt.subplots(figsize=(5, 3))
+#     ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)')
+#     ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray', label='Kravtsov et al. (2018)')
+#
+#     print(f"\n{'Run name':<25s} {'M500c             ':<15s} {'Mhot500c           ':<15s}")
+#     for i in range(numZooms):
+#         print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<5.3f} * 1e13 Msun {(Mhot500c[i] / 1.e13):<5.3f} * 1e13 Msun")
+#         ax.scatter(M500c[i], Mstar500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
+#
+#     ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
+#     ax.set_ylabel(r'$M_{{\rm star},500{\rm c}}/h_{70}^{-5/2}{\rm M}_{\odot}$')
+#     ax.set_xscale('log')
+#     ax.set_yscale('log')
+#     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
+#     fig.savefig(f'{output_path}/m500c_mstar500c.png', dpi=500)
+#     plt.show()
+#     plt.close()
+#
+#     return
 
 
-    make_single_image(
-        name_list=name_list,
-        paths_to_snap=snapshot_filenames,
-        paths_to_catalogue=catalogue_filenames,
-        output_path=output_directory,
-    )
+i
