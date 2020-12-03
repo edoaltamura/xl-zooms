@@ -1,7 +1,18 @@
 import numpy as np
+import re
 from astropy import cosmology
 import pandas as pd
-from unyt import Solar_Mass
+import unyt
+from unyt import (
+    Solar_Mass,
+    Mpc,
+    Dimensionless,
+    Solar_Luminosity,
+    Solar_Metallicity,
+    keV, erg, second, K
+)
+
+unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
 
 
 class Observations:
@@ -113,13 +124,27 @@ class Gonzalez13(Observations):
 
 class Barnes17(Observations):
     paper_name = "Barnes et al. (2017)"
-    notes = "Assumes Planck14."
+    notes = "Assumes Planck13. Values for snapshots at z=0.1."
 
     field_names = [
-        "Cluster name", "log10(M_500true)", "log10(M_500hse)", "log10(M_500spec)", "r_500true (Mpc)", "r_500spec (Mpc)",
-        "IC location x (Mpc/h)", "IC location y (Mpc/h)", "IC location z (Mpc/h)", "IC extent (Mpc/h)", "k_B T_X (keV)",
-        "L_X^{0.5−2.0 keV} (log10(L/erg s−1))", "M_gas <r_500spec (log10(M/M))", "M_star <r_500spec (log10(M/M))",
-        "Y_X <r_500spec (log10(Y/MkeV))", "Y_SZ <5*r_500spec (log10(Y/Mpc2))", "Z_Fe (Z_FeSun)", "E_kin/E_thrm"
+        "Cluster name",
+        "log10(M_500true)",
+        "log10(M_500hse)",
+        "log10(M_500spec)",
+        "r_500true (Mpc)",
+        "r_500spec (Mpc)",
+        "IC location x (Mpc/h)",
+        "IC location y (Mpc/h)",
+        "IC location z (Mpc/h)",
+        "IC extent (Mpc/h)",
+        "k_B T_X (keV)",
+        "L_X^{0.5−2.0 keV} (log10(L/erg s−1))",
+        "M_gas <r_500spec (log10(M/M))",
+        "M_star <r_500spec (log10(M/M))",
+        "Y_X <r_500spec (log10(Y/MSun keV))",
+        "Y_SZ <5*r_500spec (log10(Y/Mpc^2))",
+        "Z_Fe (Z_FeSun)",
+        "E_kin/E_thrm"
     ]
 
     table_Barn = [
@@ -158,15 +183,46 @@ class Barnes17(Observations):
     def __init__(self, *args, **kwargs):
         super(Barnes17, self).__init__(*args, **kwargs)
         self.process_data()
-        h70_Barn = 0.6777 / self.cosmo_model.h
 
     def process_data(self):
+
+        # Some `-` chars may not actually be minuses, replace those
+        self.table_Barn = [re.sub(r'[^\x00-\x7F]+', '-', s) for s in self.table_Barn]
+
+        # Construct Pandas dataset with cluster names as indices
         table_series = pd.Series(self.table_Barn).str.split(', ')
         table_series = np.array(table_series.values.tolist())
-        print(table_series.shape)
-        df = pd.DataFrame(table_series, columns=self.field_names)
-        print(df)
+        df = pd.DataFrame(table_series[:, 1:], columns=self.field_names[1:], index=table_series[:, 0])
+
+        # Convert all columns of DataFrame
+        df = df.apply(pd.to_numeric, errors='ignore', downcast='float')
+
+        h_conv_Barn = cosmology.Planck13.h / self.cosmo_model.h
+
+        self.M_500true = np.power(10, df["log10(M_500true)"].to_numpy(dtype=np.float64)) * Solar_Mass
+        self.M_500hse = np.power(10, df["log10(M_500hse)"].to_numpy(dtype=np.float64)) * Solar_Mass
+        self.M_500spec = np.power(10, df["log10(M_500spec)"].to_numpy(dtype=np.float64)) * Solar_Mass
+        self.r_500true = df["r_500true (Mpc)"].to_numpy(dtype=np.float64) * Mpc
+        self.r_500spec = df["r_500spec (Mpc)"].to_numpy(dtype=np.float64) * Mpc
+        self.x_ICs = df["IC location x (Mpc/h)"].to_numpy(dtype=np.float64) * h_conv_Barn * Mpc / unyt.hubble_parameter
+        self.y_ICs = df["IC location y (Mpc/h)"].to_numpy(dtype=np.float64) * h_conv_Barn * Mpc / unyt.hubble_parameter
+        self.z_ICs = df["IC location z (Mpc/h)"].to_numpy(dtype=np.float64) * h_conv_Barn * Mpc / unyt.hubble_parameter
+        self.extent_ICs = df["IC extent (Mpc/h)"].to_numpy(dtype=np.float64) * h_conv_Barn * Mpc / unyt.hubble_parameter
+        self.kB_TX = df["k_B T_X (keV)"].to_numpy(dtype=np.float64) * keV
+        self.LX = np.power(10, df["L_X^{0.5−2.0 keV} (log10(L/erg s−1))"].to_numpy(dtype=np.float64)) * erg / second
+        self.M_gas = np.power(10, df["M_gas <r_500spec (log10(M/M))"].to_numpy(dtype=np.float64)) * Solar_Mass
+        self.M_star = np.power(10, df["M_star <r_500spec (log10(M/M))"].to_numpy(dtype=np.float64)) * Solar_Mass
+        self.Y_X = np.power(10, df["Y_X <r_500spec (log10(Y/MSun keV))"].to_numpy(dtype=np.float64)) * Solar_Mass * keV
+        self.Y_SZ = np.power(10, df["Y_SZ <5*r_500spec (log10(Y/Mpc^2))"].to_numpy(dtype=np.float64)) * Mpc ** 2
+        self.Z_Fe = df["Z_Fe (Z_FeSun)"].to_numpy(dtype=np.float64) * Solar_Metallicity
+        self.Ekin_Ethrm = df["E_kin/E_thrm"].to_numpy(dtype=np.float64) * Dimensionless
+
+        # Convert self.LX to Solar luminosities
+        self.LX = self.LX.to(Solar_Luminosity)
+
+        # Return X-ray temperatures in Kelvin
+        self.TX = (self.kB_TX / unyt.boltzmann_constant).to(K)
+
+        # TODO: Review how h_conv_Barn is applied to each individual dataset
 
 
-bud14 = Barnes17()
-# print(bud14.Mstar500, bud14.M500)
