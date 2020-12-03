@@ -35,8 +35,6 @@ def process_single_halo(
         Mstar500c = unyt.unyt_quantity(h5file['/SO_Mass_star_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
-    print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
-
     # Read in gas particles
     mask = sw.mask(f'{path_to_snap}')
     region = [[XPotMin - R500c, XPotMin + R500c],
@@ -172,42 +170,6 @@ make_single_image()
 #     Mhot500c *= (h70_XL ** 2.5)
 #     Mstar500c *= (h70_XL ** 2.5)
 #
-#     colours = [
-#         'blue', 'blue', 'blue', 'cyan',
-#         'purple', 'purple', 'purple', 'red',
-#         'orange', 'orange', 'orange', 'yellow',
-#         'green', 'green', 'green', 'lime',
-#         'brown',
-#
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#         "black",
-#     ]
-#
 #     fig, ax = plt.subplots(figsize=(5, 3))
 #     ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)')
 #     ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray', label='Kravtsov et al. (2018)')
@@ -227,6 +189,3 @@ make_single_image()
 #     plt.close()
 #
 #     return
-
-
-i
