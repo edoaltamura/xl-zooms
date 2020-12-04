@@ -1,6 +1,28 @@
 import numpy as np
 import re
 from astropy import cosmology
+
+"""
+Each cosmology has the following parameters defined:
+==========  =====================================
+Oc0         Omega cold dark matter at z=0
+Ob0         Omega baryon at z=0
+Om0         Omega matter at z=0
+flat        Is this assumed flat?  If not, Ode0 must be specified
+Ode0        Omega dark energy at z=0 if flat is False
+H0          Hubble parameter at z=0 in km/s/Mpc
+n           Density perturbation spectral index
+Tcmb0       Current temperature of the CMB
+Neff        Effective number of neutrino species
+m_nu        Assumed mass of neutrino species, in eV.
+sigma8      Density perturbation amplitude
+tau         Ionisation optical depth
+z_reion     Redshift of hydrogen reionisation
+t0          Age of the universe in Gyr
+reference   Reference for the parameters
+==========  =====================================
+"""
+
 import pandas as pd
 import unyt
 from unyt import (
@@ -12,6 +34,82 @@ from unyt import (
     keV, erg, second, K
 )
 
+# Check back-compatibility with old versions of Astropy
+try:
+    from astropy.cosmology import Planck18
+
+except ImportError:
+
+    from astropy.cosmology.core import FlatwCDM
+    from astropy.cosmology.core import FlatLambdaCDM
+    from astropy import units as u
+
+    def create_cosmology(parameters=None, name=None):
+        """
+        A wrapper to create custom astropy cosmologies.
+        The only avaliable cosmology types in this method are: FlatLambdaCDM,
+        FlatwCDM, LambdaCDM and wCDM. See `astropy.cosmology`_ for more details on
+        these types of cosmologies. To create a cosmology of a type that isn't
+        listed above, it will have to be created directly using astropy.cosmology.
+        """
+
+        # Set the default parameters:
+        params = {'H0': 70, 'Om0': 0.3, 'Oc0': 0.26, 'Ob0': 0.04, 'w0': -1,
+                  'Neff': 3.04, 'flat': True, 'Tcmb0': 0.0, 'm_nu': 0.0}
+
+        # Override default parameters with supplied parameters
+        if parameters is not None:
+            params.update(parameters)
+
+        if params["flat"]:
+            if params['w0'] is not -1:
+                cosmo = FlatwCDM(H0=params['H0'], Om0=params['Om0'],
+                                 w0=params['w0'], Tcmb0=params['Tcmb0'],
+                                 Neff=params['Neff'], Ob0=params['Ob0'],
+                                 m_nu=u.Quantity(params['m_nu'], u.eV), name=name)
+
+            else:
+                cosmo = FlatLambdaCDM(H0=params['H0'], Om0=params['Om0'],
+                                      Tcmb0=params['Tcmb0'], Neff=params['Neff'],
+                                      Ob0=params['Ob0'], name=name,
+                                      m_nu=u.Quantity(params['m_nu'], u.eV))
+        return cosmo
+
+
+    # Planck 2018 paper VI
+    # Unlike Planck 2015, the paper includes massive neutrinos in Om0, which here
+    # are included in m_nu.  Hence, the Om0 value differs slightly from the paper.
+    planck18 = dict(
+        Oc0=0.2607,
+        Ob0=0.04897,
+        Om0=0.3111,
+        H0=67.66,
+        n=0.9665,
+        sigma8=0.8102,
+        tau=0.0561,
+        z_reion=7.82,
+        t0=13.787,
+        Tcmb0=2.7255,
+        Neff=3.046,
+        flat=True,
+        m_nu=[0., 0., 0.06],
+        reference=("Planck 2018 results. VI. Cosmological Parameters, A&A, submitted,"
+                   " Table 2 (TT, TE, EE + lowE + lensing + BAO)")
+    )
+
+
+    def Planck18():
+        """
+        Planck18 instance of FlatLambdaCDM cosmology
+        (from Planck 2018 results. VI. Cosmological Parameters,
+        A&A, submitted, Table 2 (TT, TE, EE + lowE + lensing + BAO))
+        """
+        cosmo = create_cosmology(name="Planck18", parameters=planck18)
+        return cosmo
+
+    setattr(cosmology, "Planck18", Planck18())
+
+
 unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
 
 
@@ -20,10 +118,9 @@ class Observations:
     def __init__(self, cosmo_model: str = "Planck18"):
 
         for model_name in dir(cosmology):
-            if cosmo_model.lower() in model_name.lower():
+            if cosmo_model.lower() == model_name.lower():
                 print(f"Using the {model_name} cosmology")
-                _cosmo_model = getattr(cosmology, model_name)
-                setattr(self, "cosmo_model", _cosmo_model)
+                self.cosmo_model = getattr(cosmology, model_name)
 
 
 class Sun09(Observations):
@@ -43,8 +140,8 @@ class Sun09(Observations):
     )
     Mgas500_Sun = M500_Sun * f500_Sun
 
-    def __init__(self, cosmo_model: str = "Planck18"):
-        super(Sun09, self).__init__(cosmo_model=cosmo_model)
+    def __init__(self, *args, **kwargs):
+        super(Sun09, self).__init__(*args, **kwargs)
 
         h70_Sun = 0.73 / self.cosmo_model.h
         self.M500 = self.M500_Sun * h70_Sun
@@ -66,8 +163,8 @@ class Lovisari15(Observations):
          0.906, 0.534, 0.650, 0.194, 0.627, 0.817]
     ) * 1.e13 * Solar_Mass
 
-    def __init__(self, cosmo_model: str = "Planck18"):
-        super(Lovisari15, self).__init__(cosmo_model=cosmo_model)
+    def __init__(self, *args, **kwargs):
+        super(Lovisari15, self).__init__(*args, **kwargs)
 
         h70_Lov = 0.70 / self.cosmo_model.h
         self.M500 = self.M500_Lov * h70_Lov
@@ -85,8 +182,8 @@ class Kravtsov18(Observations):
         [15.34, 12.35, 8.34, 5.48, 2.68, 3.48, 2.86, 1.88, 1.85]
     ) * 0.1 * 1.e13 * Solar_Mass
 
-    def __init__(self, cosmo_model: str = "Planck18"):
-        super(Kravtsov18, self).__init__(cosmo_model=cosmo_model)
+    def __init__(self, *args, **kwargs):
+        super(Kravtsov18, self).__init__(*args, **kwargs)
 
         h70_Kra = 0.70 / self.cosmo_model.h
         self.M500 = self.M500_Kra * h70_Kra
@@ -108,8 +205,8 @@ class Budzynski14(Observations):
     M500_Bud = np.array([10 ** 13.7, 10 ** 15]) * Solar_Mass
     Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 3.e14) + 12.44) * Solar_Mass
 
-    def __init__(self, cosmo_model: str = "Planck18"):
-        super(Budzynski14, self).__init__(cosmo_model=cosmo_model)
+    def __init__(self, *args, **kwargs):
+        super(Budzynski14, self).__init__(*args, **kwargs)
 
         h70_Bud = 0.70 / self.cosmo_model.h
         self.M500 = self.M500_Bud * h70_Bud
@@ -167,8 +264,8 @@ class Gonzalez13(Observations):
         "A2390 0.144 0.023 none none none none",
     ]
 
-    def __init__(self, cosmo_model: str = "Planck18"):
-        super(Gonzalez13, self).__init__(cosmo_model=cosmo_model)
+    def __init__(self, *args, **kwargs):
+        super(Gonzalez13, self).__init__(*args, **kwargs)
         self.process_data()
 
     def process_data(self):
@@ -246,8 +343,8 @@ class Barnes17(Observations):
         "CE-29 15.077 15.089 14.912 1.60 1.40 719.79 1449.38 1015.75 60.04 7.66 44.942 14.188 13.185 15.067 −3.510 0.52 0.30"
     ]
 
-    def __init__(self, cosmo_model: str = "Planck18"):
-        super(Barnes17, self).__init__(cosmo_model=cosmo_model)
+    def __init__(self, *args, **kwargs):
+        super(Barnes17, self).__init__(*args, **kwargs)
         self.process_data()
 
     def process_data(self):
@@ -291,4 +388,4 @@ class Barnes17(Observations):
         # TODO: Review how h_conv_Barn is applied to each individual dataset
 
 
-# Gonzalez13()
+Gonzalez13()

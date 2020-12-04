@@ -142,8 +142,8 @@ def make_single_image():
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
         Rectangle((0, 0), 0, 0, color='w', label='Observations:'),
-        Line2D([], [], color='grey', marker='.', linestyle='-', markersize=0, label='Budzynski et al. (2014)'),
-        Line2D([], [], color='grey', marker='*', linestyle='None', markersize=10, label='Kravtsov et al. (2018)'),
+        Line2D([], [], color='grey', marker='.', linestyle='-', markersize=0, label=Budzynski14.paper_name),
+        Line2D([], [], color='grey', marker='*', linestyle='None', markersize=10, label=Kravtsov18.paper_name),
     ]
     plt.legend(handles=handles)
     fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
