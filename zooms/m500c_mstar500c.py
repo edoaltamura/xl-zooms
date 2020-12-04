@@ -118,18 +118,21 @@ def make_single_image():
         Line2D([], [], color='black', marker='.', markeredgecolor='none', linestyle='None', markersize=6, label='1/8 EAGLE'),
         Line2D([], [], color='black', marker='^', markeredgecolor='none', linestyle='None', markersize=6, label='EAGLE'),
     ]
-    plt.legend(handles=handles, title="Resolution")
+    legend_resolution = plt.legend(handles=handles, title="Resolution")
     handles = [
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
     ]
-    plt.legend(handles=handles, title="AGN model")
+    legend_models = plt.legend(handles=handles, title="AGN model")
     handles = [
         Line2D([], [], color='grey', marker='.', markeredgecolor='none', linestyle='-', markersize=0, label=Budzynski14.paper_name),
         Line2D([], [], color='grey', marker='*', markeredgecolor='none', linestyle='None', markersize=4, label=Kravtsov18.paper_name),
     ]
-    plt.legend(handles=handles, title="Observations")
+    legend_observations = plt.legend(handles=handles, title="Observations")
+    ax.add_artist(legend_resolution)
+    ax.add_artist(legend_models)
+    ax.add_artist(legend_observations)
     fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
     plt.show()
     plt.close()
