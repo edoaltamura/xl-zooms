@@ -42,8 +42,8 @@ class Sun09(Observations):
     )
     Mgas500_Sun = M500_Sun * f500_Sun
 
-    def __init__(self, *args, **kwargs):
-        super(Sun09, self).__init__(*args, **kwargs)
+    def __init__(self, cosmo_model: str = "Planck18"):
+        super(Sun09, self).__init__(cosmo_model=cosmo_model)
 
         h70_Sun = 0.73 / self.cosmo_model.h
         self.M500 = self.M500_Sun * h70_Sun
@@ -65,8 +65,8 @@ class Lovisari15(Observations):
          0.906, 0.534, 0.650, 0.194, 0.627, 0.817]
     ) * 1.e13 * Solar_Mass
 
-    def __init__(self, *args, **kwargs):
-        super(Lovisari15, self).__init__(*args, **kwargs)
+    def __init__(self, cosmo_model: str = "Planck18"):
+        super(Lovisari15, self).__init__(cosmo_model=cosmo_model)
 
         h70_Lov = 0.70 / self.cosmo_model.h
         self.M500 = self.M500_Lov * h70_Lov
@@ -84,8 +84,8 @@ class Kravtsov18(Observations):
         [15.34, 12.35, 8.34, 5.48, 2.68, 3.48, 2.86, 1.88, 1.85]
     ) * 0.1 * 1.e13 * Solar_Mass
 
-    def __init__(self, *args, **kwargs):
-        super(Kravtsov18, self).__init__(*args, **kwargs)
+    def __init__(self, cosmo_model: str = "Planck18"):
+        super(Kravtsov18, self).__init__(cosmo_model=cosmo_model)
 
         h70_Kra = 0.70 / self.cosmo_model.h
         self.M500 = self.M500_Kra * h70_Kra
@@ -94,24 +94,21 @@ class Kravtsov18(Observations):
 
 class Budzynski14(Observations):
     paper_name = "Budzynski et al. (2014)"
-    notes = "Data in h_70 units."
+    notes = ("Data in h_70 units."
+             "Mstar−M500 relation",
+             "a = 0.89 ± 0.14 and b = 12.44 ± 0.03",
+             r"$\log \left(\frac{M_{\text {star }}}{\mathrm{M}_{\odot}}\right)=a \log \left(\frac{M_{500}}",
+             r"{3 \times 10^{14} \mathrm{M}_{\odot}}\right)+b$",
+             "star−M500 relation",
+             "alpha = −0.11 ± 0.14 and beta = −2.04 ± 0.03",
+             r"$\log f_{\text {star }}=\alpha \log \left(\frac{M_{500}}{3 \times 10^{14} "
+             r"\mathrm{M}_{\odot}}\right)+\beta$")
 
     M500_Bud = np.array([10 ** 13.7, 10 ** 15]) * Solar_Mass
     Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 3.e14) + 12.44) * Solar_Mass
 
-    # Mstar−M500 relation
-    # a = 0.89 ± 0.14 and b = 12.44 ± 0.03
-    #
-    # $\log \left(\frac{M_{\text {star }}}{\mathrm{M}_{\odot}}\right)=a \log \left(\frac{M_{500}}
-    # {3 \times 10^{14} \mathrm{M}_{\odot}}\right)+b$
-
-    # star−M500 relation
-    # alpha = −0.11 ± 0.14 and beta = −2.04 ± 0.03
-    #
-    # $\log f_{\text {star }}=\alpha \log \left(\frac{M_{500}}{3 \times 10^{14} \mathrm{M}_{\odot}}\right)+\beta$
-
-    def __init__(self, *args, **kwargs):
-        super(Budzynski14, self).__init__(*args, **kwargs)
+    def __init__(self, cosmo_model: str = "Planck18"):
+        super(Budzynski14, self).__init__(cosmo_model=cosmo_model)
 
         h70_Bud = 0.70 / self.cosmo_model.h
         self.M500 = self.M500_Bud * h70_Bud
@@ -169,8 +166,8 @@ class Gonzalez13(Observations):
         "A2390 0.144 0.023 none none none none",
     ]
 
-    def __init__(self, *args, **kwargs):
-        super(Gonzalez13, self).__init__(*args, **kwargs)
+    def __init__(self, cosmo_model: str = "Planck18"):
+        super(Gonzalez13, self).__init__(cosmo_model=cosmo_model)
         self.process_data()
 
     def process_data(self):
@@ -248,8 +245,8 @@ class Barnes17(Observations):
         "CE-29 15.077 15.089 14.912 1.60 1.40 719.79 1449.38 1015.75 60.04 7.66 44.942 14.188 13.185 15.067 −3.510 0.52 0.30"
     ]
 
-    def __init__(self, *args, **kwargs):
-        super(Barnes17, self).__init__(*args, **kwargs)
+    def __init__(self, cosmo_model: str = "Planck18"):
+        super(Barnes17, self).__init__(cosmo_model=cosmo_model)
         self.process_data()
 
     def process_data(self):
@@ -293,4 +290,4 @@ class Barnes17(Observations):
         # TODO: Review how h_conv_Barn is applied to each individual dataset
 
 
-# Gonzalez13()
+Gonzalez13()
