@@ -115,8 +115,8 @@ def make_single_image():
 
     # Build legends
     handles = [
-        Line2D([], [], color='black', marker='.', edgecolors='none', linestyle='None', markersize=6, label='1/8 EAGLE'),
-        Line2D([], [], color='black', marker='^', edgecolors='none', linestyle='None', markersize=6, label='EAGLE'),
+        Line2D([], [], color='black', marker='.', markeredgecolor='none', linestyle='None', markersize=6, label='1/8 EAGLE'),
+        Line2D([], [], color='black', marker='^', markeredgecolor='none', linestyle='None', markersize=6, label='EAGLE'),
     ]
     plt.legend(handles=handles, title="Resolution")
     handles = [
@@ -126,8 +126,8 @@ def make_single_image():
     ]
     plt.legend(handles=handles, title="AGN model")
     handles = [
-        Line2D([], [], color='grey', marker='.', edgecolors='none', linestyle='-', markersize=0, label=Budzynski14.paper_name),
-        Line2D([], [], color='grey', marker='*', edgecolors='none', linestyle='None', markersize=4, label=Kravtsov18.paper_name),
+        Line2D([], [], color='grey', marker='.', markeredgecolor='none', linestyle='-', markersize=0, label=Budzynski14.paper_name),
+        Line2D([], [], color='grey', marker='*', markeredgecolor='none', linestyle='None', markersize=4, label=Kravtsov18.paper_name),
     ]
     plt.legend(handles=handles, title="Observations")
     fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
