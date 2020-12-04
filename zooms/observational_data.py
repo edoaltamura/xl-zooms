@@ -22,7 +22,8 @@ class Observations:
         for model_name in dir(cosmology):
             if cosmo_model.lower() in model_name.lower():
                 print(f"Using the {model_name} cosmology")
-                self.cosmo_model = getattr(cosmology, model_name)
+                _cosmo_model = getattr(cosmology, model_name)
+                setattr(self, "cosmo_model", _cosmo_model)
 
 
 class Sun09(Observations):
@@ -290,4 +291,4 @@ class Barnes17(Observations):
         # TODO: Review how h_conv_Barn is applied to each individual dataset
 
 
-Gonzalez13()
+# Gonzalez13()
