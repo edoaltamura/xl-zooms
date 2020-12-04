@@ -100,22 +100,6 @@ def make_single_image():
         ))
 
     ax.scatter(M500c, Mstar500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
-    # # Budzynski et al. 2014
-    # M500_Bud = np.array([5., 100.])
-    # Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 30.) - 0.56)
-    #
-    # # Kravtsov et al. 2018
-    # M500_Kra = np.array([15.60, 10.30, 7.00, 5.34, 2.35, 1.86, 1.34, 0.46, 0.47]) * 10.
-    # Mstar500_Kra = np.array([15.34, 12.35, 8.34, 5.48, 2.68, 3.48, 2.86, 1.88, 1.85]) * 0.1
-    #
-    # h70_XL = H0_XL / 70.
-    # M500c *= h70_XL
-    # Mhot500c *= (h70_XL ** 2.5)
-    # Mstar500c *= (h70_XL ** 2.5)
-    #
-    # ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)')
-    # ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray',
-    #            label='Kravtsov et al. (2018)', edgecolors='none')
 
     # Display observational data
     Budzynski14 = obs.Budzynski14()
@@ -126,26 +110,26 @@ def make_single_image():
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$M_{{\rm star},500{\rm crit}}\ [{\rm M}_{\odot}]$')
 
-    # ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
-    # ax.set_ylabel(r'$M_{{\rm star},500{\rm c}}/h_{70}^{-5/2}{\rm M}_{\odot}$')
-
     ax.set_xscale('log')
     ax.set_yscale('log')
 
     # Build legend
     handles = [
-        Rectangle((0, 0), 0, 0, color='w', label='Resolution:'),
         Line2D([], [], color='black', marker='.', linestyle='None', markersize=10, label='1/8 EAGLE'),
         Line2D([], [], color='black', marker='^', linestyle='None', markersize=10, label='EAGLE'),
-        Rectangle((0, 0), 0, 0, color='w', label='AGN model:'),
+    ]
+    plt.legend(handles=handles, title="Resolution")
+    handles = [
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
-        Rectangle((0, 0), 0, 0, color='w', label='Observations:'),
+    ]
+    plt.legend(handles=handles, title="AGN model")
+    handles = [
         Line2D([], [], color='grey', marker='.', linestyle='-', markersize=0, label=Budzynski14.paper_name),
         Line2D([], [], color='grey', marker='*', linestyle='None', markersize=10, label=Kravtsov18.paper_name),
     ]
-    plt.legend(handles=handles)
+    plt.legend(handles=handles, title="Observations")
     fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
     plt.show()
     plt.close()
