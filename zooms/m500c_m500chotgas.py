@@ -115,7 +115,6 @@ def make_single_image():
                color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
     ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=1,
                color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
-    del Sun09, Lovisari15
 
     # Build legends
     handles = [
@@ -135,6 +134,7 @@ def make_single_image():
                label=Lovisari15.paper_name),
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
     ]
+    del Sun09, Lovisari15
     legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)

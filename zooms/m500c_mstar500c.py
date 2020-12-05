@@ -112,7 +112,6 @@ def make_single_image():
                     linestyle='-', color=(0.85, 0.85, 0.85), edgecolor='none', zorder=0)
     ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', s=12, color=(0.85, 0.85, 0.85),
                edgecolors='none', zorder=0)
-    del Budzynski14, Kravtsov18
 
     # Build legends
     handles = [
@@ -131,6 +130,7 @@ def make_single_image():
         Line2D([], [], color=(0.85, 0.85, 0.85), marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                label=Kravtsov18.paper_name),
     ]
+    del Budzynski14, Kravtsov18
     legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)
