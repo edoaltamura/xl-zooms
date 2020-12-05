@@ -44,6 +44,7 @@ except ImportError:
     from astropy.cosmology.core import FlatLambdaCDM
     from astropy import units as u
 
+
     def create_cosmology(parameters=None, name=None):
         """
         A wrapper to create custom astropy cosmologies.
@@ -107,8 +108,8 @@ except ImportError:
         cosmo = create_cosmology(name="Planck18", parameters=planck18)
         return cosmo
 
-    setattr(cosmology, "Planck18", Planck18())
 
+    setattr(cosmology, "Planck18", Planck18())
 
 unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
 
@@ -215,13 +216,37 @@ class Budzynski14(Observations):
 
     M500_Bud = np.array([10 ** 13.7, 10 ** 15]) * Solar_Mass
     Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 3.e14) + 12.44) * Solar_Mass
+    Mstar500_Bud_a = (0.89, 0.14)
+    Mstar500_Bud_b = (12.44, 0.03)
 
     def __init__(self, *args, **kwargs):
         super(Budzynski14, self).__init__(*args, **kwargs)
 
-        h70_Bud = 0.70 / self.cosmo_model.h
+        h70_Bud = 0.71 / self.cosmo_model.h
         self.M500 = self.M500_Bud * h70_Bud
         self.Mstar500 = self.Mstar500_Bud * (h70_Bud ** 2.5)
+        self.fit_line_uncertainty_weights()
+        self.M500_trials_upper *= (h70_Bud ** 2.5)
+        self.M500_trials_median *= (h70_Bud ** 2.5)
+        self.M500_trials_lower *= (h70_Bud ** 2.5)
+
+    def fit_line_uncertainty_weights(self):
+        np.random.seed(0)
+
+        # Generate random samples for the Mstar relation
+        M500_trials = np.logspace(13.7, 15., 40)
+        a_trials = np.random.normal(self.Mstar500_Bud_a[0], self.Mstar500_Bud_a[1], 40)
+        b_trials = np.random.normal(self.Mstar500_Bud_b[0], self.Mstar500_Bud_b[1], 40)
+        Mstar_trials = np.empty(0)
+        for a in a_trials:
+            for b in b_trials:
+                Mstar_trial = 10 ** (a * np.log10(M500_trials / 3.e14) + b)
+                Mstar_trials = np.append(Mstar_trials, Mstar_trial)
+        Mstar_trials = Mstar_trials.reshape(-1, M500_trials.size)
+
+        self.M500_trials_upper = np.percentile(Mstar_trials, 16, axis=0)
+        self.M500_trials_median = np.percentile(Mstar_trials, 50, axis=0)
+        self.M500_trials_lower = np.percentile(Mstar_trials, 84, axis=0)
 
 
 class Gonzalez13(Observations):
@@ -399,4 +424,4 @@ class Barnes17(Observations):
         # TODO: Review how h_conv_Barn is applied to each individual dataset
 
 
-# Gonzalez13()
+Budzynski14()
