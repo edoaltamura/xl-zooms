@@ -65,9 +65,9 @@ def make_single_image():
 
     columns = [
         # 'Run name',
-        'M_500crit (* 1e13 M_Sun)'
-        'M_star (< R_500crit) (* 1e13 M_Sun)'
-        'M_hot (< R_500crit) (* 1e13 M_Sun)'
+        'M_500crit (* 1e13 M_Sun)',
+        'M_star (< R_500crit) (* 1e13 M_Sun)',
+        'M_hot (< R_500crit) (* 1e13 M_Sun)',
     ]
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
