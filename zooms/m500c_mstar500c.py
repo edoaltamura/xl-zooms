@@ -63,47 +63,42 @@ def _process_single_halo(zoom: Zoom):
 def make_single_image():
     fig, ax = plt.subplots()
 
-    columns = [
-        'M_500crit (M_Sun)',
-        'M_star (< R_500crit) (M_Sun)',
-        'M_hot (< R_500crit) (M_Sun)',
-    ]
-
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
         results = pool.map(_process_single_halo, iter(zooms_register))
-        results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
-        results['Run name'] = pd.Series(name_list, dtype=str)
 
-    print(results)
+        # Recast output into a Pandas dataframe for further manipulation
+        columns = [
+            'M_500crit (M_Sun)',
+            'M_star (< R_500crit) (M_Sun)',
+            'M_hot (< R_500crit) (M_Sun)',
+        ]
+        results = pd.DataFrame(list(results), columns=columns)
+        results.indert(0, 'Run name', pd.Series(name_list, dtype=str))
+        print(results)
+
     # Display zoom data
-    for i, data in enumerate(results):
-        M500c = data[0].value
-        Mstar500c = data[1].value
-        Mhot500c = data[2].value
-
-        print((
-            f"{zooms_register[i].run_name:<40s} "
-            f"{(M500c / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(Mstar500c / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(Mhot500c / 1.e13):<6.4f} "
-        ))
+    for i in range(len(results)):
 
         marker = ''
-        if '-8res' in zooms_register[i].run_name:
+        if '-8res' in results.loc[i, "Run name"]:
             marker = '.'
-        elif '+1res' in zooms_register[i].run_name:
+        elif '+1res' in results.loc[i, "Run name"]:
             marker = '^'
 
         color = ''
-        if 'Ref' in zooms_register[i].run_name:
+        if 'Ref' in results.loc[i, "Run name"]:
             color = 'black'
-        elif 'MinimumDistance' in zooms_register[i].run_name:
+        elif 'MinimumDistance' in results.loc[i, "Run name"]:
             color = 'orange'
-        elif 'Isotropic' in zooms_register[i].run_name:
+        elif 'Isotropic' in results.loc[i, "Run name"]:
             color = 'lime'
 
-        ax.scatter(M500c, Mstar500c, marker=marker, c=color, alpha=0.7, s=15, edgecolors='none')
+        ax.scatter(
+            results.loc[i, "M_500crit (M_Sun)"],
+            results.loc[i, "M_star (< R_500crit) (M_Sun)"],
+            marker=marker, c=color, alpha=0.7, s=15, edgecolors='none'
+        )
 
     # Display observational data
     Budzynski14 = obs.Budzynski14()
