@@ -111,8 +111,10 @@ def make_single_image():
     # Display observational data
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
-    ax.scatter(Sun09.M500, Sun09.Mgas500, marker='d', s=8, alpha=0.8, color='gray', edgecolors='none')
-    ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=0.8, color='gray', edgecolors='none')
+    ax.scatter(Sun09.M500, Sun09.Mgas500, marker='d', s=8, alpha=1,
+               color=(0.8, 0.8, 0.8), edgecolors='none')
+    ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=1,
+               color=(0.8, 0.8, 0.8), edgecolors='none')
 
     # Build legends
     handles = [
