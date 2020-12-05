@@ -56,7 +56,7 @@ def process_single_halo(
     Mhot500c = np.sum(massGas[index])
     fhot500c = Mhot500c / M500c
 
-    return M500c, Mhot500c, fhot500c
+    return M500c.value, Mhot500c.value, fhot500c.value
 
 
 def _process_single_halo(zoom: Zoom):
