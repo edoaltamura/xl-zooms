@@ -53,7 +53,7 @@ def process_single_halo(
     index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
 
-    return M500c, Mstar500c, Mhot500c
+    return M500c.value, Mstar500c.value, Mhot500c.value
 
 
 def _process_single_halo(zoom: Zoom):
@@ -65,9 +65,9 @@ def make_single_image():
 
     columns = [
         # 'Run name',
-        'M_500crit (* 1e13 M_Sun)',
-        'M_star (< R_500crit) (* 1e13 M_Sun)',
-        'M_hot (< R_500crit) (* 1e13 M_Sun)',
+        'M_500crit (M_Sun)',
+        'M_star (< R_500crit) (M_Sun)',
+        'M_hot (< R_500crit) (M_Sun)',
     ]
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
@@ -78,9 +78,9 @@ def make_single_image():
     print(results)
     # Display zoom data
     for i, data in enumerate(results):
-        M500c = data[0].value
-        Mstar500c = data[1].value
-        Mhot500c = data[2].value
+        M500c = data[0]
+        Mstar500c = data[1]
+        Mhot500c = data[2]
 
         print((
             f"{zooms_register[i].run_name:<40s} "
