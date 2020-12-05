@@ -117,8 +117,6 @@ class Observations:
 
     def __init__(self, cosmo_model: str = "Planck18", verbose: int = 1):
 
-        # Initialise paper name
-        self.paper_name = None
         self.verbose = verbose
 
         for model_name in dir(cosmology):

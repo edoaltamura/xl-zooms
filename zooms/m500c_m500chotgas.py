@@ -129,7 +129,7 @@ def make_single_image():
         Line2D([], [], color='grey', marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.paper_name),
         Line2D([], [], color='grey', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=ax.paper_name),
+               label=Lovisari15.paper_name),
     ]
     legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
