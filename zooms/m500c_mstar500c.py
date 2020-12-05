@@ -74,7 +74,7 @@ def make_single_image():
             'M_hot (< R_500crit) (M_Sun)',
         ]
         results = pd.DataFrame(list(results), columns=columns)
-        results.indert(0, 'Run name', pd.Series(name_list, dtype=str))
+        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
         print(results)
 
     # Display zoom data
