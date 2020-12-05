@@ -3,9 +3,10 @@ import os
 import unyt
 import numpy as np
 from typing import Tuple
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 import h5py as h5
 import swiftsimio as sw
+import velociraptor as vr
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
@@ -25,13 +26,22 @@ def process_single_halo(
         path_to_catalogue: str
 ) -> Tuple[float]:
     # Read in halo properties
-    with h5.File(f'{path_to_catalogue}', 'r') as h5file:
-        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        Mstar500c = unyt.unyt_quantity(h5file['/SO_Mass_star_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+
+    data = vr.load(path_to_catalogue)
+    XPotMin = data.positions.Xcminpot[0]
+    YPotMin = data.positions.Ycminpot[0]
+    ZPotMin = data.positions.Zcminpot[0]
+    M500c = data.masses.SO_Mass_500_rhocrit[0]
+    Mstar500c = data.masses.SO_Mass_star_500_rhocrit[0]
+    R500c = data.masses.SO_R_500_rhocrit[0]
+
+    # with h5.File(f'{path_to_catalogue}', 'r') as h5file:
+    #     XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+    #     YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+    #     ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+    #     M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+    #     Mstar500c = unyt.unyt_quantity(h5file['/SO_Mass_star_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+    #     R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
     # Read in gas particles
     mask = sw.mask(f'{path_to_snap}', spatial_only=False)
@@ -65,6 +75,7 @@ def make_single_image():
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
+        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
         results = pool.map(_process_single_halo, iter(zooms_register))
 
         # Recast output into a Pandas dataframe for further manipulation
