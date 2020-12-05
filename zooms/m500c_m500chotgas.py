@@ -74,8 +74,8 @@ def make_single_image():
         # Recast output into a Pandas dataframe for further manipulation
         columns = [
             'M_500crit (M_Sun)',
-            'Mhot (< R_500crit) (M_Sun)',
-            'fhot (< R_500crit)',
+            'M_hot (< R_500crit) (M_Sun)',
+            'f_hot (< R_500crit)',
         ]
         results = pd.DataFrame(list(results), columns=columns)
         results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
@@ -98,10 +98,14 @@ def make_single_image():
         elif 'Isotropic' in results.loc[i, "Run name"]:
             color = 'lime'
 
+        markersize = 14
+        if marker == '.':
+            markersize *= 1.5
+
         ax.scatter(
             results.loc[i, "M_500crit (M_Sun)"],
-            results.loc[i, "Mhot (< R_500crit) (M_Sun)"],
-            marker=marker, c=color, alpha=0.7, s=15, edgecolors='none'
+            results.loc[i, "M_hot (< R_500crit) (M_Sun)"],
+            marker=marker, c=color, alpha=0.7, s=markersize, edgecolors='none'
         )
 
     # Display observational data

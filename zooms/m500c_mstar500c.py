@@ -94,10 +94,14 @@ def make_single_image():
         elif 'Isotropic' in results.loc[i, "Run name"]:
             color = 'lime'
 
+        markersize = 14
+        if marker == '.':
+            markersize *= 1.5
+
         ax.scatter(
             results.loc[i, "M_500crit (M_Sun)"],
             results.loc[i, "M_star (< R_500crit) (M_Sun)"],
-            marker=marker, c=color, alpha=0.7, s=15, edgecolors='none'
+            marker=marker, c=color, alpha=0.7, s=markersize, edgecolors='none'
         )
 
     # Display observational data
