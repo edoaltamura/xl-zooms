@@ -117,6 +117,20 @@ name_list = [
     "L0300N0564_VR666_-8res_Isotropic",
     "L0300N0564_VR813_-8res_Isotropic",
     "L0300N0564_VR93_-8res_Isotropic",
+
+    "L0300N0564_VR3032_+1res_Isotropic",
+    "L0300N0564_VR2905_+1res_Isotropic",
+    "L0300N0564_VR2414_+1res_Isotropic",
+    "L0300N0564_VR1236_+1res_Isotropic",
+    "L0300N0564_VR813_+1res_Isotropic",
+    "L0300N0564_VR666_+1res_Isotropic",
+
+    "L0300N0564_VR3032_+1res_MinimumDistance",
+    "L0300N0564_VR2905_+1res_MinimumDistance",
+    "L0300N0564_VR2414_+1res_MinimumDistance",
+    "L0300N0564_VR1236_+1res_MinimumDistance",
+    "L0300N0564_VR813_+1res_MinimumDistance",
+    "L0300N0564_VR666_+1res_MinimumDistance",
 ]
 
 snapshot_filenames = [
@@ -173,6 +187,21 @@ snapshot_filenames = [
     "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Isotropic/snapshots/L0300N0564_VR666_-8res_Isotropic_2749.hdf5",
     "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Isotropic/snapshots/L0300N0564_VR813_-8res_Isotropic_2749.hdf5",
     "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Isotropic/snapshots/L0300N0564_VR93_-8res_Isotropic_2749.hdf5",
+
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_+1res_Isotropic/snapshots/L0300N0564_VR3032_+1res_Isotropic_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_+1res_Isotropic/snapshots/L0300N0564_VR2905_+1res_Isotropic_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_+1res_Isotropic/snapshots/L0300N0564_VR2414_+1res_Isotropic_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_+1res_Isotropic/snapshots/L0300N0564_VR1236_+1res_Isotropic_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_+1res_Isotropic/snapshots/L0300N0564_VR813_+1res_Isotropic_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_+1res_Isotropic/snapshots/L0300N0564_VR666_+1res_Isotropic_2749.hdf5",
+
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_+1res_MinimumDistance/snapshots/L0300N0564_VR3032_+1res_MinimumDistance_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_+1res_MinimumDistance/snapshots/L0300N0564_VR2905_+1res_MinimumDistance_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_+1res_MinimumDistance/snapshots/L0300N0564_VR2414_+1res_MinimumDistance_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance/snapshots/L0300N0564_VR1236_+1res_MinimumDistance_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_+1res_MinimumDistance/snapshots/L0300N0564_VR813_+1res_MinimumDistance_2749.hdf5",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_+1res_MinimumDistance/snapshots/L0300N0564_VR666_+1res_MinimumDistance_2749.hdf5",
+
 ]
 
 catalogue_filenames = [
@@ -229,11 +258,28 @@ catalogue_filenames = [
     "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Isotropic/stf/L0300N0564_VR666_-8res_Isotropic_2749/L0300N0564_VR666_-8res_Isotropic_2749.properties",
     "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Isotropic/stf/L0300N0564_VR813_-8res_Isotropic_2749/L0300N0564_VR813_-8res_Isotropic_2749.properties",
     "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Isotropic/stf/L0300N0564_VR93_-8res_Isotropic_2749/L0300N0564_VR93_-8res_Isotropic_2749.properties",
+
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_+1res_Isotropic/stf/L0300N0564_VR3032_+1res_Isotropic_2749/L0300N0564_VR3032_+1res_Isotropic_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_+1res_Isotropic/stf/L0300N0564_VR2905_+1res_Isotropic_2749/L0300N0564_VR2905_+1res_Isotropic_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_+1res_Isotropic/stf/L0300N0564_VR2414_+1res_Isotropic_2749/L0300N0564_VR2414_+1res_Isotropic_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_+1res_Isotropic/stf/L0300N0564_VR1236_+1res_Isotropic_2749/L0300N0564_VR1236_+1res_Isotropic_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_+1res_Isotropic/stf/L0300N0564_VR813_+1res_Isotropic_2749/L0300N0564_VR813_+1res_Isotropic_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_+1res_Isotropic/stf/L0300N0564_VR666_+1res_Isotropic_2749/L0300N0564_VR666_+1res_Isotropic_2749.properties",
+
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_+1res_MinimumDistance/stf/L0300N0564_VR3032_+1res_MinimumDistance_2749/L0300N0564_VR3032_+1res_MinimumDistance_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_+1res_MinimumDistance/stf/L0300N0564_VR2905_+1res_MinimumDistance_2749/L0300N0564_VR2905_+1res_MinimumDistance_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_+1res_MinimumDistance/stf/L0300N0564_VR2414_+1res_MinimumDistance_2749/L0300N0564_VR2414_+1res_MinimumDistance_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance/stf/L0300N0564_VR1236_+1res_MinimumDistance_2749/L0300N0564_VR1236_+1res_MinimumDistance_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_+1res_MinimumDistance/stf/L0300N0564_VR813_+1res_MinimumDistance_2749/L0300N0564_VR813_+1res_MinimumDistance_2749.properties",
+    "/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_+1res_MinimumDistance/stf/L0300N0564_VR666_+1res_MinimumDistance_2749/L0300N0564_VR666_+1res_MinimumDistance_2749.properties",
+
 ]
 
-colours = ["black"] * 27 + ["orange"] * 12 + ["lime"] * 12
+colours = ["black"] * 27 + ["orange"] * 12 + ["lime"] * 12 + ["lime"] * 6 + ["orange"] * 6
 
 output_dir = ["/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"] * len(catalogue_filenames)
+
+Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
 
 zooms_register = ZoomList(
         name_list,

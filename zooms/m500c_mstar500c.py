@@ -7,20 +7,16 @@ from multiprocessing import Pool
 import h5py as h5
 import swiftsimio as sw
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch, Rectangle
+from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
-from register import zooms_register, Zoom
+
+from register import zooms_register, Zoom, Tcut_halogas
 import observational_data as obs
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
-
-THOT = 1.e5  # Hot gas temperature threshold in K
-
-fbary = 0.15741  # Cosmic baryon fraction
-H0_XL = 67.66  # Hubble constant in km/s/Mpc
 
 
 def process_single_halo(
@@ -37,11 +33,12 @@ def process_single_halo(
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
     # Read in gas particles
-    mask = sw.mask(f'{path_to_snap}')
+    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
     region = [[XPotMin - R500c, XPotMin + R500c],
               [YPotMin - R500c, YPotMin + R500c],
               [ZPotMin - R500c, ZPotMin + R500c]]
     mask.constrain_spatial(region)
+    mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
@@ -52,7 +49,7 @@ def process_single_halo(
     deltaY = posGas[:, 1] - YPotMin
     deltaZ = posGas[:, 2] - ZPotMin
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
-    index = np.where((deltaR < R500c) & (tempGas > THOT))[0]
+    index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
 
     return M500c, Mstar500c, Mhot500c
@@ -80,26 +77,34 @@ def make_single_image():
     with Pool() as pool:
         results = pool.map(_process_single_halo, iter(zooms_register))
 
+    # Display zoom data
+    colors = []
+    markers = []
     for i, data in enumerate(results):
-        # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
-        # Results returned as tuples, which are immutable. Convert to list to update.
-        # data = list(data)
-        #
-        # h70_XL = H0_XL / 70.
-        # data[0] = data[0] * h70_XL
-        # data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
         M500c[i] = data[0].value
         Mstar500c[i] = data[1].value
         Mhot500c[i] = data[2].value
 
         print((
             f"{zooms_register[i].run_name:<40s} "
-            f"{(data[0].value / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(data[1].value / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(data[2].value / 1.e13):<6.4f} "
+            f"{(M500c[i] / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(Mstar500c[i] / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(Mhot500c[i] / 1.e13):<6.4f} "
         ))
 
-    ax.scatter(M500c, Mstar500c, c=[zoom.plot_color for zoom in zooms_register], alpha=0.7, s=10, edgecolors='none')
+        if '-8res' in zooms_register[i].run_name:
+            markers.append('.')
+        elif '+1res' in zooms_register[i].run_name:
+            markers.append('^')
+
+        if 'Ref' in zooms_register[i].run_name:
+            colors.append('black')
+        elif 'MinimumDistance' in zooms_register[i].run_name:
+            colors.append('orange')
+        elif 'Isotropic' in zooms_register[i].run_name:
+            colors.append('lime')
+
+    ax.scatter(M500c, Mstar500c, marker=markers, c=colors, alpha=0.7, s=10, edgecolors='none')
 
     # Display observational data
     Budzynski14 = obs.Budzynski14()
@@ -112,7 +117,7 @@ def make_single_image():
         Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
                linestyle='None', markersize=6, label='-8 Res'),
         Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
-               linestyle='None', markersize=3, label='EAGLE Res'),
+               linestyle='None', markersize=3, label='+1 Res'),
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
