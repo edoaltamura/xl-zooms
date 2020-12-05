@@ -101,14 +101,15 @@ def make_single_image():
         ax.scatter(
             results.loc[i, "M_500crit (M_Sun)"],
             results.loc[i, "M_star (< R_500crit) (M_Sun)"],
-            marker=marker, c=color, alpha=0.7, s=markersize, edgecolors='none'
+            marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
 
     # Display observational data
     Budzynski14 = obs.Budzynski14()
     Kravtsov18 = obs.Kravtsov18()
-    ax.plot(Budzynski14.M500, Budzynski14.Mstar500, linestyle='-', color='gray')
-    ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', alpha=0.7, s=10, color='gray', edgecolors='none')
+    ax.plot(Budzynski14.M500, Budzynski14.Mstar500, linestyle='-', color=(0.85, 0.85, 0.85), zorder=0)
+    ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', s=12, color=(0.85, 0.85, 0.85),
+               edgecolors='none', zorder=0)
 
     # Build legends
     handles = [
@@ -122,9 +123,9 @@ def make_single_image():
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
-        Line2D([], [], color='grey', marker='.', markeredgecolor='none', linestyle='-', markersize=0,
+        Line2D([], [], color=(0.85, 0.85, 0.85), marker='.', markeredgecolor='none', linestyle='-', markersize=0,
                label=Budzynski14.paper_name),
-        Line2D([], [], color='grey', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.85, 0.85, 0.85), marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                label=Kravtsov18.paper_name),
     ]
     legend_obs = plt.legend(handles=handles, loc=4)

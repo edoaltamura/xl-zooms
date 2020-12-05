@@ -105,16 +105,16 @@ def make_single_image():
         ax.scatter(
             results.loc[i, "M_500crit (M_Sun)"],
             results.loc[i, "M_hot (< R_500crit) (M_Sun)"],
-            marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none'
+            marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
 
     # Display observational data
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
     ax.scatter(Sun09.M500, Sun09.Mgas500, marker='d', s=8, alpha=1,
-               color=(0.8, 0.8, 0.8), edgecolors='none', zorder=1)
+               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
     ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=1,
-               color=(0.8, 0.8, 0.8), edgecolors='none', zorder=1)
+               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
 
     # Build legends
     handles = [
@@ -128,9 +128,9 @@ def make_single_image():
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
-        Line2D([], [], color=(0.8, 0.8, 0.8), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.85, 0.85, 0.85), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.paper_name),
-        Line2D([], [], color=(0.8, 0.8, 0.8), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.85, 0.85, 0.85), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lovisari15.paper_name),
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
     ]
