@@ -145,7 +145,7 @@ def m_500_hotgas():
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/m500c_mhotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/m_500_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
@@ -233,11 +233,12 @@ def f_500_hotgas():
     ax.set_xscale('log')
     ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/m500c_fhotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/f_500_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
     return
+
 
 m_500_hotgas()
 f_500_hotgas()

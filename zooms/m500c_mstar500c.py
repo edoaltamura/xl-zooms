@@ -59,7 +59,7 @@ def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
 
-def make_single_image():
+def m_500_star():
     fig, ax = plt.subplots()
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
