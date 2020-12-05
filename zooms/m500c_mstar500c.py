@@ -6,6 +6,7 @@ from typing import Tuple
 from multiprocessing import Pool
 import h5py as h5
 import swiftsimio as sw
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
@@ -72,8 +73,9 @@ def make_single_image():
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
         results = pool.map(_process_single_halo, iter(zooms_register))
+        results = pd.DataFrame(list(results), columns=columns)
 
-    print(list(results))
+    print(results)
     # Display zoom data
     for i, data in enumerate(results):
         M500c = data[0].value
