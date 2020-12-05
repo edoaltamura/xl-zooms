@@ -83,11 +83,11 @@ def make_single_image():
     for i, data in enumerate(results):
         # `data` is a tuple with (M_500crit, M_hotgas, f_hotgas)
         # Results returned as tuples, which are immutable. Convert to list to update.
-        data = list(data)
-
-        h70_XL = H0_XL / 70.
-        data[0] = data[0] * h70_XL
-        data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
+        # data = list(data)
+        #
+        # h70_XL = H0_XL / 70.
+        # data[0] = data[0] * h70_XL
+        # data[1] = data[1] * (h70_XL ** 2.5)  # * 1.e10)
         M500c[i] = data[0].value
         Mstar500c[i] = data[1].value
         Mhot500c[i] = data[2].value
@@ -107,17 +107,11 @@ def make_single_image():
     ax.plot(Budzynski14.M500, Budzynski14.Mstar500, linestyle='-', color='gray')
     ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', alpha=0.7, color='gray', edgecolors='none')
 
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$M_{{\rm star},500{\rm crit}}\ [{\rm M}_{\odot}]$')
-
-    ax.set_xscale('log')
-    ax.set_yscale('log')
-
     # Build legends
     handles = [
-        Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1.3,
+        Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
                linestyle='None', markersize=6, label='-8 Res'),
-        Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1.3,
+        Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
                linestyle='None', markersize=3, label='EAGLE Res'),
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
@@ -133,6 +127,11 @@ def make_single_image():
     legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)
+
+    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'$M_{{\rm star},500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_xscale('log')
+    ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
     plt.show()
     plt.close()
