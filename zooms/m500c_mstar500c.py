@@ -11,7 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
-from register import zooms_register, Zoom, Tcut_halogas
+from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
 
 try:
@@ -64,7 +64,7 @@ def make_single_image():
     fig, ax = plt.subplots()
 
     columns = [
-        'Run name',
+        # 'Run name',
         'M_500crit (* 1e13 M_Sun)'
         'M_star (< R_500crit) (* 1e13 M_Sun)'
         'M_hot (< R_500crit) (* 1e13 M_Sun)'
