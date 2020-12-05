@@ -232,6 +232,7 @@ def f_500_star():
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$f_{{\rm star},500{\rm crit}}$')
     ax.set_xscale('log')
+    ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/f_500_star.png', dpi=300)
     plt.show()
     plt.close()
@@ -322,7 +323,7 @@ def f_500_bary():
     ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$f_{{\rm star},500{\rm crit}}$')
+    ax.set_ylabel(r'$f_{{\rm bary},500{\rm crit}}$')
     ax.set_xscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/f_500_bary.png', dpi=300)
     plt.show()
