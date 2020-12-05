@@ -65,10 +65,6 @@ def _process_single_halo(zoom: Zoom):
 def make_single_image():
     fig, ax = plt.subplots()
 
-    M500c = np.zeros(len(zooms_register), dtype=np.float64)
-    Mhot500c = np.zeros(len(zooms_register), dtype=np.float64)
-    fhot500c = np.zeros(len(zooms_register), dtype=np.float64)
-
     print((
         f"{'Run name':<40s} "
         f"{'M_500crit':<15s} "
@@ -81,33 +77,33 @@ def make_single_image():
         results = pool.map(_process_single_halo, iter(zooms_register))
 
     # Display zoom data
-    colors = []
-    markers = []
     for i, data in enumerate(results):
-        M500c[i] = data[0].value
-        Mhot500c[i] = data[1].value
-        fhot500c[i] = data[2].value
+        M500c = data[0].value
+        Mhot500c = data[1].value
+        fhot500c = data[2].value
 
         print((
             f"{zooms_register[i].run_name:<40s} "
-            f"{(data[0].value / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(data[1].value / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(data[2].value / 1.e13):<6.4f} "
+            f"{(M500c / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(Mhot500c / 1.e13):<6.4f} * 1e13 Msun "
+            f"{(fhot500c / 1.e13):<6.4f} "
         ))
 
+        marker = ''
         if '-8res' in zooms_register[i].run_name:
-            markers.append('.')
+            marker = '.'
         elif '+1res' in zooms_register[i].run_name:
-            markers.append('^')
+            marker = '^'
 
+        color = ''
         if 'Ref' in zooms_register[i].run_name:
-            colors.append('black')
+            color = 'black'
         elif 'MinimumDistance' in zooms_register[i].run_name:
-            colors.append('orange')
+            color = 'orange'
         elif 'Isotropic' in zooms_register[i].run_name:
-            colors.append('lime')
+            color = 'lime'
 
-    ax.scatter(M500c, Mhot500c, marker=markers, c=colors, alpha=0.7, s=10, edgecolors='none')
+        ax.scatter(M500c, Mhot500c, marker=marker, c=color, alpha=0.7, s=10, edgecolors='none')
 
     # Display observational data
     Sun09 = obs.Sun09()
