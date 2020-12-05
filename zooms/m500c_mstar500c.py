@@ -121,12 +121,12 @@ def make_single_image():
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
     ]
-    legend_sims = plt.legend(handles=handles)
+    legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
         Line2D([], [], color='grey', marker='.', markeredgecolor='none', linestyle='-', markersize=0, label=Budzynski14.paper_name),
         Line2D([], [], color='grey', marker='*', markeredgecolor='none', linestyle='None', markersize=4, label=Kravtsov18.paper_name),
     ]
-    legend_obs = plt.legend(handles=handles)
+    legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)
     fig.savefig(f'{zooms_register[0].output_directory}/m500c_mstar500c.png', dpi=300)
