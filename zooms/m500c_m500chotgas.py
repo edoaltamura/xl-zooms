@@ -77,7 +77,7 @@ def make_single_image():
             'M_hot (< R_500crit) (M_Sun)',
             'f_hot (< R_500crit)',
         ]
-        results = pd.DataFrame(list(results), columns=columns)
+        results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
         results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
         print(results)
 
