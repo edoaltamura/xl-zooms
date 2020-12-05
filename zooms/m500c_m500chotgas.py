@@ -193,7 +193,7 @@ def f_500_hotgas():
 
         ax.scatter(
             results.loc[i, "M_500crit (M_Sun)"],
-            results.loc[i, "f_hot (< R_500crit) (M_Sun)"],
+            results.loc[i, "f_hot (< R_500crit)"],
             marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
 
