@@ -313,11 +313,13 @@ def f_500_bary():
                label=Budzynski14.paper_name),
         Line2D([], [], color=(0.85, 0.85, 0.85), marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                label=Kravtsov18.paper_name),
+        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
     ]
     del Budzynski14, Kravtsov18
     legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)
+    ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$f_{{\rm star},500{\rm crit}}$')
