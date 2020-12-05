@@ -3,14 +3,15 @@ import os
 import unyt
 import numpy as np
 from typing import Tuple
-from multiprocessing import Pool
+from multiprocessing import Pool, cpu_count
 import h5py as h5
 import swiftsimio as sw
+import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
-from register import zooms_register, Zoom, Tcut_halogas
+from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
 
 try:
@@ -65,45 +66,43 @@ def _process_single_halo(zoom: Zoom):
 def make_single_image():
     fig, ax = plt.subplots()
 
-    print((
-        f"{'Run name':<40s} "
-        f"{'M_500crit':<15s} "
-        f"{'M_hotgas(< R_500crit)':<25s} "
-        f"{'f_hotgas(< R_500crit)':<20s} "
-    ))
-
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
+        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
         results = pool.map(_process_single_halo, iter(zooms_register))
 
-    # Display zoom data
-    for i, data in enumerate(results):
-        M500c = data[0].value
-        Mhot500c = data[1].value
-        fhot500c = data[2].value
+        # Recast output into a Pandas dataframe for further manipulation
+        columns = [
+            'M_500crit (M_Sun)',
+            'Mhot (< R_500crit) (M_Sun)',
+            'fhot (< R_500crit)',
+        ]
+        results = pd.DataFrame(list(results), columns=columns)
+        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+        print(results)
 
-        print((
-            f"{zooms_register[i].run_name:<40s} "
-            f"{(M500c / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(Mhot500c / 1.e13):<6.4f} * 1e13 Msun "
-            f"{(fhot500c / 1.e13):<6.4f} "
-        ))
+    # Display zoom data
+    for i in range(len(results)):
 
         marker = ''
-        if '-8res' in zooms_register[i].run_name:
+        if '-8res' in results.loc[i, "Run name"]:
             marker = '.'
-        elif '+1res' in zooms_register[i].run_name:
+        elif '+1res' in results.loc[i, "Run name"]:
             marker = '^'
 
         color = ''
-        if 'Ref' in zooms_register[i].run_name:
+        if 'Ref' in results.loc[i, "Run name"]:
             color = 'black'
-        elif 'MinimumDistance' in zooms_register[i].run_name:
+        elif 'MinimumDistance' in results.loc[i, "Run name"]:
             color = 'orange'
-        elif 'Isotropic' in zooms_register[i].run_name:
+        elif 'Isotropic' in results.loc[i, "Run name"]:
             color = 'lime'
 
-        ax.scatter(M500c, Mhot500c, marker=marker, c=color, alpha=0.7, s=15, edgecolors='none')
+        ax.scatter(
+            results.loc[i, "M_500crit (M_Sun)"],
+            results.loc[i, "Mhot (< R_500crit) (M_Sun)"],
+            marker=marker, c=color, alpha=0.7, s=15, edgecolors='none'
+        )
 
     # Display observational data
     Sun09 = obs.Sun09()
@@ -132,8 +131,8 @@ def make_single_image():
     ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
-    ax.set_ylabel(r'$M_{{\rm gas},500{\rm c}}/h_{70}^{-5/2}{\rm M}_{\odot}$')
+    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'$M_{{\rm gas},500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
