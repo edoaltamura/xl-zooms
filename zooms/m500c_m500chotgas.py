@@ -63,7 +63,7 @@ def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
 
-def make_single_image():
+def m_500_hotgas():
     fig, ax = plt.subplots()
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
@@ -152,4 +152,92 @@ def make_single_image():
     return
 
 
-make_single_image()
+def f_500_hotgas():
+    fig, ax = plt.subplots()
+
+    # The results of the multiprocessing Pool are returned in the same order as inputs
+    with Pool() as pool:
+        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
+        results = pool.map(_process_single_halo, iter(zooms_register))
+
+        # Recast output into a Pandas dataframe for further manipulation
+        columns = [
+            'M_500crit (M_Sun)',
+            'M_hot (< R_500crit) (M_Sun)',
+            'f_hot (< R_500crit)',
+        ]
+        results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
+        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+        print(results)
+
+    # Display zoom data
+    for i in range(len(results)):
+
+        marker = ''
+        if '-8res' in results.loc[i, "Run name"]:
+            marker = '.'
+        elif '+1res' in results.loc[i, "Run name"]:
+            marker = '^'
+
+        color = ''
+        if 'Ref' in results.loc[i, "Run name"]:
+            color = 'black'
+        elif 'MinimumDistance' in results.loc[i, "Run name"]:
+            color = 'orange'
+        elif 'Isotropic' in results.loc[i, "Run name"]:
+            color = 'lime'
+
+        markersize = 14
+        if marker == '.':
+            markersize *= 1.5
+
+        ax.scatter(
+            results.loc[i, "M_500crit (M_Sun)"],
+            results.loc[i, "f_hot (< R_500crit) (M_Sun)"],
+            marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
+        )
+
+    # Display observational data
+    Sun09 = obs.Sun09()
+    Lovisari15 = obs.Lovisari15()
+    ax.scatter(Sun09.M500, Sun09.Mgas500 / Sun09.M500, marker='d', s=8, alpha=1,
+               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
+    ax.scatter(Lovisari15.M500, Lovisari15.Mgas500 / Lovisari15.M500, marker='s', s=8, alpha=1,
+               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
+
+    # Build legends
+    handles = [
+        Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
+               linestyle='None', markersize=6, label='-8 Res'),
+        Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
+               linestyle='None', markersize=3, label='+1 Res'),
+        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
+        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
+        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
+    ]
+    legend_sims = plt.legend(handles=handles, loc=2)
+    handles = [
+        Line2D([], [], color=(0.85, 0.85, 0.85), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Sun09.paper_name),
+        Line2D([], [], color=(0.85, 0.85, 0.85), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Lovisari15.paper_name),
+        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
+    ]
+    del Sun09, Lovisari15
+    legend_obs = plt.legend(handles=handles, loc=4)
+    ax.add_artist(legend_sims)
+    ax.add_artist(legend_obs)
+
+    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'$f_{{\rm gas},500{\rm crit}}$')
+    ax.set_xscale('log')
+    ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
+
+    fig.savefig(f'{zooms_register[0].output_directory}/m500c_fhotgas.png', dpi=300)
+    plt.show()
+    plt.close()
+
+    return
+
+m_500_hotgas()
+f_500_hotgas()
