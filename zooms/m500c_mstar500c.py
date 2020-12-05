@@ -52,7 +52,7 @@ def process_single_halo(
     index = np.where(deltaR < R500c)[0]
     Mhot500c = np.sum(massGas[index])
 
-    return M500c, Mstar500c, Mhot500c
+    return M500c.to(unyt.Solar_Mass), Mstar500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass)
 
 
 def _process_single_halo(zoom: Zoom):
