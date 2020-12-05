@@ -62,17 +62,18 @@ def _process_single_halo(zoom: Zoom):
 def make_single_image():
     fig, ax = plt.subplots()
 
-    print((
-        f"{'Run name':<40s} "
-        f"{'M_500crit':<15s} "
-        f"{'M_star(< R_500crit)':<25s} "
-        f"{'M_hot(< R_500crit)':<20s} "
-    ))
+    columns = [
+        'Run name',
+        'M_500crit (* 1e13 M_Sun)'
+        'M_star (< R_500crit) (* 1e13 M_Sun)'
+        'M_hot (< R_500crit) (* 1e13 M_Sun)'
+    ]
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
         results = pool.map(_process_single_halo, iter(zooms_register))
 
+    print(list(results))
     # Display zoom data
     for i, data in enumerate(results):
         M500c = data[0].value
@@ -100,13 +101,13 @@ def make_single_image():
         elif 'Isotropic' in zooms_register[i].run_name:
             color = 'lime'
 
-        ax.scatter(M500c, Mstar500c, marker=marker, c=color, alpha=0.7, s=10, edgecolors='none')
+        ax.scatter(M500c, Mstar500c, marker=marker, c=color, alpha=0.7, s=15, edgecolors='none')
 
     # Display observational data
     Budzynski14 = obs.Budzynski14()
     Kravtsov18 = obs.Kravtsov18()
     ax.plot(Budzynski14.M500, Budzynski14.Mstar500, linestyle='-', color='gray')
-    ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', alpha=0.7, color='gray', edgecolors='none')
+    ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', alpha=0.7, s=10, color='gray', edgecolors='none')
 
     # Build legends
     handles = [

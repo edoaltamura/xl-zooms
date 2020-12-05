@@ -103,7 +103,7 @@ def make_single_image():
         elif 'Isotropic' in zooms_register[i].run_name:
             color = 'lime'
 
-        ax.scatter(M500c, Mhot500c, marker=marker, c=color, alpha=0.7, s=10, edgecolors='none')
+        ax.scatter(M500c, Mhot500c, marker=marker, c=color, alpha=0.7, s=15, edgecolors='none')
 
     # Display observational data
     Sun09 = obs.Sun09()
