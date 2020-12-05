@@ -108,7 +108,7 @@ def make_single_image():
     Budzynski14 = obs.Budzynski14()
     Kravtsov18 = obs.Kravtsov18()
     ax.plot(Budzynski14.M500, Budzynski14.Mstar500, linestyle='-', color=(0.8, 0.8, 0.8), zorder=0)
-    ax.fill_between(Budzynski14.M500, Budzynski14.M500_trials_lower, Budzynski14.M500_trials_upper,
+    ax.fill_between(Budzynski14.M500_trials, Budzynski14.Mstar_trials_lower, Budzynski14.Mstar_trials_upper,
                     linestyle='-', color=(0.85, 0.85, 0.85), edgecolor='none', zorder=0)
     ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', s=12, color=(0.85, 0.85, 0.85),
                edgecolors='none', zorder=0)

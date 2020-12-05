@@ -226,9 +226,10 @@ class Budzynski14(Observations):
         self.M500 = self.M500_Bud * h70_Bud
         self.Mstar500 = self.Mstar500_Bud * (h70_Bud ** 2.5)
         self.fit_line_uncertainty_weights()
-        self.M500_trials_upper *= (h70_Bud ** 2.5)
-        self.M500_trials_median *= (h70_Bud ** 2.5)
-        self.M500_trials_lower *= (h70_Bud ** 2.5)
+        self.M500_trials *= h70_Bud * Solar_Mass
+        self.Mstar_trials_upper *= (h70_Bud ** 2.5) * Solar_Mass
+        self.Mstar_trials_median *= (h70_Bud ** 2.5) * Solar_Mass
+        self.Mstar_trials_lower *= (h70_Bud ** 2.5) * Solar_Mass
 
     def fit_line_uncertainty_weights(self):
         np.random.seed(0)
@@ -243,10 +244,10 @@ class Budzynski14(Observations):
                 Mstar_trial = 10 ** (a * np.log10(M500_trials / 3.e14) + b)
                 Mstar_trials = np.append(Mstar_trials, Mstar_trial)
         Mstar_trials = Mstar_trials.reshape(-1, M500_trials.size)
-
-        self.M500_trials_upper = np.percentile(Mstar_trials, 16, axis=0)
-        self.M500_trials_median = np.percentile(Mstar_trials, 50, axis=0)
-        self.M500_trials_lower = np.percentile(Mstar_trials, 84, axis=0)
+        self.M500_trials = M500_trials
+        self.Mstar_trials_upper = np.percentile(Mstar_trials, 16, axis=0)
+        self.Mstar_trials_median = np.percentile(Mstar_trials, 50, axis=0)
+        self.Mstar_trials_lower = np.percentile(Mstar_trials, 84, axis=0)
 
 
 class Gonzalez13(Observations):
@@ -422,6 +423,3 @@ class Barnes17(Observations):
         self.TX = (self.kB_TX / unyt.boltzmann_constant).to(K)
 
         # TODO: Review how h_conv_Barn is applied to each individual dataset
-
-
-Budzynski14()
