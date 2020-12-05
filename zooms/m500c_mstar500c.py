@@ -115,16 +115,20 @@ def make_single_image():
 
     # Build legends
     handles = [
-        Line2D([], [], color='black', marker='.', markeredgecolor='none', linestyle='None', markersize=6, label='1/8 EAGLE'),
-        Line2D([], [], color='black', marker='^', markeredgecolor='none', linestyle='None', markersize=6, label='EAGLE'),
+        Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1.3,
+               linestyle='None', markersize=6, label='-8 Res'),
+        Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1.3,
+               linestyle='None', markersize=3, label='EAGLE Res'),
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
-        Line2D([], [], color='grey', marker='.', markeredgecolor='none', linestyle='-', markersize=0, label=Budzynski14.paper_name),
-        Line2D([], [], color='grey', marker='*', markeredgecolor='none', linestyle='None', markersize=4, label=Kravtsov18.paper_name),
+        Line2D([], [], color='grey', marker='.', markeredgecolor='none', linestyle='-', markersize=0,
+               label=Budzynski14.paper_name),
+        Line2D([], [], color='grey', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Kravtsov18.paper_name),
     ]
     legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
@@ -137,56 +141,3 @@ def make_single_image():
 
 
 make_single_image()
-
-# def make_single_image(
-#         name_list: List[str] = None,
-#         paths_to_snap: List[str] = None,
-#         paths_to_catalogue: List[str] = None,
-#         output_path: str = None
-# ) -> None:
-#
-#     assert len(paths_to_snap) == len(paths_to_catalogue)
-#
-#     numZooms = len(paths_to_snap)
-#     M500c = np.zeros(numZooms)
-#     Mstar500c = np.zeros(numZooms)
-#     Mhot500c = np.zeros(numZooms)
-#
-#     for i, (snap, catalogue) in enumerate(zip(paths_to_snap, paths_to_catalogue)):
-#         results = process_single_halo(snap, catalogue)
-#         M500c[i] = results[0]
-#         Mstar500c[i] = results[1]
-#         Mhot500c[i] = results[2]
-#
-#     # Budzynski et al. 2014
-#     M500_Bud = np.array([5., 100.])
-#     Mstar500_Bud = 10. ** (0.89 * np.log10(M500_Bud / 30.) - 0.56)
-#
-#     # Kravtsov et al. 2018
-#     M500_Kra = np.array([15.60, 10.30, 7.00, 5.34, 2.35, 1.86, 1.34, 0.46, 0.47]) * 10.
-#     Mstar500_Kra = np.array([15.34, 12.35, 8.34, 5.48, 2.68, 3.48, 2.86, 1.88, 1.85]) * 0.1
-#
-#     h70_XL = H0_XL / 70.
-#     M500c *= h70_XL
-#     Mhot500c *= (h70_XL ** 2.5)
-#     Mstar500c *= (h70_XL ** 2.5)
-#
-#     fig, ax = plt.subplots(figsize=(5, 3))
-#     ax.plot(M500_Bud * 1.e13, Mstar500_Bud * 1.e13, linestyle='-', color='gray', label='Budzynski et al. (2014)')
-#     ax.scatter(M500_Kra * 1.e13, Mstar500_Kra * 1.e13, marker='*', alpha=0.7, color='gray', label='Kravtsov et al. (2018)')
-#
-#     print(f"\n{'Run name':<25s} {'M500c             ':<15s} {'Mhot500c           ':<15s}")
-#     for i in range(numZooms):
-#         print(f"{name_list[i]:<25s} {(M500c[i] / 1.e13):<5.3f} * 1e13 Msun {(Mhot500c[i] / 1.e13):<5.3f} * 1e13 Msun")
-#         ax.scatter(M500c[i], Mstar500c[i], c=colours[i], label=name_list[i], alpha=0.5, s=5)
-#
-#     ax.set_xlabel(r'$M_{500{\rm c}}/h_{70}^{-1}{\rm M}_{\odot}$')
-#     ax.set_ylabel(r'$M_{{\rm star},500{\rm c}}/h_{70}^{-5/2}{\rm M}_{\odot}$')
-#     ax.set_xscale('log')
-#     ax.set_yscale('log')
-#     ax.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0.)
-#     fig.savefig(f'{output_path}/m500c_mstar500c.png', dpi=500)
-#     plt.show()
-#     plt.close()
-#
-#     return
