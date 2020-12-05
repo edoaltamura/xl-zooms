@@ -224,20 +224,20 @@ class Budzynski14(Observations):
 
         h70_Bud = 0.71 / self.cosmo_model.h
         self.M500 = self.M500_Bud * h70_Bud
-        self.Mstar500 = self.Mstar500_Bud * (h70_Bud ** 2.5)
+        self.Mstar500 = self.Mstar500_Bud * (h70_Bud ** 2)
         self.fit_line_uncertainty_weights()
         self.M500_trials *= h70_Bud * Solar_Mass
-        self.Mstar_trials_upper *= (h70_Bud ** 2.5) * Solar_Mass
-        self.Mstar_trials_median *= (h70_Bud ** 2.5) * Solar_Mass
-        self.Mstar_trials_lower *= (h70_Bud ** 2.5) * Solar_Mass
+        self.Mstar_trials_upper *= (h70_Bud ** 2) * Solar_Mass
+        self.Mstar_trials_median *= (h70_Bud ** 2) * Solar_Mass
+        self.Mstar_trials_lower *= (h70_Bud ** 2) * Solar_Mass
 
     def fit_line_uncertainty_weights(self):
         np.random.seed(0)
 
         # Generate random samples for the Mstar relation
-        M500_trials = np.logspace(13.7, 15., 40)
-        a_trials = np.random.normal(self.Mstar500_Bud_a[0], self.Mstar500_Bud_a[1], 40)
-        b_trials = np.random.normal(self.Mstar500_Bud_b[0], self.Mstar500_Bud_b[1], 40)
+        M500_trials = np.logspace(13.7, 15., 20)
+        a_trials = np.random.normal(self.Mstar500_Bud_a[0], self.Mstar500_Bud_a[1], 20)
+        b_trials = np.random.normal(self.Mstar500_Bud_b[0], self.Mstar500_Bud_b[1], 20)
         Mstar_trials = np.empty(0)
         for a in a_trials:
             for b in b_trials:
