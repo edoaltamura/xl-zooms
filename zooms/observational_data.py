@@ -115,12 +115,25 @@ unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
 
 class Observations:
 
-    def __init__(self, cosmo_model: str = "Planck18"):
+    def __init__(self, cosmo_model: str = "Planck18", verbose: int = 1):
+
+        # Initialise paper name
+        self.paper_name = None
+        self.verbose = verbose
 
         for model_name in dir(cosmology):
             if cosmo_model.lower() == model_name.lower():
-                print(f"Using the {model_name} cosmology")
+                if self.verbose > 0:
+                    print(f"Using the {model_name} cosmology")
                 self.cosmo_model = getattr(cosmology, model_name)
+
+    def __del__(self):
+        """
+        When the instance of Observations is destroyed, print out
+        the name of the paper. If verbosity is 0, it has no effect.
+        """
+        if self.verbose > 0:
+            print(f"[Literature data] Applied: {self.paper_name}")
 
 
 class Sun09(Observations):
