@@ -129,7 +129,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='mass_weighted_temps_kev')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='pressure')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
