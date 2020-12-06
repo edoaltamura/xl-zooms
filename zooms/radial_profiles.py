@@ -153,7 +153,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         # Make dimensionless, divide by P_500crit
         norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
         hist /= norm.to(hist.units)
-        hist *= radial_distance ** 3
+        hist *= bin_centre ** 3
 
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
