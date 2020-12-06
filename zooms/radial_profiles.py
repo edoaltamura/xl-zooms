@@ -125,6 +125,14 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 
+    try:
+        bin_centre = bin_centre.value
+    except:
+        pass
+    try:
+        hist = hist.value
+    except:
+        pass
     return bin_centre, hist
 
 
