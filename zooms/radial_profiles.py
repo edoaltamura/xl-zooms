@@ -111,10 +111,10 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     # Allocate weights
     if weights.lower() == 'gas_mass':
-        hist = mass_weights / M500c
+        hist = mass_weights / M500c.to(mass_weights.units)
 
     elif weights.lower() == 'gas_mass_cumulative':
-        hist = cumsum_unyt(mass_weights) / M500c
+        hist = cumsum_unyt(mass_weights) / M500c.to(mass_weights.units)
 
     elif weights.lower() == 'gas_density':
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.densities)
