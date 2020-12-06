@@ -64,9 +64,10 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     dm_masses = data.dark_matter.masses.to('Msun')
     zoom_mass_resolution = dm_masses[0]
 
-    # Since useful for different applications, attach the electron number density dataset
+    # Since useful for different applications, attach datasets
     data.gas.electron_number_densities = np.log10(data.gas.densities.to('Msun/Mpc**3') / 1.14 / unyt.mass_hydrogen)
     data.gas.mass_weighted_temperatures = data.gas.masses.to('Msun') * data.gas.temperatures
+
     # Construct bins and compute density profile
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
 
@@ -150,7 +151,7 @@ with Pool() as pool:
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
 
-plt.plot(results['bin_centre (Mpc)'][0], results['entropy'][0])
+plt.plot(results['bin_centre (Mpc)'], results['entropy'], linewidth=1, color=(0.5,0.5,0.5))
 plt.xscale('log')
 plt.yscale('log')
 plt.show()
