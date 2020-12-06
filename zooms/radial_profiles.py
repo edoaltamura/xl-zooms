@@ -1,8 +1,9 @@
 import unyt
 import numpy as np
-from typing import Tuple
+from typing import Tuple, Union
 from multiprocessing import Pool, cpu_count
 import h5py as h5
+from copy import deepcopy
 import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -29,6 +30,47 @@ def latex_float(f):
         return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
     else:
         return float_str
+
+
+def histogram_unyt(
+        data: Union[np.ndarray, unyt.unyt_array],
+        bins: Union[np.ndarray, unyt.unyt_array] = None,
+        weights: Union[np.ndarray, unyt.unyt_array] = None
+) -> Tuple[Union[np.ndarray, unyt.unyt_array]]:
+    assert data.shape == weights.shape, (
+        "Data and weights arrays must have the same shape. "
+        f"Detected data {data.shape}, weights {weights.shape}."
+    )
+
+    _data = deepcopy(data)
+    if isinstance(data, unyt.unyt_array):
+        _data = deepcopy(data.value)
+
+        assert data.units == bins.units, (
+            "Data and bins must have the same units. "
+            f"Detected data {data.units}, bins {bins.units}."
+        )
+
+    _bins = deepcopy(bins)
+    if isinstance(bins, unyt.unyt_array):
+        _bins = deepcopy(bins.value)
+
+    _weights = deepcopy(weights)
+    if isinstance(weights, unyt.unyt_array):
+        _weights = deepcopy(weights.value)
+
+    if weights is None:
+        _weights = np.ones_like(_data)
+
+    hist, bin_edges = np.histogram(_data, bins=_bins, weights=_weights)
+
+    if isinstance(weights, unyt.unyt_array):
+        hist *= weights.units
+
+    if isinstance(data, unyt.unyt_array):
+        bin_edges *= data.units
+
+    return hist, bin_edges
 
 
 def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> Tuple[np.ndarray]:
@@ -70,9 +112,13 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
     data.gas.masses = data.gas.masses
 
+    # Rescale profiles to R500c
+    radial_distance = deltaR / R500c
+    assert radial_distance.units == unyt.dimensionless
+
     # Construct bins for mass-weighted quantities and retrieve bin_edges
-    lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
-    mass_weights, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
+    lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins) * radial_distance.units
+    mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.masses)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
     mass_weights *= data.gas.masses.units
 
@@ -86,12 +132,12 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'gas_density':
         weights_field = data.gas.densities
-        hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
     elif weights.lower() == 'dm_density':
         weights_field = data.dark_matter.masses
-        hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
         volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         hist = hist * weights_field.units / volume_shell / rho_crit
         # Correct for the universal baryon fraction
@@ -99,12 +145,12 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units / mass_weights
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units / mass_weights
         hist = (hist * unyt.boltzmann_constant).to('keV')
 
@@ -115,7 +161,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'entropy':
         weights_field = data.gas.entropies.to('Mpc**4/(Gyr**2*Msun**(5/3))')
-        hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
         # Make dimensionless, divide by (k_B T_500crit)
@@ -127,7 +173,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        hist, bin_edges = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
 
         # Make dimensionless, divide by (k_B T_500crit)
         norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
@@ -136,13 +182,11 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-
-
     return bin_centre, hist
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='dm_density')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
@@ -176,7 +220,7 @@ for i in range(len(results)):
     elif 'Isotropic' in results.loc[i, "Run name"]:
         color = 'lime'
 
-    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i],# * results['bin_centre (Mpc)'][i] ** 3,
+    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i],  # * results['bin_centre (Mpc)'][i] ** 3,
             linestyle=style, linewidth=0.3, color=color, alpha=0.4)
 ax.set_xscale('log')
 ax.set_yscale('log')
