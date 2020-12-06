@@ -18,6 +18,8 @@ except:
 bins = 20
 radius_bounds = [0.1, 3]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
+mean_molecular_weight = 0.59
+mean_atomic_weight_per_free_electron = 1.14
 
 
 def latex_float(f):
@@ -111,6 +113,11 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist *= unyt.K
         hist = (hist * unyt.boltzmann_constant).to('keV')
 
+        # Make dimensionless, divide by (k_B T_500crit)
+        norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+        norm = norm.to('keV')
+        hist /= norm
+
     elif weights.lower() == 'entropy':
         weights_field = data.gas.mass_weighted_temperatures * unyt.boltzmann_constant \
                         / data.gas.electron_number_densities ** (2 / 3)
@@ -118,12 +125,21 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
         hist = hist / mass_hist
 
+        # Make dimensionless, divide by (k_B T_500crit)
+        norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
+               / (500 * fbary * rho_crit / mean_atomic_weight_per_free_electron / unyt.mass_proton) ** (2 / 3)
+        hist /= norm
+
     elif weights.lower() == 'pressure':
         weights_field = data.gas.densities * data.gas.mass_weighted_temperatures * unyt.boltzmann_constant / 0.59 \
                         / unyt.mass_hydrogen
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
         hist = hist / mass_hist
+
+        # Make dimensionless, divide by (k_B T_500crit)
+        norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
+        hist /= norm
 
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
@@ -151,8 +167,11 @@ with Pool() as pool:
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
 
+fig, ax = plt.subplots()
 for i in range(len(results)):
-    plt.plot(results['bin_centre (Mpc)'][i], results['entropy'][i], linewidth=1, color=(0.5, 0.5, 0.5))
-plt.xscale('log')
-plt.yscale('log')
+    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i], linewidth=0.5, color=(0.5, 0.5, 0.5))
+ax.set_xscale('log')
+ax.set_yscale('log')
+ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+ax.set_ylabel(r'$M_{{\rm star},500{\rm crit}}\ [{\rm M}_{\odot}]$')
 plt.show()
