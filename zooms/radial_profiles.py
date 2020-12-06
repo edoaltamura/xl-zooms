@@ -67,26 +67,27 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     zoom_mass_resolution = dm_masses[0]
 
     # Since useful for different applications, attach datasets
-    data.gas.electron_number_densities = data.gas.densities / mean_atomic_weight_per_free_electron / unyt.mass_proton
+    # data.gas.electron_number_densities = data.gas.densities.to('Msun/Mpc**3') / mean_atomic_weight_per_free_electron / unyt.mass_proton
     data.gas.mass_weighted_temperatures = data.gas.masses.to('Msun') * data.gas.temperatures
+    data.gas.masses = data.gas.masses.to('Msun')
 
     # Construct bins and compute density profile
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
 
     # Allocate weights
     if weights.lower() == 'gas_mass':
-        weights_field = data.gas.masses.to('Msun')
+        weights_field = data.gas.masses
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
     if weights.lower() == 'gas_mass_cumulative':
-        weights_field = data.gas.masses.to('Msun')
+        weights_field = data.gas.masses
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist = np.cumsum(hist)
         hist *= weights_field.units
 
     elif weights.lower() == 'gas_density':
-        weights_field = data.gas.densities.to('Msun/Mpc**3')
+        weights_field = data.gas.densities
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
@@ -101,14 +102,14 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
         hist *= unyt.K
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
         hist *= unyt.K
         hist = (hist * unyt.boltzmann_constant).to('keV')
@@ -119,10 +120,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= norm
 
     elif weights.lower() == 'entropy':
-        weights_field = data.gas.mass_weighted_temperatures * unyt.boltzmann_constant \
-                        / data.gas.electron_number_densities ** (2 / 3)
+        weights_field = data.gas.entropies
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
 
         # Make dimensionless, divide by (k_B T_500crit)
@@ -131,8 +131,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= norm.value
 
     elif weights.lower() == 'pressure':
-        weights_field = data.gas.densities * data.gas.mass_weighted_temperatures * unyt.boltzmann_constant / 0.59 \
-                        / unyt.mass_proton
+        weights_field = data.gas.pressures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
