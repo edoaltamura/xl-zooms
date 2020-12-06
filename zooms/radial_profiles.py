@@ -67,24 +67,21 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     zoom_mass_resolution = dm_masses[0]
 
     # Since useful for different applications, attach datasets
-    # data.gas.electron_number_densities = data.gas.densities.to('Msun/Mpc**3') / mean_atomic_weight_per_free_electron / unyt.mass_proton
-    data.gas.mass_weighted_temperatures = data.gas.masses.to('Msun') * data.gas.temperatures
-    data.gas.masses = data.gas.masses.to('Msun')
+    data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
+    data.gas.masses = data.gas.masses
 
     # Construct bins and compute density profile
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
+    mass_weights, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
+    mass_weights *= data.gas.masses.units
 
     # Allocate weights
     if weights.lower() == 'gas_mass':
-        weights_field = data.gas.masses
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        hist *= weights_field.units
+        hist = mass_weights
 
     if weights.lower() == 'gas_mass_cumulative':
-        weights_field = data.gas.masses
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        hist = np.cumsum(hist)
-        hist *= weights_field.units
+        hist = np.cumsum(mass_weights.value)
+        hist *= data.gas.masses.units
 
     elif weights.lower() == 'gas_density':
         weights_field = data.gas.densities
@@ -92,26 +89,22 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist *= weights_field.units
 
     elif weights.lower() == 'dm_density':
-        weights_field = dm_masses
+        weights_field = data.dark_matter.masses
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-        hist = hist * dm_masses.units / volume_shell / rho_crit
+        hist = hist * weights_field.units / volume_shell / rho_crit
         # Correct for the universal baryon fraction
         hist /= (1 - fbary)
 
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
-        hist = hist / mass_hist
-        hist *= unyt.K
+        hist *= weights_field.units / mass_weights
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
-        hist = hist / mass_hist
-        hist *= unyt.K
+        hist *= weights_field.units / mass_weights
         hist = (hist * unyt.boltzmann_constant).to('keV')
 
         # Make dimensionless, divide by (k_B T_500crit)
@@ -149,7 +142,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='pressure')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='mass_weighted_temps_kev')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
