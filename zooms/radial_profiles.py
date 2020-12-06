@@ -120,23 +120,15 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.densities)
         hist /= rho_crit.to(hist.units)
 
-    elif weights.lower() == 'dm_density':
-        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.dark_matter.masses)
-        volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-        hist /= volume_shell
-        hist /= rho_crit.to(hist.units)
-        # Correct for the universal baryon fraction
-        hist /= (1 - fbary)
-
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
-        hist *= weights_field.units / mass_weights
+        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field)
+        hist /= mass_weights
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field.value)
-        hist *= weights_field.units / mass_weights
+        hist /= mass_weights
         hist = (hist * unyt.boltzmann_constant).to('keV')
 
         # Make dimensionless, divide by (k_B T_500crit)
@@ -171,7 +163,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='dm_density')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='mass_weighted_temps_kev')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
