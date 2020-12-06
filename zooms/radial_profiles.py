@@ -127,7 +127,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field.value)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
         hist /= mass_weights
         hist = (hist * unyt.boltzmann_constant).to('keV')
 
