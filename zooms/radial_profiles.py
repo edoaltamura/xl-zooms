@@ -153,10 +153,10 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= mass_weights
 
         # Make dimensionless, divide by K_500crit
-        norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
-               / (500 * fbary * rho_crit / mean_atomic_weight_per_free_electron / unyt.mass_proton) ** (2 / 3)
-
-        hist /= norm.to(hist.units)
+        # norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
+        #        / (500 * fbary * rho_crit / mean_atomic_weight_per_free_electron / unyt.mass_proton) ** (2 / 3)
+        #
+        # hist /= norm.to(hist.units)
 
         ylabel = r'$(K/K_{500{\rm crit}})$'
 
@@ -177,7 +177,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     return bin_centre, hist, ylabel
 
+
 field_name = 'entropy'
+
 
 def _process_single_halo(zoom: Zoom):
     return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
