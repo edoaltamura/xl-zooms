@@ -136,7 +136,6 @@ def _process_single_halo(zoom: Zoom):
 with Pool() as pool:
     print(f"Analysis mapped onto {cpu_count():d} CPUs.")
     results = pool.map(_process_single_halo, iter(zooms_register))
-    results = _process_single_halo(zooms_register[0])
 
     # Recast output into a Pandas dataframe for further manipulation
     columns = [
@@ -147,5 +146,5 @@ with Pool() as pool:
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
 
-plt.plot(results[0], results[1])
+plt.plot(results['bin_centre (Mpc)'], results['entropy'])
 plt.show()
