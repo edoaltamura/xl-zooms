@@ -148,9 +148,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         ylabel = r'$(k_B T/k_B T_{500{\rm crit}})$'
 
     elif weights.lower() == 'entropy':
-        weights_field = data.gas.entropies * data.gas.masses
+        weights_field = data.gas.entropies# * data.gas.masses
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
-        hist /= mass_weights
+        # hist /= mass_weights
 
         # Make dimensionless, divide by K_500crit
         norm = unyt.unyt_quantity(2.25342209e-23, 'Mpc**4/(Gyr**2*Msun**(5/3))')
