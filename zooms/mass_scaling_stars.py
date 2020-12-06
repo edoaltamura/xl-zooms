@@ -111,9 +111,9 @@ def m_500_star():
     Kravtsov18 = obs.Kravtsov18()
     ax.plot(Budzynski14.M500_trials, Budzynski14.Mstar_trials_median, linestyle='-', color=(0.8, 0.8, 0.8), zorder=0)
     ax.fill_between(Budzynski14.M500_trials, Budzynski14.Mstar_trials_lower, Budzynski14.Mstar_trials_upper,
-                    linestyle='-', color=(0.85, 0.85, 0.85), edgecolor='none', zorder=0)
+                    linewidth=0, color=(0.85, 0.85, 0.85), edgecolor='none', zorder=0)
     ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500, marker='*', s=12, color=(0.85, 0.85, 0.85),
-               edgecolors='none', zorder=0)
+               linewidth=1.2, edgecolors='none', zorder=0)
 
     # Build legends
     handles = [
@@ -197,11 +197,11 @@ def f_500_star():
     Budzynski14 = obs.Budzynski14()
     Kravtsov18 = obs.Kravtsov18()
     ax.plot(Budzynski14.M500_trials, Budzynski14.Mstar_trials_median / Budzynski14.M500_trials,
-            linestyle='-', color=(0.8, 0.8, 0.8), zorder=0)
+            linestyle='-', linewidth=1.2, color=(0.8, 0.8, 0.8), zorder=0)
     ax.fill_between(Budzynski14.M500_trials,
                     Budzynski14.Mstar_trials_lower / Budzynski14.M500_trials,
                     Budzynski14.Mstar_trials_upper / Budzynski14.M500_trials,
-                    linestyle='-', color=(0.85, 0.85, 0.85), edgecolor='none', zorder=0)
+                    color=(0.85, 0.85, 0.85), linewidth=0, edgecolor='none', zorder=0)
     ax.scatter(Kravtsov18.M500, Kravtsov18.Mstar500 / Kravtsov18.M500, marker='*', s=12, color=(0.85, 0.85, 0.85),
                edgecolors='none', zorder=0)
 
@@ -287,8 +287,8 @@ def f_500_bary():
         )
 
     # Display observational data
-    Budzynski14 = obs.Budzynski14()
-    Kravtsov18 = obs.Kravtsov18()
+    # Budzynski14 = obs.Budzynski14()
+    # Kravtsov18 = obs.Kravtsov18()
     # ax.plot(Budzynski14.M500_trials, Budzynski14.Mstar_trials_median / Budzynski14.M500_trials,
     #         linestyle='-', color=(0.8, 0.8, 0.8), zorder=0)
     # ax.fill_between(Budzynski14.M500_trials,
@@ -309,17 +309,17 @@ def f_500_bary():
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
-    handles = [
-        Line2D([], [], color=(0.85, 0.85, 0.85), marker='.', markeredgecolor='none', linestyle='-', markersize=0,
-               label=Budzynski14.paper_name),
-        Line2D([], [], color=(0.85, 0.85, 0.85), marker='*', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Kravtsov18.paper_name),
-        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
-    ]
-    del Budzynski14, Kravtsov18
-    legend_obs = plt.legend(handles=handles, loc=4)
+    # handles = [
+    #     Line2D([], [], color=(0.85, 0.85, 0.85), marker='.', markeredgecolor='none', linestyle='-', markersize=0,
+    #            label=Budzynski14.paper_name),
+    #     Line2D([], [], color=(0.85, 0.85, 0.85), marker='*', markeredgecolor='none', linestyle='None', markersize=4,
+    #            label=Kravtsov18.paper_name),
+    #     Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
+    # ]
+    # del Budzynski14, Kravtsov18
+    # legend_obs = plt.legend(handles=handles, loc=4)
     ax.add_artist(legend_sims)
-    ax.add_artist(legend_obs)
+    # ax.add_artist(legend_obs)
     ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')

@@ -151,7 +151,8 @@ with Pool() as pool:
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
 
-plt.plot(results['bin_centre (Mpc)'], results['entropy'], linewidth=1, color=(0.5,0.5,0.5))
+for i in range(len(results)):
+    plt.plot(results['bin_centre (Mpc)'][i], results['entropy'][i], linewidth=1, color=(0.5, 0.5, 0.5))
 plt.xscale('log')
 plt.yscale('log')
 plt.show()
