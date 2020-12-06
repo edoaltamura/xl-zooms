@@ -169,10 +169,27 @@ with Pool() as pool:
 
 fig, ax = plt.subplots()
 for i in range(len(results)):
+
+    style = ''
+    if '-8res' in results.loc[i, "Run name"]:
+        style = '-'
+    elif '+1res' in results.loc[i, "Run name"]:
+        style = ':'
+
+    color = ''
+    if 'Ref' in results.loc[i, "Run name"]:
+        color = 'black'
+    elif 'MinimumDistance' in results.loc[i, "Run name"]:
+        color = 'orange'
+    elif 'Isotropic' in results.loc[i, "Run name"]:
+        color = 'lime'
+
+
+
     ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i] * results['bin_centre (Mpc)'][i] ** 3,
-            linewidth=0.5, color=(0.5, 0.5, 0.5))
+            linestyle=style, linewidth=0.5, color=color)
 ax.set_xscale('log')
 ax.set_yscale('log')
-ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-ax.set_ylabel(r'$R/R_{500{\rm crit}}$')
+ax.set_ylabel(r'$P/P_{500{\rm crit}} \times (R/R_{500{\rm crit}})^3 $')
+ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
 plt.show()
