@@ -58,7 +58,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     unitLength = data.metadata.units.length
     unitMass = data.metadata.units.mass
     rho_crit = unyt.unyt_quantity(
-        data.metadata.cosmology['Critical density [internal units]'],
+        data.metadata.cosmology_raw['Critical density [internal units]'],
         unitMass / unitLength ** 3
     )
     dm_masses = data.dark_matter.masses.to('Msun')
@@ -135,8 +135,8 @@ def _process_single_halo(zoom: Zoom):
 # The results of the multiprocessing Pool are returned in the same order as inputs
 with Pool() as pool:
     print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-    # results = pool.map(_process_single_halo, iter(zooms_register))
-    results = _process_single_halo(zooms_register[0])
+    results = pool.map(_process_single_halo, iter(zooms_register))
+    # results = _process_single_halo(zooms_register[0])
 
     # Recast output into a Pandas dataframe for further manipulation
     columns = [
