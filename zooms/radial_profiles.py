@@ -135,7 +135,7 @@ def _process_single_halo(zoom: Zoom):
 # The results of the multiprocessing Pool are returned in the same order as inputs
 with Pool() as pool:
     print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-    # results = pool.map(_process_single_halo, iter(zooms_register))
+    results = pool.map(_process_single_halo, iter(zooms_register))
     results = _process_single_halo(zooms_register[0])
 
     # Recast output into a Pandas dataframe for further manipulation
@@ -147,5 +147,5 @@ with Pool() as pool:
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
 
-plt.plot(results['bin_centre (Mpc)'], results['entropy'])
+plt.plot(results[0], results[1])
 plt.show()
