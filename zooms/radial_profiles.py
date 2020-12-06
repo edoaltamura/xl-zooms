@@ -113,17 +113,26 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     if weights.lower() == 'gas_mass':
         hist = mass_weights / M500c.to(mass_weights.units)
 
+        ylabel = r'$M(dR) / M_{500{\rm crit}}$'
+
     elif weights.lower() == 'gas_mass_cumulative':
         hist = cumsum_unyt(mass_weights) / M500c.to(mass_weights.units)
+
+        ylabel = r'$M(<R) / M_{500{\rm crit}}$'
 
     elif weights.lower() == 'gas_density':
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.densities)
         hist /= rho_crit.to(hist.units)
+        hist *= bin_centre ** 2
+
+        ylabel = r'$(\rho_{\rm gas}/\rho_{\rm crit})\ (R/R_{500{\rm crit}})^3 $'
 
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
         hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field)
         hist /= mass_weights
+
+        ylabel = r'$T$ [K]'
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
@@ -136,6 +145,8 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         norm = norm.to('keV')
         hist /= norm
 
+        ylabel = r'$(k_B T/k_B T_{500{\rm crit}})$'
+
     elif weights.lower() == 'entropy':
         weights_field = data.gas.entropies
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
@@ -146,6 +157,8 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
         hist /= norm.to(hist.units)
 
+        ylabel = r'$(K/K_{500{\rm crit}})$'
+
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
@@ -155,14 +168,17 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= norm.to(hist.units)
         hist *= bin_centre ** 3
 
+        ylabel = r'$(P/P_{500{\rm crit}})\ (R/R_{500{\rm crit}})^3 $'
+
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-    return bin_centre, hist
+    return bin_centre, hist, ylabel
 
+field_name = 'pressure'
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='pressure')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
@@ -172,8 +188,9 @@ with Pool() as pool:
 
     # Recast output into a Pandas dataframe for further manipulation
     columns = [
-        'bin_centre (Mpc)',
-        'entropy',
+        'bin_centre',
+        field_name,
+        'ylabel'
     ]
     results = pd.DataFrame(list(results), columns=columns)
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
@@ -196,10 +213,9 @@ for i in range(len(results)):
     elif 'Isotropic' in results.loc[i, "Run name"]:
         color = 'lime'
 
-    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i],  # * results['bin_centre (Mpc)'][i] ** 3,
-            linestyle=style, linewidth=0.3, color=color, alpha=0.4)
+    ax.plot(results['bin_centre'][i], results[field_name][i], linestyle=style, linewidth=0.3, color=color, alpha=0.4)
 ax.set_xscale('log')
 ax.set_yscale('log')
-ax.set_ylabel(r'$P/P_{500{\rm crit}} \times (R/R_{500{\rm crit}})^3 $')
 ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
+ax.set_ylabel(results['ylabel'][0])
 plt.show()
