@@ -67,7 +67,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     zoom_mass_resolution = dm_masses[0]
 
     # Since useful for different applications, attach datasets
-    data.gas.electron_number_densities = np.log10(data.gas.densities.to('Msun/Mpc**3') / 1.14 / unyt.mass_hydrogen)
+    data.gas.electron_number_densities = data.gas.densities / mean_atomic_weight_per_free_electron / unyt.mass_proton
     data.gas.mass_weighted_temperatures = data.gas.masses.to('Msun') * data.gas.temperatures
 
     # Construct bins and compute density profile
@@ -132,7 +132,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.densities * data.gas.mass_weighted_temperatures * unyt.boltzmann_constant / 0.59 \
-                        / unyt.mass_hydrogen
+                        / unyt.mass_proton
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
         hist = hist / mass_hist
