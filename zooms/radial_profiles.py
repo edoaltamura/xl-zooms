@@ -169,9 +169,10 @@ with Pool() as pool:
 
 fig, ax = plt.subplots()
 for i in range(len(results)):
-    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i], linewidth=0.5, color=(0.5, 0.5, 0.5))
+    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i] * results['bin_centre (Mpc)'][i] ** 3,
+            linewidth=0.5, color=(0.5, 0.5, 0.5))
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-ax.set_ylabel(r'$M_{{\rm star},500{\rm crit}}\ [{\rm M}_{\odot}]$')
+ax.set_ylabel(r'$R/R_{500{\rm crit}}$')
 plt.show()
