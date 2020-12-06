@@ -120,7 +120,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= norm
 
     elif weights.lower() == 'entropy':
-        weights_field = data.gas.entropies
+        weights_field = data.gas.entropies.to('Mpc**4/(Gyr**2*Msun**(5/3))')
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
@@ -131,7 +131,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= norm.value
 
     elif weights.lower() == 'pressure':
-        weights_field = data.gas.pressures
+        weights_field = data.gas.pressures.to('Msun/(Gyr**2*Mpc)')
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
