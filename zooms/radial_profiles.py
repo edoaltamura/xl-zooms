@@ -129,7 +129,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 
-    return bin_centre, hist
+    return bin_centre, hist.value
 
 
 def _process_single_halo(zoom: Zoom):
