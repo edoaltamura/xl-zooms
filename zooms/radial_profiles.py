@@ -120,15 +120,15 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins) * radial_distance.units
     mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.masses)
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-    mass_weights *= data.gas.masses.units
 
     # Allocate weights
     if weights.lower() == 'gas_mass':
         hist = mass_weights
+        hist /= M500c
 
     elif weights.lower() == 'gas_mass_cumulative':
         hist = np.cumsum(mass_weights.value)
-        hist *= data.gas.masses.units
+        hist /= M500c
 
     elif weights.lower() == 'gas_density':
         weights_field = data.gas.densities
@@ -186,7 +186,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass_cumulative')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
