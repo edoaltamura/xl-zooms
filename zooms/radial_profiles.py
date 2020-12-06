@@ -73,23 +73,23 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     # Allocate weights
     if weights.lower() == 'gas_mass':
         weights_field = data.gas.masses
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
     if weights.lower() == 'gas_mass_cumulative':
         weights_field = data.gas.masses
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist = np.cumsum(hist)
         hist *= weights_field.units
 
     elif weights.lower() == 'gas_density':
         weights_field = data.gas.densities
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
     elif weights.lower() == 'dm_density':
         weights_field = dm_masses
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
         hist = hist * dm_masses.units / volume_shell / rho_crit
         # Correct for the universal baryon fraction
@@ -97,15 +97,15 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
         hist *= unyt.K
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
         hist *= unyt.K
         hist = (hist * unyt.boltzmann_constant).to('keV')
@@ -113,12 +113,12 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     elif weights.lower() == 'entropy':
         weights_field = data.gas.mass_weighted_temperatures * unyt.boltzmann_constant \
                         / data.gas.electron_number_densities ** (2 / 3)
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.densities * data.gas.mass_weighted_temperatures * unyt.boltzmann_constant / 0.59 \
                         / unyt.mass_hydrogen
-        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field)
+        hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
 
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
@@ -147,4 +147,6 @@ with Pool() as pool:
     print(results)
 
 plt.plot(results['bin_centre (Mpc)'][0], results['entropy'][0])
+plt.xscale('log')
+plt.yscale('log')
 plt.show()
