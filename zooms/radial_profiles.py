@@ -176,7 +176,7 @@ for i in range(len(results)):
     elif 'Isotropic' in results.loc[i, "Run name"]:
         color = 'lime'
 
-    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i] * results['bin_centre (Mpc)'][i] ** 3,
+    ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i],# * results['bin_centre (Mpc)'][i] ** 3,
             linestyle=style, linewidth=0.3, color=color, alpha=0.4)
 ax.set_xscale('log')
 ax.set_yscale('log')
