@@ -65,7 +65,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     zoom_mass_resolution = dm_masses[0]
 
     # Since useful for different applications, attach the electron number density dataset
-    data.gas.electron_number_densities = (data.gas.densities.to('Msun/Mpc**3') / 1.14 / unyt.mass_hydrogen)
+    data.gas.electron_number_densities = np.log10(data.gas.densities.to('Msun/Mpc**3') / 1.14 / unyt.mass_hydrogen)
     data.gas.mass_weighted_temperatures = data.gas.masses.to('Msun') * data.gas.temperatures
     # Construct bins and compute density profile
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
@@ -129,7 +129,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 
-    return bin_centre, hist.value
+    return bin_centre, hist
 
 
 def _process_single_halo(zoom: Zoom):
