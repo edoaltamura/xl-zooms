@@ -137,16 +137,14 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= norm
 
     elif weights.lower() == 'entropy':
-        weights_field = data.gas.entropies.to('Mpc**4/(Gyr**2*Msun**(5/3))')
-        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
-        hist *= weights_field.units
+        weights_field = data.gas.entropies
+        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field)
 
-        # Make dimensionless, divide by (k_B T_500crit)
+        # Make dimensionless, divide by K_500crit
         norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
                / (500 * fbary * rho_crit / mean_atomic_weight_per_free_electron / unyt.mass_proton) ** (2 / 3)
-        norm = norm.to(weights_field.units)
 
-        hist /= norm
+        hist /= norm.to(hist.units)
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures
@@ -163,7 +161,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='mass_weighted_temps_kev')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='entropy')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
