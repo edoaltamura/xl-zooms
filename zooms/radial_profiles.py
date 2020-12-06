@@ -206,9 +206,9 @@ for i in range(len(results)):
 
     style = ''
     if '-8res' in results.loc[i, "Run name"]:
-        style = '-'
-    elif '+1res' in results.loc[i, "Run name"]:
         style = ':'
+    elif '+1res' in results.loc[i, "Run name"]:
+        style = '-'
 
     color = ''
     if 'Ref' in results.loc[i, "Run name"]:
@@ -218,7 +218,9 @@ for i in range(len(results)):
     elif 'Isotropic' in results.loc[i, "Run name"]:
         color = 'lime'
 
-    ax.plot(results['bin_centre'][i], results[field_name][i], linestyle=style, linewidth=0.3, color=color, alpha=0.4)
+    if '+1res' in results.loc[i, "Run name"]:
+        ax.plot(results['bin_centre'][i], results[field_name][i], linestyle=style, linewidth=0.3, color=color, alpha=0.4)
+
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
