@@ -148,8 +148,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         ylabel = r'$(k_B T/k_B T_{500{\rm crit}})$'
 
     elif weights.lower() == 'entropy':
-        weights_field = data.gas.entropies
+        weights_field = data.gas.entropies * data.gas.masses
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
+        hist /= mass_weights
 
         # Make dimensionless, divide by K_500crit
         norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
@@ -160,8 +161,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         ylabel = r'$(K/K_{500{\rm crit}})$'
 
     elif weights.lower() == 'pressure':
-        weights_field = data.gas.pressures
+        weights_field = data.gas.pressures * data.gas.masses
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
+        hist /= mass_weights
 
         # Make dimensionless, divide by P_500crit
         norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
