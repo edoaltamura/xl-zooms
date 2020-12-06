@@ -154,9 +154,10 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
         # Make dimensionless, divide by K_500crit
         kBT500 = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
-        norm = kBT500 / (500 * fbary * rho_crit / mean_atomic_weight_per_free_electron * unyt.mass_proton) ** (2 / 3)
+        norm = kBT500 * (500 * fbary * rho_crit / (mean_atomic_weight_per_free_electron * unyt.mass_proton)) ** (-2 / 3)
+        print(norm, norm.to(hist.units))
 
-        hist /= norm.to(hist.units)
+        # hist /= norm.to(hist.units)
 
         ylabel = r'$(K/K_{500{\rm crit}})$'
 
