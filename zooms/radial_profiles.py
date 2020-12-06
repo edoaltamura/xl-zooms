@@ -150,9 +150,8 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'entropy':
         n_e = (data.gas.densities / (mean_atomic_weight_per_free_electron * unyt.mass_proton)).to('m**-3')
-        weights_field = data.gas.mass_weighted_temperatures / n_e ** (2 / 3)
+        weights_field = data.gas.temperatures / n_e ** (2 / 3)
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
-        hist /= mass_weights
         hist.to('keV*m**2')
 
         # Make dimensionless, divide by K_500crit
