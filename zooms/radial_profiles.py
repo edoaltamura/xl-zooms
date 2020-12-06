@@ -126,7 +126,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     if weights.lower() == 'gas_mass':
         hist = mass_weights
 
-    if weights.lower() == 'gas_mass_cumulative':
+    elif weights.lower() == 'gas_mass_cumulative':
         hist = np.cumsum(mass_weights.value)
         hist *= data.gas.masses.units
 
