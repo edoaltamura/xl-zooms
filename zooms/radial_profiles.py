@@ -17,7 +17,7 @@ except:
 
 # Constants
 bins = 30
-radius_bounds = [0.01, 3]  # In units of R500crit
+radius_bounds = [0.05, 4]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
@@ -186,7 +186,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass_cumulative')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
