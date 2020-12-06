@@ -118,6 +118,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'gas_density':
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.densities)
+        hist /= rho_crit.to(hist.units)
 
     elif weights.lower() == 'dm_density':
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.dark_matter.masses)
