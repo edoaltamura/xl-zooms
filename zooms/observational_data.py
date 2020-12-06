@@ -132,7 +132,10 @@ class Observations:
         the name of the paper. If verbosity is 0, it has no effect.
         """
         if self.verbose > 0:
-            print(f"[Literature data] Applied: {self.paper_name}")
+            try:
+                print(f"[Literature data] Applied: {self.paper_name}")
+            except:
+                pass
 
 
 class Sun09(Observations):
