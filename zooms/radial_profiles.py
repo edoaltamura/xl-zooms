@@ -149,17 +149,14 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         ylabel = r'$(k_B T/k_B T_{500{\rm crit}})$'
 
     elif weights.lower() == 'entropy':
-        n_e = (data.gas.densities / (mean_atomic_weight_per_free_electron * unyt.mass_proton)).to('m**-3')
-        weights_field = data.gas.temperatures / n_e ** (2 / 3)
-        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
-        hist.to('keV*m**2')
+        n_e = data.gas.densities
+        ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
 
-        # Make dimensionless, divide by K_500crit
-        # norm = unyt.unyt_quantity(2.25342209e-23, 'Mpc**4/(Gyr**2*Msun**(5/3))')
-        kBT = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
-        ne_500crit = (3 * M500c * fbary / (4 * np.pi * R500c ** 3) / (mean_atomic_weight_per_free_electron * unyt.mass_proton)).to('m**-3')
-        norm = kBT / ne_500crit ** (2 / 3)
-        hist /= norm.value
+        kBT = unyt.boltzmann_constant * data.gas.temperatures
+        kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+
+        weights_field = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
 
         ylabel = r'$(K/K_{500{\rm crit}})$'
 
