@@ -15,8 +15,8 @@ except:
     pass
 
 # Constants
-bins = 20
-radius_bounds = [0.1, 3]  # In units of R500crit
+bins = 30
+radius_bounds = [0.01, 3]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
@@ -184,10 +184,8 @@ for i in range(len(results)):
     elif 'Isotropic' in results.loc[i, "Run name"]:
         color = 'lime'
 
-
-
     ax.plot(results['bin_centre (Mpc)'][i], results['entropy'][i] * results['bin_centre (Mpc)'][i] ** 3,
-            linestyle=style, linewidth=0.5, color=color)
+            linestyle=style, linewidth=0.3, color=color, alpha=0.4)
 ax.set_xscale('log')
 ax.set_yscale('log')
 ax.set_ylabel(r'$P/P_{500{\rm crit}} \times (R/R_{500{\rm crit}})^3 $')
