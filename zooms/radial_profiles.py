@@ -127,7 +127,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= M500c
 
     elif weights.lower() == 'gas_mass_cumulative':
-        hist = np.cumsum(mass_weights.value)
+        hist = np.cumsum(mass_weights)
         hist /= M500c
 
     elif weights.lower() == 'gas_density':
