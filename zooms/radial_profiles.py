@@ -128,18 +128,18 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         # Make dimensionless, divide by (k_B T_500crit)
         norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
                / (500 * fbary * rho_crit / mean_atomic_weight_per_free_electron / unyt.mass_proton) ** (2 / 3)
-        hist /= norm
+        hist /= norm.value
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.densities * data.gas.mass_weighted_temperatures * unyt.boltzmann_constant / 0.59 \
                         / unyt.mass_proton
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
         hist = hist / mass_hist
 
         # Make dimensionless, divide by (k_B T_500crit)
         norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
-        hist /= norm
+        hist /= norm.value
 
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
