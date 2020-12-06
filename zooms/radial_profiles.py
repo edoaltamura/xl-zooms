@@ -138,7 +138,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'entropy':
         weights_field = data.gas.entropies
-        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
 
         # Make dimensionless, divide by K_500crit
         norm = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c \
