@@ -148,11 +148,11 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures
-        hist, bin_edges = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
 
-        # Make dimensionless, divide by (k_B T_500crit)
+        # Make dimensionless, divide by P_500crit
         norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
-        hist /= norm.to('Msun/(Gyr**2*Mpc)').value
+        hist /= norm.to(hist.units)
 
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
@@ -161,7 +161,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='entropy')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='pressure')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
