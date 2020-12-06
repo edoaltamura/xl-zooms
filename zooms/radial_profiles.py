@@ -143,6 +143,6 @@ with Pool() as pool:
         'bin_centre (Mpc)',
         'gas_mass_cumulative',
     ]
-    results = pd.DataFrame(list(results), columns=columns, dtype=np.ndarray)
+    results = pd.DataFrame(list(results), columns=columns)
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
