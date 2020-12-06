@@ -152,11 +152,12 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         n_e = data.gas.densities
         ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
 
-        kBT = unyt.boltzmann_constant * data.gas.temperatures
+        kBT = unyt.boltzmann_constant * data.gas.mass_weighted_temperatures
         kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
 
         weights_field = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
+        hist /= mass_weights
 
         ylabel = r'$(K/K_{500{\rm crit}})$'
 
