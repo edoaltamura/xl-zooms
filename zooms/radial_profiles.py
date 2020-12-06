@@ -111,23 +111,18 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     # Allocate weights
     if weights.lower() == 'gas_mass':
-        hist = mass_weights
-        hist /= M500c
+        hist = mass_weights / M500c
 
     elif weights.lower() == 'gas_mass_cumulative':
-        hist = cumsum_unyt(mass_weights)
-        hist /= M500c
+        hist = cumsum_unyt(mass_weights) / M500c
 
     elif weights.lower() == 'gas_density':
-        weights_field = data.gas.densities
-        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
-        hist *= weights_field.units
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.densities)
 
     elif weights.lower() == 'dm_density':
-        weights_field = data.dark_matter.masses
-        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field.value)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.dark_matter.masses)
         volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-        hist = hist * weights_field.units / volume_shell / rho_crit
+        hist = hist / volume_shell / rho_crit
         # Correct for the universal baryon fraction
         hist /= (1 - fbary)
 
@@ -174,7 +169,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass_cumulative')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_density')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
