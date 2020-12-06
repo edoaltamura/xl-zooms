@@ -146,5 +146,5 @@ with Pool() as pool:
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
 
-plt.plot(results['bin_centre (Mpc)'], results['entropy'])
+plt.plot(results['bin_centre (Mpc)'][0], results['entropy'][0])
 plt.show()
