@@ -15,8 +15,8 @@ except:
     pass
 
 # Constants
-bins = 11
-radius_bounds = [5e-2, 3]  # In units of R500crit
+bins = 20
+radius_bounds = [0.1, 3]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 
 
