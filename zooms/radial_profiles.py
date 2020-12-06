@@ -16,8 +16,8 @@ except:
     pass
 
 # Constants
-bins = 30
-radius_bounds = [0.05, 4]  # In units of R500crit
+bins = 60
+radius_bounds = [0.01, 4]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
