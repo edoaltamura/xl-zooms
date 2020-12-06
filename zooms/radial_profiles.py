@@ -129,20 +129,23 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass_cumulative')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='entropy')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
 with Pool() as pool:
     print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-    results = pool.map(_process_single_halo, iter(zooms_register))
-    # results = _process_single_halo(zooms_register[0])
+    # results = pool.map(_process_single_halo, iter(zooms_register))
+    results = _process_single_halo(zooms_register[0])
 
     # Recast output into a Pandas dataframe for further manipulation
     columns = [
         'bin_centre (Mpc)',
-        'gas_mass_cumulative',
+        'entropy',
     ]
     results = pd.DataFrame(list(results), columns=columns)
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results)
+
+plt.plot(results['bin_centre (Mpc)'], results['entropy'])
+plt.show()
