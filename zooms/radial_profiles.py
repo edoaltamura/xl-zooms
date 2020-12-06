@@ -33,44 +33,32 @@ def latex_float(f):
 
 
 def histogram_unyt(
-        data: Union[np.ndarray, unyt.unyt_array],
-        bins: Union[np.ndarray, unyt.unyt_array] = None,
-        weights: Union[np.ndarray, unyt.unyt_array] = None
-) -> Tuple[Union[np.ndarray, unyt.unyt_array]]:
+        data: unyt.unyt_array,
+        bins: unyt.unyt_array = None,
+        weights: unyt.unyt_array = None,
+        **kwargs,
+) -> Tuple[unyt.unyt_array]:
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
         f"Detected data {data.shape}, weights {weights.shape}."
     )
 
-    _data = deepcopy(data)
-    if isinstance(data, unyt.unyt_array):
-        _data = deepcopy(data.value)
+    assert data.units == bins.units, (
+        "Data and bins must have the same units. "
+        f"Detected data {data.units}, bins {bins.units}."
+    )
 
-        assert data.units == bins.units, (
-            "Data and bins must have the same units. "
-            f"Detected data {data.units}, bins {bins.units}."
-        )
-
-    _bins = deepcopy(bins)
-    if isinstance(bins, unyt.unyt_array):
-        _bins = deepcopy(bins.value)
-
-    _weights = deepcopy(weights)
-    if isinstance(weights, unyt.unyt_array):
-        _weights = deepcopy(weights.value)
-
-    if weights is None:
-        _weights = np.ones_like(_data)
-
-    hist, bin_edges = np.histogram(_data, bins=_bins, weights=_weights)
-
-    if isinstance(weights, unyt.unyt_array):
-        hist *= weights.units
-
-    if isinstance(data, unyt.unyt_array):
-        bin_edges *= data.units
+    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value, **kwargs)
+    hist *= weights.units
+    bin_edges *= data.units
 
     return hist, bin_edges
+
+
+def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
+    res = np.cumsum(data.value, **kwargs)
+
+    return res * data.units
 
 
 def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> Tuple[np.ndarray]:
@@ -127,8 +115,8 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         hist /= M500c
 
     elif weights.lower() == 'gas_mass_cumulative':
-        hist = np.cumsum(mass_weights.value)
-        hist /= M500c.value
+        hist = cumsum_unyt(mass_weights)
+        hist /= M500c
 
     elif weights.lower() == 'gas_density':
         weights_field = data.gas.densities
@@ -186,7 +174,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 
 def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass')
+    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights='gas_mass_cumulative')
 
 
 # The results of the multiprocessing Pool are returned in the same order as inputs
