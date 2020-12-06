@@ -65,25 +65,25 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     zoom_mass_resolution = dm_masses[0]
 
     # Since useful for different applications, attach the electron number density dataset
-    data.gas.electron_number_densities = (data.gas.densities / 1.14 / unyt.mass_hydrogen).to('m**-3')
-    data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
+    data.gas.electron_number_densities = (data.gas.densities.to('Msun/Mpc**3') / 1.14 / unyt.mass_hydrogen).to('m**-3')
+    data.gas.mass_weighted_temperatures = data.gas.masses.to('Msun') * data.gas.temperatures
     # Construct bins and compute density profile
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins)
 
     # Allocate weights
     if weights.lower() == 'gas_mass':
-        weights_field = data.gas.masses
+        weights_field = data.gas.masses.to('Msun')
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
     if weights.lower() == 'gas_mass_cumulative':
-        weights_field = data.gas.masses
+        weights_field = data.gas.masses.to('Msun')
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist = np.cumsum(hist)
         hist *= weights_field.units
 
     elif weights.lower() == 'gas_density':
-        weights_field = data.gas.densities
+        weights_field = data.gas.densities.to('Msun/Mpc**3')
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
         hist *= weights_field.units
 
@@ -98,14 +98,14 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
         hist = hist / mass_hist
         hist *= unyt.K
 
     elif weights.lower() == 'mass_weighted_temps_kev':
         weights_field = data.gas.mass_weighted_temperatures
         hist, bin_edges = np.histogram(deltaR / R500c, bins=lbins, weights=weights_field.value)
-        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.value)
+        mass_hist, _ = np.histogram(deltaR / R500c, bins=lbins, weights=data.gas.masses.to('Msun'))
         hist = hist / mass_hist
         hist *= unyt.K
         hist = (hist * unyt.boltzmann_constant).to('keV')
