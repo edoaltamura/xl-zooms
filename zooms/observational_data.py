@@ -426,3 +426,33 @@ class Barnes17(Observations):
         self.TX = (self.kB_TX / unyt.boltzmann_constant).to(K)
 
         # TODO: Review how h_conv_Barn is applied to each individual dataset
+
+
+class Voit05(Observations):
+
+    paper_name = "Voit et al. (2005)"
+    notes = (
+        "Dimensionless entropy profiles. "
+        "The first set of simulated non-radiative clusters we will consider"
+        "was produced by the entropy-conserving version of the SPH code"
+        "GADGET (Springel, Yoshida & White 2001; Springel & Hernquist"
+        "2002) with Omega_M = 0.3, Omega_ = 0.7, Omega_ = 0.045, h = 0.7, and"
+        "σ 8 = 0.9. Most of this set comes from the non-radiative simulation"
+        "described in Kay (2004), from which we take the 30 most massive clusters, "
+        "ranging from 2.1 × 1013 to 7.5 × 1014 h−1 M_Sun."
+    )
+
+    radial_range_r200c = np.array([0.2, 1])
+
+    a = 1.51
+    b = 1.24
+
+    def __init__(self, *args, **kwargs):
+        super(Voit05, self).__init__(*args, **kwargs)
+
+        self.k_k200c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r200c))
+        r500c_r200c = 0.1 ** (1 / 3)
+        self.radial_range_r500c = self.radial_range_r200c * r500c_r200c
+        self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
+
+

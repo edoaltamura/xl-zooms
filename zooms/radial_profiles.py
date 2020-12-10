@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 from convergence_radius import convergence_radius
+import observational_data as obs
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -266,6 +267,8 @@ if __name__ == "__main__":
                 linestyle=style, linewidth=0.3, color='black', alpha=0.1
             )
 
+    Voit05 = obs.Voit05()
+    ax.plot(Voit05.radial_range_r500c, Voit05.k_k500c, linestyle='--', color='k')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
