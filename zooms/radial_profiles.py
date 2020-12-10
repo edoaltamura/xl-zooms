@@ -247,15 +247,15 @@ if __name__ == "__main__":
 
         if '+1res' in results.loc[i, "Run name"]:
             ax.plot(
-                results['bin_centre'][i][convergence_index],
-                results[field_name][i][convergence_index],
+                results['bin_centre'][i, convergence_index],
+                results[field_name][i, convergence_index],
                 linestyle=style, linewidth=0.5, color=color, alpha=0.6
             )
-            ax.plot(
-                results['bin_centre'][i][~convergence_index],
-                results[field_name][i][~convergence_index],
-                linestyle=style, linewidth=0.3, color='black', alpha=0.1
-            )
+            # ax.plot(
+            #     results['bin_centre'][i][~convergence_index],
+            #     results[field_name][i][~convergence_index],
+            #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
+            # )
 
     ax.set_xscale('log')
     ax.set_yscale('log')
