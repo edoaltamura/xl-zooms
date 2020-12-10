@@ -17,14 +17,14 @@ except:
     pass
 
 # Constants
-bins = 60
-radius_bounds = [0.01, 4]  # In units of R500crit
+bins = 40
+radius_bounds = [0.01, 6.]# In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
-# sampling_method = 'shell_density'
-sampling_method = 'particle_density'
+sampling_method = 'shell_density'
+# sampling_method = 'particle_density'
 
 
 
@@ -137,7 +137,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'mass_weighted_temps':
         weights_field = data.gas.mass_weighted_temperatures
-        hist, _ = np.histogram(radial_distance, bins=lbins, weights=weights_field)
+        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
         hist /= mass_weights
 
         ylabel = r'$T$ [K]'
@@ -161,10 +161,10 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         if sampling_method == 'shell_density':
 
             volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-            density_gas = (mass_weights / volume_shell).to(rho_crit.units)
-            mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(rho_crit.units)
+            density_gas = mass_weights / volume_shell
+            mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_gas.units)
 
-            kBT, _ = np.histogram(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
+            kBT, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
             kBT *= (unyt.boltzmann_constant / mass_weights)
             kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
             kBT_500crit = kBT_500crit.to(kBT.units)
