@@ -107,7 +107,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     assert radial_distance.units == unyt.dimensionless
 
     # Compute convergence radius
-    conv_radius = convergence_radius(deltaR, data.gas.masses.to('Msun'), rho_crit) / R500c
+    conv_radius = convergence_radius(deltaR, data.gas.masses.to('Msun'), rho_crit.to('Msun/Mpc**3')) / R500c
 
     # Construct bins for mass-weighted quantities and retrieve bin_edges
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins) * radial_distance.units
