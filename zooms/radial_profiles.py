@@ -23,7 +23,9 @@ fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
-sampling_method = 'shell_density'
+# sampling_method = 'shell_density'
+sampling_method = 'particle_density'
+
 
 
 def latex_float(f):
