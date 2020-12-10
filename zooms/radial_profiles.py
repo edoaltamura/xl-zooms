@@ -9,6 +9,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
+from convergence_radius import convergence_radius
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -21,6 +22,8 @@ radius_bounds = [0.01, 4]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
+
+sampling_method = 'shell_density'
 
 
 def latex_float(f):
@@ -98,11 +101,13 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     # Since useful for different applications, attach datasets
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
-    data.gas.masses = data.gas.masses
 
     # Rescale profiles to R500c
     radial_distance = deltaR / R500c
     assert radial_distance.units == unyt.dimensionless
+
+    # Compute convergence radius
+    conv_radius = convergence_radius(deltaR, data.gas.masses, rho_crit) / R500c
 
     # Construct bins for mass-weighted quantities and retrieve bin_edges
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins) * radial_distance.units
@@ -149,15 +154,30 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         ylabel = r'$(k_B T/k_B T_{500{\rm crit}})$'
 
     elif weights.lower() == 'entropy':
-        n_e = data.gas.densities
-        ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
 
-        kBT = unyt.boltzmann_constant * data.gas.mass_weighted_temperatures
-        kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+        if sampling_method == 'shell_density':
 
-        weights_field = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
-        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
-        hist /= mass_weights
+            volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
+            n_e = mass_weights / volume_shell
+            ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
+
+            kBT, _ = np.histogram(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
+            kBT /= mass_weights
+            kBT *= unyt.boltzmann_constant
+            kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+
+            hist = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
+
+        elif sampling_method == 'particle_density':
+            n_e = data.gas.densities
+            ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
+
+            kBT = unyt.boltzmann_constant * data.gas.mass_weighted_temperatures
+            kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+
+            weights_field = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
+            hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
+            hist /= mass_weights
 
         ylabel = r'$(K/K_{500{\rm crit}})$'
 
@@ -176,53 +196,57 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-    return bin_centre, hist, ylabel
+    return bin_centre, hist, ylabel, conv_radius
 
 
-field_name = 'entropy'
+if __name__ == "__main__":
+
+    field_name = 'entropy'
 
 
-def _process_single_halo(zoom: Zoom):
-    return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
+    def _process_single_halo(zoom: Zoom):
+        return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
 
 
-# The results of the multiprocessing Pool are returned in the same order as inputs
-with Pool() as pool:
-    print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-    results = pool.map(_process_single_halo, iter(zooms_register))
+    # The results of the multiprocessing Pool are returned in the same order as inputs
+    with Pool() as pool:
+        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
+        results = pool.map(_process_single_halo, iter(zooms_register))
 
-    # Recast output into a Pandas dataframe for further manipulation
-    columns = [
-        'bin_centre',
-        field_name,
-        'ylabel'
-    ]
-    results = pd.DataFrame(list(results), columns=columns)
-    results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
-    print(results)
+        # Recast output into a Pandas dataframe for further manipulation
+        columns = [
+            'bin_centre',
+            field_name,
+            'ylabel',
+            'gas_convergence_radius',
+        ]
+        results = pd.DataFrame(list(results), columns=columns)
+        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+        print(results)
 
-fig, ax = plt.subplots()
-for i in range(len(results)):
+    fig, ax = plt.subplots()
+    for i in range(len(results)):
 
-    style = ''
-    if '-8res' in results.loc[i, "Run name"]:
-        style = ':'
-    elif '+1res' in results.loc[i, "Run name"]:
-        style = '-'
+        style = ''
+        if '-8res' in results.loc[i, "Run name"]:
+            style = ':'
+        elif '+1res' in results.loc[i, "Run name"]:
+            style = '-'
 
-    color = ''
-    if 'Ref' in results.loc[i, "Run name"]:
-        color = 'black'
-    elif 'MinimumDistance' in results.loc[i, "Run name"]:
-        color = 'orange'
-    elif 'Isotropic' in results.loc[i, "Run name"]:
-        color = 'lime'
+        color = ''
+        if 'Ref' in results.loc[i, "Run name"]:
+            color = 'black'
+        elif 'MinimumDistance' in results.loc[i, "Run name"]:
+            color = 'orange'
+        elif 'Isotropic' in results.loc[i, "Run name"]:
+            color = 'lime'
 
-    if '+1res' in results.loc[i, "Run name"]:
-        ax.plot(results['bin_centre'][i], results[field_name][i], linestyle=style, linewidth=0.3, color=color, alpha=0.4)
+        if '+1res' in results.loc[i, "Run name"]:
+            ax.plot(results['bin_centre'][i], results[field_name][i], linestyle=style, linewidth=0.3, color=color,
+                    alpha=0.4)
 
-ax.set_xscale('log')
-ax.set_yscale('log')
-ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
-ax.set_ylabel(results['ylabel'][0])
-plt.show()
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
+    ax.set_ylabel(results['ylabel'][0])
+    plt.show()
