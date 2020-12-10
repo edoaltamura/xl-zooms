@@ -64,7 +64,7 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
     return res * data.units
 
 
-def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> Tuple[np.ndarray]:
+def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> tuple:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
