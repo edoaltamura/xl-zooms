@@ -254,7 +254,7 @@ if __name__ == "__main__":
         # Plot only profiles outside convergence radius
         convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
 
-        if '+1res' in results.loc[i, "Run name"]:
+        if 'res' in results.loc[i, "Run name"]:
             ax.plot(
                 results['bin_centre'][i][convergence_index],
                 results[field_name][i][convergence_index],
