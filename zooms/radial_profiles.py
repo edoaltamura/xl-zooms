@@ -158,15 +158,16 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         if sampling_method == 'shell_density':
 
             volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-            n_e = mass_weights / volume_shell
-            ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
+            density_gas = (mass_weights / volume_shell).to(rho_crit.units)
+            mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(rho_crit.units)
 
             kBT, _ = np.histogram(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
-            kBT /= mass_weights
-            kBT *= unyt.boltzmann_constant
+            kBT *= (unyt.boltzmann_constant / mass_weights)
             kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+            kBT_500crit = kBT_500crit.to(kBT.units)
 
-            hist = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
+            # Note: the ratio of densities is the same as ratio of electron number densities
+            hist = kBT / kBT_500crit * (mean_density_R500c / density_gas) ** (2 / 3)
 
         elif sampling_method == 'particle_density':
             n_e = data.gas.densities
@@ -179,7 +180,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
             hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
             hist /= mass_weights
 
-        ylabel = r'$(K/K_{500{\rm crit}})$'
+        ylabel = r'$K/K_{500{\rm crit}}$'
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures * data.gas.masses
