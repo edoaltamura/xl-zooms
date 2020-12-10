@@ -214,14 +214,13 @@ if __name__ == "__main__":
     with Pool() as pool:
         print(f"Analysis mapped onto {cpu_count():d} CPUs.")
         results = pool.map(_process_single_halo, iter(zooms_register))
-        print(results)
 
         # Recast output into a Pandas dataframe for further manipulation
         columns = [
             'bin_centre',
             field_name,
             'ylabel',
-            'gas_convergence_radius',
+            'convergence_radius'
         ]
         results = pd.DataFrame(list(results), columns=columns)
         results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
@@ -245,7 +244,7 @@ if __name__ == "__main__":
             color = 'lime'
 
         # Plot only profiles outside convergence radius
-        convergence_index = np.where(results['bin_centre'][i] > results['gas_convergence_radius'][i])[0]
+        convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
 
         if '+1res' in results.loc[i, "Run name"]:
             ax.plot(
