@@ -165,7 +165,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
             mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_gas.units)
 
             kBT, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
-            kBT *= (unyt.boltzmann_constant / mass_weights)
+            kBT *= unyt.boltzmann_constant
+            kBT /= mass_weights
+            kBT = kBT.to('keV')
             kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
             kBT_500crit = kBT_500crit.to(kBT.units)
 
