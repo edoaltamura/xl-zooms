@@ -452,7 +452,7 @@ class Voit05(Observations):
 
         self.k_k200c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r200c))
         r500c_r200c = 0.1 ** (1 / 3)
-        self.radial_range_r500c = self.radial_range_r200c * r500c_r200c
+        self.radial_range_r500c = self.radial_range_r200c / r500c_r200c
         self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
 
 
