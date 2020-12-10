@@ -115,6 +115,10 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     # Construct bins for mass-weighted quantities and retrieve bin_edges
     lbins = np.logspace(np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), bins) * radial_distance.units
     mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.masses)
+
+    # Replace zeros with Nans
+    mass_weights[mass_weights == 0] = np.nan
+
     bin_centre = np.sqrt(bin_edges[1:] * bin_edges[:-1])
 
     # Allocate weights
@@ -228,7 +232,7 @@ if __name__ == "__main__":
         ]
         results = pd.DataFrame(list(results), columns=columns)
         results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
-        print(results)
+        print(results.head())
 
     fig, ax = plt.subplots()
     for i in range(len(results)):
