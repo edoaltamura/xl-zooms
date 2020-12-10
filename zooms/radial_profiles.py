@@ -65,6 +65,7 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
 
 
 def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> tuple:
+
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -213,6 +214,7 @@ if __name__ == "__main__":
     with Pool() as pool:
         print(f"Analysis mapped onto {cpu_count():d} CPUs.")
         results = pool.map(_process_single_halo, iter(zooms_register))
+        print(results)
 
         # Recast output into a Pandas dataframe for further manipulation
         columns = [
@@ -247,15 +249,15 @@ if __name__ == "__main__":
 
         if '+1res' in results.loc[i, "Run name"]:
             ax.plot(
-                results['bin_centre'][i, convergence_index],
-                results[field_name][i, convergence_index],
+                results['bin_centre'][i][convergence_index],
+                results[field_name][i][convergence_index],
                 linestyle=style, linewidth=0.5, color=color, alpha=0.6
             )
-            # ax.plot(
-            #     results['bin_centre'][i][~convergence_index],
-            #     results[field_name][i][~convergence_index],
-            #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
-            # )
+            ax.plot(
+                results['bin_centre'][i][~convergence_index],
+                results[field_name][i][~convergence_index],
+                linestyle=style, linewidth=0.3, color='black', alpha=0.1
+            )
 
     ax.set_xscale('log')
     ax.set_yscale('log')
