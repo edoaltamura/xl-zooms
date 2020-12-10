@@ -241,9 +241,20 @@ if __name__ == "__main__":
         elif 'Isotropic' in results.loc[i, "Run name"]:
             color = 'lime'
 
+        # Plot only profiles outside convergence radius
+        convergence_index = np.where(results['bin_centre'][i] > results['gas_convergence_radius'][i])[0]
+
         if '+1res' in results.loc[i, "Run name"]:
-            ax.plot(results['bin_centre'][i], results[field_name][i], linestyle=style, linewidth=0.3, color=color,
-                    alpha=0.4)
+            ax.plot(
+                results['bin_centre'][i][convergence_index],
+                results[field_name][i][convergence_index],
+                linestyle=style, linewidth=0.5, color=color, alpha=0.6
+            )
+            ax.plot(
+                results['bin_centre'][i][~convergence_index],
+                results[field_name][i][~convergence_index],
+                linestyle=style, linewidth=0.3, color='black', alpha=0.1
+            )
 
     ax.set_xscale('log')
     ax.set_yscale('log')
