@@ -268,7 +268,11 @@ if __name__ == "__main__":
             )
 
     Voit05 = obs.Voit05()
-    ax.plot(Voit05.radial_range_r500c, Voit05.k_k500c, linestyle='--', color='k')
+    ax.plot(Voit05.radial_range_r500c, Voit05.k_k500c, linestyle='--', color='k', linewidth=0.5)
+
+    Pratt10 = obs.Pratt10()
+    ax.plot(Pratt10.radial_range_r500c, Pratt10.k_k500c, linestyle='--', color='r', linewidth=0.5)
+
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')

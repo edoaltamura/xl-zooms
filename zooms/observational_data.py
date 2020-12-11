@@ -456,3 +456,22 @@ class Voit05(Observations):
         self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
 
 
+class Pratt10(Observations):
+
+    paper_name = "Pratt et al. (2010)"
+    notes = (
+        "Dimensionless entropy profiles. "
+    )
+
+    radial_range_r500c = np.array([0.5, 2])
+
+    a = 1.42
+    b = 1.1
+
+    def __init__(self, *args, **kwargs):
+        super(Pratt10, self).__init__(*args, **kwargs)
+
+        self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
+
+
+
