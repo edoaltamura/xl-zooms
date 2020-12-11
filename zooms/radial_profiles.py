@@ -233,35 +233,35 @@ if __name__ == "__main__":
             'convergence_radius'
         ]
         results = pd.DataFrame(list(results), columns=columns)
-        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+        results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
         print(results.head())
 
     fig, ax = plt.subplots()
 
     # Plot bands for each AGN model
-    agn_random = results.query("Ref in `Run name`")
+    agn_random = results.query("Ref in run_name")
     print(agn_random)
 
     for i in range(len(results)):
 
         style = ''
-        if '-8res' in results.loc[i, "Run name"]:
+        if '-8res' in results.loc[i, "run_name"]:
             style = ':'
-        elif '+1res' in results.loc[i, "Run name"]:
+        elif '+1res' in results.loc[i, "run_name"]:
             style = '-'
 
         color = ''
-        if 'Ref' in results.loc[i, "Run name"]:
+        if 'Ref' in results.loc[i, "run_name"]:
             color = 'black'
-        elif 'MinimumDistance' in results.loc[i, "Run name"]:
+        elif 'MinimumDistance' in results.loc[i, "run_name"]:
             color = 'orange'
-        elif 'Isotropic' in results.loc[i, "Run name"]:
+        elif 'Isotropic' in results.loc[i, "run_name"]:
             color = 'lime'
 
         # Plot only profiles outside convergence radius
         convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
 
-        if 'res' in results.loc[i, "Run name"]:
+        if 'res' in results.loc[i, "run_name"]:
             ax.plot(
                 results['bin_centre'][i][convergence_index],
                 results[field_name][i][convergence_index],
