@@ -239,7 +239,7 @@ if __name__ == "__main__":
     fig, ax = plt.subplots()
 
     # Plot bands for each AGN model
-    agn_random = results.query("Ref in run_name")
+    agn_random = results.query('run_name.str.contains("Ref")')
     print(agn_random)
 
     for i in range(len(results)):
