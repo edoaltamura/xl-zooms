@@ -1,14 +1,20 @@
 import unyt
 import numpy as np
-from typing import Tuple, Union
+from typing import Tuple
 from multiprocessing import Pool, cpu_count
 import h5py as h5
-from copy import deepcopy
 import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
 
-from register import zooms_register, Zoom, Tcut_halogas, name_list
+from register import (
+    zooms_register,
+    Zoom,
+    Tcut_halogas,
+    name_list,
+    vr_numbers
+)
+
 from convergence_radius import convergence_radius
 import observational_data as obs
 
@@ -19,14 +25,13 @@ except:
 
 # Constants
 bins = 40
-radius_bounds = [0.01, 6.]# In units of R500crit
+radius_bounds = [0.01, 6.]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
 sampling_method = 'shell_density'
 # sampling_method = 'particle_density'
-
 
 
 def latex_float(f):
@@ -68,7 +73,6 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
 
 
 def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> tuple:
-
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -236,45 +240,52 @@ if __name__ == "__main__":
         results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
         print(results.head())
 
-    fig, ax = plt.subplots()
+    fig, axes = plt.subplots(nrows=6, ncols=5, sharex=True, sharey=True, squeeze=True)
+
     for i in range(len(results)):
 
-        style = ''
-        if '-8res' in results.loc[i, "run_name"]:
-            style = ':'
-        elif '+1res' in results.loc[i, "run_name"]:
-            style = '-'
+        for vr_num in vr_numbers:
 
-        color = ''
-        if 'Ref' in results.loc[i, "run_name"]:
-            color = 'black'
-        elif 'MinimumDistance' in results.loc[i, "run_name"]:
-            color = 'orange'
-        elif 'Isotropic' in results.loc[i, "run_name"]:
-            color = 'lime'
+            if vr_num in results.loc[i, "run_name"]:
+                print(vr_num)
+                ax = axes[vr_numbers.index(vr_num) % 6, vr_numbers.index(vr_num) // 5]
 
-        # Plot only profiles outside convergence radius
-        convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
+                style = ''
+                if '-8res' in results.loc[i, "run_name"]:
+                    style = ':'
+                elif '+1res' in results.loc[i, "run_name"]:
+                    style = '-'
 
-        if 'res' in results.loc[i, "run_name"]:
-            ax.plot(
-                results['bin_centre'][i][convergence_index],
-                results[field_name][i][convergence_index],
-                linestyle=style, linewidth=0.5, color=color, alpha=0.6
-            )
+                color = ''
+                if 'Ref' in results.loc[i, "run_name"]:
+                    color = 'black'
+                elif 'MinimumDistance' in results.loc[i, "run_name"]:
+                    color = 'orange'
+                elif 'Isotropic' in results.loc[i, "run_name"]:
+                    color = 'lime'
 
-            # Plot section below the convergence radius
-            # ax.plot(
-            #     results['bin_centre'][i][~convergence_index],
-            #     results[field_name][i][~convergence_index],
-            #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
-            # )
+                # Plot only profiles outside convergence radius
+                convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
 
-    obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
-    obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
+                if 'res' in results.loc[i, "run_name"]:
+                    ax.plot(
+                        results['bin_centre'][i][convergence_index],
+                        results[field_name][i][convergence_index],
+                        linestyle=style, linewidth=0.5, color=color, alpha=0.6
+                    )
 
-    ax.set_xscale('log')
-    ax.set_yscale('log')
-    ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
-    ax.set_ylabel(results['ylabel'][0])
+                    # Plot section below the convergence radius
+                    # ax.plot(
+                    #     results['bin_centre'][i][~convergence_index],
+                    #     results[field_name][i][~convergence_index],
+                    #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
+                    # )
+
+                obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
+                obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
+
+                ax.set_xscale('log')
+                ax.set_yscale('log')
+                ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
+                ax.set_ylabel(results['ylabel'][0])
     plt.show()

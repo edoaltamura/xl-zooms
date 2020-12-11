@@ -3,8 +3,9 @@
 # To access the catalog file of the first zoom, use
 #       zooms_register[0].catalog_file
 
-from typing import Union, Tuple, List
+from typing import List
 from matplotlib import colors
+import re
 
 
 class Zoom:
@@ -14,13 +15,11 @@ class Zoom:
             run_name: str,
             snapshot_file: str,
             catalog_file: str,
-            plot_color: Union[str, Tuple[float]],
             output_directory: str
     ) -> None:
         self.run_name = run_name
         self.snapshot_file = snapshot_file
         self.catalog_file = catalog_file
-        self.plot_color = colors.to_rgba(plot_color)
         self.output_directory = output_directory
 
     def __str__(self):
@@ -29,9 +28,19 @@ class Zoom:
             f"\tName:                    {self.run_name}\n"
             f"\tSnapshot file:           {self.snapshot_file}\n"
             f"\tCatalog file:            {self.catalog_file}\n"
-            f"\tColor identifier (RGBA): {self.plot_color}\n"
             f"\tOutput directory:        {self.output_directory}\n"
         )
+
+
+def get_vr_number_from_name(name: str) -> int:
+    result = re.search('VR(.*)_', name)
+    return int(result.group(1))
+
+
+def get_vr_numbers_unique() -> List[int]:
+    vr_nums = [get_vr_number_from_name(name) for name in name_list]
+    vr_nums = set(vr_nums)
+    return list(vr_nums).sort()
 
 
 class ZoomList:
@@ -275,19 +284,18 @@ catalogue_filenames = [
 
 ]
 
-colours = ["black"] * 27 + ["orange"] * 12 + ["lime"] * 12 + ["lime"] * 6 + ["orange"] * 6
-
 output_dir = ["/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"] * len(catalogue_filenames)
 
 Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
 
 zooms_register = ZoomList(
-        name_list,
-        snapshot_filenames,
-        catalogue_filenames,
-        colours,
-        output_dir,
-    ).obj_list
+    name_list,
+    snapshot_filenames,
+    catalogue_filenames,
+    output_dir,
+).obj_list
+
+vr_numbers = get_vr_numbers_unique()
 
 if __name__ == "__main__":
     for i in zooms_register:
