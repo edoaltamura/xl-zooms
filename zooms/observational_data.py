@@ -455,6 +455,12 @@ class Voit05(Observations):
         self.radial_range_r500c = self.radial_range_r200c / r500c_r200c
         self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
 
+    def plot_on_axes(self, ax, **kwargs):
+        r500c_r200c = 0.1 ** (1 / 3)
+        radial_range_r500c = ax.get_xlim() / r500c_r200c
+        k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(radial_range_r500c))
+        ax.plot(ax.get_xlim(), k_k500c, **kwargs)
+
 
 class Pratt10(Observations):
 
@@ -472,6 +478,10 @@ class Pratt10(Observations):
         super(Pratt10, self).__init__(*args, **kwargs)
 
         self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
+
+    def plot_on_axes(self, ax, **kwargs):
+        k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(ax.get_xlim()))
+        ax.plot(ax.get_xlim(), k_k500c, **kwargs)
 
 
 

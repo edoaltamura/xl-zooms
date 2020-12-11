@@ -163,7 +163,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     elif weights.lower() == 'entropy':
 
-        if sampling_method == 'shell_density':
+        if sampling_method.lower() == 'shell_density':
 
             volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
             density_gas = mass_weights / volume_shell
@@ -179,7 +179,8 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
             # Note: the ratio of densities is the same as ratio of electron number densities
             hist = kBT / kBT_500crit * (mean_density_R500c / density_gas) ** (2 / 3)
 
-        elif sampling_method == 'particle_density':
+        elif sampling_method.lower() == 'particle_density':
+
             n_e = data.gas.densities
             ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
 
@@ -236,6 +237,11 @@ if __name__ == "__main__":
         print(results.head())
 
     fig, ax = plt.subplots()
+
+    # Plot bands for each AGN model
+    agn_random = results.query("Ref in `Run name`")
+    print(agn_random)
+
     for i in range(len(results)):
 
         style = ''
@@ -261,17 +267,16 @@ if __name__ == "__main__":
                 results[field_name][i][convergence_index],
                 linestyle=style, linewidth=0.5, color=color, alpha=0.6
             )
-            ax.plot(
-                results['bin_centre'][i][~convergence_index],
-                results[field_name][i][~convergence_index],
-                linestyle=style, linewidth=0.3, color='black', alpha=0.1
-            )
 
-    Voit05 = obs.Voit05()
-    ax.plot(Voit05.radial_range_r500c, Voit05.k_k500c, linestyle='--', color='k', linewidth=0.5)
+            # Plot section below the convergence radius
+            # ax.plot(
+            #     results['bin_centre'][i][~convergence_index],
+            #     results[field_name][i][~convergence_index],
+            #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
+            # )
 
-    Pratt10 = obs.Pratt10()
-    ax.plot(Pratt10.radial_range_r500c, Pratt10.k_k500c, linestyle='--', color='r', linewidth=0.5)
+    obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
+    obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
