@@ -240,52 +240,52 @@ if __name__ == "__main__":
         results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
         print(results.head())
 
-    fig, axes = plt.subplots(nrows=6, ncols=5, sharex=True, sharey=True, squeeze=True)
+    fig, axes = plt.subplots()
 
     for i in range(len(results)):
 
-        for vr_num in vr_numbers:
+        vr_num = 'VR813'
 
-            if vr_num in results.loc[i, "run_name"]:
-                print(vr_num)
-                ax = axes[vr_numbers.index(vr_num) % 6, vr_numbers.index(vr_num) // 5]
+        if vr_num in results.loc[i, "run_name"]:
+            print(vr_num)
+            ax = axes[vr_numbers.index(vr_num) % 6, vr_numbers.index(vr_num) // 5]
 
-                style = ''
-                if '-8res' in results.loc[i, "run_name"]:
-                    style = ':'
-                elif '+1res' in results.loc[i, "run_name"]:
-                    style = '-'
+            style = ''
+            if '-8res' in results.loc[i, "run_name"]:
+                style = ':'
+            elif '+1res' in results.loc[i, "run_name"]:
+                style = '-'
 
-                color = ''
-                if 'Ref' in results.loc[i, "run_name"]:
-                    color = 'black'
-                elif 'MinimumDistance' in results.loc[i, "run_name"]:
-                    color = 'orange'
-                elif 'Isotropic' in results.loc[i, "run_name"]:
-                    color = 'lime'
+            color = ''
+            if 'Ref' in results.loc[i, "run_name"]:
+                color = 'black'
+            elif 'MinimumDistance' in results.loc[i, "run_name"]:
+                color = 'orange'
+            elif 'Isotropic' in results.loc[i, "run_name"]:
+                color = 'lime'
 
-                # Plot only profiles outside convergence radius
-                convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
+            # Plot only profiles outside convergence radius
+            convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
 
-                if 'res' in results.loc[i, "run_name"]:
-                    ax.plot(
-                        results['bin_centre'][i][convergence_index],
-                        results[field_name][i][convergence_index],
-                        linestyle=style, linewidth=0.5, color=color, alpha=0.6
-                    )
+            if 'res' in results.loc[i, "run_name"]:
+                ax.plot(
+                    results['bin_centre'][i][convergence_index],
+                    results[field_name][i][convergence_index],
+                    linestyle=style, linewidth=0.5, color=color, alpha=0.6
+                )
 
-                    # Plot section below the convergence radius
-                    # ax.plot(
-                    #     results['bin_centre'][i][~convergence_index],
-                    #     results[field_name][i][~convergence_index],
-                    #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
-                    # )
+                # Plot section below the convergence radius
+                # ax.plot(
+                #     results['bin_centre'][i][~convergence_index],
+                #     results[field_name][i][~convergence_index],
+                #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
+                # )
 
-                obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
-                obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
+            obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
+            obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
 
-                ax.set_xscale('log')
-                ax.set_yscale('log')
-                ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
-                ax.set_ylabel(results['ylabel'][0])
+            ax.set_xscale('log')
+            ax.set_yscale('log')
+            ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
+            ax.set_ylabel(results['ylabel'][0])
     plt.show()
