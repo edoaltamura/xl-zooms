@@ -286,4 +286,5 @@ if __name__ == "__main__":
     ax.set_yscale('log')
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(results['ylabel'][0])
+    plt.legend()
     plt.show()
