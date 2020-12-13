@@ -225,12 +225,13 @@ if __name__ == "__main__":
         return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
 
 
-    zooms_process_list = [zoom for zoom in zooms_register if vr_num in zoom.run_name]
+    zooms_register = [zoom for zoom in zooms_register if vr_num in zoom.run_name]
+    name_list = [zoom for zoom in name_list if vr_num in zoom]
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
         print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_process_list))
+        results = pool.map(_process_single_halo, iter(zooms_register))
 
         # Recast output into a Pandas dataframe for further manipulation
         columns = [
