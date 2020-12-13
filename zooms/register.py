@@ -33,8 +33,12 @@ class Zoom:
 
 
 def get_vr_number_from_name(name: str) -> int:
-    result = re.search('VR(.*)_', name)
-    return int(result.group(1))
+    start = 'VR'
+    end = '_'
+
+    result = re.search('%s(.*)%s' % (start, end), name).group(1)
+
+    return int(result)
 
 
 def get_vr_numbers_unique() -> List[int]:
