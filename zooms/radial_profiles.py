@@ -217,6 +217,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 if __name__ == "__main__":
 
+    vr_num = 'VR813'
     field_name = 'entropy'
 
 
@@ -224,10 +225,12 @@ if __name__ == "__main__":
         return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
 
 
+    zooms_process_list = [zoom for zoom in zooms_register if vr_num in zoom.run_name]
+
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
         print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_register))
+        results = pool.map(_process_single_halo, iter(zooms_process_list))
 
         # Recast output into a Pandas dataframe for further manipulation
         columns = [
@@ -244,47 +247,42 @@ if __name__ == "__main__":
 
     for i in range(len(results)):
 
-        vr_num = 'VR813'
+        style = ''
+        if '-8res' in results.loc[i, "run_name"]:
+            style = ':'
+        elif '+1res' in results.loc[i, "run_name"]:
+            style = '-'
 
-        if vr_num in results.loc[i, "run_name"]:
-            print(vr_num)
+        color = ''
+        if 'Ref' in results.loc[i, "run_name"]:
+            color = 'black'
+        elif 'MinimumDistance' in results.loc[i, "run_name"]:
+            color = 'orange'
+        elif 'Isotropic' in results.loc[i, "run_name"]:
+            color = 'lime'
 
-            style = ''
-            if '-8res' in results.loc[i, "run_name"]:
-                style = ':'
-            elif '+1res' in results.loc[i, "run_name"]:
-                style = '-'
+        # Plot only profiles outside convergence radius
+        convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
 
-            color = ''
-            if 'Ref' in results.loc[i, "run_name"]:
-                color = 'black'
-            elif 'MinimumDistance' in results.loc[i, "run_name"]:
-                color = 'orange'
-            elif 'Isotropic' in results.loc[i, "run_name"]:
-                color = 'lime'
+        if 'res' in results.loc[i, "run_name"]:
+            ax.plot(
+                results['bin_centre'][i][convergence_index],
+                results[field_name][i][convergence_index],
+                linestyle=style, linewidth=0.5, color=color, alpha=0.6
+            )
 
-            # Plot only profiles outside convergence radius
-            convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
+            # Plot section below the convergence radius
+            # ax.plot(
+            #     results['bin_centre'][i][~convergence_index],
+            #     results[field_name][i][~convergence_index],
+            #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
+            # )
 
-            if 'res' in results.loc[i, "run_name"]:
-                ax.plot(
-                    results['bin_centre'][i][convergence_index],
-                    results[field_name][i][convergence_index],
-                    linestyle=style, linewidth=0.5, color=color, alpha=0.6
-                )
+    obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
+    obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
 
-                # Plot section below the convergence radius
-                # ax.plot(
-                #     results['bin_centre'][i][~convergence_index],
-                #     results[field_name][i][~convergence_index],
-                #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
-                # )
-
-            obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
-            obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
-
-            ax.set_xscale('log')
-            ax.set_yscale('log')
-            ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
-            ax.set_ylabel(results['ylabel'][0])
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
+    ax.set_ylabel(results['ylabel'][0])
     plt.show()
