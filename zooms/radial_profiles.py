@@ -240,7 +240,7 @@ if __name__ == "__main__":
         results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
         print(results.head())
 
-    fig, axes = plt.subplots()
+    fig, ax = plt.subplots()
 
     for i in range(len(results)):
 
@@ -248,7 +248,6 @@ if __name__ == "__main__":
 
         if vr_num in results.loc[i, "run_name"]:
             print(vr_num)
-            ax = axes[vr_numbers.index(vr_num) % 6, vr_numbers.index(vr_num) // 5]
 
             style = ''
             if '-8res' in results.loc[i, "run_name"]:
