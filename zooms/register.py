@@ -4,8 +4,6 @@
 #       zooms_register[0].catalog_file
 
 from typing import List
-from matplotlib import colors
-import re
 
 
 class Zoom:
@@ -35,8 +33,8 @@ class Zoom:
 def get_vr_number_from_name(name: str) -> int:
     start = 'VR'
     end = '_'
-
-    result = re.search('%s(.*)%s' % (start, end), name).group(1)
+    start_position = name.find(start) + len(start)
+    result = name[start_position:name.find(end, start_position)]
 
     return int(result)
 
