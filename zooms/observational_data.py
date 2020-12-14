@@ -458,7 +458,7 @@ class Voit05(Observations):
     def plot_on_axes(self, ax, **kwargs):
         r500c_r200c = 0.1 ** (1 / 3)
         radial_range_r500c = np.array(ax.get_xlim()) - np.log10(r500c_r200c)
-        k_k500c = 10 ** (np.log10(self.a) + self.b * radial_range_r500c)
+        k_k500c = 10 ** (np.log10(self.a) + self.b * 10 ** radial_range_r500c)
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
 
 
