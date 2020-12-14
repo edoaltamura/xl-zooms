@@ -480,7 +480,7 @@ class Pratt10(Observations):
         self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
 
     def plot_on_axes(self, ax, **kwargs):
-        k_k500c = 10 ** (np.log10(self.a) + self.b * np.array(ax.get_xlim()))
+        k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(np.array(ax.get_xlim())))
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
 
 
