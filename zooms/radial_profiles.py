@@ -217,7 +217,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 if __name__ == "__main__":
 
-    vr_num = 'VR18_'
+    vr_num = 18
     field_name = 'entropy'
 
 
@@ -226,7 +226,7 @@ if __name__ == "__main__":
 
 
     zooms_register = [zoom for zoom in zooms_register if vr_num in zoom.run_name]
-    name_list = [zoom for zoom in name_list if vr_num in zoom]
+    name_list = [zoom for zoom in name_list if f"VR{vr_num}_" in zoom]
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
