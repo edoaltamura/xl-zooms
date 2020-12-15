@@ -81,7 +81,7 @@ def remove_extracted_snipshots(run_directory: str):
     if os.path.isdir(os.path.join(run_directory, "snapshots", "snipshots")):
         shutil.rmtree(os.path.join(run_directory, "snapshots", "snipshots"))
     else:
-        print("No restart directory found. Nothing was removed.")
+        print("No extracted snipshots directory found. Nothing was removed.")
 
 
 if __name__ == '__main__':
