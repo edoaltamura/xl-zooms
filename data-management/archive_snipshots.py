@@ -5,11 +5,11 @@ import numpy as np
 
 
 def humanize_bytes(num, suffix='B'):
-    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+    for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
-            return "%3.1f%s%s" % (num, unit, suffix)
+            return "%3.1f%s %s" % (num, unit, suffix)
         num /= 1024.0
-    return "%.1f%s%s" % (num, 'Yi', suffix)
+    return "%.1f%s %s" % (num, 'Y', suffix)
 
 
 def zipdir(path: str, zip_handle: zipfile.ZipFile):
@@ -47,7 +47,7 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
         print(humanize_bytes(size))
         file_sizes[i] = size
         # zip_handle.write(file)
-    print(np.sum(file_sizes))
+    print(humanize_bytes(np.sum(file_sizes)))
 
 
 def archive_outputs(snap_directory: str):
