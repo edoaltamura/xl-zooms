@@ -13,7 +13,25 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
 
     snipshot_index = np.where(output_list == 'Snipshot')[0]
 
-    print(snipshot_index)
+    # Get filenames in output data directory
+    output_data_directory = os.path.join(path, "snapshots")
+    outfiles = [f for f in os.listdir(output_data_directory) if os.path.isfile(os.path.join(output_data_directory, f))]
+    outfiles = [f for f in outfiles if f.endswith('.hdf5')]
+    outfiles_index = [int(f[-9:-5]) for f in outfiles]
+
+    # Sort filenames in data directory
+    sort_key = np.argsort(outfiles_index)
+    outfiles = np.asarray(outfiles)[sort_key]
+    outfiles_index = np.asarray(outfiles_index)[sort_key]
+
+    assert all(x < y for x, y in zip(outfiles_index[:-1], outfiles_index[1:])), (
+        "Checking monotonicity of sorted indices for output files failed. "
+        "The sequence of file indices is not strictly increasing. Check sorting algorithm."
+    )
+
+    snipshots_filenames = outfiles[snipshot_index]
+
+    print(snipshots_filenames, snipshot_index)
 
     # for file in output_list:
     #     zip_handle.write(file)
