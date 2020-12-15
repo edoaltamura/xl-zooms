@@ -10,6 +10,8 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
         os.path.join(path, "snap_redshifts.txt"),
         delimiter=',', dtype=None
     )
+    output_list = np.asarray(output_list)
+
 
     print(output_list)
 
