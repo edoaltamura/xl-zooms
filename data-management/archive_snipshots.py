@@ -13,7 +13,7 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
 
     snip_index = np.where(output_list == 'Snipshot')[0]
 
-    print(output_list[~snip_index])
+    print(output_list[snip_index])
 
     # for file in output_list:
     #     zip_handle.write(file)
