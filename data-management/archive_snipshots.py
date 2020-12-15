@@ -7,22 +7,22 @@ import numpy as np
 def humanize_bytes(num, suffix='B'):
     for unit in ['', 'K', 'M', 'G', 'T', 'P', 'E', 'Z']:
         if abs(num) < 1024.0:
-            return "%3.1f%s %s" % (num, unit, suffix)
+            return "%3.1f %s%s" % (num, unit, suffix)
         num /= 1024.0
-    return "%.1f%s %s" % (num, 'Y', suffix)
+    return "%.1f %s%s" % (num, 'Y', suffix)
 
 
-def zipdir(path: str, zip_handle: zipfile.ZipFile):
+def compress_snipshots(run_directory: str):
     # Get output type list
     output_list = np.genfromtxt(
-        os.path.join(path, "snap_redshifts.txt"),
+        os.path.join(run_directory, "snap_redshifts.txt"),
         delimiter=', ', dtype=str
     ).T[1]
 
     snipshot_index = np.where(output_list == 'Snipshot')[0]
 
     # Get filenames in output data directory
-    output_data_directory = os.path.join(path, "snapshots")
+    output_data_directory = os.path.join(run_directory, "snapshots")
     outfiles = [f for f in os.listdir(output_data_directory) if os.path.isfile(os.path.join(output_data_directory, f))]
     outfiles = [f for f in outfiles if f.endswith('.hdf5')]
     outfiles_index = [int(f[-9:-5]) for f in outfiles]
@@ -37,33 +37,36 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
         "The sequence of file indices is not strictly increasing. Check sorting algorithm."
     )
 
+    # Filter snipshot filenames
     snipshots_filenames = outfiles[snipshot_index]
+    print(
+        f"Found {len(snipshots_filenames):d} snipshot files.\n"
+        f"Found {(len(outfiles) - len(snipshots_filenames)):d} snapshot files."
+    )
 
-    print(snipshots_filenames, snipshot_index)
+    # Compress snipshots and gather file sizes for report
+    archive_filename = os.path.join(run_directory, "snapshots", "snipshots.zip")
+    with zipfile.ZipFile(archive_filename, 'w', zipfile.ZIP_DEFLATED) as zip_handle:
 
-    file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
-    for i, file in enumerate(snipshots_filenames):
-        size = os.path.getsize(os.path.join(path, 'snapshots', file))
-        print(humanize_bytes(size))
-        file_sizes[i] = size
-        # zip_handle.write(file)
-    print(humanize_bytes(np.sum(file_sizes)))
+        file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
+        for i, file in enumerate(snipshots_filenames):
+            size = os.path.getsize(os.path.join(run_directory, 'snapshots', file))
+            file_sizes[i] = size
+            zip_handle.write(file)
 
+    print(
+        "Compression complete.\n"
+        f"Minimum file size: {humanize_bytes(np.min(file_sizes))}\n"
+        f"Maximum file size: {humanize_bytes(np.max(file_sizes))}\n"
+        f"Total file size: {humanize_bytes(np.sum(file_sizes))}\n"
+        f"Archive file size: {humanize_bytes(os.path.getsize(archive_filename))}\n"
+    )
 
-def archive_outputs(snap_directory: str):
-    # Make sure to be in the correct working directory
-    os.chdir(snap_directory)
-    dir_basename = os.path.basename(os.path.normpath(os.getcwd()))
-    assert 'snap' in dir_basename.lower(), "Check that what you are archiving is a snapshot directory."
-
-    # Identify contents recursively and append to zip handle
-    with zipfile.ZipFile(f'{dir_basename}.zip', 'w', zipfile.ZIP_DEFLATED) as zip_handle:
-        zipdir(snap_directory, zip_handle)
-
+    return
 
 def remove_restart_files(snap_directory: str):
     shutil.rmtree(os.path.join(snap_directory, "restart"))
 
 
 if __name__ == '__main__':
-    zipdir("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic", None)
+    compress_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
