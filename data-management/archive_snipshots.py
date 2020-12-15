@@ -4,6 +4,15 @@ import shutil
 import numpy as np
 
 
+def human_readable_format(size, precision=2):
+    suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
+    suffix_index = 0
+    while size > 1024:
+        suffix_index += 1     # increment the index of the suffix
+        size = size / 1024.0  # apply the division
+    return "%.*f %d" % (precision, size, suffixes[suffix_index])
+
+
 def zipdir(path: str, zip_handle: zipfile.ZipFile):
     # Get output type list
     output_list = np.genfromtxt(
@@ -33,8 +42,13 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
 
     print(snipshots_filenames, snipshot_index)
 
-    # for file in output_list:
-    #     zip_handle.write(file)
+    file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
+    for i, file in enumerate(snipshots_filenames):
+        size = os.path.getsize(os.path.join(path, 'snapshots', file))
+        print(human_readable_format(size))
+        file_sizes[i] = size
+        # zip_handle.write(file)
+    print(np.sum(file_sizes))
 
 
 def archive_outputs(snap_directory: str):
