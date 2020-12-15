@@ -11,9 +11,7 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
         delimiter=', ', dtype=str
     ).T[1]
 
-    snip_index = np.where(output_list == 'Snipshot')[0]
-
-    print(output_list[snip_index])
+    print(output_list[output_list == 'Snipshot'])
 
     # for file in output_list:
     #     zip_handle.write(file)
