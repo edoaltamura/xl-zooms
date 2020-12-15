@@ -8,10 +8,8 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
     # Get output type list
     output_list = np.genfromtxt(
         os.path.join(path, "snap_redshifts.txt"),
-        delimiter=',', dtype=(np.float, "|S10")
+        delimiter=',', dtype=str
     )
-    output_list = np.asarray(output_list)
-
 
     print(output_list)
 
