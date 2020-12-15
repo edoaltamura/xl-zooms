@@ -54,7 +54,7 @@ def compress_snipshots(run_directory: str):
             size = os.path.getsize(file)
             file_sizes[i] = size
             zip_handle.write(file)
-            os.remove(file)
+            # os.remove(file)
 
     print(
         "Compression complete.\n"
