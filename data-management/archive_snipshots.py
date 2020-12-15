@@ -8,10 +8,12 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
     # Get output type list
     output_list = np.genfromtxt(
         os.path.join(path, "snap_redshifts.txt"),
-        delimiter=',', dtype=str
+        delimiter=', ', dtype=str
     ).T[1]
 
-    print(output_list)
+    snip_index = np.where(output_list == 'Snipshot')[0]
+
+    print(output_list[~snip_index])
 
     # for file in output_list:
     #     zip_handle.write(file)
