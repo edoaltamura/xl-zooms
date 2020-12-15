@@ -4,13 +4,12 @@ import shutil
 import numpy as np
 
 
-def human_readable_format(size, precision=2):
-    suffixes = ['B', 'KB', 'MB', 'GB', 'TB']
-    suffix_index = 0
-    while size > 1024:
-        suffix_index += 1     # increment the index of the suffix
-        size = size / 1024.0  # apply the division
-    return "%.*f %d" % (precision, size, suffixes[suffix_index])
+def humanize_bytes(num, suffix='B'):
+    for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
+        if abs(num) < 1024.0:
+            return "%3.1f%s%s" % (num, unit, suffix)
+        num /= 1024.0
+    return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
 def zipdir(path: str, zip_handle: zipfile.ZipFile):
