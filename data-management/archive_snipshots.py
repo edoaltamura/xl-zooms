@@ -9,7 +9,7 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
     output_list = np.genfromtxt(
         os.path.join(path, "snap_redshifts.txt"),
         delimiter=',', dtype=str
-    )
+    ).T[1]
 
     print(output_list)
 
