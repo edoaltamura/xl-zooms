@@ -68,12 +68,15 @@ def compress_snipshots(run_directory: str):
 
 
 def remove_restart_files(run_directory: str):
-    shutil.rmtree(os.path.join(run_directory, "restart"))
+    if os.path.isdir(os.path.join(run_directory, "restart")):
+        shutil.rmtree(os.path.join(run_directory, "restart"))
+    else:
+        print("No restart directory found. Nothing was removed.")
 
 
 def extract_snipshots(run_directory: str):
     archive_filename = os.path.join(run_directory, "snapshots", "snipshots.zip")
-    with zipfile.ZipFile(archive_filename, 'w', zipfile.ZIP_DEFLATED) as zip_handle:
+    with zipfile.ZipFile(archive_filename, 'r') as zip_handle:
         zip_handle.extractall(os.path.join(run_directory, "snapshots", "snipshots"))
 
 
