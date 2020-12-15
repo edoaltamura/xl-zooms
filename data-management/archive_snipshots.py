@@ -47,7 +47,6 @@ def compress_snipshots(run_directory: str):
     # Compress snipshots and gather file sizes for report
     archive_filename = os.path.join(run_directory, "snapshots", "snipshots.zip")
     with zipfile.ZipFile(archive_filename, 'w', zipfile.ZIP_DEFLATED) as zip_handle:
-
         file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
         for i, file in enumerate(snipshots_filenames):
             print(file)
@@ -55,6 +54,7 @@ def compress_snipshots(run_directory: str):
             size = os.path.getsize(file)
             file_sizes[i] = size
             zip_handle.write(file)
+            os.remove(file)
 
     print(
         "Compression complete.\n"
@@ -66,9 +66,18 @@ def compress_snipshots(run_directory: str):
 
     return
 
-def remove_restart_files(snap_directory: str):
-    shutil.rmtree(os.path.join(snap_directory, "restart"))
+
+def remove_restart_files(run_directory: str):
+    shutil.rmtree(os.path.join(run_directory, "restart"))
+
+
+def extract_snipshots(run_directory: str):
+    archive_filename = os.path.join(run_directory, "snapshots", "snipshots.zip")
+    with zipfile.ZipFile(archive_filename, 'w', zipfile.ZIP_DEFLATED) as zip_handle:
+        zip_handle.extractall(os.path.join(run_directory, "snapshots", "snipshots"))
 
 
 if __name__ == '__main__':
-    compress_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
+    # compress_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
+    remove_restart_files("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
+    extract_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
