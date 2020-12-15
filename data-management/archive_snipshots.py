@@ -83,8 +83,7 @@ def extract_snipshots(run_directory: str):
 
         # Extract files in a loop - same implementation of self.extractall() in Lib/zipfile.
         for i in trange(len(contents), desc=f"Extracting from snipshots.zip"):
-            file = os.path.join(run_directory, 'snapshots', contents[i])
-            zip_handle.extract(file, dest_directory)
+            zip_handle.extract(contents[i], dest_directory)
 
 
 def remove_extracted_snipshots(run_directory: str):
@@ -96,7 +95,7 @@ def remove_extracted_snipshots(run_directory: str):
 
 if __name__ == '__main__':
     working_run_directory = "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic"
-    remove_extracted_snipshots(working_run_directory)
-    compress_snipshots(working_run_directory)
-    remove_restart_files(working_run_directory)
+    # remove_extracted_snipshots(working_run_directory)
+    # compress_snipshots(working_run_directory)
+    # remove_restart_files(working_run_directory)
     extract_snipshots(working_run_directory)
