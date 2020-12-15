@@ -46,14 +46,16 @@ def compress_snipshots(run_directory: str):
     )
 
     # Compress snipshots and gather file sizes for report
+    # Use len_dir_path to avoid including the internal directory structure inside zip archive
     archive_filename = os.path.join(run_directory, "snapshots", "snipshots.zip")
+    len_dir_path = len(os.path.join(run_directory, "snapshots"))
     with zipfile.ZipFile(archive_filename, 'w', zipfile.ZIP_DEFLATED) as zip_handle:
         file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
         for i in trange(len(snipshots_filenames), desc=f"Compression to snipshots.zip"):
             file = os.path.join(run_directory, 'snapshots', snipshots_filenames[i])
             size = os.path.getsize(file)
             file_sizes[i] = size
-            zip_handle.write(file)
+            zip_handle.write(file, file[len_dir_path:])
             os.remove(file)
 
     print(
@@ -61,7 +63,7 @@ def compress_snipshots(run_directory: str):
         f"Minimum file size: {humanize_bytes(np.min(file_sizes))}\n"
         f"Maximum file size: {humanize_bytes(np.max(file_sizes))}\n"
         f"Total file size: {humanize_bytes(np.sum(file_sizes))}\n"
-        f"Archive file size: {humanize_bytes(os.path.getsize(archive_filename))}\n"
+        f"Archive file size: {humanize_bytes(os.path.getsize(archive_filename))}"
     )
 
 
@@ -74,8 +76,16 @@ def remove_restart_files(run_directory: str):
 
 def extract_snipshots(run_directory: str):
     archive_filename = os.path.join(run_directory, "snapshots", "snipshots.zip")
+    dest_directory = os.path.join(run_directory, "snapshots", "snipshots")
+
     with zipfile.ZipFile(archive_filename, 'r') as zip_handle:
-        zip_handle.extractall(os.path.join(run_directory, "snapshots", "snipshots"))
+        contents = zip_handle.namelist()
+
+        # Extract files in a loop - same implementation of self.extractall() in Lib/zipfile.
+        for i in trange(len(contents), desc=f"Extracting from snipshots.zip"):
+            file = os.path.join(run_directory, 'snapshots', contents[i])
+            zip_handle.extract(file, dest_directory)
+
 
 def remove_extracted_snipshots(run_directory: str):
     if os.path.isdir(os.path.join(run_directory, "snapshots", "snipshots")):
@@ -85,7 +95,8 @@ def remove_extracted_snipshots(run_directory: str):
 
 
 if __name__ == '__main__':
-    remove_extracted_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
-    compress_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
-    remove_restart_files("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
-    extract_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
+    run_dir = "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic"
+    remove_extracted_snipshots(run_dir)
+    compress_snipshots(run_dir)
+    remove_restart_files(run_dir)
+    extract_snipshots(run_dir)
