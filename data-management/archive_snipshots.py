@@ -50,7 +50,9 @@ def compress_snipshots(run_directory: str):
 
         file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
         for i, file in enumerate(snipshots_filenames):
-            size = os.path.getsize(os.path.join(run_directory, 'snapshots', file))
+            print(file)
+            file = os.path.join(run_directory, 'snapshots', file)
+            size = os.path.getsize(file)
             file_sizes[i] = size
             zip_handle.write(file)
 
