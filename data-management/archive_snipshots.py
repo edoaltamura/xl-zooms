@@ -37,7 +37,7 @@ def compress_snipshots(run_directory: str):
         "Checking monotonicity of sorted indices for output files failed. "
         "The sequence of file indices is not strictly increasing. Check sorting algorithm."
     )
-    print(len(outfiles), outfiles)
+
     # Filter snipshot filenames
     snipshots_filenames = outfiles[snipshot_index]
     print(
@@ -96,7 +96,7 @@ def remove_extracted_snipshots(run_directory: str):
 
 if __name__ == '__main__':
     working_run_directory = "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic"
-    remove_extracted_snipshots(working_run_directory)
-    compress_snipshots(working_run_directory)
-    remove_restart_files(working_run_directory)
+    # remove_extracted_snipshots(working_run_directory)
+    # compress_snipshots(working_run_directory)
+    # remove_restart_files(working_run_directory)
     extract_snipshots(working_run_directory)
