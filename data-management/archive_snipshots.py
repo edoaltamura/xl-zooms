@@ -44,7 +44,7 @@ def zipdir(path: str, zip_handle: zipfile.ZipFile):
     file_sizes = np.ones_like(snipshots_filenames, dtype=np.int64)
     for i, file in enumerate(snipshots_filenames):
         size = os.path.getsize(os.path.join(path, 'snapshots', file))
-        print(human_readable_format(size))
+        print(humanize_bytes(size))
         file_sizes[i] = size
         # zip_handle.write(file)
     print(np.sum(file_sizes))
