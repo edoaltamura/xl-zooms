@@ -81,6 +81,6 @@ def extract_snipshots(run_directory: str):
 
 
 if __name__ == '__main__':
-    # compress_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
+    compress_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
     remove_restart_files("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
     extract_snipshots("/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic")
