@@ -37,7 +37,7 @@ def compress_snipshots(run_directory: str):
         "Checking monotonicity of sorted indices for output files failed. "
         "The sequence of file indices is not strictly increasing. Check sorting algorithm."
     )
-
+    print(len(outfiles), outfiles)
     # Filter snipshot filenames
     snipshots_filenames = outfiles[snipshot_index]
     print(
