@@ -251,8 +251,8 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 if __name__ == "__main__":
 
-    vr_num = 'VR187_'
-    field_name = 'entropy_physical'
+    vr_num = 'Minimum'
+    field_name = 'pressure'
 
 
     def _process_single_halo(zoom: Zoom):
@@ -303,7 +303,7 @@ if __name__ == "__main__":
             results['bin_centre'][i][convergence_index],
             results[field_name][i][convergence_index],
             linestyle=style, linewidth=0.5, color=color, alpha=0.6,
-            label=results.loc[i, "run_name"]
+            # label=results.loc[i, "run_name"]
         )
 
         # Plot section below the convergence radius
@@ -321,15 +321,15 @@ if __name__ == "__main__":
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(results['ylabel'][0])
 
-    # handles = [
-    #     Line2D([], [], markersize=0, color='k', linestyle=':', label='-8 Res'),
-    #     Line2D([], [], markersize=0, color='k', linestyle='-', label='+1 Res'),
-    #     Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
-    #     Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
-    #     Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
-    # ]
-    # legend_sims = plt.legend(handles=handles, loc=2)
-    # ax.add_artist(legend_sims)
+    handles = [
+        Line2D([], [], markersize=0, color='k', linestyle=':', label='-8 Res'),
+        Line2D([], [], markersize=0, color='k', linestyle='-', label='+1 Res'),
+        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
+        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
+        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
+    ]
+    legend_sims = plt.legend(handles=handles, loc=2)
+    ax.add_artist(legend_sims)
 
-    plt.legend()
+    # plt.legend()
     plt.show()
