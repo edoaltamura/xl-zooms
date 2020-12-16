@@ -109,9 +109,6 @@ def remove_extracted_snipshots(run_directory: str):
 if __name__ == '__main__':
 
     runs = [
-        # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance",
-        # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance",
-        # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_+1res_MinimumDistance",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR18_+1res_MinimumDistance",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR187_+1res_MinimumDistance",
@@ -135,6 +132,10 @@ if __name__ == '__main__':
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref_old",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref_stuck",
     ]
+
+    # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance",
+    # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance",
+    # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_+1res_MinimumDistance",
 
     for working_run_directory in runs:
         print(working_run_directory)
