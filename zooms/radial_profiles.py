@@ -213,7 +213,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
             # Note: the ratio of densities is the same as ratio of electron number densities
             hist = kBT / number_density_gas ** (2 / 3)
-            hist = hist.to('kev/cm**2')
+            hist = hist.to('keV*cm**2')
 
         elif sampling_method.lower() == 'particle_density':
 
@@ -225,7 +225,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
             weights_field = kBT / number_density_gas ** (2 / 3)
             hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
             hist /= mass_weights
-            hist = hist.to('kev/cm**2')
+            hist = hist.to('keV*cm**2')
 
         ylabel = r'$K/K_{500{\rm crit}}$'
 

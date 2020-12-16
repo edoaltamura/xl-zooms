@@ -14,6 +14,15 @@ def humanize_bytes(num, suffix='B'):
 
 
 def compress_snipshots(run_directory: str):
+
+    if not os.path.isfile(os.path.join(run_directory, "snap_redshifts.txt")):
+        print(f"snap_redshifts.txt file not found. Nothing was compressed")
+        return
+
+    if not os.path.isdir(os.path.join(run_directory, "snapshots")):
+        print(f"snapshots directory not found. Nothing was compressed")
+        return
+
     # Get output type list
     output_list = np.genfromtxt(
         os.path.join(run_directory, "snap_redshifts.txt"),
@@ -94,8 +103,38 @@ def remove_extracted_snipshots(run_directory: str):
 
 
 if __name__ == '__main__':
-    working_run_directory = "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic"
-    remove_extracted_snipshots(working_run_directory)
-    # compress_snipshots(working_run_directory)
-    # remove_restart_files(working_run_directory)
-    # extract_snipshots(working_run_directory)
+
+    runs = [
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR18_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR187_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR187_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR2414_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR2414_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR2905_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR2905_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR3032_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR470_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR470_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR55_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR55_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR666_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR666_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR813_+1res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR813_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref_old",
+        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR93_-8res_Ref_stuck",
+    ]
+
+    for working_run_directory in runs:
+        print(working_run_directory)
+        # remove_extracted_snipshots(working_run_directory)
+        compress_snipshots(working_run_directory)
+        remove_restart_files(working_run_directory)
+        # extract_snipshots(working_run_directory)
