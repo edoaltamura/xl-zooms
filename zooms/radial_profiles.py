@@ -232,9 +232,28 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
         ylabel = r'$K$   [keV cm$^2$]'
 
     elif weights.lower() == 'pressure':
-        weights_field = data.gas.pressures * data.gas.masses
-        hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
-        hist /= mass_weights
+
+        if sampling_method.lower() == 'shell_density':
+
+            volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
+            density_gas = mass_weights / volume_shell
+            number_density_gas = density_gas / (mean_molecular_weight * unyt.mass_proton)
+            number_density_gas = number_density_gas.to('1/cm**3')
+
+            kBT, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
+            kBT *= unyt.boltzmann_constant
+            kBT /= mass_weights
+            kBT = kBT.to('keV')
+
+            # Note: the ratio of densities is the same as ratio of electron number densities
+            hist = kBT * number_density_gas
+            hist = hist.to('keV/cm**3')
+
+        elif sampling_method.lower() == 'particle_density':
+
+            weights_field = data.gas.pressures * data.gas.masses
+            hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
+            hist /= mass_weights
 
         # Make dimensionless, divide by P_500crit
         norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
