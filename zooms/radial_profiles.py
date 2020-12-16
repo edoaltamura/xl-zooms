@@ -229,7 +229,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
             hist /= mass_weights
             hist = hist.to('keV*cm**2')
 
-        ylabel = r'$K$ [keV cm$^2$]'
+        ylabel = r'$K$\quad[keV cm$^2$]'
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures * data.gas.masses
@@ -322,8 +322,8 @@ if __name__ == "__main__":
     ax.set_ylabel(results['ylabel'][0])
 
     handles = [
-        Line2D([], [], markersize=0, linestyle='--', label='-8 Res'),
-        Line2D([], [], markersize=0, linestyle='-', label='+1 Res'),
+        Line2D([], [], markersize=0, color='k', linestyle=':', label='-8 Res'),
+        Line2D([], [], markersize=0, color='k', linestyle='-', label='+1 Res'),
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
