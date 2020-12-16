@@ -322,8 +322,8 @@ if __name__ == "__main__":
     ax.set_ylabel(results['ylabel'][0])
 
     handles = [
-        Line2D([], [], marker='none', linestyle='--', label='-8 Res'),
-        Line2D([], [], marker='none', linestyle='-', label='+1 Res'),
+        Line2D([], [], markersize=0, linestyle='--', label='-8 Res'),
+        Line2D([], [], markersize=0, linestyle='-', label='+1 Res'),
         Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
         Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
         Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
