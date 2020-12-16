@@ -85,9 +85,9 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
     # Read in gas particles
     mask = sw.mask(f'{path_to_snap}', spatial_only=False)
-    region = [[XPotMin - R500c, XPotMin + R500c],
-              [YPotMin - R500c, YPotMin + R500c],
-              [ZPotMin - R500c, ZPotMin + R500c]]
+    region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
+              [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
+              [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
     mask.constrain_spatial(region)
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
