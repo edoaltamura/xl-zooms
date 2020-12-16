@@ -23,6 +23,10 @@ def compress_snipshots(run_directory: str):
         print(f"snapshots directory not found. Nothing was compressed")
         return
 
+    if not os.path.isfile(os.path.join(run_directory, "snapshots", "snipshots.zip")):
+        print(f"snipshots.zip already exists. Nothing was compressed")
+        return
+
     # Get output type list
     output_list = np.genfromtxt(
         os.path.join(run_directory, "snap_redshifts.txt"),
@@ -105,9 +109,9 @@ def remove_extracted_snipshots(run_directory: str):
 if __name__ == '__main__':
 
     runs = [
-        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance",
-        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance",
-        "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_+1res_MinimumDistance",
+        # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_+1res_MinimumDistance",
+        # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance",
+        # "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_+1res_MinimumDistance",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR18_+1res_MinimumDistance",
         "/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR187_+1res_MinimumDistance",
