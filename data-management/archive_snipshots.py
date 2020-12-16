@@ -23,7 +23,7 @@ def compress_snipshots(run_directory: str):
         print(f"snapshots directory not found. Nothing was compressed")
         return
 
-    if not os.path.isfile(os.path.join(run_directory, "snapshots", "snipshots.zip")):
+    if os.path.isfile(os.path.join(run_directory, "snapshots", "snipshots.zip")):
         print(f"snipshots.zip already exists. Nothing was compressed")
         return
 
