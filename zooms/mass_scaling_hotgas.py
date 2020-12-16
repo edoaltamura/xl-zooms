@@ -79,7 +79,7 @@ def m_500_hotgas():
         ]
         results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
         results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
-        print(results)
+        print(results.head())
 
     # Display zoom data
     for i in range(len(results)):
@@ -107,6 +107,8 @@ def m_500_hotgas():
             results.loc[i, "M_hot (< R_500crit) (M_Sun)"],
             marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
+
+        print(results.loc[i, "M_500crit (M_Sun)"].value/1.e10, results.loc[i, "M_hot (< R_500crit) (M_Sun)"].value/1.e10)
 
     # Display observational data
     Sun09 = obs.Sun09()
@@ -168,7 +170,7 @@ def f_500_hotgas():
         ]
         results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
         results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
-        print(results)
+        print(results.head())
 
     # Display zoom data
     for i in range(len(results)):

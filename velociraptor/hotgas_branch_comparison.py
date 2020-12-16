@@ -1,4 +1,6 @@
 import os
+import h5py
+import unyt
 
 os.chdir("/cosma/home/dp004/dc-alta2/data7/xl-zooms/hydro")
 
@@ -33,4 +35,9 @@ runs = [
 ]
 
 for run in runs:
-    os.system(f"export OMP_NUM_THREADS=28;VELOCIraptor-STF_hotgas_2020/stf -I 2 -C vrconfig_3dfofbound_subhalos_SO_hydro.cfg -i {run}/snapshots/{run}_2749 -o Ref_VR_comparison_analysis/{run}")
+    with h5py.File(f'Ref_VR_comparison_analysis/{run}.properties', 'r') as h5file:
+        Mgas500 = h5file['/SO_Mass_gas_highT_1.000000_times_500.000000_rhocrit'][0]
+        print(Mgas500)
+
+
+    # os.system(f"export OMP_NUM_THREADS=28;VELOCIraptor-STF_hotgas_2020/stf -I 2 -C vrconfig_3dfofbound_subhalos_SO_hydro.cfg -i {run}/snapshots/{run}_2749 -o Ref_VR_comparison_analysis/{run}")
