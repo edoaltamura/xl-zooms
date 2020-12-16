@@ -251,7 +251,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 if __name__ == "__main__":
 
-    vr_num = 'VR18_'
+    vr_num = 'VR187_'
     field_name = 'entropy_physical'
 
 
