@@ -249,7 +249,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 
 if __name__ == "__main__":
 
-    vr_num = 18
+    vr_num = 'Minimum'
     field_name = 'entropy_physical'
 
 
@@ -312,7 +312,7 @@ if __name__ == "__main__":
         # )
 
     # obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
-    obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
+    # obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
