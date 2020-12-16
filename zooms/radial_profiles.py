@@ -6,6 +6,8 @@ import h5py as h5
 import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 
 from register import (
     zooms_register,
@@ -301,7 +303,7 @@ if __name__ == "__main__":
             results['bin_centre'][i][convergence_index],
             results[field_name][i][convergence_index],
             linestyle=style, linewidth=0.5, color=color, alpha=0.6,
-            label=results.loc[i, "run_name"]
+            #label=results.loc[i, "run_name"]
         )
 
         # Plot section below the convergence radius
@@ -318,5 +320,16 @@ if __name__ == "__main__":
     ax.set_yscale('log')
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(results['ylabel'][0])
-    plt.legend()
+
+    handles = [
+        Line2D([], [], marker='none', linestyle='--', label='-8 Res'),
+        Line2D([], [], marker='none', linestyle='-', label='+1 Res'),
+        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
+        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
+        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
+    ]
+    legend_sims = plt.legend(handles=handles, loc=2)
+    ax.add_artist(legend_sims)
+
+    # plt.legend()
     plt.show()
