@@ -227,7 +227,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
             hist /= mass_weights
             hist = hist.to('keV*cm**2')
 
-        ylabel = r'$K/K_{500{\rm crit}}$'
+        ylabel = r'$K$ [keV cm$^2$]'
 
     elif weights.lower() == 'pressure':
         weights_field = data.gas.pressures * data.gas.masses
@@ -250,7 +250,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
 if __name__ == "__main__":
 
     vr_num = 18
-    field_name = 'entropy'
+    field_name = 'entropy_physical'
 
 
     def _process_single_halo(zoom: Zoom):
