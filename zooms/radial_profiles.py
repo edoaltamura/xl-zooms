@@ -259,8 +259,8 @@ if __name__ == "__main__":
         return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
 
 
-    # zooms_register = [zoom for zoom in zooms_register if f"VR{vr_num}_" in zoom.run_name]
-    # name_list = [zoom for zoom in name_list if f"VR{vr_num}_" in zoom]
+    zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
+    name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
