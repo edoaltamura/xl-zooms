@@ -1,6 +1,5 @@
 import unyt
 import numpy as np
-from typing import Tuple
 from multiprocessing import Pool, cpu_count
 import h5py as h5
 import swiftsimio as sw
@@ -39,7 +38,7 @@ def latex_float(f):
         return float_str
 
 
-def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
+def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str):
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -62,11 +61,14 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
     return feedback_stats, edges
 
 
+def _process_single_halo(zoom: Zoom):
+    return feedback_stats_dT(zoom.snapshot_file, zoom.catalog_file)
+
+
 if __name__ == "__main__":
     vr_num = 'VR187_'
 
-    def _process_single_halo(zoom: Zoom):
-        return feedback_stats_dT(zoom.snapshot_file, zoom.catalog_file)
+
 
 
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
