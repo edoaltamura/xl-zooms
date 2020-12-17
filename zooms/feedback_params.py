@@ -58,7 +58,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
 
     feedback_stats, edges = np.histogram(np.log10(data.black_holes.feedback_delta_t.value), bins=30)
 
-    return feedback_stats, edges
+    return feedback_stats, edges[:-1]
 
 
 def _process_single_halo(zoom: Zoom):
@@ -67,9 +67,6 @@ def _process_single_halo(zoom: Zoom):
 
 if __name__ == "__main__":
     vr_num = 'Minimum'
-
-
-
 
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
@@ -112,7 +109,6 @@ if __name__ == "__main__":
             linestyle=style, linewidth=1, color=color, alpha=1,
             label=results.loc[i, "run_name"]
         )
-
 
     ax.set_yscale('log')
     ax.set_xlabel(r'Number of feedback events')
