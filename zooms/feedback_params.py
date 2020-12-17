@@ -111,8 +111,8 @@ if __name__ == "__main__":
         )
 
     ax.set_yscale('log')
-    ax.set_xlabel(r'Number of feedback events')
-    ax.set_ylabel(r'log10(dT)')
+    ax.set_ylabel(r'Number of feedback events')
+    ax.set_xlabel(r'$\log_{10}(\DeltaT)$')
 
     plt.legend()
     plt.show()
