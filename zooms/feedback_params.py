@@ -56,9 +56,10 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
 
-    feedback_stats, edges = np.histogram(np.log10(data.black_holes.feedback_delta_t.value)*data.black_holes.number_of_agnevents, bins=30)
+    feedback_stats, edges = np.histogram(np.log10(data.black_holes.feedback_delta_t.value), bins=30)
+    num , _edges = np.histogram(data.black_holes.number_of_agnevents, bins=30)
 
-    return feedback_stats, edges[:-1]
+    return feedback_stats * _edges[:-1], edges[:-1]
 
 
 def _process_single_halo(zoom: Zoom):
