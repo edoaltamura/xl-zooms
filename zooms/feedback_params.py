@@ -78,8 +78,8 @@ if __name__ == "__main__":
 
         # Recast output into a Pandas dataframe for further manipulation
         columns = [
-            'bin',
-            'num'
+            'num',
+            'bin'
         ]
         results = pd.DataFrame(list(results), columns=columns)
         results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
@@ -107,7 +107,7 @@ if __name__ == "__main__":
             results['bin'][i],
             results['num'][i],
             linestyle=style, linewidth=1, color=color, alpha=1,
-            label=results.loc[i, "run_name"]
+            # label=results.loc[i, "run_name"]
         )
 
     ax.set_yscale('log')
