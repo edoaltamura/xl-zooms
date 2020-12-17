@@ -66,7 +66,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 if __name__ == "__main__":
-    vr_num = 'VR187_'
+    vr_num = 'Minimum'
 
 
 
