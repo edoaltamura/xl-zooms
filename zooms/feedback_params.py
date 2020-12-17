@@ -17,9 +17,6 @@ from register import (
     vr_numbers
 )
 
-from convergence_radius import convergence_radius
-import observational_data as obs
-
 try:
     plt.style.use("../mnras.mplstyle")
 except:
@@ -67,8 +64,6 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
 
 if __name__ == "__main__":
     vr_num = 'VR187_'
-    field_name = 'pressure'
-
 
     def _process_single_halo(zoom: Zoom):
         return feedback_stats_dT(zoom.snapshot_file, zoom.catalog_file)
