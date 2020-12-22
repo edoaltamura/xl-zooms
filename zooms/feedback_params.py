@@ -125,7 +125,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         central_bh[key] = sw.cosmo_array(central_bh[key])
 
     if BH_LOCK == 'id':
-        assert len(set(central_bh['id'].v.tolist())) == 1
+        assert len(set([i.v for i in central_bh['id']])) == 1
 
     return central_bh
 
