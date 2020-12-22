@@ -138,9 +138,6 @@ if __name__ == "__main__":
     print(central_bh)
     plt.plot(central_bh['redshift'], central_bh['mass'])
     plt.show()
-    plt.clf()
-    plt.plot(central_bh['x'], central_bh['y'])
-    plt.show()
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     # with Pool() as pool:
