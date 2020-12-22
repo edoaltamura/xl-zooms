@@ -136,7 +136,7 @@ if __name__ == "__main__":
 
     central_bh = _process_single_halo(zooms_register[0])
     print(central_bh)
-    plt.scatter(central_bh[redshift], central_bh['mass'])
+    plt.scatter(central_bh['redshift'], central_bh['mass'])
     plt.show()
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
