@@ -87,9 +87,9 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         if (
                 highz_snap != path_to_snap and
                 highz_catalogue != path_to_catalogue and
-                sw.load(f'{highz_snap}').metadata.z < 6.
+                sw.load(f'{highz_snap}').metadata.z < 3.
         ):
-            # Do not repeat redshift zero and keep only z < 6
+            # Do not repeat redshift zero and keep only z < 3
             print(f"Analysing:\n\t{highz_snap}\n\t{highz_catalogue}")
 
             with h5.File(f'{highz_catalogue}', 'r') as h5file:
