@@ -100,12 +100,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
                 R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
                 print(XPotMin, YPotMin, ZPotMin)
 
-            mask = sw.mask(f'{highz_snap}', spatial_only=True)
-            region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
-                      [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
-                      [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
-            mask.constrain_spatial(region)
-            data = sw.load(f'{highz_snap}', mask=mask)
+            data = sw.load(highz_snap)
             bh_positions = data.black_holes.coordinates
             print(bh_positions)
             bh_coordX = bh_positions[:, 0] - XPotMin
