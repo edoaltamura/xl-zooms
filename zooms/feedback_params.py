@@ -101,9 +101,9 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
 
             data = sw.load(highz_snap)
             bh_positions = data.black_holes.coordinates
-            bh_coordX = bh_positions[:, 0] - XPotMin
-            bh_coordY = bh_positions[:, 1] - YPotMin
-            bh_coordZ = bh_positions[:, 2] - ZPotMin
+            bh_coordX = (bh_positions[:, 0] - XPotMin) / data.metadata.a
+            bh_coordY = (bh_positions[:, 1] - YPotMin) / data.metadata.a
+            bh_coordZ = (bh_positions[:, 2] - ZPotMin) / data.metadata.a
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
             central_bh_index = np.argmin(bh_radial_distance)
