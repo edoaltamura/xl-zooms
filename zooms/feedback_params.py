@@ -111,7 +111,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
             # Get the same BH that is found at the centre at z=0 (filter by ID)
-            central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'][0])[0]
+            central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'])[0]
             central_bh['x'] = np.append(central_bh['x'], np.array(bh_coordX[central_bh_index]))
             central_bh['y'] = np.append(central_bh['y'], np.array(bh_coordY[central_bh_index]))
             central_bh['z'] = np.append(central_bh['z'], np.array(bh_coordZ[central_bh_index]))
