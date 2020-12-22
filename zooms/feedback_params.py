@@ -93,29 +93,29 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
             #     ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
             #     M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
             #     R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-            #
-            # mask = sw.mask(f'{highz_snap}', spatial_only=True)
-            # region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
-            #           [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
-            #           [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
-            # mask.constrain_spatial(region)
-            # data = sw.load(f'{highz_snap}', mask=mask)
-            # bh_positions = data.black_holes.coordinates
-            # bh_coordX = bh_positions[:, 0] - XPotMin
-            # bh_coordY = bh_positions[:, 1] - YPotMin
-            # bh_coordZ = bh_positions[:, 2] - ZPotMin
-            # bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
-            #
-            # # Get the same BH that is found at the centre at z=0 (filter by ID)
-            # central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'][0])[0]
-            # central_bh['x'] = np.append(central_bh['x'], np.array(bh_coordX[central_bh_index]))
-            # central_bh['y'] = np.append(central_bh['y'], np.array(bh_coordY[central_bh_index]))
-            # central_bh['z'] = np.append(central_bh['z'], np.array(bh_coordZ[central_bh_index]))
-            # central_bh['r'] = np.append(central_bh['r'], np.array(bh_radial_distance[central_bh_index]))
-            # central_bh['mass'] = np.append(central_bh['mass'],
-            #                                np.array(data.black_holes.dynamical_masses[central_bh_index]))
-            # central_bh['id'] = np.append(central_bh['id'], np.array(data.black_holes.particle_ids[central_bh_index]))
-            # central_bh['redshift'] = np.append(central_bh['redshift'], np.array(data.metadata.z))
+
+            mask = sw.mask(f'{highz_snap}', spatial_only=True)
+            region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
+                      [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
+                      [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
+            mask.constrain_spatial(region)
+            data = sw.load(f'{highz_snap}', mask=mask)
+            bh_positions = data.black_holes.coordinates
+            bh_coordX = bh_positions[:, 0] - XPotMin
+            bh_coordY = bh_positions[:, 1] - YPotMin
+            bh_coordZ = bh_positions[:, 2] - ZPotMin
+            bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
+
+            # Get the same BH that is found at the centre at z=0 (filter by ID)
+            central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'][0])[0]
+            central_bh['x'] = np.append(central_bh['x'], np.array(bh_coordX[central_bh_index]))
+            central_bh['y'] = np.append(central_bh['y'], np.array(bh_coordY[central_bh_index]))
+            central_bh['z'] = np.append(central_bh['z'], np.array(bh_coordZ[central_bh_index]))
+            central_bh['r'] = np.append(central_bh['r'], np.array(bh_radial_distance[central_bh_index]))
+            central_bh['mass'] = np.append(central_bh['mass'],
+                                           np.array(data.black_holes.dynamical_masses[central_bh_index]))
+            central_bh['id'] = np.append(central_bh['id'], np.array(data.black_holes.particle_ids[central_bh_index]))
+            central_bh['redshift'] = np.append(central_bh['redshift'], np.array(data.metadata.z))
 
     return central_bh
 
