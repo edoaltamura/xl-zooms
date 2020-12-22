@@ -83,16 +83,20 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
     )
     for highz_snap, highz_catalogue in zip(all_snaps, all_catalogues):
 
-        if highz_snap != path_to_snap and highz_catalogue != path_to_catalogue:
+        if (
+                highz_snap != path_to_snap and
+                highz_catalogue != path_to_catalogue and
+                sw.load(f'{highz_snap}').metadata.z < 6.
+        ):
             # Do not repeat redshift zero
             print(f"Analysing:\n\t{highz_snap}\n\t{highz_catalogue}")
 
-            # with h5.File(f'{highz_catalogue}', 'r') as h5file:
-            #     XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-            #     YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-            #     ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
-            #     M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-            #     R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+            with h5.File(f'{highz_catalogue}', 'r') as h5file:
+                XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+                YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+                ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+                M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+                R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
             mask = sw.mask(f'{highz_snap}', spatial_only=True)
             region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
