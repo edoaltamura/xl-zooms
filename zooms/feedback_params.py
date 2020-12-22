@@ -1,5 +1,6 @@
 import unyt
 import numpy as np
+from collections import defaultdict
 from multiprocessing import Pool, cpu_count
 import h5py as h5
 import swiftsimio as sw
@@ -64,15 +65,15 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
     bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
     # Get the central BH closest to centre of halo at z=0
-    central_bh = {}
+    central_bh = defaultdict(list)
     central_bh_index = np.argmin(bh_radial_distance)
-    central_bh['x'] = np.asarray([bh_coordX[central_bh_index].v])
-    central_bh['y'] = np.asarray([bh_coordY[central_bh_index].v])
-    central_bh['z'] = np.asarray([bh_coordZ[central_bh_index].v])
-    central_bh['r'] = np.asarray([bh_radial_distance[central_bh_index].v])
-    central_bh['mass'] = np.asarray([data.black_holes.dynamical_masses[central_bh_index].v])
-    central_bh['id'] = np.asarray([data.black_holes.particle_ids[central_bh_index].v])
-    central_bh['redshift'] = np.asarray([data.metadata.z])
+    central_bh['x'] = [bh_coordX[central_bh_index]]
+    central_bh['y'] = [bh_coordY[central_bh_index]]
+    central_bh['z'] = [bh_coordZ[central_bh_index]]
+    central_bh['r'] = [bh_radial_distance[central_bh_index]]
+    central_bh['mass'] = [data.black_holes.dynamical_masses[central_bh_index]]
+    central_bh['id'] = [data.black_holes.particle_ids[central_bh_index]]
+    central_bh['redshift'] = [data.metadata.z]
 
     # Retrieve BH data from other snaps
     all_snaps = get_allpaths_from_last(path_to_snap)
@@ -112,13 +113,13 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
 
             # Get the same BH that is found at the centre at z=0 (filter by ID)
             central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'])[0]
-            central_bh['x'] = np.append(central_bh['x'], bh_coordX[central_bh_index].v)
-            central_bh['y'] = np.append(central_bh['y'], bh_coordY[central_bh_index].v)
-            central_bh['z'] = np.append(central_bh['z'], bh_coordZ[central_bh_index].v)
-            central_bh['r'] = np.append(central_bh['r'], bh_radial_distance[central_bh_index].v)
-            central_bh['mass'] = np.append(central_bh['mass'], data.black_holes.dynamical_masses[central_bh_index].v)
-            central_bh['id'] = np.append(central_bh['id'], data.black_holes.particle_ids[central_bh_index].v)
-            central_bh['redshift'] = np.append(central_bh['redshift'], data.metadata.z)
+            central_bh['x'].append(bh_coordX[central_bh_index])
+            central_bh['y'].append(bh_coordY[central_bh_index])
+            central_bh['z'].append(bh_coordZ[central_bh_index])
+            central_bh['r'].append(bh_radial_distance[central_bh_index])
+            central_bh['mass'].append(data.black_holes.dynamical_masses[central_bh_index])
+            central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
+            central_bh['redshift'].append(data.metadata.z)
 
     return central_bh
 
