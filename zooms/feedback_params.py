@@ -119,7 +119,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             central_bh['redshift'].append(data.metadata.z)
 
     for key in central_bh:
-        central_bh[key] = sw.cosmo_array(central_bh[key].flatten())
+        central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
 
     return central_bh
 
