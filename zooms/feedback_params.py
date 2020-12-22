@@ -69,13 +69,14 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     # Get the central BH closest to centre of halo at z=0
     central_bh = defaultdict(list)
     central_bh_index = np.argmin(bh_radial_distance)
-    central_bh['x'] = [bh_coordX[central_bh_index]]
-    central_bh['y'] = [bh_coordY[central_bh_index]]
-    central_bh['z'] = [bh_coordZ[central_bh_index]]
-    central_bh['r'] = [bh_radial_distance[central_bh_index]]
-    central_bh['mass'] = [data.black_holes.dynamical_masses[central_bh_index]]
-    central_bh['id'] = [data.black_holes.particle_ids[central_bh_index]]
-    central_bh['redshift'] = [data.metadata.z]
+    central_bh_id_target = data.black_holes.particle_ids[central_bh_index]
+    central_bh['x'] = []
+    central_bh['y'] = []
+    central_bh['z'] = []
+    central_bh['r'] = []
+    central_bh['mass'] = []
+    central_bh['id'] = []
+    central_bh['redshift'] = []
 
     # Retrieve BH data from other snaps
     all_snaps = get_allpaths_from_last(path_to_snap)
@@ -86,12 +87,8 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     )
     for highz_snap, highz_catalogue in zip(all_snaps[::-1], all_catalogues[::-1]):
 
-        if (
-                highz_snap != path_to_snap and
-                highz_catalogue != path_to_catalogue and
-                sw.load(f'{highz_snap}').metadata.z < 3.
-        ):
-            # Do not repeat redshift zero and keep only z < 3
+        if sw.load(f'{highz_snap}').metadata.z < 3.:
+            # Keep only z < 3 data
             print(f"Analysing:\n\t{highz_snap}\n\t{highz_catalogue}")
 
             with h5.File(f'{highz_catalogue}', 'r') as h5file:
@@ -109,7 +106,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
             if BH_LOCK == 'id':
-                central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh['id'][0].v)[0]
+                central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
             elif BH_LOCK == 'cop':
                 central_bh_index = np.argmin(bh_radial_distance)
 
