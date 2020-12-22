@@ -66,13 +66,13 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
     # Get the central BH closest to centre of halo at z=0
     central_bh = {}
     central_bh_index = np.argmin(bh_radial_distance)
-    central_bh['x'] = np.array(bh_coordX[central_bh_index])
-    central_bh['y'] = np.array(bh_coordY[central_bh_index])
-    central_bh['z'] = np.array(bh_coordZ[central_bh_index])
-    central_bh['r'] = np.array(bh_radial_distance[central_bh_index])
-    central_bh['mass'] = np.array(data.black_holes.dynamical_masses[central_bh_index])
-    central_bh['id'] = np.array(data.black_holes.particle_ids[central_bh_index])
-    central_bh['redshift'] = np.array(data.metadata.z)
+    central_bh['x'] = np.array([bh_coordX[central_bh_index]])
+    central_bh['y'] = np.array([bh_coordY[central_bh_index]])
+    central_bh['z'] = np.array([bh_coordZ[central_bh_index]])
+    central_bh['r'] = np.array([bh_radial_distance[central_bh_index]])
+    central_bh['mass'] = np.array([data.black_holes.dynamical_masses[central_bh_index]])
+    central_bh['id'] = np.array([data.black_holes.particle_ids[central_bh_index]])
+    central_bh['redshift'] = np.array([data.metadata.z])
 
     # Retrieve BH data from other snaps
     all_snaps = get_allpaths_from_last(path_to_snap)
