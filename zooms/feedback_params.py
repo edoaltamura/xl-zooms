@@ -109,7 +109,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
             if BH_LOCK == 'id':
-                central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'][0])[0]
+                central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh['id'][0].v)[0]
             elif BH_LOCK == 'cop':
                 central_bh_index = np.argmin(bh_radial_distance)
 
@@ -120,6 +120,9 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             central_bh['mass'].append(data.black_holes.dynamical_masses[central_bh_index])
             central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
             central_bh['redshift'].append(data.metadata.z)
+
+    if BH_LOCK == 'id':
+        assert len(set(central_bh['id'])) == 1
 
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key])
