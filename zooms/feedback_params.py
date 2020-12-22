@@ -98,6 +98,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
                 ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
                 M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
                 R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+                print(XPotMin, YPotMin, ZPotMin)
 
             mask = sw.mask(f'{highz_snap}', spatial_only=True)
             region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
