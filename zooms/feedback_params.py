@@ -30,6 +30,8 @@ fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
+BH_LOCK = 'id'  # 'cop'
+
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -106,7 +108,11 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             bh_coordZ = (bh_positions[:, 2] - ZPotMin) / data.metadata.a
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
-            central_bh_index = np.argmin(bh_radial_distance)
+            if BH_LOCK == 'id':
+                central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'][0])[0]
+            elif BH_LOCK == 'cop':
+                central_bh_index = np.argmin(bh_radial_distance)
+
             central_bh['x'].append(bh_coordX[central_bh_index])
             central_bh['y'].append(bh_coordY[central_bh_index])
             central_bh['z'].append(bh_coordZ[central_bh_index])
