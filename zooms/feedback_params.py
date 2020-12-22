@@ -81,7 +81,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
         f"Detected different number of high-z snaps and high-z catalogues. "
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
-    for highz_snap, highz_catalogue in zip(all_snaps, all_catalogues):
+    for highz_snap, highz_catalogue in zip(all_snaps[::-1], all_catalogues[::-1]):
 
         if (
                 highz_snap != path_to_snap and
