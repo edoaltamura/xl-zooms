@@ -70,7 +70,7 @@ def get_allpaths_from_last(path_z0: str) -> list:
                     allpaths.append(filepath)
                     break
 
-        allpaths.sort(key=lambda x: int(x.rstrip(vr_out_section)[-4:]))
+        allpaths.sort(key=lambda x: int(x.rstrip(vr_out_section)[-5:]))
         return allpaths
 
 
