@@ -109,17 +109,17 @@ master = np.array([
     [12785.413582786045, 1498.6474684416],
 ]).T * 1e10
 
-import matplotlib.pyplot as plt
-
-fig, ax = plt.subplots(figsize=(3.321 * 2, 3.0 * 2))
-ax.scatter(hotgas[0], hotgas[1], marker='.', s=70, c='k', label='hotgas_branch')
-ax.scatter(master[0], master[1], marker='.', s=200, facecolors='none', edgecolors='r', label='master')
-ax.set_xscale('log')
-ax.set_yscale('log')
-ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-ax.set_ylabel(r'$M_{{\rm gas},500{\rm crit}}\ [{\rm M}_{\odot}]$')
-ax.plot(ax.get_xlim(), [lim * 0.15741 for lim in ax.get_xlim()], '--', color='k')
-
-plt.legend()
-plt.show()
+# import matplotlib.pyplot as plt
+#
+# fig, ax = plt.subplots(figsize=(3.321 * 2, 3.0 * 2))
+# ax.scatter(hotgas[0], hotgas[1], marker='.', s=70, c='k', label='hotgas_branch')
+# ax.scatter(master[0], master[1], marker='.', s=200, facecolors='none', edgecolors='r', label='master')
+# ax.set_xscale('log')
+# ax.set_yscale('log')
+# ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+# ax.set_ylabel(r'$M_{{\rm gas},500{\rm crit}}\ [{\rm M}_{\odot}]$')
+# ax.plot(ax.get_xlim(), [lim * 0.15741 for lim in ax.get_xlim()], '--', color='k')
+#
+# plt.legend()
+# plt.show()
 # fig.savefig('test.png', dpi=400)

@@ -361,71 +361,45 @@ do
    sbatch ./submit
    cd ..
 done
+declare -a temps=("7.5" "8" "8.5" "9" "9.5")
+declare -a arr=("VR18"
+"VR23"
+"VR36"
+"VR37"
+"VR55"
+"VR93"
+"VR121"
+"VR130"
+"VR139"
+"VR155"
+"VR187"
+"VR340"
+"VR470"
+"VR485"
+"VR666"
+"VR680"
+"VR775"
+"VR801"
+"VR813"
+"VR918"
+"VR1236"
+"VR2272"
+"VR2414"
+"VR2766"
+"VR2905"
+"VR2915"
+"VR3032")
+for t in "${temps[@]}"
+do
+    for i in "${arr[@]}"
+    do
+        echo "$i | $t";
+        cp ~/data6/xl-zooms/hydro/L0300N0564_"$i"_-8res_Ref/ics/L0300N0564_"$i"_-8res_Ref.hdf5 \
+         L0300N0564_"$i"_-8res_MinimumDistance_fixedAGNdT"$t"_Nheat1_SNnobirth/ics/L0300N0564_"$i"_-8res_MinimumDistance_fixedAGNdT"$t"_Nheat1_SNnobirth
+    done
+done
 
 
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_MinimumDistance/stf/L0300N0564_VR1236_-8res_MinimumDistance_2749/L0300N0564_VR1236_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_MinimumDistance/stf/L0300N0564_VR139_-8res_MinimumDistance_2749/L0300N0564_VR139_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_MinimumDistance/stf/L0300N0564_VR187_-8res_MinimumDistance_2749/L0300N0564_VR187_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance/stf/L0300N0564_VR18_-8res_MinimumDistance_2749/L0300N0564_VR18_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_MinimumDistance/stf/L0300N0564_VR2414_-8res_MinimumDistance_2749/L0300N0564_VR2414_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_MinimumDistance/stf/L0300N0564_VR2905_-8res_MinimumDistance_2749/L0300N0564_VR2905_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance/stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_MinimumDistance/stf/L0300N0564_VR470_-8res_MinimumDistance_2749/L0300N0564_VR470_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_MinimumDistance/stf/L0300N0564_VR55_-8res_MinimumDistance_2749/L0300N0564_VR55_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_MinimumDistance/stf/L0300N0564_VR666_-8res_MinimumDistance_2749/L0300N0564_VR666_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_MinimumDistance/stf/L0300N0564_VR813_-8res_MinimumDistance_2749/L0300N0564_VR813_-8res_MinimumDistance_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance/stf/L0300N0564_VR93_-8res_MinimumDistance_2749/L0300N0564_VR93_-8res_MinimumDistance_2749.properties",
-
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR1236_-8res_Isotropic/stf/L0300N0564_VR1236_-8res_Isotropic_2749/L0300N0564_VR1236_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR139_-8res_Isotropic/stf/L0300N0564_VR139_-8res_Isotropic_2749/L0300N0564_VR139_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR187_-8res_Isotropic/stf/L0300N0564_VR187_-8res_Isotropic_2749/L0300N0564_VR187_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Isotropic/stf/L0300N0564_VR18_-8res_Isotropic_2749/L0300N0564_VR18_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_-8res_Isotropic/stf/L0300N0564_VR2414_-8res_Isotropic_2749/L0300N0564_VR2414_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Isotropic/stf/L0300N0564_VR2905_-8res_Isotropic_2749/L0300N0564_VR2905_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Isotropic/stf/L0300N0564_VR3032_-8res_Isotropic_2749/L0300N0564_VR3032_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR470_-8res_Isotropic/stf/L0300N0564_VR470_-8res_Isotropic_2749/L0300N0564_VR470_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR55_-8res_Isotropic/stf/L0300N0564_VR55_-8res_Isotropic_2749/L0300N0564_VR55_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR666_-8res_Isotropic/stf/L0300N0564_VR666_-8res_Isotropic_2749/L0300N0564_VR666_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR813_-8res_Isotropic/stf/L0300N0564_VR813_-8res_Isotropic_2749/L0300N0564_VR813_-8res_Isotropic_2749.properties",
-"/snap7/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR93_-8res_Isotropic/stf/L0300N0564_VR93_-8res_Isotropic_2749/L0300N0564_VR93_-8res_Isotropic_2749.properties",
-
-
-
-
-
-
-
-
-
-[10470.871305061322, 1205.65234375],
-[1927.8919169139967, 129.640380859375],
-[9872.485173727897, 1084.92041015625],
-[8633.183958648162, 950.6312255859375],
-[9291.25696547179, 1095.5577392578125],
-[8828.982009168481, 914.2821044921875],
-[29078.73349020424, 3587.639892578125],
-[1108.3664271757536, 47.246437072753906],
-[24184.3916103626, 3064.78173828125],
-[983.3178222680216, 46.0886344909668],
-[941.9762313801245, 38.413673400878906],
-[923.5887049489812, 43.418548583984375],
-[832.4801160104131, 33.174781799316406],
-[755.9020052795005, 25.031953811645508],
-[5047.376606709369, 425.9169616699219],
-[20805.08007116237, 2755.0859375],
-[23177.980938143413, 3046.862548828125],
-[4353.688247323345, 336.8359069824219],
-[4114.599545566402, 352.1247253417969],
-[17266.19556747952, 2029.6187744140625],
-[3493.1009422858424, 257.8345947265625],
-[3373.0609190198948, 274.95721435546875],
-[3108.1507966398594, 175.1416473388672],
-[2644.130269874521, 194.98504638671875],
-[2958.4123721371257, 266.6622009277344],
-[2670.1405651982373, 184.58700561523438],
-[12785.215476010579, 1493.7310791015625]
-
-
-
-
-
+for i in $(ls -d L* | sort -t _ -k 2 -V | cut -d '_' -f2); do
+  echo $i;
+  cp ~/data6/xl-zooms/hydro/L0300N0564_"$i"_-8res_Ref/ics/L0300N0564_"$i"_-8res_Ref.hdf5 L0300N0564_"$i"_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth/ics/L0300N0564_"$i"_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth; done

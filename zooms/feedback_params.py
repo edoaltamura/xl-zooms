@@ -13,7 +13,8 @@ from register import (
     Zoom,
     Tcut_halogas,
     name_list,
-    vr_numbers
+    vr_numbers,
+    get_allpaths_from_last
 )
 
 try:
@@ -47,18 +48,75 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
-    # Read in gas particles
-    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    # Read in particles
+    mask = sw.mask(f'{path_to_snap}', spatial_only=True)
     region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
               [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
               [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
     mask.constrain_spatial(region)
-    mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
 
-    feedback_stats, edges = np.histogram(np.log10(data.black_holes.feedback_delta_t.value), bins=30)
+    # Get positions for all BHs in the bounding region
+    bh_positions = data.black_holes.coordinates
+    bh_coordX = bh_positions[:, 0] - XPotMin
+    bh_coordY = bh_positions[:, 1] - YPotMin
+    bh_coordZ = bh_positions[:, 2] - ZPotMin
+    bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
-    return feedback_stats, edges[:-1]
+    # Get the central BH closest to centre of halo at z=0
+    central_bh = {}
+    central_bh_index = np.argmin(bh_radial_distance)
+    central_bh['x'] = np.array(bh_coordX[central_bh_index])
+    central_bh['y'] = np.array(bh_coordY[central_bh_index])
+    central_bh['z'] = np.array(bh_coordZ[central_bh_index])
+    central_bh['r'] = np.array(bh_radial_distance[central_bh_index])
+    central_bh['mass'] = np.array(data.black_holes.dynamical_masses[central_bh_index])
+    central_bh['id'] = np.array(data.black_holes.particle_ids[central_bh_index])
+    central_bh['redshift'] = np.array(data.metadata.z)
+
+    # Retrieve BH data from other snaps
+    all_snaps = get_allpaths_from_last(path_to_snap)
+    all_catalogues = get_allpaths_from_last(path_to_catalogue)
+    assert len(all_snaps) == len(all_catalogues), (
+        f"Detected different number of high-z snaps and high-z catalogues. "
+        f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
+    )
+    for highz_snap, highz_catalogue in zip(all_snaps, all_catalogues):
+
+        if highz_snap != path_to_snap and highz_catalogue != path_to_catalogue:
+            # Do not repeat redshift zero
+
+            with h5.File(f'{highz_catalogue}', 'r') as h5file:
+                XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+                YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+                ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+                M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+                R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+
+            mask = sw.mask(f'{highz_snap}', spatial_only=True)
+            region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
+                      [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
+                      [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
+            mask.constrain_spatial(region)
+            data = sw.load(f'{highz_snap}', mask=mask)
+            bh_positions = data.black_holes.coordinates
+            bh_coordX = bh_positions[:, 0] - XPotMin
+            bh_coordY = bh_positions[:, 1] - YPotMin
+            bh_coordZ = bh_positions[:, 2] - ZPotMin
+            bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
+
+            # Get the same BH that is found at the centre at z=0 (filter by ID)
+            central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'][0])[0]
+            central_bh['x'] = np.append(central_bh['x'], np.array(bh_coordX[central_bh_index]))
+            central_bh['y'] = np.append(central_bh['y'], np.array(bh_coordY[central_bh_index]))
+            central_bh['z'] = np.append(central_bh['z'], np.array(bh_coordZ[central_bh_index]))
+            central_bh['r'] = np.append(central_bh['r'], np.array(bh_radial_distance[central_bh_index]))
+            central_bh['mass'] = np.append(central_bh['mass'],
+                                           np.array(data.black_holes.dynamical_masses[central_bh_index]))
+            central_bh['id'] = np.append(central_bh['id'], np.array(data.black_holes.particle_ids[central_bh_index]))
+            central_bh['redshift'] = np.append(central_bh['redshift'], np.array(data.metadata.z))
+
+    return central_bh
 
 
 def _process_single_halo(zoom: Zoom):
@@ -71,48 +129,51 @@ if __name__ == "__main__":
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
+    central_bh = _process_single_halo(zooms_register[0])
+    print(central_bh)
+
     # The results of the multiprocessing Pool are returned in the same order as inputs
-    with Pool() as pool:
-        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_register))
-
-        # Recast output into a Pandas dataframe for further manipulation
-        columns = [
-            'num',
-            'bin'
-        ]
-        results = pd.DataFrame(list(results), columns=columns)
-        results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
-        print(results.head())
-
-    fig, ax = plt.subplots()
-
-    for i in range(len(results)):
-
-        style = ''
-        if '-8res' in results.loc[i, "run_name"]:
-            style = ':'
-        elif '+1res' in results.loc[i, "run_name"]:
-            style = '-'
-
-        color = ''
-        if 'Ref' in results.loc[i, "run_name"]:
-            color = 'black'
-        elif 'MinimumDistance' in results.loc[i, "run_name"]:
-            color = 'orange'
-        elif 'Isotropic' in results.loc[i, "run_name"]:
-            color = 'lime'
-
-        ax.step(
-            results['bin'][i],
-            results['num'][i],
-            linestyle=style, linewidth=1, color=color, alpha=1,
-            # label=results.loc[i, "run_name"]
-        )
-
-    ax.set_yscale('log')
-    ax.set_ylabel(r'Number of feedback events')
-    ax.set_xlabel(r'$\log_{10}(\Delta T)$')
-
-    plt.legend()
-    plt.show()
+    # with Pool() as pool:
+    #     print(f"Analysis mapped onto {cpu_count():d} CPUs.")
+    #     results = pool.map(_process_single_halo, iter(zooms_register))
+    #
+    #     # Recast output into a Pandas dataframe for further manipulation
+    #     columns = [
+    #         'num',
+    #         'bin'
+    #     ]
+    #     results = pd.DataFrame(list(results), columns=columns)
+    #     results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
+    #     print(results.head())
+    #
+    # fig, ax = plt.subplots()
+    #
+    # for i in range(len(results)):
+    #
+    #     style = ''
+    #     if '-8res' in results.loc[i, "run_name"]:
+    #         style = ':'
+    #     elif '+1res' in results.loc[i, "run_name"]:
+    #         style = '-'
+    #
+    #     color = ''
+    #     if 'Ref' in results.loc[i, "run_name"]:
+    #         color = 'black'
+    #     elif 'MinimumDistance' in results.loc[i, "run_name"]:
+    #         color = 'orange'
+    #     elif 'Isotropic' in results.loc[i, "run_name"]:
+    #         color = 'lime'
+    #
+    #     ax.step(
+    #         results['bin'][i],
+    #         results['num'][i],
+    #         linestyle=style, linewidth=1, color=color, alpha=1,
+    #         # label=results.loc[i, "run_name"]
+    #     )
+    #
+    # ax.set_yscale('log')
+    # ax.set_ylabel(r'Number of feedback events')
+    # ax.set_xlabel(r'$\log_{10}(\Delta T)$')
+    #
+    # plt.legend()
+    # plt.show()
