@@ -40,7 +40,7 @@ def latex_float(f):
         return float_str
 
 
-def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
+def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
