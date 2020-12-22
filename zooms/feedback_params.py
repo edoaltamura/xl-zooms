@@ -85,6 +85,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
 
         if highz_snap != path_to_snap and highz_catalogue != path_to_catalogue:
             # Do not repeat redshift zero
+            print(f"Analysing:\n\t{highz_snap}\n\t{highz_catalogue}")
 
             with h5.File(f'{highz_catalogue}', 'r') as h5file:
                 XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
