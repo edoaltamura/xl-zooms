@@ -112,14 +112,13 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> tuple:
 
             # Get the same BH that is found at the centre at z=0 (filter by ID)
             central_bh_index = np.where(data.black_holes.particle_ids == central_bh['id'])[0]
-            central_bh['x'] = np.append(central_bh['x'], np.array(bh_coordX[central_bh_index]))
-            central_bh['y'] = np.append(central_bh['y'], np.array(bh_coordY[central_bh_index]))
-            central_bh['z'] = np.append(central_bh['z'], np.array(bh_coordZ[central_bh_index]))
-            central_bh['r'] = np.append(central_bh['r'], np.array(bh_radial_distance[central_bh_index]))
-            central_bh['mass'] = np.append(central_bh['mass'],
-                                           np.array(data.black_holes.dynamical_masses[central_bh_index]))
-            central_bh['id'] = np.append(central_bh['id'], np.array(data.black_holes.particle_ids[central_bh_index]))
-            central_bh['redshift'] = np.append(central_bh['redshift'], np.array(data.metadata.z))
+            central_bh['x'] = np.append(central_bh['x'], bh_coordX[central_bh_index])
+            central_bh['y'] = np.append(central_bh['y'], bh_coordY[central_bh_index])
+            central_bh['z'] = np.append(central_bh['z'], bh_coordZ[central_bh_index])
+            central_bh['r'] = np.append(central_bh['r'], bh_radial_distance[central_bh_index])
+            central_bh['mass'] = np.append(central_bh['mass'], data.black_holes.dynamical_masses[central_bh_index])
+            central_bh['id'] = np.append(central_bh['id'], data.black_holes.particle_ids[central_bh_index])
+            central_bh['redshift'] = np.append(central_bh['redshift'], data.metadata.z)
 
     return central_bh
 
