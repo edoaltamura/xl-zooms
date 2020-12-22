@@ -25,7 +25,7 @@ except:
 
 # Constants
 bins = 40
-radius_bounds = [0.01, 6.]  # In units of R500crit
+radius_bounds = [0.01, 1.]  # In units of R500crit
 fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
@@ -110,6 +110,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             bh_coordY = bh_positions[:, 1] - YPotMin
             bh_coordZ = bh_positions[:, 2] - ZPotMin
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
+            print(bh_radial_distance)
 
             central_bh_index = np.argmin(bh_radial_distance)
             central_bh['x'].append(bh_coordX[central_bh_index])
