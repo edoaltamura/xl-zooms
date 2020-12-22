@@ -107,6 +107,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             mask.constrain_spatial(region)
             data = sw.load(f'{highz_snap}', mask=mask)
             bh_positions = data.black_holes.coordinates
+            print(bh_positions)
             bh_coordX = bh_positions[:, 0] - XPotMin
             bh_coordY = bh_positions[:, 1] - YPotMin
             bh_coordZ = bh_positions[:, 2] - ZPotMin
