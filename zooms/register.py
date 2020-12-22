@@ -52,6 +52,7 @@ def get_allpaths_from_last(path_z0: str) -> list:
         snapdir = os.path.dirname(path_z0)
         allpaths = [os.path.join(snapdir, filepath) for filepath in os.listdir(snapdir) if filepath.endswith('.hdf5')]
         allpaths = [filepath for filepath in allpaths if os.path.isfile(filepath)]
+        allpaths.sort(key=lambda x: int(x[-9:-5]))
         return allpaths
 
     else:
@@ -69,6 +70,7 @@ def get_allpaths_from_last(path_z0: str) -> list:
                     allpaths.append(filepath)
                     break
 
+        allpaths.sort(key=lambda x: int(x.rstrip(vr_out_section)[-4:]))
         return allpaths
 
 
