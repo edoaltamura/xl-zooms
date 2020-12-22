@@ -98,16 +98,13 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
                 ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
                 M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
                 R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-                print(XPotMin, YPotMin, ZPotMin)
 
             data = sw.load(highz_snap)
             bh_positions = data.black_holes.coordinates
-            print(bh_positions)
             bh_coordX = bh_positions[:, 0] - XPotMin
             bh_coordY = bh_positions[:, 1] - YPotMin
             bh_coordZ = bh_positions[:, 2] - ZPotMin
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
-            print(bh_radial_distance)
 
             central_bh_index = np.argmin(bh_radial_distance)
             central_bh['x'].append(bh_coordX[central_bh_index])
@@ -117,6 +114,9 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             central_bh['mass'].append(data.black_holes.dynamical_masses[central_bh_index])
             central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
             central_bh['redshift'].append(data.metadata.z)
+
+    for key in central_bh:
+        central_bh[key] = np.asarray(central_bh[key])
 
     return central_bh
 
