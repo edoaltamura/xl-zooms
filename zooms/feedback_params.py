@@ -148,7 +148,7 @@ if __name__ == "__main__":
 
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
-    ax2.set_xticks(central_bh['redshift'].value)
+    ax2.set_xticks(central_bh['time'].value)
     ax2.set_xticklabels(central_bh['redshift'].value[::3])
     fig.tight_layout()
     plt.show()
