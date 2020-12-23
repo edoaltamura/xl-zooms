@@ -149,6 +149,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     if INCLUDE_SNIPS:
         unitLength = data.metadata.units.length
         unitMass = data.metadata.units.mass
+        unitTime = data.metadata.units.time
 
         snip_handles = get_snip_handles(path_to_snap, z_max=z_clip)
         for snip_handle in tqdm(snip_handles, desc=f"Analysing snipshots", disable=SILENT_PROGRESSBAR):
@@ -188,7 +189,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             # central_bh['m500c'].append(np.nan)
             central_bh['id'].append(unyt.unyt_quantity(bh_ids[central_bh_index], unyt.dimensionless))
             central_bh['redshift'].append(unyt.unyt_quantity(redshift, unyt.dimensionless))
-            central_bh['time'].append(unyt.unyt_quantity(time, unyt.Gyr))
+            central_bh['time'].append(unyt.unyt_quantity(time, unitTime))
 
     # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
