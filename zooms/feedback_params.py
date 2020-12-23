@@ -147,7 +147,6 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         central_bh['time'].append(data.metadata.time)
 
     if INCLUDE_SNIPS:
-        from unyt import dimensionless
         unitLength = data.metadata.units.length
         unitMass = data.metadata.units.mass
 
@@ -178,18 +177,18 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
 
             # This time we need to manually convert to physical coordinates and assign units.
             # Catalogue-dependent quantities are not appended.
-            central_bh['x'].append(bh_positions[central_bh_index, 0] / a * unitLength)
-            central_bh['y'].append(bh_positions[central_bh_index, 1] / a * unitLength)
-            central_bh['z'].append(bh_positions[central_bh_index, 2] / a * unitLength)
+            central_bh['x'].append(unyt.unyt_quantity(bh_positions[central_bh_index, 0] / a, unitLength))
+            central_bh['y'].append(unyt.unyt_quantity(bh_positions[central_bh_index, 1] / a, unitLength))
+            central_bh['z'].append(unyt.unyt_quantity(bh_positions[central_bh_index, 2] / a, unitLength))
             # central_bh['dx'].append(np.nan)
             # central_bh['dy'].append(np.nan)
             # central_bh['dz'].append(np.nan)
             # central_bh['dr'].append(np.nan)
-            central_bh['mass'].append(bh_masses[central_bh_index] * unitMass)
+            central_bh['mass'].append(unyt.unyt_quantity(bh_masses[central_bh_index], unitMass))
             # central_bh['m500c'].append(np.nan)
-            central_bh['id'].append(bh_ids[central_bh_index] * dimensionless)
-            central_bh['redshift'].append(redshift * dimensionless)
-            central_bh['time'].append(time * dimensionless)
+            central_bh['id'].append(unyt.unyt_quantity(bh_ids[central_bh_index], unyt.dimensionless))
+            central_bh['redshift'].append(unyt.unyt_quantity(redshift, unyt.dimensionless))
+            central_bh['time'].append(unyt.unyt_quantity(time, unyt.Gyr))
 
     # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
