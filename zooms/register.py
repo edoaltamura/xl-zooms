@@ -9,8 +9,10 @@ import zipfile
 from typing import List
 from swiftsimio import load
 from tqdm import tqdm
+import psutil
 
 SILENT_PROGRESSBAR = False
+total_memory = psutil.virtual_memory().total
 
 
 class Zoom:
@@ -109,6 +111,14 @@ def get_snip_handles(path_z0: str, z_min: float = 0., z_max: float = 5.):
 
     return snip_handles
 
+
+def dump_memory_usage() -> None:
+    process = psutil.Process(os.getpid())
+    memory = process.memory_info().rss  # in bytes
+    print((
+        f"[Resources] Memory usage: {memory / 1024 / 1024:.2f} MB "
+        f"({memory / total_memory * 100:.2f}%)"
+    ))
 
 
 class ZoomList:

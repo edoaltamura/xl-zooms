@@ -20,6 +20,7 @@ from register import (
     vr_numbers,
     get_allpaths_from_last,
     get_snip_handles,
+    dump_memory_usage,
 )
 
 try:
@@ -194,6 +195,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
+        print(f"Central BH memory [{key}]: {central_bh[key].nbytes / 1024 / 1024} MB")
 
     return central_bh
 
@@ -213,6 +215,8 @@ if __name__ == "__main__":
     central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
     central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
 
+    dump_memory_usage()
+
     fig, ax1 = plt.subplots()
     ax1.plot(central_bh['time'], central_bh['mass'], linewidth=1)
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
@@ -222,9 +226,9 @@ if __name__ == "__main__":
     from observational_data import Observations
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
-    redshift_ticks = np.array([0, .1, .2, .4, .7, 1, 2, 3, 4, 5])
+    redshift_ticks = np.array([0, .1, .2, .4, .6, 1, 1.5, 2, 3, 4])
     redshift_ticks_apply = Observations().time_from_redshift(redshift_ticks).value
-    redshift_ticklabels = ['0', '0.1', '0.2', '0.4', '0.7', '1', '2', '3', '4', '5']
+    redshift_ticklabels = ['0', '0.1', '0.2', '0.4', '0.6', '1', '1.5', '2', '3', '4']
     ax2.set_xticks(redshift_ticks_apply)
     ax2.set_xticklabels(redshift_ticklabels)
     ax2.set_xlabel(r"Redshift")
