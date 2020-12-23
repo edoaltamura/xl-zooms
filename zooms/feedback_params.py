@@ -30,7 +30,7 @@ fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
-BH_LOCK = 'cop'  # 'id'
+BH_LOCK = 'id'  # 'cop'
 
 
 def latex_float(f):
@@ -75,6 +75,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     central_bh['z'] = []
     central_bh['r'] = []
     central_bh['mass'] = []
+    central_bh['m500c'] = []
     central_bh['id'] = []
     central_bh['redshift'] = []
 
@@ -115,6 +116,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             central_bh['z'].append(bh_coordZ[central_bh_index])
             central_bh['r'].append(bh_radial_distance[central_bh_index])
             central_bh['mass'].append(data.black_holes.dynamical_masses[central_bh_index])
+            central_bh['m500c'].append(M500c)
             central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
             central_bh['redshift'].append(data.metadata.z)
 
@@ -136,7 +138,7 @@ if __name__ == "__main__":
 
     central_bh = _process_single_halo(zooms_register[0])
     print(central_bh)
-    plt.plot(central_bh['redshift'], central_bh['mass'])
+    plt.plot(central_bh['redshift'], central_bh['mass']/central_bh['m500c'].to(central_bh['mass'].units))
     plt.show()
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
