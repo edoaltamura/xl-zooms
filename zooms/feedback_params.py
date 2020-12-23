@@ -147,7 +147,7 @@ if __name__ == "__main__":
     fig, ax1 = plt.subplots()
     ax1.plot(central_bh['time'], central_bh['mass'])
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
-    ax1.set_xlabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
+    ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
 
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
