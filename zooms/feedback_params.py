@@ -143,13 +143,13 @@ if __name__ == "__main__":
 
     fig, ax1 = plt.subplots()
     ax1.plot(central_bh['time'], central_bh['mass'])
-    ax1.set_xlabel(f"Cosmic time [{central_bh['time'].units.latex_repr}]")
-    ax1.set_xlabel(f"BH dynamical mass [{ central_bh['mass'].units.latex_repr}]")
+    ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
+    ax1.set_xlabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
 
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
     ax2.set_xticks(central_bh['redshift'].value)
-    ax2.set_yticklabels(central_bh['redshift'].value[::2])
+    ax2.set_xticklabels(central_bh['redshift'].value[::3])
     fig.tight_layout()
     plt.show()
 
