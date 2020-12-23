@@ -177,16 +177,16 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
                 ))
 
             # This time we need to manually convert to physical coordinates and assign units.
-            # Catalogue-dependent quantities are entered as numpy nans.
+            # Catalogue-dependent quantities are not appended.
             central_bh['x'].append(bh_positions[central_bh_index, 0] / a * unitLength)
             central_bh['y'].append(bh_positions[central_bh_index, 1] / a * unitLength)
             central_bh['z'].append(bh_positions[central_bh_index, 2] / a * unitLength)
-            central_bh['dx'].append(np.nan)
-            central_bh['dy'].append(np.nan)
-            central_bh['dz'].append(np.nan)
-            central_bh['dr'].append(np.nan)
+            # central_bh['dx'].append(np.nan)
+            # central_bh['dy'].append(np.nan)
+            # central_bh['dz'].append(np.nan)
+            # central_bh['dr'].append(np.nan)
             central_bh['mass'].append(bh_masses[central_bh_index] * unitMass)
-            central_bh['m500c'].append(np.nan)
+            # central_bh['m500c'].append(np.nan)
             central_bh['id'].append(bh_ids[central_bh_index] * dimensionless)
             central_bh['redshift'].append(redshift * dimensionless)
             central_bh['time'].append(time * dimensionless)
@@ -221,16 +221,11 @@ if __name__ == "__main__":
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
 
-    redshift_ticks = []
-    redshift_ticklabels = []
-    for i, (t, z) in enumerate(zip(central_bh['time'].v[::2], central_bh['redshift'].v[::2])):
-        redshift_ticks.append(t)
-        if z < 1.:
-            redshift_ticklabels.append(f"{z:.1f}")
-        else:
-            redshift_ticklabels.append(f"{z:.1f}" if i % 2 else "")
-
-    ax2.set_xticks(redshift_ticks)
+    from observational_data import Observations as obs
+    redshift_ticks = np.array([0, 0.1, 0.4, 0.7, 1, 1.5, 2, 3, 4])
+    redshift_ticks_apply = obs().time_from_redshift(redshift_ticks)
+    redshift_ticklabels = [f"{z}" for z in redshift_ticks]
+    ax2.set_xticks(redshift_ticks_apply)
     ax2.set_xticklabels(redshift_ticklabels)
     ax2.set_xlabel(r"Redshift")
     fig.tight_layout()

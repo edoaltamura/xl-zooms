@@ -24,6 +24,7 @@ reference   Reference for the parameters
 """
 
 import pandas as pd
+from typing import Union, List
 import unyt
 from unyt import (
     Solar_Mass,
@@ -136,6 +137,31 @@ class Observations:
                 print(f"[Literature data] Applied: {self.paper_name}")
             except:
                 pass
+
+    def time_from_redshift(self, z: Union[float, List[float], np.ndarray]):
+        """
+        Assuming the current cosmology, takes a redshift value (or list or numpy array)
+        and returns the corresponding age of the Universe at that redshift.
+        In the case of lists, the calculation is mapped onto the input array in
+        vectorized form.
+        """
+        if isinstance(z, float):
+            return self.cosmo_model.age(0) - self.cosmo_model.lookback_time(z)
+        else:
+            convert = lambda redshift: (self.cosmo_model.age(0) - self.cosmo_model.lookback_time(redshift)).value
+            return np.vectorize(convert)(np.asarray(z)) * self.cosmo_model.age(0).unit
+
+    def redshift_from_time(self, t: Union[unyt.unyt_quantity, unyt.unyt_array]):
+        """
+        Assuming the current cosmology, takes a value (or list or numpy array)
+        for the age of the Universe and returns the corresponding redshift.
+        Note: numpy.vectorize is not a supported ufunc for unyt (astropy) arrays.
+        """
+        if isinstance(t, unyt.unyt_quantity):
+            return cosmology.z_at_value(self.cosmo_model.age, t)
+        else:
+            convert = [cosmology.z_at_value(self.cosmo_model.age, time) for time in t]
+            return np.asarray(convert)
 
 
 class Sun09(Observations):
@@ -429,7 +455,6 @@ class Barnes17(Observations):
 
 
 class Voit05(Observations):
-
     paper_name = "Voit et al. (2005)"
     notes = (
         "Dimensionless entropy profiles. "
@@ -463,7 +488,6 @@ class Voit05(Observations):
 
 
 class Pratt10(Observations):
-
     paper_name = "Pratt et al. (2010)"
     notes = (
         "Dimensionless entropy profiles. "
@@ -482,6 +506,3 @@ class Pratt10(Observations):
     def plot_on_axes(self, ax, **kwargs):
         k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(np.array(ax.get_xlim())))
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
-
-
-
