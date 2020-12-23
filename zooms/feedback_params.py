@@ -31,7 +31,7 @@ fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
-BH_LOCK = 'id'  # 'cop'
+BH_LOCK_ID = True
 
 
 def latex_float(f):
@@ -68,9 +68,11 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
     # Get the central BH closest to centre of halo at z=0
-    central_bh = defaultdict(list)
     central_bh_index = np.argmin(bh_radial_distance)
     central_bh_id_target = data.black_holes.particle_ids[central_bh_index]
+
+    # Initialise typed dictionary for the central BH
+    central_bh = defaultdict(list)
     central_bh['x'] = []
     central_bh['y'] = []
     central_bh['z'] = []
@@ -90,8 +92,6 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         f"Detected different number of high-z snaps and high-z catalogues. "
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
-
-    print(all_snaps, all_catalogues)
 
     for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps, all_catalogues)):
 
@@ -115,9 +115,14 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         bh_coordZ = (bh_positions[:, 2] - ZPotMin)
         bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
-        if BH_LOCK == 'id':
+        if BH_LOCK_ID:
+            print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
             central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
-        elif BH_LOCK == 'cop':
+        else:
+            print((
+                "Locking on the halo centre of potential. "
+                "Tracing the BH closest to the centre (may have different particle ID)."
+            ))
             central_bh_index = np.argmin(bh_radial_distance)
 
         central_bh['x'].append(bh_coordX[central_bh_index])
@@ -130,6 +135,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         central_bh['redshift'].append(data.metadata.redshift)
         central_bh['time'].append(data.metadata.time)
 
+    # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
 
@@ -147,11 +153,14 @@ if __name__ == "__main__":
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
     central_bh = _process_single_halo(zooms_register[0])
+    central_bh['time'] = central_bh['time'].to('Gyr')
+    central_bh['mass'] = central_bh['mass'].to('Solar_Mass')
 
     fig, ax1 = plt.subplots()
     ax1.plot(central_bh['time'], central_bh['mass'])
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
+    ax1.set_yscale('log')
 
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
