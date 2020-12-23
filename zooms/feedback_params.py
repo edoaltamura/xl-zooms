@@ -1,10 +1,10 @@
 import unyt
 import os
+import h5py
 import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
-import h5py as h5
 import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -48,10 +48,8 @@ def latex_float(f):
 
 
 def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
-
-
     # Read in halo properties
-    with h5.File(f'{path_to_catalogue}', 'r') as h5file:
+    with h5py.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
@@ -117,7 +115,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             f"\t{os.path.basename(highz_catalogue)}"
         ))
 
-        with h5.File(f'{highz_catalogue}', 'r') as h5file:
+        with h5py.File(f'{highz_catalogue}', 'r') as h5file:
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / data.metadata.a
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / data.metadata.a
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / data.metadata.a
@@ -149,15 +147,24 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         central_bh['time'].append(data.metadata.time)
 
     if INCLUDE_SNIPS:
+        from unyt import dimensionless
+        unitLength = data.metadata.units.length
+        unitMass = data.metadata.units.mass
+
         snip_handles = get_snip_handles(path_to_snap, z_max=z_clip)
         for snip_handle in tqdm(snip_handles, desc=f"Analysing snipshots", disable=SILENT_PROGRESSBAR):
 
-            data = sw.load(snip_handle)
-            bh_positions = data.black_holes.coordinates.to_physical()
-            bh_masses = data.black_holes.dynamical_masses.to_physical()
+            # Open the snipshot file from the I/O stream
+            with h5py.File(snip_handle, 'r') as f:
+                bh_positions = f['/PartType5/Coordinates']
+                bh_masses = f['/PartType5/DynamicalMasses']
+                bh_ids = f['/PartType5/ParticleIDs']
+                redshift = f['Header'].attrs['Redshift'][0]
+                time = f['Header'].attrs['Time'][0]
+                a = f['Header'].attrs['Scale-factor'][0]
 
             if BH_LOCK_ID:
-                central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
+                central_bh_index = np.where(bh_ids[:] == central_bh_id_target.v)[0]
             else:
                 raise ValueError((
                     "Trying to lock the central BH to the halo centre of potential "
@@ -167,18 +174,20 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
                     "interpolate the position of the CoP between snapshots w.r.t. cosmic time."
                 ))
 
-            central_bh['x'].append(bh_positions[central_bh_index, 0])
-            central_bh['y'].append(bh_positions[central_bh_index, 1])
-            central_bh['z'].append(bh_positions[central_bh_index, 2])
+            # This time we need to manually convert to physical coordinates and assign units.
+            # Catalogue-dependent quantities are entered as numpy nans.
+            central_bh['x'].append(bh_positions[central_bh_index, 0] / a * unitLength)
+            central_bh['y'].append(bh_positions[central_bh_index, 1] / a * unitLength)
+            central_bh['z'].append(bh_positions[central_bh_index, 2] / a * unitLength)
             central_bh['dx'].append(np.nan)
             central_bh['dy'].append(np.nan)
             central_bh['dz'].append(np.nan)
             central_bh['dr'].append(np.nan)
-            central_bh['mass'].append(bh_masses[central_bh_index])
+            central_bh['mass'].append(bh_masses[central_bh_index] * unitMass)
             central_bh['m500c'].append(np.nan)
-            central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
-            central_bh['redshift'].append(data.metadata.redshift)
-            central_bh['time'].append(data.metadata.time)
+            central_bh['id'].append(bh_ids[central_bh_index] * dimensionless)
+            central_bh['redshift'].append(redshift * dimensionless)
+            central_bh['time'].append(time * dimensionless)
 
     # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
