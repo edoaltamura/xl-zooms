@@ -103,7 +103,6 @@ def get_snip_handles(path_z0: str, z_min: float = 0., z_max: float = 5.):
             snip_handle = io.BytesIO(archive.open(snip_name).read())
             with h5py.File(snip_handle, 'r') as f:
                 z = f['Header'].attrs['Redshift'][0]
-                print(z)
             # Filter redshifts
             if z_min < z < z_max:
                 snip_handles.append(snip_handle)
