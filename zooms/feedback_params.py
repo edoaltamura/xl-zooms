@@ -95,12 +95,12 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             all_snaps.remove(a)
             all_catalogues.remove(b)
 
-    print(zip(all_snaps, all_catalogues))
+    print(all_snaps, all_catalogues)
 
     for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps[::-1], all_catalogues[::-1])):
 
         print((
-            f"Analysing ({i}/{len(all_snaps)}):\n"
+            f"Analysing ({i + 1}/{len(all_snaps)}):\n"
             f"\t{os.path.basename(highz_snap)}\n"
             f"\t{os.path.basename(highz_catalogue)}"
         ))
