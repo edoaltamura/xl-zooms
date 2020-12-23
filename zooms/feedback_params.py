@@ -165,8 +165,18 @@ if __name__ == "__main__":
 
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
-    ax2.set_xticks(central_bh['time'].value[::2])
-    ax2.set_xticklabels([f"{i:.1f}" for i in central_bh['redshift'].value[::2]])
+
+    redshift_ticks = []
+    redshift_ticklabels = []
+    for i, (t, z) in enumerate(zip(central_bh['time'].v[::2], central_bh['redshift'].v[::2])):
+        redshift_ticks.append(t)
+        if z < 1.:
+            redshift_ticklabels.append(f"{z:.1f}")
+        else:
+            redshift_ticklabels.append(f"{z:.1f}" if i % 2 else "")
+
+    ax2.set_xticks(redshift_ticks)
+    ax2.set_xticklabels(redshift_ticklabels)
     fig.tight_layout()
     plt.show()
 
