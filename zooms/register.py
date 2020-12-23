@@ -5,6 +5,8 @@
 
 from typing import List
 import os
+from swiftsimio import load
+import h5py
 
 
 class Zoom:
@@ -46,13 +48,18 @@ def get_vr_numbers_unique() -> List[int]:
     return list(vr_nums).sort()
 
 
-def get_allpaths_from_last(path_z0: str) -> list:
+def get_allpaths_from_last(path_z0: str, z_min: float = 0., z_max: float = 5.) -> list:
     if path_z0.endswith('.hdf5'):
         # This is a snapshot
         snapdir = os.path.dirname(path_z0)
         allpaths = [os.path.join(snapdir, filepath) for filepath in os.listdir(snapdir) if filepath.endswith('.hdf5')]
         allpaths = [filepath for filepath in allpaths if os.path.isfile(filepath)]
         allpaths.sort(key=lambda x: int(x[-9:-5]))
+        # Filter redshifts
+        for path in allpaths:
+            z = load(path).metadata.redshift
+            if z > z_max or z < z_min:
+                allpaths.remove(path)
         return allpaths
 
     else:
@@ -71,6 +78,13 @@ def get_allpaths_from_last(path_z0: str) -> list:
                     break
 
         allpaths.sort(key=lambda x: int(x.rstrip('.' + vr_out_section)[-4:]))
+        # Filter redshifts
+        for path in allpaths:
+            with h5py.File(path, 'r') as file:
+                scale_factor = float(file['/SimulationInfo'].attrs['ScaleFactor'])
+                z = 1 / scale_factor - 1
+            if z > z_max or z < z_min:
+                allpaths.remove(path)
         return allpaths
 
 

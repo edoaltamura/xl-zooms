@@ -82,15 +82,14 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     central_bh['time'] = []
 
     # Retrieve BH data from other snaps
-    all_snaps = get_allpaths_from_last(path_to_snap)
-    all_catalogues = get_allpaths_from_last(path_to_catalogue)
+    # Clip redshift data (get snaps below that redshifts)
+    z_clip = 5.
+    all_snaps = get_allpaths_from_last(path_to_snap, z_max=z_clip)
+    all_catalogues = get_allpaths_from_last(path_to_catalogue, z_max=z_clip)
     assert len(all_snaps) == len(all_catalogues), (
         f"Detected different number of high-z snaps and high-z catalogues. "
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
-    # Clip redshift data (get snaps below that redshifts)
-    z_clip = 5.
-    all_snaps, all_catalogues = [(a, b) for a, b in zip(all_snaps, all_catalogues) if sw.load(a).metadata.z > z_clip]
 
     print(all_snaps, all_catalogues)
 
