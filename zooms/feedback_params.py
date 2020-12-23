@@ -49,7 +49,6 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
     # Read in particles
@@ -93,6 +92,14 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
 
+    if BH_LOCK_ID:
+        print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
+    else:
+        print((
+            "Locking on the halo centre of potential. "
+            "Tracing the BH closest to the centre (may have different particle ID)."
+        ))
+
     for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps, all_catalogues)):
 
         print((
@@ -106,7 +113,6 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / data.metadata.a
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / data.metadata.a
             M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / data.metadata.a
 
         data = sw.load(highz_snap)
         bh_positions = data.black_holes.coordinates.to_physical()
@@ -116,13 +122,8 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
         if BH_LOCK_ID:
-            print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
             central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
         else:
-            print((
-                "Locking on the halo centre of potential. "
-                "Tracing the BH closest to the centre (may have different particle ID)."
-            ))
             central_bh_index = np.argmin(bh_radial_distance)
 
         central_bh['x'].append(bh_coordX[central_bh_index])
@@ -165,7 +166,7 @@ if __name__ == "__main__":
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
     ax2.set_xticks(central_bh['time'].value[::2])
-    ax2.set_xticklabels([latex_float(i) for i in central_bh['redshift'].value[::2]])
+    ax2.set_xticklabels([f"{i:.1f}" for i in central_bh['redshift'].value[::2]])
     fig.tight_layout()
     plt.show()
 

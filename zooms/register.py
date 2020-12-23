@@ -7,6 +7,9 @@ from typing import List
 import os
 from swiftsimio import load
 import h5py
+from tqdm import tqdm
+
+SILENT_PROGRESSBAR = False
 
 
 class Zoom:
@@ -56,7 +59,7 @@ def get_allpaths_from_last(path_z0: str, z_min: float = 0., z_max: float = 5.) -
         allpaths = [filepath for filepath in allpaths if os.path.isfile(filepath)]
         allpaths.sort(key=lambda x: int(x[-9:-5]))
         # Filter redshifts
-        for path in allpaths.copy():
+        for path in tqdm(allpaths.copy(), desc=f"Fetching snapshots", disable=SILENT_PROGRESSBAR):
             z = load(path).metadata.redshift
             if z > z_max or z < z_min:
                 allpaths.remove(path)
@@ -79,7 +82,7 @@ def get_allpaths_from_last(path_z0: str, z_min: float = 0., z_max: float = 5.) -
 
         allpaths.sort(key=lambda x: int(x.rstrip('.' + vr_out_section)[-4:]))
         # Filter redshifts
-        for path in allpaths.copy():
+        for path in tqdm(allpaths.copy(), desc=f"Fetching snap catalogues", disable=SILENT_PROGRESSBAR):
             with h5py.File(path, 'r') as file:
                 scale_factor = float(file['/SimulationInfo'].attrs['ScaleFactor'])
                 z = 1 / scale_factor - 1
