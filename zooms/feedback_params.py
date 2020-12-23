@@ -16,7 +16,8 @@ from register import (
     Tcut_halogas,
     name_list,
     vr_numbers,
-    get_allpaths_from_last
+    get_allpaths_from_last,
+    get_snip_handles,
 )
 
 try:
@@ -32,6 +33,7 @@ mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
 BH_LOCK_ID = True
+INCLUDE_SNIPS = True
 
 
 def latex_float(f):
@@ -44,6 +46,8 @@ def latex_float(f):
 
 
 def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
+    get_snip_handles(path_to_snap)
+
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -103,7 +107,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps, all_catalogues)):
 
         print((
-            f"Analysing ({i + 1}/{len(all_snaps)}):\n"
+            f"Analysing snap ({i + 1}/{len(all_snaps)}):\n"
             f"\t{os.path.basename(highz_snap)}\n"
             f"\t{os.path.basename(highz_catalogue)}"
         ))
@@ -177,6 +181,7 @@ if __name__ == "__main__":
 
     ax2.set_xticks(redshift_ticks)
     ax2.set_xticklabels(redshift_ticklabels)
+    ax2.set_xlabel(r"Redshift")
     fig.tight_layout()
     plt.show()
 
