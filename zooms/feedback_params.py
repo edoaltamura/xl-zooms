@@ -209,22 +209,22 @@ if __name__ == "__main__":
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
     central_bh = _process_single_halo(zooms_register[0])
-    central_bh['time'] = central_bh['time'].to('Gyr')
-    central_bh['mass'] = central_bh['mass'].to('Solar_Mass')
+    sort_key = np.argsort(central_bh['time'])
+    central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
+    central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
 
     fig, ax1 = plt.subplots()
-    ax1.scatter(central_bh['time'], central_bh['mass'], marker='.', s=3, alpha=1, edgecolors='none')
+    ax1.plot(central_bh['time'], central_bh['mass'], linewidth=1)
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
     ax1.set_yscale('log')
 
+    from observational_data import Observations
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
-
-    from observational_data import Observations
-    redshift_ticks = np.array([0, .1, .4, .7, 1, 1.5, 2, 3, 4])[::-1]
+    redshift_ticks = np.array([0, .1, .2, .4, .7, 1, 2, 3, 4, 5])
     redshift_ticks_apply = Observations().time_from_redshift(redshift_ticks).value
-    redshift_ticklabels = [f"{z}" for z in redshift_ticks]
+    redshift_ticklabels = ['0', '0.1', '0.2', '0.4', '0.7', '1', '2', '3', '4', '5']
     ax2.set_xticks(redshift_ticks_apply)
     ax2.set_xticklabels(redshift_ticklabels)
     ax2.set_xlabel(r"Redshift")
