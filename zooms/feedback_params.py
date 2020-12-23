@@ -88,40 +88,43 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         f"Detected different number of high-z snaps and high-z catalogues. "
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
+    # Clip redshift data
+    z_clip = 4.
+    all_snaps = [path for path in all_snaps if sw.load(path).metadata.z < z_clip]
+    all_catalogues = [path for path in all_catalogues if sw.load(path).metadata.z < z_clip]
+
     for highz_snap, highz_catalogue in zip(all_snaps[::-1], all_catalogues[::-1]):
 
-        if sw.load(f'{highz_snap}').metadata.z < 4.:
-            # Clip redshift data
-            print(f"Analysing:\n\t{os.path.basename(highz_snap)}\n\t{os.path.basename(highz_catalogue)}")
+        print(f"Analysing:\n\t{os.path.basename(highz_snap)}\n\t{os.path.basename(highz_catalogue)}")
 
-            with h5.File(f'{highz_catalogue}', 'r') as h5file:
-                XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / data.metadata.a
-                YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / data.metadata.a
-                ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / data.metadata.a
-                M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-                R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / data.metadata.a
+        with h5.File(f'{highz_catalogue}', 'r') as h5file:
+            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / data.metadata.a
+            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / data.metadata.a
+            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / data.metadata.a
+            M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / data.metadata.a
 
-            data = sw.load(highz_snap)
-            bh_positions = data.black_holes.coordinates.to_physical()
-            bh_coordX = (bh_positions[:, 0] - XPotMin)
-            bh_coordY = (bh_positions[:, 1] - YPotMin)
-            bh_coordZ = (bh_positions[:, 2] - ZPotMin)
-            bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
+        data = sw.load(highz_snap)
+        bh_positions = data.black_holes.coordinates.to_physical()
+        bh_coordX = (bh_positions[:, 0] - XPotMin)
+        bh_coordY = (bh_positions[:, 1] - YPotMin)
+        bh_coordZ = (bh_positions[:, 2] - ZPotMin)
+        bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
-            if BH_LOCK == 'id':
-                central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
-            elif BH_LOCK == 'cop':
-                central_bh_index = np.argmin(bh_radial_distance)
+        if BH_LOCK == 'id':
+            central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
+        elif BH_LOCK == 'cop':
+            central_bh_index = np.argmin(bh_radial_distance)
 
-            central_bh['x'].append(bh_coordX[central_bh_index])
-            central_bh['y'].append(bh_coordY[central_bh_index])
-            central_bh['z'].append(bh_coordZ[central_bh_index])
-            central_bh['r'].append(bh_radial_distance[central_bh_index])
-            central_bh['mass'].append(data.black_holes.dynamical_masses.to_physical()[central_bh_index])
-            central_bh['m500c'].append(M500c)
-            central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
-            central_bh['redshift'].append(data.metadata.redshift)
-            central_bh['time'].append(data.metadata.time)
+        central_bh['x'].append(bh_coordX[central_bh_index])
+        central_bh['y'].append(bh_coordY[central_bh_index])
+        central_bh['z'].append(bh_coordZ[central_bh_index])
+        central_bh['r'].append(bh_radial_distance[central_bh_index])
+        central_bh['mass'].append(data.black_holes.dynamical_masses.to_physical()[central_bh_index])
+        central_bh['m500c'].append(M500c)
+        central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
+        central_bh['redshift'].append(data.metadata.redshift)
+        central_bh['time'].append(data.metadata.time)
 
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
@@ -148,8 +151,8 @@ if __name__ == "__main__":
 
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
-    ax2.set_xticks(central_bh['time'].value)
-    ax2.set_xticklabels(central_bh['redshift'].value[::3])
+    ax2.set_xticks(ax1.get_xticks())
+    ax2.set_xticklabels([latex_float(i) for i in central_bh['redshift'].value])
     fig.tight_layout()
     plt.show()
 
