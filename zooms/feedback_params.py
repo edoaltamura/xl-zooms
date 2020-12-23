@@ -89,15 +89,19 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
     # Clip redshift data (get snaps below that redshifts)
-    z_clip = 4.
+    z_clip = 3.
     for a, b in zip(all_snaps, all_catalogues):
         if sw.load(a).metadata.z > z_clip:
             all_snaps.remove(a)
             all_catalogues.remove(b)
 
-    for highz_snap, highz_catalogue in zip(all_snaps[::-1], all_catalogues[::-1]):
+    for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps[::-1], all_catalogues[::-1])):
 
-        print(f"Analysing:\n\t{os.path.basename(highz_snap)}\n\t{os.path.basename(highz_catalogue)}")
+        print((
+            f"Analysing ({i}/{len(all_snaps)}):\n"
+            f"\t{os.path.basename(highz_snap)}\n"
+            f"\t{os.path.basename(highz_catalogue)}"
+        ))
 
         with h5.File(f'{highz_catalogue}', 'r') as h5file:
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / data.metadata.a
