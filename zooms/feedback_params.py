@@ -1,4 +1,5 @@
 import unyt
+import os
 import numpy as np
 from collections import defaultdict
 from multiprocessing import Pool, cpu_count
@@ -78,6 +79,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     central_bh['m500c'] = []
     central_bh['id'] = []
     central_bh['redshift'] = []
+    central_bh['time'] = []
 
     # Retrieve BH data from other snaps
     all_snaps = get_allpaths_from_last(path_to_snap)
@@ -88,22 +90,22 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     )
     for highz_snap, highz_catalogue in zip(all_snaps[::-1], all_catalogues[::-1]):
 
-        if sw.load(f'{highz_snap}').metadata.z < 3.:
-            # Keep only z < 3 data
-            print(f"Analysing:\n\t{highz_snap}\n\t{highz_catalogue}")
+        if sw.load(f'{highz_snap}').metadata.z < 4.:
+            # Clip redshift data
+            print(f"Analysing:\n\t{os.path.basename(highz_snap)}\n\t{os.path.basename(highz_catalogue)}")
 
             with h5.File(f'{highz_catalogue}', 'r') as h5file:
-                XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-                YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-                ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+                XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / data.metadata.a
+                YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / data.metadata.a
+                ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / data.metadata.a
                 M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-                R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+                R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / data.metadata.a
 
             data = sw.load(highz_snap)
-            bh_positions = data.black_holes.coordinates
-            bh_coordX = (bh_positions[:, 0] - XPotMin) / data.metadata.a
-            bh_coordY = (bh_positions[:, 1] - YPotMin) / data.metadata.a
-            bh_coordZ = (bh_positions[:, 2] - ZPotMin) / data.metadata.a
+            bh_positions = data.black_holes.coordinates.to_physical()
+            bh_coordX = (bh_positions[:, 0] - XPotMin)
+            bh_coordY = (bh_positions[:, 1] - YPotMin)
+            bh_coordZ = (bh_positions[:, 2] - ZPotMin)
             bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
             if BH_LOCK == 'id':
@@ -115,10 +117,11 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             central_bh['y'].append(bh_coordY[central_bh_index])
             central_bh['z'].append(bh_coordZ[central_bh_index])
             central_bh['r'].append(bh_radial_distance[central_bh_index])
-            central_bh['mass'].append(data.black_holes.dynamical_masses[central_bh_index])
+            central_bh['mass'].append(data.black_holes.dynamical_masses.to_physical()[central_bh_index])
             central_bh['m500c'].append(M500c)
             central_bh['id'].append(data.black_holes.particle_ids[central_bh_index])
-            central_bh['redshift'].append(data.metadata.z)
+            central_bh['redshift'].append(data.metadata.redshift)
+            central_bh['time'].append(data.metadata.time)
 
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
@@ -137,8 +140,17 @@ if __name__ == "__main__":
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
     central_bh = _process_single_halo(zooms_register[0])
-    print(central_bh)
-    plt.plot(central_bh['redshift'], central_bh['mass']/central_bh['m500c'].to(central_bh['mass'].units))
+
+    fig, ax1 = plt.subplots()
+    ax1.plot(central_bh['time'], central_bh['mass'])
+    ax1.set_xlabel(f"Cosmic time [{central_bh['time'].units.latex_repr}]")
+    ax1.set_xlabel(f"BH dynamical mass [{ central_bh['mass'].units.latex_repr}]")
+
+    ax2 = ax1.twiny()
+    ax2.tick_params(axis='x')
+    ax2.set_xticks(central_bh['redshift'].value)
+    ax2.set_yticklabels(central_bh['redshift'].value[::2])
+    fig.tight_layout()
     plt.show()
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
