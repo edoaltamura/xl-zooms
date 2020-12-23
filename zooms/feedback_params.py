@@ -158,8 +158,8 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             # Cannot use Swiftsimio, since it automatically looks for PartType0,
             # which is not included in snipshot outputs.
             with h5py.File(snip_handle, 'r') as f:
-                bh_positions = f['/PartType5/Coordinates']
-                bh_masses = f['/PartType5/DynamicalMasses']
+                bh_positions = f['/PartType5/Coordinates'][...]
+                bh_masses = f['/PartType5/DynamicalMasses'][...]
                 bh_ids = f['/PartType5/ParticleIDs'][...]
                 redshift = f['Header'].attrs['Redshift'][0]
                 time = f['Header'].attrs['Time'][0]
