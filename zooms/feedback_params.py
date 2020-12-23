@@ -89,15 +89,12 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
     # Clip redshift data (get snaps below that redshifts)
-    z_clip = 3.
-    for a, b in zip(all_snaps, all_catalogues):
-        if sw.load(a).metadata.z > z_clip:
-            all_snaps.remove(a)
-            all_catalogues.remove(b)
+    z_clip = 5.
+    all_snaps, all_catalogues = [(a, b) for a, b in zip(all_snaps, all_catalogues) if sw.load(a).metadata.z > z_clip]
 
     print(all_snaps, all_catalogues)
 
-    for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps[::-1], all_catalogues[::-1])):
+    for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps, all_catalogues)):
 
         print((
             f"Analysing ({i + 1}/{len(all_snaps)}):\n"
