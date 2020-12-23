@@ -38,6 +38,14 @@ mean_atomic_weight_per_free_electron = 1.14
 BH_LOCK_ID = True
 INCLUDE_SNIPS = True
 
+if BH_LOCK_ID:
+    print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
+else:
+    print((
+        "Locking on the halo centre of potential. "
+        "Tracing the BH closest to the centre (may have different particle ID)."
+    ))
+
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -99,14 +107,6 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         f"Detected different number of high-z snaps and high-z catalogues. "
         f"Number of snaps: {len(all_snaps)}. Number of catalogues: {len(all_catalogues)}."
     )
-
-    if BH_LOCK_ID:
-        print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
-    else:
-        print((
-            "Locking on the halo centre of potential. "
-            "Tracing the BH closest to the centre (may have different particle ID)."
-        ))
 
     for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps, all_catalogues)):
 
@@ -214,13 +214,12 @@ if __name__ == "__main__":
 
     # The results of the multiprocessing Pool are returned in the same order as inputs
     with Pool() as pool:
-        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
+        print(f"Analysis of {len(zooms_register):d} zooms mapped onto {cpu_count():d} CPUs.")
         results = pool.map(_process_single_halo, iter(zooms_register))
         dump_memory_usage()
 
     fig, ax1 = plt.subplots()
     for central_bh, zoom in zip(list(results), zooms_register):
-        central_bh = _process_single_halo(zooms_register[0])
         sort_key = np.argsort(central_bh['time'])
         central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
         central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
