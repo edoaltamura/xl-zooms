@@ -195,7 +195,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
-        print(f"Central BH memory [{key}]: {central_bh[key].nbytes / 1024 / 1024} MB")
+        print(f"Central BH memory [{key}]: {central_bh[key].nbytes / 1024:.3f} kB")
 
     return central_bh
 
@@ -210,20 +210,41 @@ if __name__ == "__main__":
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
-    central_bh = _process_single_halo(zooms_register[0])
-    sort_key = np.argsort(central_bh['time'])
-    central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
-    central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
-
-    dump_memory_usage()
+    # The results of the multiprocessing Pool are returned in the same order as inputs
+    with Pool() as pool:
+        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
+        results = pool.map(_process_single_halo, iter(zooms_register))
+        dump_memory_usage()
 
     fig, ax1 = plt.subplots()
-    ax1.plot(central_bh['time'], central_bh['mass'], linewidth=1)
+    for central_bh, zoom in zip(list(results), zooms_register):
+        central_bh = _process_single_halo(zooms_register[0])
+        sort_key = np.argsort(central_bh['time'])
+        central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
+        central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
+
+        style = ''
+        if '-8res' in zoom.run_name:
+            style = ':'
+        elif '+1res' in zoom.run_name:
+            style = '-'
+
+        color = ''
+        if 'Ref' in zoom.run_name:
+            color = 'black'
+        elif 'MinimumDistance' in zoom.run_name:
+            color = 'orange'
+        elif 'Isotropic' in zoom.run_name:
+            color = 'lime'
+
+        ax1.plot(central_bh['time'], central_bh['mass'], linestyle=style, linewidth=1, color=color, alpha=1)
+
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
     ax1.set_yscale('log')
 
     from observational_data import Observations
+
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
     redshift_ticks = np.array([0, .1, .2, .4, .6, 1, 1.5, 2, 3, 4])
@@ -235,10 +256,6 @@ if __name__ == "__main__":
     fig.tight_layout()
     plt.show()
 
-    # The results of the multiprocessing Pool are returned in the same order as inputs
-    # with Pool() as pool:
-    #     print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-    #     results = pool.map(_process_single_halo, iter(zooms_register))
     #
     #     # Recast output into a Pandas dataframe for further manipulation
     #     columns = [
