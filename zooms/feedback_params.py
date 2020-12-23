@@ -221,9 +221,9 @@ if __name__ == "__main__":
     ax2 = ax1.twiny()
     ax2.tick_params(axis='x')
 
-    from observational_data import Observations as obs
-    redshift_ticks = np.array([0, 0.1, 0.4, 0.7, 1, 1.5, 2, 3, 4])
-    redshift_ticks_apply = obs().time_from_redshift(redshift_ticks)
+    from observational_data import Observations
+    redshift_ticks = np.array([0, .1, .4, .7, 1, 1.5, 2, 3, 4])[::-1]
+    redshift_ticks_apply = Observations().time_from_redshift(redshift_ticks).value
     redshift_ticklabels = [f"{z}" for z in redshift_ticks]
     ax2.set_xticks(redshift_ticks_apply)
     ax2.set_xticklabels(redshift_ticklabels)
