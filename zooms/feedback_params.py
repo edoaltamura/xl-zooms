@@ -154,17 +154,19 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         snip_handles = get_snip_handles(path_to_snap, z_max=z_clip)
         for snip_handle in tqdm(snip_handles, desc=f"Analysing snipshots", disable=SILENT_PROGRESSBAR):
 
-            # Open the snipshot file from the I/O stream
+            # Open the snipshot file from the I/O stream.
+            # Cannot use Swiftsimio, since it automatically looks for PartType0,
+            # which is not included in snipshot outputs.
             with h5py.File(snip_handle, 'r') as f:
                 bh_positions = f['/PartType5/Coordinates']
                 bh_masses = f['/PartType5/DynamicalMasses']
-                bh_ids = f['/PartType5/ParticleIDs']
+                bh_ids = f['/PartType5/ParticleIDs'][...]
                 redshift = f['Header'].attrs['Redshift'][0]
                 time = f['Header'].attrs['Time'][0]
                 a = f['Header'].attrs['Scale-factor'][0]
 
             if BH_LOCK_ID:
-                central_bh_index = np.where(bh_ids[:] == central_bh_id_target.v)[0]
+                central_bh_index = np.where(bh_ids == central_bh_id_target.v)[0]
             else:
                 raise ValueError((
                     "Trying to lock the central BH to the halo centre of potential "
