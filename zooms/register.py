@@ -2,7 +2,7 @@
 #       from register import zooms_register
 # To access the catalog file of the first zoom, use
 #       zooms_register[0].catalog_file
-
+import io
 import os
 import h5py
 import zipfile
@@ -100,7 +100,7 @@ def get_snip_handles(path_z0: str, z_min: float = 0., z_max: float = 5.):
         all_snips = archive.namelist()
         all_snips.sort(key=lambda x: int(x[-9:-5]))
         for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=SILENT_PROGRESSBAR):
-            snip_handle = archive.open(snip_name)
+            snip_handle = io.BytesIO(archive.open(snip_name).read())
             with h5py.File(snip_handle, 'r') as f:
                 z = f['Header'].attrs['Redshift'][0]
                 print(z)
