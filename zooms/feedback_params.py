@@ -110,11 +110,12 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
 
     for i, (highz_snap, highz_catalogue) in enumerate(zip(all_snaps, all_catalogues)):
 
-        print((
-            f"Analysing snap ({i + 1}/{len(all_snaps)}):\n"
-            f"\t{os.path.basename(highz_snap)}\n"
-            f"\t{os.path.basename(highz_catalogue)}"
-        ))
+        if not SILENT_PROGRESSBAR:
+            print((
+                f"Analysing snap ({i + 1}/{len(all_snaps)}):\n"
+                f"\t{os.path.basename(highz_snap)}\n"
+                f"\t{os.path.basename(highz_catalogue)}"
+            ))
 
         with h5py.File(f'{highz_catalogue}', 'r') as h5file:
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / data.metadata.a
@@ -195,7 +196,8 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     # Convert lists to Swiftsimio cosmo arrays
     for key in central_bh:
         central_bh[key] = sw.cosmo_array(central_bh[key]).flatten()
-        print(f"Central BH memory [{key}]: {central_bh[key].nbytes / 1024:.3f} kB")
+        if not SILENT_PROGRESSBAR:
+            print(f"Central BH memory [{key}]: {central_bh[key].nbytes / 1024:.3f} kB")
 
     return central_bh
 
