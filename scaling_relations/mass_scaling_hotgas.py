@@ -11,6 +11,7 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
+# Connect to
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
 
