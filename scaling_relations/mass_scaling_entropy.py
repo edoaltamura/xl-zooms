@@ -100,7 +100,7 @@ def process_single_halo(
         entropy = kBT_sphere / number_density_gas ** (2 / 3)
         entropy = entropy.to('keV*cm**2')
 
-    return M500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass), fhot500c.value, entropy
+    return M500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass), fhot500c, entropy
 
 
 def _process_single_halo(zoom: Zoom):
@@ -166,18 +166,13 @@ def m_500_entropy():
     legend_sims = plt.legend(handles=handles, loc=2)
 
     ax.add_artist(legend_sims)
-
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$M_{{\rm gas},500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'Entropy $\ (r<{{0:.1g}} R_{500{\rm crit}})$'.format(entropy_radius_r500c))
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
 
     fig.savefig(f'{zooms_register[0].output_directory}/m500_k500.png', dpi=300)
     plt.show()
     plt.close()
-
-    return
-
 
 m_500_entropy()
