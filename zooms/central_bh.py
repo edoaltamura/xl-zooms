@@ -212,11 +212,16 @@ if __name__ == "__main__":
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
-    # The results of the multiprocessing Pool are returned in the same order as inputs
-    with Pool() as pool:
-        print(f"Analysis of {len(zooms_register):d} zooms mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_register))
-        dump_memory_usage()
+    if len(zooms_register) == 1:
+        results = _process_single_halo(zooms_register[0])
+    else:
+        num_threads = len(zooms_register) if len(zooms_register) < cpu_count() else cpu_count()
+        # The results of the multiprocessing Pool are returned in the same order as inputs
+        print(f"Analysis of {len(zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
+        with Pool(num_threads) as pool:
+            results = pool.map(_process_single_halo, iter(zooms_register))
+
+    dump_memory_usage()
 
     fig, ax1 = plt.subplots()
     for central_bh, zoom in zip(list(results), zooms_register):

@@ -11,7 +11,7 @@ from swiftsimio import load
 from tqdm import tqdm
 import psutil
 
-SILENT_PROGRESSBAR = True
+SILENT_PROGRESSBAR = False
 total_memory = psutil.virtual_memory().total
 
 
