@@ -63,7 +63,8 @@ def get_allpaths_from_last(path_z0: str, z_min: float = 0., z_max: float = 5.) -
         allpaths.sort(key=lambda x: int(x[-9:-5]))
         # Filter redshifts
         for path in tqdm(allpaths.copy(), desc=f"Fetching snapshots", disable=SILENT_PROGRESSBAR):
-            z = load(path).metadata.redshift
+            with h5py.File(path, 'r') as f:
+                z = f['Header'].attrs['Redshift'][0]
             if z > z_max or z < z_min:
                 allpaths.remove(path)
         return allpaths

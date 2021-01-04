@@ -4,9 +4,9 @@ import h5py
 import numpy as np
 from tqdm import tqdm
 from collections import defaultdict
+from warnings import warn
 from multiprocessing import Pool, cpu_count
 import swiftsimio as sw
-import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
@@ -216,9 +216,19 @@ if __name__ == "__main__":
     vr_num = 'L0300N0564_VR813_+1res_Isotropic'
 
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
-    name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
+    name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
+
+    for name in name_list:
+        if '+1res' not in name:
+            warn((
+                "Trying to analyse the central SMBH of objects simulated at "
+                "low resolution (i.e. less than EAGLE). The BH seeding is "
+                "calibrated at EAGLE resolution, which may cause low-res data to"
+                "look very odd."
+            ))
 
     if len(zooms_register) == 1:
+        print("Analysing one object only. Not using multiprocessing features.")
         results = [_process_single_halo(zooms_register[0])]
     else:
         num_threads = len(zooms_register) if len(zooms_register) < cpu_count() else cpu_count()
@@ -231,17 +241,11 @@ if __name__ == "__main__":
 
     fig, ax1 = plt.subplots()
     for central_bh, zoom in zip(list(results), zooms_register):
-        print(central_bh)
         sort_key = np.argsort(central_bh['time'].value)
         central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
         central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
 
-        style = ''
-        if '-8res' in zoom.run_name:
-            style = '-'
-        elif '+1res' in zoom.run_name:
-            style = '-'
-
+        style = '-'
         color = ''
         if 'Ref' in zoom.run_name:
             color = 'black'
@@ -250,7 +254,14 @@ if __name__ == "__main__":
         elif 'Isotropic' in zoom.run_name:
             color = 'lime'
 
-        ax1.plot(central_bh['time'], central_bh['mass'], linestyle=style, linewidth=1, color=color, alpha=1)
+        ax1.plot(
+            central_bh['time'],
+            central_bh['mass'],
+            linestyle=style,
+            linewidth=1,
+            color=color,
+            alpha=1
+        )
 
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
@@ -268,45 +279,3 @@ if __name__ == "__main__":
     ax2.set_xlabel(r"Redshift")
     fig.tight_layout()
     plt.show()
-
-    #
-    #     # Recast output into a Pandas dataframe for further manipulation
-    #     columns = [
-    #         'num',
-    #         'bin'
-    #     ]
-    #     results = pd.DataFrame(list(results), columns=columns)
-    #     results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
-    #     print(results.head())
-    #
-    # fig, ax = plt.subplots()
-    #
-    # for i in range(len(results)):
-    #
-    #     style = ''
-    #     if '-8res' in results.loc[i, "run_name"]:
-    #         style = ':'
-    #     elif '+1res' in results.loc[i, "run_name"]:
-    #         style = '-'
-    #
-    #     color = ''
-    #     if 'Ref' in results.loc[i, "run_name"]:
-    #         color = 'black'
-    #     elif 'MinimumDistance' in results.loc[i, "run_name"]:
-    #         color = 'orange'
-    #     elif 'Isotropic' in results.loc[i, "run_name"]:
-    #         color = 'lime'
-    #
-    #     ax.step(
-    #         results['bin'][i],
-    #         results['num'][i],
-    #         linestyle=style, linewidth=1, color=color, alpha=1,
-    #         # label=results.loc[i, "run_name"]
-    #     )
-    #
-    # ax.set_yscale('log')
-    # ax.set_ylabel(r'Number of feedback events')
-    # ax.set_xlabel(r'$\log_{10}(\Delta T)$')
-    #
-    # plt.legend()
-    # plt.show()
