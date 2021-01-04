@@ -36,7 +36,7 @@ mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
 BH_LOCK_ID = True
-INCLUDE_SNIPS = False
+INCLUDE_SNIPS = True
 
 if BH_LOCK_ID:
     print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
@@ -248,7 +248,7 @@ if __name__ == "__main__":
 
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
-    # ax1.set_yscale('log')
+    ax1.set_yscale('log')
 
     from observational_data import Observations
 
