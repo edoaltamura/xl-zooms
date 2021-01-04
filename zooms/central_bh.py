@@ -36,7 +36,7 @@ mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
 BH_LOCK_ID = True
-INCLUDE_SNIPS = True
+INCLUDE_SNIPS = False
 
 if BH_LOCK_ID:
     print("Locking on the central BH particle ID at z = 0. Tracing back the same ID.")
