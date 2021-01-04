@@ -1,5 +1,6 @@
 # Plot scaling relations for EAGLE-XL tests
 import os
+import sys
 import unyt
 import numpy as np
 from typing import Tuple
@@ -10,6 +11,17 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
+
+# Make the register backend visible to the script
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir,
+            'zooms'
+        )
+    )
+)
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
