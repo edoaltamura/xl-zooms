@@ -232,7 +232,7 @@ if __name__ == "__main__":
 
         style = ''
         if '-8res' in zoom.run_name:
-            style = ':'
+            style = '-'
         elif '+1res' in zoom.run_name:
             style = '-'
 
@@ -248,7 +248,7 @@ if __name__ == "__main__":
 
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
-    ax1.set_yscale('log')
+    # ax1.set_yscale('log')
 
     from observational_data import Observations
 
