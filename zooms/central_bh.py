@@ -213,7 +213,7 @@ if __name__ == "__main__":
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
 
     if len(zooms_register) == 1:
-        results = _process_single_halo(zooms_register[0])
+        results = [_process_single_halo(zooms_register[0])]
     else:
         num_threads = len(zooms_register) if len(zooms_register) < cpu_count() else cpu_count()
         # The results of the multiprocessing Pool are returned in the same order as inputs
