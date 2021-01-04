@@ -213,7 +213,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 if __name__ == "__main__":
-    vr_num = 'L0300N0564_VR18_-8res_MinimumDistance'
+    vr_num = 'L0300N0564_VR93_+1res_MinimumDistance'
 
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
