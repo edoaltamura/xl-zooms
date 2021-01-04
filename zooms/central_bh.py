@@ -225,6 +225,7 @@ if __name__ == "__main__":
 
     fig, ax1 = plt.subplots()
     for central_bh, zoom in zip(list(results), zooms_register):
+        print(central_bh['time'])
         sort_key = np.argsort(central_bh['time'].value)
         central_bh['time'] = central_bh['time'][sort_key].to('Gyr')
         central_bh['mass'] = central_bh['mass'][sort_key].to('Solar_Mass')
