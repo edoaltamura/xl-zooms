@@ -42,7 +42,7 @@ entropy_radius_r500c = 0.1
 def process_single_halo(
         path_to_snap: str,
         path_to_catalogue: str
-) -> Tuple[float]:
+) -> tuple:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
