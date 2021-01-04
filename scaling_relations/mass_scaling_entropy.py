@@ -23,7 +23,17 @@ sys.path.append(
     )
 )
 
-from register import zooms_register, Zoom, Tcut_halogas, name_list
+from register import (
+    SILENT_PROGRESSBAR,
+    zooms_register,
+    Zoom,
+    Tcut_halogas,
+    name_list,
+    vr_numbers,
+    get_allpaths_from_last,
+    get_snip_handles,
+    dump_memory_usage,
+)
 import observational_data as obs
 
 try:
@@ -108,23 +118,34 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_entropy():
+    vr_num = 'L0300N0564_VR813_+1res_Isotropic'
+
+    zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
+    name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
+
+    if len(zooms_register) == 1:
+        print("Analysing one object only. Not using multiprocessing features.")
+        results = [_process_single_halo(zooms_register[0])]
+    else:
+        num_threads = len(zooms_register) if len(zooms_register) < cpu_count() else cpu_count()
+        # The results of the multiprocessing Pool are returned in the same order as inputs
+        print(f"Analysis of {len(zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
+        with Pool(num_threads) as pool:
+            results = pool.map(_process_single_halo, iter(zooms_register))
+
+    # Recast output into a Pandas dataframe for further manipulation
+    columns = [
+        'M_500crit (M_Sun)',
+        'M_hot (< R_500crit) (M_Sun)',
+        'f_hot (< R_500crit)',
+        'entropy',
+    ]
+    results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
+    results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+    print(results.head())
+    dump_memory_usage()
+
     fig, ax = plt.subplots()
-
-    # The results of the multiprocessing Pool are returned in the same order as inputs
-    with Pool() as pool:
-        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_register))
-
-        # Recast output into a Pandas dataframe for further manipulation
-        columns = [
-            'M_500crit (M_Sun)',
-            'M_hot (< R_500crit) (M_Sun)',
-            'f_hot (< R_500crit)',
-            'entropy',
-        ]
-        results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
-        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
-        print(results.head())
 
     # Display zoom data
     for i in range(len(results)):
