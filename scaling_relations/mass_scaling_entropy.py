@@ -121,7 +121,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_entropy():
-    vr_num = 'VR'
+    vr_num = '-8res'
 
     _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     _name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
