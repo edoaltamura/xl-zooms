@@ -195,4 +195,4 @@ def m_500_entropy():
     plt.show()
     plt.close()
 
-m_500_entropy()
+_process_single_halo(zooms_register[0])
