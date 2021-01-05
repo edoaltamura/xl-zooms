@@ -84,7 +84,11 @@ def process_single_halo(
     fhot500c = Mhot500c / M500c
 
     # Calculate entropy
-    sphere_index = np.where(deltaR < entropy_radius_r500c * R500c)[0]
+    entropy_radius = entropy_radius_r500c * R500c
+    shell_thickness = unyt.unyt_quantity(100, 'kpc')
+    sphere_index = np.where(
+        entropy_radius - shell_thickness / 2 < deltaR < entropy_radius + shell_thickness / 2
+    )[0]
     mass_sphere = np.sum(massGas[sphere_index])
     volume_sphere = (4. * np.pi / 3.) * (entropy_radius_r500c * R500c) ** 3
     density_sphere = mass_sphere / volume_sphere
