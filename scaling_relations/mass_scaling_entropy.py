@@ -23,7 +23,7 @@ sys.path.append(
     )
 )
 
-from zooms.register import (
+from register import (
     SILENT_PROGRESSBAR,
     zooms_register,
     Zoom,
