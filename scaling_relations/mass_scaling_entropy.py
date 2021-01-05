@@ -85,7 +85,7 @@ def process_single_halo(
 
     # Calculate entropy
     entropy_radius = entropy_radius_r500c * R500c
-    shell_thickness = unyt.unyt_quantity(100, 'kpc')
+    shell_thickness = unyt.unyt_quantity(10, 'kpc')
     sphere_index = np.where(
         entropy_radius - shell_thickness / 2 < deltaR < entropy_radius + shell_thickness / 2
     )[0]
@@ -194,7 +194,7 @@ def m_500_entropy():
     ax.set_xlabel(r'$T_{500{\rm crit}}$ [${0}$]'.format(
         results.loc[0, "kBT_500crit"].units.latex_repr
     ))
-    ax.set_ylabel(r'Entropy $\ (r<{0:.1g} R_{{500{{\rm crit}}}})$ [${1}$]'.format(
+    ax.set_ylabel(r'Entropy $\ (r={0:.1g}\ R_{{500{{\rm crit}}}})$ [${1}$]'.format(
         entropy_radius_r500c,
         results.loc[0, "entropy"].units.latex_repr
     ))
