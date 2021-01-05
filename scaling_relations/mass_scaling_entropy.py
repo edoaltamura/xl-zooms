@@ -90,6 +90,7 @@ def process_single_halo(
     density_sphere = mass_sphere / volume_sphere
 
     kBT_sphere = np.sum(mass_weighted_tempGas[sphere_index])
+    print(kBT_sphere)
     kBT_sphere *= unyt.boltzmann_constant
     kBT_sphere /= mass_sphere
     kBT_sphere = kBT_sphere.to('keV')
