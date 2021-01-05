@@ -187,7 +187,7 @@ def m_500_entropy():
 
     ax.add_artist(legend_sims)
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'Entropy $\ (r<{{0:.1g}} R_{500{\rm crit}})$'.format(entropy_radius_r500c))
+    ax.set_ylabel(r'Entropy $\ (r<{0:.1g} R_{{500{{\rm crit}}}})$'.format(entropy_radius_r500c))
     ax.set_xscale('log')
     ax.set_yscale('log')
 
