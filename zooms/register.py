@@ -376,7 +376,12 @@ for repo in cosma_repositories:
     for run_dir in os.listdir(repo):
         run_path = os.path.join(repo, run_dir)
 
-        if os.path.isdir(run_path) and run_dir.startswith('L0300N0564'):
+        if (
+                run_dir.startswith('L0300N0564') and
+                os.path.isdir(run_path) and
+                os.path.isdir(os.path.join(run_path, 'snapshots')) and
+                os.path.isdir(os.path.join(run_path, 'stf'))
+        ):
             name_list.append(run_dir)
 
             snap_files = os.listdir(os.path.join(run_path, 'snapshots'))
@@ -395,6 +400,17 @@ for repo in cosma_repositories:
                     f"{os.path.splitext(snap_z0)[0]}.properties"
                 )
             )
+        elif (
+                run_dir.startswith('L0300N0564') and
+                os.path.isdir(run_path) and
+                (~os.path.isdir(os.path.join(run_path, 'snapshots')) or
+                os.path.isdir(~os.path.join(run_path, 'stf')))
+        ):
+            print((
+                f"The simulation {run_dir} was found with directory set-up, "
+                "but was missing the snapshots or stf sub-directory. It was "
+                "likely not launched and was not appended in the master register."
+            ))
 
 output_dir = ["/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"] * len(name_list)
 
