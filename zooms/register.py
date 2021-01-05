@@ -7,7 +7,6 @@ import os
 import h5py
 import zipfile
 from typing import List
-from swiftsimio import load
 from tqdm import tqdm
 import psutil
 

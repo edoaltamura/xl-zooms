@@ -213,7 +213,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 if __name__ == "__main__":
-    vr_num = 'L0300N0564_VR813_+1res_Isotropic'
+    vr_num = 'L0300N0564_VR18_-8res_Ref'
 
     zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
@@ -263,6 +263,7 @@ if __name__ == "__main__":
             alpha=1
         )
 
+    ax1.set_title(zoom.run_name)
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
     ax1.set_yscale('log')
