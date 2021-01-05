@@ -263,7 +263,7 @@ if __name__ == "__main__":
             alpha=1
         )
 
-    ax1.set_title(zoom.run_name)
+    ax1.set_title(zoom.run_name, pad=30)
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
     ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
     ax1.set_yscale('log')
