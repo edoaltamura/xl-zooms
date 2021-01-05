@@ -14,30 +14,6 @@ SILENT_PROGRESSBAR = False
 total_memory = psutil.virtual_memory().total
 
 
-class Zoom:
-
-    def __init__(
-            self,
-            run_name: str,
-            snapshot_file: str,
-            catalog_file: str,
-            output_directory: str
-    ) -> None:
-        self.run_name = run_name
-        self.snapshot_file = snapshot_file
-        self.catalog_file = catalog_file
-        self.output_directory = output_directory
-
-    def __str__(self):
-        return (
-            "Zoom object:\n"
-            f"\tName:                    {self.run_name}\n"
-            f"\tSnapshot file:           {self.snapshot_file}\n"
-            f"\tCatalog file:            {self.catalog_file}\n"
-            f"\tOutput directory:        {self.output_directory}\n"
-        )
-
-
 def get_vr_number_from_name(name: str) -> int:
     start = 'VR'
     end = '_'
@@ -121,6 +97,30 @@ def dump_memory_usage() -> None:
     ))
 
 
+class Zoom:
+
+    def __init__(
+            self,
+            run_name: str,
+            snapshot_file: str,
+            catalog_file: str,
+            output_directory: str
+    ) -> None:
+        self.run_name = run_name
+        self.snapshot_file = snapshot_file
+        self.catalog_file = catalog_file
+        self.output_directory = output_directory
+
+    def __str__(self):
+        return (
+            "Zoom object:\n"
+            f"\tName:                    {self.run_name}\n"
+            f"\tSnapshot file:           {self.snapshot_file}\n"
+            f"\tCatalog file:            {self.catalog_file}\n"
+            f"\tOutput directory:        {self.output_directory}\n"
+        )
+
+
 class ZoomList:
 
     def __init__(self, *args) -> None:
@@ -151,6 +151,7 @@ class ZoomList:
         for obj in self.obj_list:
             message += str(obj)
         return message
+
 
 cosma_repositories = [
     "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
