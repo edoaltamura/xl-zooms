@@ -173,7 +173,7 @@ for repo in cosma_repositories:
 
             snap_files = os.listdir(os.path.join(run_path, 'snapshots'))
             snap_files = [file_name for file_name in snap_files if file_name.endswith('.hdf5')]
-            snap_files.sort()
+            snap_files.sort(key=lambda x: x[-9:-5])
             snap_z0 = snap_files[-1]
             snap_z0_path = os.path.join(run_path, 'snapshots', snap_z0)
             assert os.path.isfile(snap_z0_path)
