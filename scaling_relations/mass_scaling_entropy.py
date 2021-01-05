@@ -94,11 +94,11 @@ def process_single_halo(
     kBT_sphere /= mass_sphere
     kBT_sphere = kBT_sphere.to('keV')
 
-    if entropy_scaling.lower() == 'k500':
+    mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_sphere.units)
+    kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+    kBT_500crit = kBT_500crit.to(kBT_sphere.units)
 
-        mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_sphere.units)
-        kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
-        kBT_500crit = kBT_500crit.to(kBT_sphere.units)
+    if entropy_scaling.lower() == 'k500':
         # Note: the ratio of densities is the same as ratio of electron number densities
         entropy = kBT_sphere / kBT_500crit * (mean_density_R500c / density_sphere) ** (2 / 3)
 
@@ -109,7 +109,7 @@ def process_single_halo(
         entropy = kBT_sphere / number_density_gas ** (2 / 3)
         entropy = entropy.to('keV*cm**2')
 
-    return M500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass), fhot500c, entropy
+    return M500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass), fhot500c, entropy, kBT_500crit
 
 
 def _process_single_halo(zoom: Zoom):
@@ -138,6 +138,7 @@ def m_500_entropy():
         'M_hot (< R_500crit) (M_Sun)',
         'f_hot (< R_500crit)',
         'entropy',
+        'kBT_500crit'
     ]
     results = pd.DataFrame(list(results), columns=columns)
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
@@ -168,7 +169,7 @@ def m_500_entropy():
             markersize *= 1.5
 
         ax.scatter(
-            results.loc[i, "M_500crit (M_Sun)"],
+            results.loc[i, "kBT_500crit"],
             results.loc[i, "entropy"],
             marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
@@ -186,7 +187,9 @@ def m_500_entropy():
     legend_sims = plt.legend(handles=handles, loc=2)
 
     ax.add_artist(legend_sims)
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_xlabel(r'$T_{500{\rm crit}}$ [${0}$]'.format(
+        results.loc[0, "kBT_500crit"].units.latex_repr
+    ))
     ax.set_ylabel(r'Entropy $\ (r<{0:.1g} R_{{500{{\rm crit}}}})$ [${1}$]'.format(
         entropy_radius_r500c,
         results.loc[0, "entropy"].units.latex_repr
