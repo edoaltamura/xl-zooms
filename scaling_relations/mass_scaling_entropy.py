@@ -71,8 +71,8 @@ def process_single_halo(
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
     posGas = data.gas.coordinates
-    massGas = data.gas.masses * data.gas.masses
-    mass_weighted_tempGas = data.gas.temperatures
+    massGas = data.gas.masses
+    mass_weighted_tempGas = data.gas.temperatures * data.gas.masses
 
     # Select hot gas within sphere
     deltaX = posGas[:, 0] - XPotMin
