@@ -80,9 +80,9 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
     bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
     # The central SMBH will probably be massive.
-    # Narrow down the search to the BH with top 10% in mass
-    bh_masses = data.black_holes.dynamical_masses.to_physical()
-    bh_top_massive_index = np.where(bh_masses > np.percentile(bh_masses.value, 90))[0]
+    # Narrow down the search to the BH with top 5% in mass
+    bh_masses = data.black_holes.subgrid_masses.to_physical()
+    bh_top_massive_index = np.where(bh_masses > np.percentile(bh_masses.value, 95))[0]
 
     # Get the central BH closest to centre of halo at z=0
     central_bh_index = np.argmin(bh_radial_distance[bh_top_massive_index])
@@ -134,7 +134,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
         bh_coordY = bh_positions[:, 1] - YPotMin
         bh_coordZ = bh_positions[:, 2] - ZPotMin
         bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
-        bh_masses = data.black_holes.dynamical_masses.to_physical()
+        bh_masses = data.black_holes.subgrid_masses.to_physical()
 
         if BH_LOCK_ID:
             central_bh_index = np.where(data.black_holes.particle_ids.v == central_bh_id_target.v)[0]
@@ -167,7 +167,7 @@ def feedback_stats_dT(path_to_snap: str, path_to_catalogue: str) -> dict:
             # which is not included in snipshot outputs.
             with h5py.File(snip_handle, 'r') as f:
                 bh_positions = f['/PartType5/Coordinates'][...]
-                bh_masses = f['/PartType5/DynamicalMasses'][...]
+                bh_masses = f['/PartType5/SubgridMasses'][...]
                 bh_ids = f['/PartType5/ParticleIDs'][...]
                 redshift = f['Header'].attrs['Redshift'][0]
                 time = f['Header'].attrs['Time'][0]
@@ -265,7 +265,7 @@ if __name__ == "__main__":
 
     ax1.set_title(zoom.run_name, pad=30)
     ax1.set_xlabel(r"Cosmic time [${}$]".format(central_bh['time'].units.latex_repr))
-    ax1.set_ylabel(r"BH dynamical mass [${}$]".format(central_bh['mass'].units.latex_repr))
+    ax1.set_ylabel(r"BH subgrid mass [${}$]".format(central_bh['mass'].units.latex_repr))
     ax1.set_yscale('log')
 
     from observational_data import Observations
