@@ -139,7 +139,7 @@ def m_500_entropy():
         'f_hot (< R_500crit)',
         'entropy',
     ]
-    results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
+    results = pd.DataFrame(list(results), columns=columns)
     results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
     print(results.head())
     dump_memory_usage()
