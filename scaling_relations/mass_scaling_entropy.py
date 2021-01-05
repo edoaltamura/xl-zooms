@@ -192,7 +192,7 @@ def m_500_entropy():
     legend_sims = plt.legend(handles=handles, loc=2)
 
     ax.add_artist(legend_sims)
-    ax.set_xlabel(r'$T_{500{\rm crit}}$ [${0}$]'.format(
+    ax.set_xlabel(r'$T_{{500{{\rm crit}}}}$ [${0}$]'.format(
         results.loc[0, "kBT_500crit"].units.latex_repr
     ))
     ax.set_ylabel(r'Entropy $\ (r={0:.1g}\ R_{{500{{\rm crit}}}})$ [${1}$]'.format(
