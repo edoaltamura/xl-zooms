@@ -222,7 +222,8 @@ if __name__ == "__main__":
         "\n"
         "The following simulations were found with directory set-up, "
         "but missing snapshots or stf sub-directories. They are "
-        "likely not launched and were not appended in the master register."
+        "likely not yet launched or incomplete and were not appended "
+        "to the master register."
     ))
     for i in incomplete_runs:
         print(f"[!] -> {i:s}")
