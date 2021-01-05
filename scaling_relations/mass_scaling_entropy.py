@@ -90,7 +90,6 @@ def process_single_halo(
     density_sphere = mass_sphere / volume_sphere
 
     kBT_sphere = np.sum(mass_weighted_tempGas[sphere_index])
-    print(kBT_sphere)
     kBT_sphere *= unyt.boltzmann_constant
     kBT_sphere /= mass_sphere
     kBT_sphere = kBT_sphere.to('keV')
@@ -118,7 +117,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_entropy():
-    vr_num = 'L0300N0564_VR813_+1res_Isotropic'
+    vr_num = 'Isotropic'
 
     _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     _name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
@@ -196,4 +195,4 @@ def m_500_entropy():
     plt.show()
     plt.close()
 
-print(_process_single_halo(zooms_register[0]))
+m_500_entropy()
