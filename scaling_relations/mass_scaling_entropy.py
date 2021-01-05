@@ -44,7 +44,7 @@ fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
-entropy_scaling = 'k500'
+entropy_scaling = 'physical'
 entropy_radius_r500c = 0.1
 
 
@@ -117,7 +117,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_entropy():
-    vr_num = 'Isotropic'
+    vr_num = 'VR'
 
     _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     _name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
@@ -187,7 +187,10 @@ def m_500_entropy():
 
     ax.add_artist(legend_sims)
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'Entropy $\ (r<{0:.1g} R_{{500{{\rm crit}}}})$'.format(entropy_radius_r500c))
+    ax.set_ylabel(r'Entropy $\ (r<{0:.1g} R_{{500{{\rm crit}}}})$ [${1}$]'.format(
+        entropy_radius_r500c,
+        results.loc[0, "entropy"].units.latex_repr
+    ))
     ax.set_xscale('log')
     ax.set_yscale('log')
 
