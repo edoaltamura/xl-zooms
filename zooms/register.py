@@ -189,9 +189,10 @@ for repo in cosma_repositories:
             )
         elif (
                 run_dir.startswith('L0300N0564') and
-                os.path.isdir(run_path) and
-                (~os.path.isdir(os.path.join(run_path, 'snapshots')) or
-                os.path.isdir(~os.path.join(run_path, 'stf')))
+                os.path.isdir(run_path) and (
+                        ~os.path.isdir(os.path.join(run_path, 'snapshots')) or
+                        ~os.path.isdir(os.path.join(run_path, 'stf'))
+                )
         ):
             print((
                 f"The simulation {run_dir} was found with directory set-up, "
