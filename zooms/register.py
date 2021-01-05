@@ -217,8 +217,8 @@ zooms_register = ZoomList(
 vr_numbers = get_vr_numbers_unique()
 
 if __name__ == "__main__":
-
     print((
+        "\n"
         "The following simulations were found with directory set-up, "
         "but missing snapshots or stf sub-directories. They are "
         "likely not launched and were not appended in the master register."
@@ -226,7 +226,7 @@ if __name__ == "__main__":
     for i in incomplete_runs:
         print(f"[!] -> {i:s}")
 
-    print(f"{' Zoom register ':-^40s}")
+    print(f"\n{' Zoom register ':-^40s}")
     for i in zooms_register:
         print(
             os.path.dirname(
