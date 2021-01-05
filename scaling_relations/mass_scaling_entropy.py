@@ -125,7 +125,7 @@ def m_500_entropy():
     vr_num = '-8res'
 
     _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
-    _name_list = [zoom_name for zoom_name in name_list if f"{vr_num}" in zoom_name]
+    _name_list = [zoom.run_name for zoom in _zooms_register]
 
     if len(zooms_register) == 1:
         print("Analysing one object only. Not using multiprocessing features.")
@@ -146,7 +146,7 @@ def m_500_entropy():
         'kBT_500crit'
     ]
     results = pd.DataFrame(list(results), columns=columns)
-    results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+    results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
     print(results.head())
     dump_memory_usage()
 
@@ -174,7 +174,7 @@ def m_500_entropy():
             markersize *= 1.5
 
         ax.scatter(
-            results.loc[i, "kBT_500crit"],
+            results.loc[i, "M_500crit (M_Sun)"],
             results.loc[i, "entropy"],
             marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
@@ -192,8 +192,8 @@ def m_500_entropy():
     legend_sims = plt.legend(handles=handles, loc=2)
 
     ax.add_artist(legend_sims)
-    ax.set_xlabel(r'$T_{{500{{\rm crit}}}}$ [${0}$]'.format(
-        results.loc[0, "kBT_500crit"].units.latex_repr
+    ax.set_xlabel(r'$M_{{500{{\rm crit}}}}$ [${0}$]'.format(
+        results.loc[0, "M_500crit (M_Sun)"].units.latex_repr
     ))
     ax.set_ylabel(r'Entropy $\ (r={0:.1g}\ R_{{500{{\rm crit}}}})$ [${1}$]'.format(
         entropy_radius_r500c,
