@@ -224,8 +224,12 @@ if __name__ == "__main__":
         "likely not launched and were not appended in the master register."
     ))
     for i in incomplete_runs:
-        print(f"-> {i:s}")
+        print(f"[!] -> {i:s}")
 
     print(f"{' Zoom register ':-^40s}")
     for i in zooms_register:
-        print(i.run_name)
+        print(
+            os.path.dirname(
+                os.path.dirname(i.snapshot_file)
+            )
+        )
