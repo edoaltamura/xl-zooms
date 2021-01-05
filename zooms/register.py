@@ -137,7 +137,10 @@ class ZoomList:
         obj_list = []
         for zoom_data in zip(*args):
             obj_list.append(Zoom(*zoom_data))
+
+        # Sort zooms by VR number
         obj_list.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
+
         self.obj_list = obj_list
 
     def get_list(self) -> List[Zoom]:
@@ -158,6 +161,7 @@ cosma_repositories = [
 name_list = []
 snapshot_filenames = []
 catalogue_filenames = []
+incomplete_runs = []
 
 for repo in cosma_repositories:
     for run_dir in os.listdir(repo):
@@ -173,7 +177,10 @@ for repo in cosma_repositories:
 
             snap_files = os.listdir(os.path.join(run_path, 'snapshots'))
             snap_files = [file_name for file_name in snap_files if file_name.endswith('.hdf5')]
+
+            # Sort filenames by snapshot file
             snap_files.sort(key=lambda x: int(x[-9:-5]))
+
             snap_z0 = snap_files[-1]
             snap_z0_path = os.path.join(run_path, 'snapshots', snap_z0)
             assert os.path.isfile(snap_z0_path)
@@ -194,11 +201,7 @@ for repo in cosma_repositories:
                         ~os.path.isdir(os.path.join(run_path, 'stf'))
                 )
         ):
-            print((
-                f"The simulation {run_dir} was found with directory set-up, "
-                "but was missing the snapshots or stf sub-directory. It was "
-                "likely not launched and was not appended in the master register."
-            ))
+            incomplete_runs.append(run_path)
 
 output_dir = ["/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"] * len(name_list)
 
@@ -214,5 +217,14 @@ zooms_register = ZoomList(
 vr_numbers = get_vr_numbers_unique()
 
 if __name__ == "__main__":
+
+    print((
+        "The following simulations were found with directory set-up, "
+        "but missing snapshots or stf sub-directories. They are "
+        "likely not launched and were not appended in the master register."
+    ))
+    for i in incomplete_runs:
+        print(i)
+
     for i in zooms_register:
         print(i)
