@@ -137,7 +137,7 @@ class ZoomList:
         obj_list = []
         for zoom_data in zip(*args):
             obj_list.append(Zoom(*zoom_data))
-
+        obj_list.sort(key=lambda x: x.run_name.split('_')[1])
         self.obj_list = obj_list
 
     def get_list(self) -> List[Zoom]:
