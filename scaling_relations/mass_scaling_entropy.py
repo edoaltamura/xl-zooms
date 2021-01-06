@@ -45,7 +45,8 @@ mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
 entropy_scaling = 'physical'
-entropy_radius_r500c = 0.1
+entropy_shell_radius = (0.1, 'R500')
+entropy_shell_thickness = unyt.unyt_quantity(10, 'kpc')
 
 
 def process_single_halo(
@@ -58,7 +59,9 @@ def process_single_halo(
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+        R2500c = unyt.unyt_quantity(h5file['/SO_R_2500_rhocrit'][0], unyt.Mpc)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc)
 
     # print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
 
@@ -84,34 +87,43 @@ def process_single_halo(
     fhot500c = Mhot500c / M500c
 
     # Calculate entropy
-    entropy_radius = entropy_radius_r500c * R500c
-    shell_thickness = unyt.unyt_quantity(10, 'kpc')
-    sphere_index = np.where(
-        (deltaR > entropy_radius - shell_thickness / 2) &
-        (deltaR < entropy_radius + shell_thickness / 2)
+    factor, scale_radius = entropy_shell_radius
+    if 'r500' in scale_radius.lower():
+        entropy_radius = factor * R500c
+    elif 'r200' in scale_radius.lower():
+        entropy_radius = factor * R200c
+    elif 'r2500' in scale_radius.lower():
+        entropy_radius = factor * R2500c
+
+    shell_index = np.where(
+        (deltaR > entropy_radius - entropy_shell_thickness / 2) &
+        (deltaR < entropy_radius + entropy_shell_thickness / 2)
     )[0]
-    mass_sphere = np.sum(massGas[sphere_index])
-    volume_sphere = (4. * np.pi / 3.) * (entropy_radius_r500c * R500c) ** 3
-    density_sphere = mass_sphere / volume_sphere
+    mass_shell = np.sum(massGas[shell_index])
+    volume_shell = (4. * np.pi / 3.) * (
+            (entropy_radius + entropy_shell_thickness / 2) ** 3 -
+            (entropy_radius - entropy_shell_thickness / 2) ** 3
+    )
+    density_shell = mass_shell / volume_shell
 
-    kBT_sphere = np.sum(mass_weighted_tempGas[sphere_index])
-    kBT_sphere *= unyt.boltzmann_constant
-    kBT_sphere /= mass_sphere
-    kBT_sphere = kBT_sphere.to('keV')
+    kBT_shell = np.sum(mass_weighted_tempGas[shell_index])
+    kBT_shell /= mass_shell
+    kBT_shell *= unyt.boltzmann_constant
+    kBT_shell = kBT_shell.to('keV')
 
-    mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_sphere.units)
+    mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_shell.units)
     kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
-    kBT_500crit = kBT_500crit.to(kBT_sphere.units)
+    kBT_500crit = kBT_500crit.to(kBT_shell.units)
 
     if entropy_scaling.lower() == 'k500':
         # Note: the ratio of densities is the same as ratio of electron number densities
-        entropy = kBT_sphere / kBT_500crit * (mean_density_R500c / density_sphere) ** (2 / 3)
+        entropy = kBT_shell / kBT_500crit * (mean_density_R500c / density_shell) ** (2 / 3)
 
     elif entropy_scaling.lower() == 'physical':
 
-        number_density_gas = density_sphere / (mean_molecular_weight * unyt.mass_proton)
+        number_density_gas = density_shell / (mean_molecular_weight * unyt.mass_proton)
         number_density_gas = number_density_gas.to('1/cm**3')
-        entropy = kBT_sphere / number_density_gas ** (2 / 3)
+        entropy = kBT_shell / number_density_gas ** (2 / 3)
         entropy = entropy.to('keV*cm**2')
 
     return M500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass), fhot500c, entropy, kBT_500crit
@@ -195,8 +207,9 @@ def m_500_entropy():
     ax.set_xlabel(r'$M_{{500{{\rm crit}}}}$ [${0}$]'.format(
         results.loc[0, "M_500crit (M_Sun)"].units.latex_repr
     ))
-    ax.set_ylabel(r'Entropy $\ (r={0:.1g}\ R_{{500{{\rm crit}}}})$ [${1}$]'.format(
-        entropy_radius_r500c,
+    ax.set_ylabel(r'Entropy $\ (r={0:.1g}\ R_{{{1:d}{{\rm crit}}}})$ [${2:s}$]'.format(
+        entropy_shell_radius[0],
+        int(''.join([i for i in entropy_shell_radius[1] if i.isdigit()])),
         results.loc[0, "entropy"].units.latex_repr
     ))
     ax.set_xscale('log')
@@ -205,5 +218,6 @@ def m_500_entropy():
     fig.savefig(f'{zooms_register[0].output_directory}/m500_k500.png', dpi=300)
     plt.show()
     plt.close()
+
 
 m_500_entropy()
