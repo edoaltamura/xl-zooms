@@ -10,7 +10,10 @@ from typing import List
 from tqdm import tqdm
 import psutil
 
+Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
+output_dir = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 SILENT_PROGRESSBAR = False
+
 total_memory = psutil.virtual_memory().total
 
 
@@ -168,11 +171,26 @@ for repo in cosma_repositories:
     for run_dir in os.listdir(repo):
         run_path = os.path.join(repo, run_dir)
 
+        if os.path.isdir(os.path.join(run_path, 'snapshots')):
+            number_snapshots = len(
+                [file for file in os.path.join(run_path, 'snapshots') if file.endswith('.hdf5')]
+            )
+        else:
+            number_snapshots = 0
+
+        if os.path.isdir(os.path.join(run_path, 'stf')):
+            number_catalogues = len(
+                [subdir for subdir in os.path.join(run_path, 'stf') if os.path.isdir(os.path.join(run_path, 'stf', subdir))]
+            )
+        else:
+            number_catalogues = 0
+
         if (
                 run_dir.startswith('L0300N0564') and
                 os.path.isdir(run_path) and
-                os.path.isdir(os.path.join(run_path, 'snapshots')) and
-                os.path.isdir(os.path.join(run_path, 'stf'))
+                number_snapshots > 0 and
+                number_catalogues > 0 and
+                number_snapshots == number_catalogues
         ):
             name_list.append(run_dir)
 
@@ -204,15 +222,13 @@ for repo in cosma_repositories:
         ):
             incomplete_runs.append(run_path)
 
-output_dir = ["/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"] * len(name_list)
 
-Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
 
 zooms_register = ZoomList(
     name_list,
     snapshot_filenames,
     catalogue_filenames,
-    output_dir,
+    [output_dir] * len(name_list),
 ).obj_list
 
 vr_numbers = get_vr_numbers_unique()
