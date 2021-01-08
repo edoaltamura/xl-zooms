@@ -217,7 +217,10 @@ for repo in cosma_repositories:
                 run_dir.startswith('L0300N0564') and
                 os.path.isdir(run_path) and (
                         ~os.path.isdir(os.path.join(run_path, 'snapshots')) or
-                        ~os.path.isdir(os.path.join(run_path, 'stf'))
+                        ~os.path.isdir(os.path.join(run_path, 'stf')) or
+                        number_snapshots == 0 or
+                        number_catalogues == 0 or
+                        number_snapshots != number_catalogues
                 )
         ):
             incomplete_runs.append(run_path)
