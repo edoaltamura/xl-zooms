@@ -174,11 +174,11 @@ def m_500_entropy():
             marker = '^'
 
         color = ''
-        if 'Ref' in results.loc[i, "Run name"]:
+        if 'dT9_' in results.loc[i, "Run name"]:
             color = 'black'
-        elif 'MinimumDistance' in results.loc[i, "Run name"]:
+        elif 'dT8_' in results.loc[i, "Run name"]:
             color = 'orange'
-        elif 'Isotropic' in results.loc[i, "Run name"]:
+        elif 'dT9.5_' in results.loc[i, "Run name"]:
             color = 'lime'
 
         markersize = 14
