@@ -159,7 +159,7 @@ class ZoomList:
 cosma_repositories = [
     "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
     "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
-    # "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
+    "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
 ]
 
 name_list = []
