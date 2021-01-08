@@ -104,7 +104,7 @@ def m_500_hotgas():
 
         color = ''
         if 'Ref' in results.loc[i, "Run name"]:
-            color = 'black'
+            color = '#660099'
         elif 'MinimumDistance' in results.loc[i, "Run name"]:
             color = 'orange'
         elif 'Isotropic' in results.loc[i, "Run name"]:
@@ -127,9 +127,9 @@ def m_500_hotgas():
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
     ax.scatter(Sun09.M500, Sun09.Mgas500, marker='d', s=8, alpha=1,
-               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
+               color=(0.95, 0.95, 0.95), edgecolors='none', zorder=0)
     ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=1,
-               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
+               color=(0.95, 0.95, 0.95), edgecolors='none', zorder=0)
 
     # Build legends
     handles = [
@@ -143,9 +143,9 @@ def m_500_hotgas():
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
-        Line2D([], [], color=(0.85, 0.85, 0.85), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.95, 0.95, 0.95), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.paper_name),
-        Line2D([], [], color=(0.85, 0.85, 0.85), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.95, 0.95, 0.95), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lovisari15.paper_name),
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
     ]
@@ -196,7 +196,7 @@ def f_500_hotgas():
 
         color = ''
         if 'Ref' in results.loc[i, "Run name"]:
-            color = 'black'
+            color = '#660099'
         elif 'MinimumDistance' in results.loc[i, "Run name"]:
             color = 'orange'
         elif 'Isotropic' in results.loc[i, "Run name"]:
@@ -216,9 +216,9 @@ def f_500_hotgas():
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
     ax.scatter(Sun09.M500, Sun09.Mgas500 / Sun09.M500, marker='d', s=8, alpha=1,
-               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
+               color=(0.95, 0.95, 0.95), edgecolors='none', zorder=0)
     ax.scatter(Lovisari15.M500, Lovisari15.Mgas500 / Lovisari15.M500, marker='s', s=8, alpha=1,
-               color=(0.85, 0.85, 0.85), edgecolors='none', zorder=0)
+               color=(0.95, 0.95, 0.95), edgecolors='none', zorder=0)
 
     # Build legends
     handles = [
@@ -232,15 +232,15 @@ def f_500_hotgas():
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
-        Line2D([], [], color=(0.85, 0.85, 0.85), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.95, 0.95, 0.95), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.paper_name),
-        Line2D([], [], color=(0.85, 0.85, 0.85), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.95, 0.95, 0.95), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lovisari15.paper_name),
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
     ]
     del Sun09, Lovisari15
     legend_obs = plt.legend(handles=handles, loc=4)
-    ax.add_artist(legend_sims)
+    # ax.add_artist(legend_sims)
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
