@@ -178,7 +178,7 @@ def m_500_entropy():
             color = 'black'
         elif 'dT8_' in results.loc[i, "Run name"]:
             color = 'orange'
-        elif 'dT9.5_' in results.loc[i, "Run name"]:
+        elif 'dT7.5_' in results.loc[i, "Run name"]:
             color = 'lime'
 
         markersize = 14
