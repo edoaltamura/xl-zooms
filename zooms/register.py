@@ -170,18 +170,16 @@ incomplete_runs = []
 for repo in cosma_repositories:
     for run_dir in os.listdir(repo):
         run_path = os.path.join(repo, run_dir)
+        snaps_path = os.path.join(run_path, 'snapshots')
+        catalogues_path = os.path.join(run_path, 'stf')
 
-        if os.path.isdir(os.path.join(run_path, 'snapshots')):
-            number_snapshots = len(
-                [file for file in os.path.join(run_path, 'snapshots') if file.endswith('.hdf5')]
-            )
+        if os.path.isdir(snaps_path):
+            number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
         else:
             number_snapshots = 0
 
-        if os.path.isdir(os.path.join(run_path, 'stf')):
-            number_catalogues = len(
-                [subdir for subdir in os.path.join(run_path, 'stf') if os.path.isdir(os.path.join(run_path, 'stf', subdir))]
-            )
+        if os.path.isdir(catalogues_path):
+            number_catalogues = len([subdir for subdir in os.listdir(catalogues_path)])
         else:
             number_catalogues = 0
 
