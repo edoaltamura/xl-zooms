@@ -118,8 +118,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         for j in range(len(plot_database)):
             convergence_index = np.where(plot_database['bin_centre'][j] > max_convergence_radius)[0]
             radial_profiles.append(plot_database[FIELD_NAME][j][convergence_index])
+
         radial_profiles = np.asarray(radial_profiles)
-        bin_centres = plot_database['bin_centre'][0][convergence_index]
+        print(radial_profiles.shape, radial_profiles)
+        bin_centres = plot_database.loc[0, 'bin_centre'][convergence_index]
         median_profile = np.median(radial_profiles, axis=0)
 
         ax.plot(
