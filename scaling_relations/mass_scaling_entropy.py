@@ -220,4 +220,6 @@ def m_500_entropy():
     plt.close()
 
 
-m_500_entropy()
+if __name__ == "__main__":
+
+    m_500_entropy()
