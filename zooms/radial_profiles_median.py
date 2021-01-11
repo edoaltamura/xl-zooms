@@ -62,6 +62,7 @@ def process_catalogue() -> pd.DataFrame:
         _zooms_register = [zoom for zoom in zooms_register if find_keyword in zoom.run_name]
 
     _name_list = [zoom.run_name for zoom in _zooms_register]
+    for i in _name_list: print(i)
 
     if len(_zooms_register) == 1:
         print("Analysing one object only. Not using multiprocessing features.")
