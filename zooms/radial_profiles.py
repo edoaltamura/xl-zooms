@@ -325,13 +325,6 @@ if __name__ == "__main__":
             # label=results.loc[i, "run_name"]
         )
 
-        # Plot section below the convergence radius
-        # ax.plot(
-        #     results['bin_centre'][i][~convergence_index],
-        #     results[field_name][i][~convergence_index],
-        #     linestyle=style, linewidth=0.3, color='black', alpha=0.1
-        # )
-
     # obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
     # obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
 
