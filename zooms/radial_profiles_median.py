@@ -52,9 +52,11 @@ def _process_single_halo(zoom: Zoom) -> tuple:
     return tuple(scaling_database + profiles_database)
 
 
-def process_catalogue(find_keyword: str) -> pd.DataFrame:
-
-    _zooms_register = [zoom for zoom in zooms_register if f"{find_keyword}" in zoom.run_name]
+def process_catalogue(find_keyword: str = '') -> pd.DataFrame:
+    if find_keyword == '':
+        _zooms_register = zooms_register
+    else:
+        _zooms_register = [zoom for zoom in zooms_register if find_keyword in zoom.run_name]
 
     _name_list = [zoom.run_name for zoom in _zooms_register]
 
@@ -99,7 +101,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
     name = "Set2"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
-    colors = cmap.colors  # type: list
+    colors = cmap.colors   # type: list
 
     fig, ax = plt.subplots()
     ax.set_prop_cycle(color=colors)
