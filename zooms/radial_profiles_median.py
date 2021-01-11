@@ -52,11 +52,9 @@ def _process_single_halo(zoom: Zoom) -> tuple:
     return tuple(scaling_database + profiles_database)
 
 
-def process_catalogue(find_keyword: str = None) -> pd.DataFrame:
-    if find_keyword is None:
-        _zooms_register = zooms_register
-    else:
-        _zooms_register = [zoom for zoom in zooms_register if f"{find_keyword}" in zoom.run_name]
+def process_catalogue(find_keyword: str) -> pd.DataFrame:
+
+    _zooms_register = [zoom for zoom in zooms_register if f"{find_keyword}" in zoom.run_name]
 
     _name_list = [zoom.run_name for zoom in _zooms_register]
 
