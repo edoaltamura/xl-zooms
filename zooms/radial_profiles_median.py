@@ -141,6 +141,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 
 if __name__ == "__main__":
-    results_database = process_catalogue(find_keyword='Ref')
+    results_database = process_catalogue(find_keyword='-8res_Ref')
     results_database, bin_edges = attach_mass_bin_index(results_database)
     plot_radial_profiles_median(results_database, bin_edges)
