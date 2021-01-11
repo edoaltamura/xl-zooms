@@ -52,7 +52,10 @@ def _process_single_halo(zoom: Zoom) -> tuple:
     return tuple(scaling_database + profiles_database)
 
 
-def process_catalogue(find_keyword: str) -> pd.DataFrame:
+def process_catalogue() -> pd.DataFrame:
+
+    find_keyword = '-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth'
+
     if find_keyword == '':
         _zooms_register = zooms_register
     else:
@@ -140,6 +143,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 
 if __name__ == "__main__":
-    results_database = process_catalogue(find_keyword='-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth')
+    results_database = process_catalogue()
     results_database, bin_edges = attach_mass_bin_index(results_database)
     plot_radial_profiles_median(results_database, bin_edges)
