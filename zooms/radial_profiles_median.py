@@ -56,10 +56,7 @@ def process_catalogue() -> pd.DataFrame:
 
     find_keyword = '-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth'
 
-    if find_keyword == '':
-        _zooms_register = zooms_register
-    else:
-        _zooms_register = [zoom for zoom in zooms_register if find_keyword in zoom.run_name]
+    _zooms_register = [zoom for zoom in zooms_register if find_keyword in zoom.run_name]
 
     _name_list = [zoom.run_name for zoom in _zooms_register]
     for i in _name_list: print(i)
