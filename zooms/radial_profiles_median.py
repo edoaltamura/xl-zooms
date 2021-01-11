@@ -52,7 +52,7 @@ def _process_single_halo(zoom: Zoom) -> tuple:
     return tuple(scaling_database + profiles_database)
 
 
-def process_catalogue(find_keyword: str = '') -> pd.DataFrame:
+def process_catalogue(find_keyword: str) -> pd.DataFrame:
     if find_keyword == '':
         _zooms_register = zooms_register
     else:
