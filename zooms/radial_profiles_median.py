@@ -93,9 +93,11 @@ def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tup
     m500crit_min = object_database['M_500crit'].min().value
     m500crit_max = object_database['M_500crit'].max().value
     bin_log_edges = np.logspace(m500crit_min, m500crit_max, n_bins)
-    groups = object_database.groupby(np.digitize(object_database['M_500crit'], bin_log_edges))
+    groups = object_database.groupby(
+        np.digitize(object_database['M_500crit'], bin_log_edges)
+    )
 
-    print("Bin edges", groups)
+    print("Bin edges", groups.groups)
     # bin_indices = np.digitize(m500crit, bin_log_edges)
     # print("Indices", bin_indices)
     # object_database.insert(1, 'M_500crit bin_indices', pd.Series(bin_indices, dtype=int))
