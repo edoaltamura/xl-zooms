@@ -90,8 +90,8 @@ def process_catalogue(find_keyword: str = '') -> pd.DataFrame:
 
 
 def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tuple[pd.DataFrame, np.ndarray]:
-    m500crit = object_database['M_500crit'].to_numpy(dtype="float64")
-    bin_log_edges = np.logspace(np.min(m500crit), np.max(m500crit), n_bins)
+    m500crit = object_database['M_500crit']
+    bin_log_edges = np.logspace(m500crit.min(), m500crit.max(), n_bins)
     print("Bin edges", bin_log_edges)
     bin_indices = np.digitize(m500crit, bin_log_edges)
     print("Indices", bin_indices)
