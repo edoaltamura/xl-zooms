@@ -123,7 +123,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
         radial_profiles = np.asarray(radial_profiles)
         print(radial_profiles.shape, radial_profiles)
-        bin_centres = plot_database.loc[0, 'bin_centre'][convergence_index]
+        bin_centres = plot_database.iloc[0]['bin_centre'][convergence_index]
         median_profile = np.median(radial_profiles, axis=0)
 
         ax.plot(
