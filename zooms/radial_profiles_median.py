@@ -52,7 +52,7 @@ def _process_single_halo(zoom: Zoom) -> tuple:
     return tuple(scaling_database + profiles_database)
 
 
-def process_catalogue(find_keyword: str = '') -> pd.DataFrame:
+def process_catalogue(find_keyword: str = '', savefile: bool = False) -> pd.DataFrame:
     if find_keyword == '':
         _zooms_register = zooms_register
     else:
@@ -86,7 +86,28 @@ def process_catalogue(find_keyword: str = '') -> pd.DataFrame:
     results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
     print(results.head())
     dump_memory_usage()
+
+    if savefile:
+        file_name = f'{zooms_register[0].output_directory}/median_radial_profiles_catalogue.pkl'
+        results.to_pickle(file_name)
+        print(f"Catalogue file saved to {file_name}")
+
     return results
+
+
+def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame:
+
+    if filename is None:
+        file_path = f'{zooms_register[0].output_directory}/median_radial_profiles_catalogue.pkl'
+    else:
+        file_path = filename
+
+    catalogue = pd.read_pickle(file_path)
+
+    if find_keyword != '':
+        return catalogue[catalogue['Run name'].str.contains(find_keyword)]
+
+    return catalogue
 
 
 def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tuple[pd.DataFrame, np.ndarray]:
@@ -150,6 +171,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 
 if __name__ == "__main__":
-    results_database = process_catalogue(find_keyword='-8res_Ref')
+
+    keyword = '-8res_Ref'
+
+    try:
+        results_database = load_catalogue(find_keyword=keyword)
+    except FileNotFoundError or FileExistsError as err:
+        print(err, "\n Analysing catalogues from data...")
+        results_database = process_catalogue(find_keyword=keyword)
+
     results_database, bin_edges = attach_mass_bin_index(results_database)
     plot_radial_profiles_median(results_database, bin_edges)
