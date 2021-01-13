@@ -95,7 +95,6 @@ def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tup
     bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max(), n_bins)
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
     print(m500crit_log10, bin_indices, bin_log_edges)
-    print("Indices", bin_indices)
     object_database.insert(1, 'M_500crit bin_indices', pd.Series(bin_indices, dtype=int))
     return object_database, bin_log_edges
 
@@ -112,7 +111,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
     print(object_database.head())
     # Display zoom data
     for i, bin_edge in enumerate(bin_edges[:-1]):
-        bin_select = object_database['M_500crit bin_indices'] == i
+        bin_select = object_database['M_500crit bin_indices'] == i + 1
         plot_database = object_database[bin_select]
         max_convergence_radius = plot_database['convergence_radius'].max()
 
