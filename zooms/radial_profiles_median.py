@@ -150,12 +150,12 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
         ax.fill_between(
             bin_centres, y1=percent16_profile, y2=percent84_profile,
-            linewidth=0, alpha=1, color=colors[i],
+            linewidth=0, alpha=0.5, color=colors[i],
         )
         ax.plot(
             bin_centres, median_profile,
-            linestyle='-', linewidth=0.5, alpha=1, color=colors[i],
-            label=f"{bin_edges[i]}$<M_{{500, crit}}<${bin_edges[i + 1]}"
+            linestyle='-', linewidth=1, alpha=1, color=colors[i],
+            label=f"$10^{{{bin_edges[i]:0.1g}}}<M_{{500, crit}}<10^{{{bin_edges[i + 1]:0.1g}}}$"
         )
 
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
@@ -177,8 +177,8 @@ if __name__ == "__main__":
     try:
         results_database = load_catalogue(find_keyword=keyword)
     except FileNotFoundError or FileExistsError as err:
-        print(err, "\n Analysing catalogues from data...")
-        results_database = process_catalogue(find_keyword=keyword)
+        print(err, "\nAnalysing catalogues from data...")
+        results_database = process_catalogue(find_keyword=keyword, savefile=True)
 
     results_database, bin_edges = attach_mass_bin_index(results_database)
     plot_radial_profiles_median(results_database, bin_edges)
