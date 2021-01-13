@@ -102,11 +102,12 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
     else:
         file_path = filename
 
+    print(f"Retrieving catalogue file {file_path}")
     catalogue = pd.read_pickle(file_path)
 
     if find_keyword != '':
         return catalogue[catalogue['Run name'].str.contains(find_keyword)]
-
+    print(f"Loaded {len(catalogue):d} objects.")
     return catalogue
 
 
