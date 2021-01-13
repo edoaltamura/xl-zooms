@@ -92,7 +92,7 @@ def process_catalogue(find_keyword: str = '') -> pd.DataFrame:
 def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tuple[pd.DataFrame, np.ndarray]:
 
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit']])
-    bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins)
+    bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
     print(m500crit_log10, bin_indices, bin_log_edges)
     object_database.insert(1, 'M_500crit bin_indices', pd.Series(bin_indices, dtype=int))
@@ -118,8 +118,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         # Plot only profiles outside the *largest* convergence radius
         radial_profiles = []
         for j in range(len(plot_database)):
-            convergence_index = np.where(plot_database.loc[j, 'bin_centre'] > max_convergence_radius)[0]
-            radial_profiles.append(plot_database.loc[j, FIELD_NAME][convergence_index])
+            convergence_index = np.where(plot_database.iloc[j]['bin_centre'] > max_convergence_radius)[0]
+            radial_profiles.append(plot_database.iloc[j][FIELD_NAME][convergence_index])
 
         radial_profiles = np.asarray(radial_profiles)
         print(radial_profiles.shape, radial_profiles)
