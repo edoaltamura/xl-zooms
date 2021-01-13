@@ -107,7 +107,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
 
     if find_keyword != '':
         match_filter = catalogue['Run name'].str.contains(r'{0}'.format(find_keyword), na=False)
-        return catalogue[match_filter]
+        catalogue = catalogue[match_filter]
 
     print(f"Loaded {len(catalogue):d} objects.")
     return catalogue
@@ -175,7 +175,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 if __name__ == "__main__":
 
-    keyword = 'fixedAGNdT9.5'
+    keyword = 'fixedAGNdT7.5'
 
     try:
         results_database = load_catalogue(find_keyword=keyword)
