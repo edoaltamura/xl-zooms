@@ -172,7 +172,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 if __name__ == "__main__":
 
-    keyword = ''
+    keyword = 'fixedAGNdT9.5'
 
     try:
         results_database = load_catalogue(find_keyword=keyword)
