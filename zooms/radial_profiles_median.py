@@ -150,7 +150,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         median_profile = 10 ** np.median(np.log10(radial_profiles), axis=0)
         percent16_profile = 10 ** np.percentile(np.log10(radial_profiles), 16, axis=0)
         percent84_profile = 10 ** np.percentile(np.log10(radial_profiles), 84, axis=0)
-
+        print(percent16_profile)
+        print(percent84_profile)
         ax.fill_between(
             bin_centres, y1=percent16_profile, y2=percent84_profile,
             linewidth=0, alpha=0.5, color=colors[i],
@@ -158,7 +159,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         ax.plot(
             bin_centres, median_profile,
             linestyle='-', linewidth=1, alpha=1, color=colors[i],
-            label=f"$10^{{{bin_edges[i]:.1f}}}<M_{{500, crit}}/M_{{/odot}}<10^{{{bin_edges[i + 1]:.1f}}}$"
+            label=f"$10^{{{bin_edges[i]:.1f}}}<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_edges[i + 1]:.1f}}}$"
         )
 
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
