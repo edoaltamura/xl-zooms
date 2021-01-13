@@ -127,9 +127,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         percent16_profile = np.percentile(radial_profiles, 16, axis=0)
         percent84_profile = np.percentile(radial_profiles, 84, axis=0)
 
-        ax.fillbetween(
-            bin_centres, percent16_profile, percent84_profile,
-            linestyle='-', linewidth=0.5, alpha=1, color=colors[i],
+        ax.fill_between(
+            bin_centres, y1=percent16_profile, y2=percent84_profile,
+            linewidth=0, alpha=1, color=colors[i],
         )
         ax.plot(
             bin_centres, median_profile,
