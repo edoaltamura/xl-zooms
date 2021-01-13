@@ -153,7 +153,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
         ax.fill_between(
             bin_centres, percent84_profile, percent16_profile,
-            linewidth=1, alpha=0.5, color=colors[i],
+            linewidth=0, alpha=0.5, color=colors[i],
         )
         ax.plot(
             bin_centres, median_profile,
@@ -175,7 +175,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 if __name__ == "__main__":
 
-    keyword = 'fixedAGNdT7.5'
+    keyword = 'fixedAGNdT9'
 
     try:
         results_database = load_catalogue(find_keyword=keyword)
