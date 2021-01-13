@@ -108,6 +108,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
     if find_keyword != '':
         match_filter = catalogue['Run name'].str.contains(r'{0}'.format(find_keyword), na=False)
         return catalogue[match_filter]
+
     print(f"Loaded {len(catalogue):d} objects.")
     return catalogue
 
@@ -161,7 +162,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         )
 
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
-    ax.set_ylabel(plot_database['ylabel'][0])
+    ax.set_ylabel(plot_database.iloc[0]['ylabel'])
 
     ax.set_xscale('log')
     ax.set_yscale('log')
