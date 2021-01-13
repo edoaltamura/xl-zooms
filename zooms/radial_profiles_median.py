@@ -144,9 +144,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
         radial_profiles = np.asarray(radial_profiles)
         bin_centres = plot_database.iloc[0]['bin_centre'][convergence_index]
-        median_profile = np.median(radial_profiles, axis=0)
-        percent16_profile = np.percentile(radial_profiles, 16, axis=0)
-        percent84_profile = np.percentile(radial_profiles, 84, axis=0)
+        median_profile = 10 ** np.median(np.log10(radial_profiles), axis=0)
+        percent16_profile = 10 ** np.percentile(np.log10(radial_profiles), 16, axis=0)
+        percent84_profile = 10 ** np.percentile(np.log10(radial_profiles), 84, axis=0)
 
         ax.fill_between(
             bin_centres, y1=percent16_profile, y2=percent84_profile,
@@ -155,7 +155,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         ax.plot(
             bin_centres, median_profile,
             linestyle='-', linewidth=1, alpha=1, color=colors[i],
-            label=f"$10^{{{bin_edges[i]:0.1g}}}<M_{{500, crit}}<10^{{{bin_edges[i + 1]:0.1g}}}$"
+            label=f"$10^{{{bin_edges[i]:.1f}}}<M_{{500, crit}}/M_{{/odot}}<10^{{{bin_edges[i + 1]:.1f}}}$"
         )
 
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
@@ -172,7 +172,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 if __name__ == "__main__":
 
-    keyword = '-8res_Ref'
+    keyword = ''
 
     try:
         results_database = load_catalogue(find_keyword=keyword)
