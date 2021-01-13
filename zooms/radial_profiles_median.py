@@ -94,8 +94,8 @@ def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tup
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit']])
     bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
-    print(m500crit_log10, bin_indices, bin_log_edges)
     object_database.insert(1, 'M_500crit bin_indices', pd.Series(bin_indices, dtype=int))
+
     return object_database, bin_log_edges
 
 
@@ -108,7 +108,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
     fig, ax = plt.subplots()
     ax.set_prop_cycle(color=colors)
-    print(object_database.head())
+
     # Display zoom data
     for i, bin_edge in enumerate(bin_edges[:-1]):
         bin_select = object_database['M_500crit bin_indices'] == i + 1
@@ -122,13 +122,18 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
             radial_profiles.append(plot_database.iloc[j][FIELD_NAME][convergence_index])
 
         radial_profiles = np.asarray(radial_profiles)
-        print(radial_profiles.shape, radial_profiles)
         bin_centres = plot_database.iloc[0]['bin_centre'][convergence_index]
         median_profile = np.median(radial_profiles, axis=0)
+        percent16_profile = np.percentile(radial_profiles, 16, axis=0)
+        percent84_profile = np.percentile(radial_profiles, 84, axis=0)
 
+        ax.fillbetween(
+            bin_centres, percent16_profile, percent84_profile,
+            linestyle='-', linewidth=0.5, alpha=1, color=colors[i],
+        )
         ax.plot(
             bin_centres, median_profile,
-            linestyle='-', linewidth=0.5, alpha=1,
+            linestyle='-', linewidth=0.5, alpha=1, color=colors[i],
             label=f"{bin_edges[i]}$<M_{{500, crit}}<${bin_edges[i + 1]}"
         )
 
@@ -139,6 +144,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
     ax.set_yscale('log')
 
     fig.savefig(f'{zooms_register[0].output_directory}/median_radial_profiles.png', dpi=300)
+    plt.legend()
     plt.show()
     plt.close()
 
