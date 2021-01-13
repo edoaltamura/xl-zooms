@@ -146,6 +146,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
             radial_profiles.append(plot_database.iloc[j][FIELD_NAME][convergence_index])
 
         radial_profiles = np.asarray(radial_profiles)
+        convergence_index = np.where(plot_database.iloc[0]['bin_centre'] > max_convergence_radius)[0]
         bin_centres = plot_database.iloc[0]['bin_centre'][convergence_index]
         median_profile = np.median(radial_profiles, axis=0)
         percent16_profile = np.percentile(radial_profiles, 16, axis=0)
