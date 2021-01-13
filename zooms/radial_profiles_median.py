@@ -106,7 +106,8 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
     catalogue = pd.read_pickle(file_path)
 
     if find_keyword != '':
-        return catalogue[catalogue['Run name'].str.contains(find_keyword)]
+        match_filter = catalogue['Run name'].str.contains(r'{0}'.format(find_keyword), na=False)
+        return catalogue[match_filter]
     print(f"Loaded {len(catalogue):d} objects.")
     return catalogue
 
