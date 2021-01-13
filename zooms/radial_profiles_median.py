@@ -147,9 +147,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
         radial_profiles = np.asarray(radial_profiles)
         bin_centres = plot_database.iloc[0]['bin_centre'][convergence_index]
-        median_profile = 10 ** np.median(np.log10(radial_profiles), axis=0)
-        percent16_profile = 10 ** np.percentile(np.log10(radial_profiles), 16, axis=0)
-        percent84_profile = 10 ** np.percentile(np.log10(radial_profiles), 84, axis=0)
+        median_profile = np.median(radial_profiles, axis=0)
+        percent16_profile = np.percentile(radial_profiles, 16, axis=0)
+        percent84_profile = np.percentile(radial_profiles, 84, axis=0)
 
         ax.fill_between(
             bin_centres, percent84_profile, percent16_profile,
