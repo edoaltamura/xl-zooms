@@ -76,24 +76,33 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_hotgas():
-    fig, ax = plt.subplots()
+    vr_num = 'fixedAGNdT'
 
-    # The results of the multiprocessing Pool are returned in the same order as inputs
-    with Pool() as pool:
-        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_register))
+    _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
+    _name_list = [zoom.run_name for zoom in _zooms_register]
 
-        # Recast output into a Pandas dataframe for further manipulation
-        columns = [
-            'M_500crit (M_Sun)',
-            'M_hot (< R_500crit) (M_Sun)',
-            'f_hot (< R_500crit)',
-        ]
-        results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
-        results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
-        print(results.head())
+    if len(zooms_register) == 1:
+        print("Analysing one object only. Not using multiprocessing features.")
+        results = [_process_single_halo(_zooms_register[0])]
+    else:
+        num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
+        # The results of the multiprocessing Pool are returned in the same order as inputs
+        print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
+        with Pool(num_threads) as pool:
+            results = pool.map(_process_single_halo, iter(_zooms_register))
+
+    # Recast output into a Pandas dataframe for further manipulation
+    columns = [
+        'M_500crit (M_Sun)',
+        'M_hot (< R_500crit) (M_Sun)',
+        'f_hot (< R_500crit)',
+    ]
+    results = pd.DataFrame(list(results), columns=columns, dtype=np.float64)
+    results.insert(0, 'Run name', pd.Series(name_list, dtype=str))
+    print(results.head())
 
     # Display zoom data
+    fig, ax = plt.subplots()
     for i in range(len(results)):
 
         marker = ''
@@ -194,12 +203,24 @@ def f_500_hotgas():
         elif '+1res' in results.loc[i, "Run name"]:
             marker = '^'
 
+        # color = ''
+        # if 'Ref' in results.loc[i, "Run name"]:
+        #     color = '#660099'
+        # elif 'MinimumDistance' in results.loc[i, "Run name"]:
+        #     color = 'orange'
+        # elif 'Isotropic' in results.loc[i, "Run name"]:
+        #     color = 'lime'
+
         color = ''
-        if 'Ref' in results.loc[i, "Run name"]:
-            color = '#660099'
-        elif 'MinimumDistance' in results.loc[i, "Run name"]:
+        if 'dT9.5_' in results.loc[i, "Run name"]:
+            color = 'blue'
+        elif 'dT9_' in results.loc[i, "Run name"]:
+            color = 'black'
+        elif 'dT8.5_' in results.loc[i, "Run name"]:
+            color = 'red'
+        elif 'dT8_' in results.loc[i, "Run name"]:
             color = 'orange'
-        elif 'Isotropic' in results.loc[i, "Run name"]:
+        elif 'dT7.5_' in results.loc[i, "Run name"]:
             color = 'lime'
 
         markersize = 14
@@ -256,4 +277,4 @@ def f_500_hotgas():
 
 
 m_500_hotgas()
-f_500_hotgas()
+# f_500_hotgas()
