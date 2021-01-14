@@ -138,7 +138,7 @@ def m_500_hotgas():
         ax.scatter(
             results.loc[i, "M_500crit (M_Sun)"],
             results.loc[i, "M_hot (< R_500crit) (M_Sun)"],
-            marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
+            marker=marker, c=color, alpha=0.7, s=markersize, edgecolors='none', zorder=5
         )
 
         if 'Ref' in results.loc[i, "Run name"]:
@@ -148,9 +148,9 @@ def m_500_hotgas():
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
     ax.scatter(Sun09.M500, Sun09.Mgas500, marker='d', s=8, alpha=1,
-               color=(0.95, 0.95, 0.95), edgecolors='none', zorder=0)
+               color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
     ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=1,
-               color=(0.95, 0.95, 0.95), edgecolors='none', zorder=0)
+               color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
 
     # Build legends
     handles = [
@@ -169,9 +169,9 @@ def m_500_hotgas():
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
-        Line2D([], [], color=(0.95, 0.95, 0.95), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.65, 0.65, 0.65), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.paper_name),
-        Line2D([], [], color=(0.95, 0.95, 0.95), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=(0.65, 0.65, 0.65), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lovisari15.paper_name),
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
     ]
