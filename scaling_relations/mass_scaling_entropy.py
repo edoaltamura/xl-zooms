@@ -134,7 +134,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_entropy():
-    vr_num = '-8res'
+    vr_num = 'fixedAGNdT'
 
     _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
     _name_list = [zoom.run_name for zoom in _zooms_register]
@@ -174,8 +174,12 @@ def m_500_entropy():
             marker = '^'
 
         color = ''
-        if 'dT9_' in results.loc[i, "Run name"]:
+        if 'dT9.5_' in results.loc[i, "Run name"]:
+            color = 'blue'
+        elif 'dT9_' in results.loc[i, "Run name"]:
             color = 'black'
+        elif 'dT8.5_' in results.loc[i, "Run name"]:
+            color = 'red'
         elif 'dT8_' in results.loc[i, "Run name"]:
             color = 'orange'
         elif 'dT7.5_' in results.loc[i, "Run name"]:
@@ -197,9 +201,11 @@ def m_500_entropy():
                linestyle='None', markersize=6, label='-8 Res'),
         Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
                linestyle='None', markersize=3, label='+1 Res'),
-        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
-        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
-        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
+        Patch(facecolor='blue', edgecolor='None', label='dT9.5'),
+        Patch(facecolor='black', edgecolor='None', label='dT9'),
+        Patch(facecolor='red', edgecolor='None', label='dT8.5'),
+        Patch(facecolor='orange', edgecolor='None', label='dT8'),
+        Patch(facecolor='lime', edgecolor='None', label='dT7.5'),
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
 
