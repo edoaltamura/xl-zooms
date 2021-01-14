@@ -111,13 +111,25 @@ def m_500_hotgas():
         elif '+1res' in results.loc[i, "Run name"]:
             marker = '^'
 
-        color = ''
-        if 'Ref' in results.loc[i, "Run name"]:
-            color = '#660099'
-        elif 'MinimumDistance' in results.loc[i, "Run name"]:
-            color = 'orange'
-        elif 'Isotropic' in results.loc[i, "Run name"]:
-            color = 'lime'
+            # color = ''
+            # if 'Ref' in results.loc[i, "Run name"]:
+            #     color = '#660099'
+            # elif 'MinimumDistance' in results.loc[i, "Run name"]:
+            #     color = 'orange'
+            # elif 'Isotropic' in results.loc[i, "Run name"]:
+            #     color = 'lime'
+
+            color = ''
+            if 'dT9.5_' in results.loc[i, "Run name"]:
+                color = 'blue'
+            elif 'dT9_' in results.loc[i, "Run name"]:
+                color = 'black'
+            elif 'dT8.5_' in results.loc[i, "Run name"]:
+                color = 'red'
+            elif 'dT8_' in results.loc[i, "Run name"]:
+                color = 'orange'
+            elif 'dT7.5_' in results.loc[i, "Run name"]:
+                color = 'lime'
 
         markersize = 14
         if marker == '.':
@@ -146,9 +158,14 @@ def m_500_hotgas():
                linestyle='None', markersize=6, label='-8 Res'),
         Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
                linestyle='None', markersize=3, label='+1 Res'),
-        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
-        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
-        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
+        # Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
+        # Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
+        # Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
+        Patch(facecolor='blue', edgecolor='None', label='dT9.5'),
+        Patch(facecolor='black', edgecolor='None', label='dT9'),
+        Patch(facecolor='red', edgecolor='None', label='dT8.5'),
+        Patch(facecolor='orange', edgecolor='None', label='dT8'),
+        Patch(facecolor='lime', edgecolor='None', label='dT7.5'),
     ]
     legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
