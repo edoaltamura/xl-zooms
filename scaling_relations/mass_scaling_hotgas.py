@@ -111,25 +111,25 @@ def m_500_hotgas():
         elif '+1res' in results.loc[i, "Run name"]:
             marker = '^'
 
-            # color = ''
-            # if 'Ref' in results.loc[i, "Run name"]:
-            #     color = '#660099'
-            # elif 'MinimumDistance' in results.loc[i, "Run name"]:
-            #     color = 'orange'
-            # elif 'Isotropic' in results.loc[i, "Run name"]:
-            #     color = 'lime'
+        # color = ''
+        # if 'Ref' in results.loc[i, "Run name"]:
+        #     color = '#660099'
+        # elif 'MinimumDistance' in results.loc[i, "Run name"]:
+        #     color = 'orange'
+        # elif 'Isotropic' in results.loc[i, "Run name"]:
+        #     color = 'lime'
 
-            color = ''
-            if 'dT9.5_' in results.loc[i, "Run name"]:
-                color = 'blue'
-            elif 'dT9_' in results.loc[i, "Run name"]:
-                color = 'black'
-            elif 'dT8.5_' in results.loc[i, "Run name"]:
-                color = 'red'
-            elif 'dT8_' in results.loc[i, "Run name"]:
-                color = 'orange'
-            elif 'dT7.5_' in results.loc[i, "Run name"]:
-                color = 'lime'
+        color = ''
+        if 'dT9.5_' in results.loc[i, "Run name"]:
+            color = 'blue'
+        elif 'dT9_' in results.loc[i, "Run name"]:
+            color = 'black'
+        elif 'dT8.5_' in results.loc[i, "Run name"]:
+            color = 'red'
+        elif 'dT8_' in results.loc[i, "Run name"]:
+            color = 'orange'
+        elif 'dT7.5_' in results.loc[i, "Run name"]:
+            color = 'lime'
 
         markersize = 14
         if marker == '.':
