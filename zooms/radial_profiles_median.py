@@ -167,7 +167,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
     ax.set_xscale('log')
     ax.set_yscale('log')
-
+    plt.title(keyword)
     fig.savefig(f'{zooms_register[0].output_directory}/median_radial_profiles.png', dpi=300)
     plt.legend()
     plt.show()
