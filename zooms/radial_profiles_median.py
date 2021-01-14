@@ -168,7 +168,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.title(keyword)
-    fig.savefig(f'{zooms_register[0].output_directory}/median_radial_profiles.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/median_radial_profiles_{keyword}.png', dpi=300)
     plt.legend()
     plt.show()
     plt.close()
@@ -176,13 +176,16 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
 if __name__ == "__main__":
 
-    keyword = 'fixedAGNdT9_'
+    dts = ['7.5', '8', '8.5', '9', '9.5']
 
-    try:
-        results_database = load_catalogue(find_keyword=keyword)
-    except FileNotFoundError or FileExistsError as err:
-        print(err, "\nAnalysing catalogues from data...")
-        results_database = process_catalogue(find_keyword=keyword, savefile=True)
+    for dt in dts:
+        keyword = f'fixedAGNdT{dt}_'
 
-    results_database, bin_edges = attach_mass_bin_index(results_database)
-    plot_radial_profiles_median(results_database, bin_edges)
+        try:
+            results_database = load_catalogue(find_keyword=keyword)
+        except FileNotFoundError or FileExistsError as err:
+            print(err, "\nAnalysing catalogues from data...")
+            results_database = process_catalogue(find_keyword=keyword, savefile=False)
+
+        results_database, bin_edges = attach_mass_bin_index(results_database)
+        plot_radial_profiles_median(results_database, bin_edges)
