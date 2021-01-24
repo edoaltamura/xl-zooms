@@ -76,7 +76,7 @@ def process_single_halo(
         # Get the central BH closest to centre of halo at z=0
         central_bh_index = np.argmin(bh_radial_distance[bh_top_massive_index])
         central_bh_dr = massive_bh_radial_distances[central_bh_index]
-        central_bh_mass = massive_bh_masses[central_bh_index]
+        central_bh_mass = massive_bh_masses[central_bh_index].to('Msun')
 
     return M500c, Mbh_aperture50kpc, Mbh_max, central_bh_mass, central_bh_dr, Mstar_bcg_50kpc
 
@@ -104,7 +104,7 @@ def plot_bhmass_halomass(results: pd.DataFrame):
             legend_handles.append(run_style['Legend handle'])
 
         ax.scatter(
-            results.loc[i, "M_500crit"],
+            results.loc[i, "Mstar_bcg_50kpc"],
             results.loc[i, "central_bh_mass"],
             marker=run_style['Marker style'],
             c=run_style['Color'],
@@ -137,7 +137,7 @@ def plot_bhmass_halomass(results: pd.DataFrame):
     # legend_obs = plt.legend(handles=handles, loc=4)
     # ax.add_artist(legend_obs)
 
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_xlabel(r'$M_{star, 50{\rm kpc}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$M_{\rm BH}\ [{\rm M}_{\odot}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
