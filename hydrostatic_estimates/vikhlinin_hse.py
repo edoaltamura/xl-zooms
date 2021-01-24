@@ -198,7 +198,7 @@ class HydrostaticEstimator:
 
     def density_fit(self, x, y):
 
-        p0 = [100.0, 0.1, 1.0, 1.0, 0.8 * self.R500, 1.0]
+        p0 = [100.0, 0.1, 1.0, 1.0, 0.8 * self.R500c, 1.0]
         coeff_rho = minimize(
             self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
@@ -206,7 +206,7 @@ class HydrostaticEstimator:
                 (0.0, 10.0),
                 (0.0, 10.0),
                 (0.0, np.inf),
-                (0.2 * self.R500, np.inf),
+                (0.2 * self.R500c, np.inf),
                 (0.0, 5.0)
             ],
             options={'maxiter': 200, 'ftol': 1e-10}
@@ -215,10 +215,10 @@ class HydrostaticEstimator:
 
     def temperature_fit(self, x, y):
 
-        kT500 = (unyt.G * self.M500 * mean_molecular_weight * unyt.mass_proton) / (2 * self.R500)
+        kT500 = (unyt.G * self.M500c * mean_molecular_weight * unyt.mass_proton) / (2 * self.R500c)
         kT500 = kT500.to('keV')
 
-        p0 = [kT500, self.R500, 0.1, 3.0, 1.0, 0.1, 1.0, kT500]
+        p0 = [kT500, self.R500c, 0.1, 3.0, 1.0, 0.1, 1.0, kT500]
         bnds = ([0.0, 0.0, -3.0, 1.0, 0.0, 0.0, 1.0e-10, 0.0],
                 [np.inf, np.inf, 3.0, 5.0, 10.0, np.inf, 3.0, np.inf])
 
