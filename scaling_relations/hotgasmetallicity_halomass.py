@@ -36,7 +36,7 @@ def process_single_halo(
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
         Thot500c = unyt.unyt_quantity(h5file['/SO_T_gas_highT_1.000000_times_500.000000_rhocrit'][0], unyt.K)
-        Zhot500c = unyt.unyt_quantity(h5file['/SO_Zmet_gas_highT_1.000000_times_500.000000_rhocrit'][0], unyt.K)
+        Zhot500c = unyt.unyt_quantity(h5file['/SO_Zmet_gas_highT_1.000000_times_500.000000_rhocrit'][0], unyt.solar_metallicity)
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
@@ -99,7 +99,7 @@ def m500_Fe500(results: pd.DataFrame):
             legend_handles.append(run_style['Legend handle'])
 
         ax.scatter(
-            results.loc[i, "M_500crit"],
+            results.loc[i, "Thot500c"],
             results.loc[i, "Zhot500c"],
             marker=run_style['Marker style'],
             c=run_style['Color'],
@@ -132,11 +132,11 @@ def m500_Fe500(results: pd.DataFrame):
     # legend_obs = plt.legend(handles=handles, loc=4)
     # ax.add_artist(legend_obs)
 
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_xlabel(r'$T_{500{\rm crit}}\ [{\rm keV}]$')
     ax.set_ylabel(r'${\rm Z}_{500{\rm crit}}\ [{\rm Z}_{\odot}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    fig.savefig(f'{zooms_register[0].output_directory}/m500_z500.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/t500_z500.png', dpi=300)
     plt.show()
     plt.close()
 
