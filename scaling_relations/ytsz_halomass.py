@@ -68,7 +68,7 @@ def process_single_halo(
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
 
     index = np.where(deltaR < 5 * R500c)[0]
-    compton_y = tsz_const * np.sum(mass_weighted_temperatures[index]) / (np.pi * 25 * R500c ** 2)
+    compton_y = tsz_const * np.sum(mass_weighted_temperatures[index])# / (np.pi * 25 * R500c ** 2)
 
     index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
     Thot500c_nocore = np.sum(mass_weighted_temperatures[index]) / np.sum(massGas[index])
