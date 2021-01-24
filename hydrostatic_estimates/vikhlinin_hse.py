@@ -198,15 +198,15 @@ class HydrostaticEstimator:
 
     def density_fit(self, x, y):
 
-        p0 = [100.0, 0.1, 1.0, 1.0, 0.8 * self.R500c, 1.0]
+        p0 = [100.0, 0.1, 1.0, 1.0, 0.8 * self.R500c.v, 1.0]
         coeff_rho = minimize(
-            self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
+            self.residuals_density.v, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
                 (1.0e2, 1.0e4),
                 (0.0, 10.0),
                 (0.0, 10.0),
                 (0.0, np.inf),
-                (0.2 * self.R500c, np.inf),
+                (0.2 * self.R500c.v, np.inf),
                 (0.0, 5.0)
             ],
             options={'maxiter': 200, 'ftol': 1e-10}
@@ -216,19 +216,19 @@ class HydrostaticEstimator:
     def temperature_fit(self, x, y):
 
         kT500 = (unyt.G * self.M500c * mean_molecular_weight * unyt.mass_proton) / (2 * self.R500c)
-        kT500 = kT500.to('keV')
+        kT500 = kT500.to('keV').v
 
-        p0 = [kT500, self.R500c, 0.1, 3.0, 1.0, 0.1, 1.0, kT500]
+        p0 = [kT500, self.R500c.v, 0.1, 3.0, 1.0, 0.1, 1.0, kT500]
         bnds = ([0.0, 0.0, -3.0, 1.0, 0.0, 0.0, 1.0e-10, 0.0],
                 [np.inf, np.inf, 3.0, 5.0, 10.0, np.inf, 3.0, np.inf])
 
-        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=2000)
+        cf1 = least_squares(self.residuals_temperature.v, p0, bounds=bnds, args=(y, x), max_nfev=2000)
         mod1 = self.temperature_profile_model(
             x, cf1.x[0], cf1.x[1], cf1.x[2], cf1.x[3], cf1.x[4], cf1.x[5], cf1.x[6], cf1.x[7]
         )
         xis1 = np.sum((mod1 - y) ** 2.0 / y) / len(y)
 
-        cf2 = minimize(self.residuals_temperature, p0, args=(y, x), method='Nelder-Mead',
+        cf2 = minimize(self.residuals_temperature.v, p0, args=(y, x), method='Nelder-Mead',
                        options={'maxiter': 2000, 'ftol': 1e-5})
         mod2 = self.temperature_profile_model(
             x, cf2.x[0], cf2.x[1], cf2.x[2], cf2.x[3], cf2.x[4], cf2.x[5], cf2.x[6], cf2.x[7]
@@ -250,8 +250,8 @@ class HydrostaticEstimator:
         and the total mass within the each radial bin, using the
         hydrostatic mass estimate (HSE).
         """
-        cfr = self.density_fit(self.radial_bin_centres, np.log10(self.density_profile))
-        cft = self.temperature_fit(self.radial_bin_centres, self.temperature_profile)
+        cfr = self.density_fit(self.radial_bin_centres.v, np.log10(self.density_profile.v))
+        cft = self.temperature_fit(self.radial_bin_centres.v, self.temperature_profile.v)
 
         temperatures_hse = self.temperature_profile_model(
             self.radial_bin_centres,
