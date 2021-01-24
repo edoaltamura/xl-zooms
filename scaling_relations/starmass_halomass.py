@@ -3,11 +3,9 @@ import sys
 import os
 import unyt
 from typing import Tuple
-from multiprocessing import Pool, cpu_count
 import h5py as h5
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
