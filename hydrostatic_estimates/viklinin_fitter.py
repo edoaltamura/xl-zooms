@@ -16,9 +16,9 @@ sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 from convergence_radius import convergence_radius
-import observational_data as obs
-import scaling_utils as utils
-import scaling_style as style
+# import observational_data as obs
+# import scaling_utils as utils
+# import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
