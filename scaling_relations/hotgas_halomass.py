@@ -192,7 +192,7 @@ def f_500_hotgas(results: pd.DataFrame):
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/m_500_hotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/f_500_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
