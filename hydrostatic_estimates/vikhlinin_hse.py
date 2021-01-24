@@ -273,5 +273,4 @@ class HydrostaticEstimator:
 
 if __name__ == "__main__":
     hse_test = HydrostaticEstimator(zooms_register[0])
-    print(hse_test.run_hse_fit())
     print(np.log10(hse_test.run_hse_fit()[-1]))
