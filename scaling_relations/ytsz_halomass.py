@@ -69,6 +69,7 @@ def process_single_halo(
 
     index = np.where(deltaR < 5 * R500c)[0]
     compton_y = tsz_const * np.sum(mass_weighted_temperatures[index])# / (np.pi * 25 * R500c ** 2)
+    compton_y = compton_y.to('Mpc**2')
 
     index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
     Thot500c_nocore = np.sum(mass_weighted_temperatures[index]) / np.sum(massGas[index])
@@ -87,7 +88,7 @@ def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
 
-def m_500_star(results: pd.DataFrame):
+def m_500_ysz(results: pd.DataFrame):
     fig, ax = plt.subplots()
     legend_handles = []
     for i in range(len(results)):
@@ -141,4 +142,4 @@ def m_500_star(results: pd.DataFrame):
 
 if __name__ == "__main__":
     results = utils.process_catalogue(_process_single_halo, find_keyword='Ref')
-    m_500_star(results)
+    m_500_ysz(results)
