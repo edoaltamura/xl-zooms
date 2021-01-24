@@ -8,6 +8,7 @@ import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy.optimize import minimize, least_squares, curve_fit
+from scipy.interpolate import interp1d
 
 
 # Make the register backend visible to the script
@@ -16,7 +17,7 @@ sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 from convergence_radius import convergence_radius
-# import observational_data as obs
+import observational_data as obs
 # import scaling_utils as utils
 # import scaling_style as style
 
@@ -25,7 +26,8 @@ try:
 except:
     pass
 
-
+cosmology = obs.Observations().cosmo_model
+fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 mean_molecular_weight = 0.5954
 
 
@@ -65,6 +67,7 @@ class HydrostaticEstimator:
         self.using_mcmc = using_mcmc
         self.excise_core = excise_core
         self.load_zoom_profiles()
+        self.interpolate_hse()
 
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
@@ -91,7 +94,7 @@ class HydrostaticEstimator:
         # Calculate the critical density for the density profile
         unitLength = data.metadata.units.length
         unitMass = data.metadata.units.mass
-        rho_crit = unyt.unyt_quantity(
+        self.rho_crit = unyt.unyt_quantity(
             data.metadata.cosmology_raw['Critical density [internal units]'],
             unitMass / unitLength ** 3
         )
@@ -117,7 +120,7 @@ class HydrostaticEstimator:
             gas_convergence_radius = convergence_radius(
                 deltaR[index],
                 gas_masses.to('Msun'),
-                rho_crit.to('Msun/Mpc**3')
+                self.rho_crit.to('Msun/Mpc**3')
             ) / self.R500c
             radius_bounds[0] = gas_convergence_radius.value
 
@@ -135,7 +138,7 @@ class HydrostaticEstimator:
 
         # Compute the radial gas density profile
         volume_shell = (4. * np.pi / 3.) * (self.R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
-        self.density_profile = mass_weights / volume_shell / rho_crit
+        self.density_profile = mass_weights / volume_shell / self.rho_crit
         assert self.density_profile.units == unyt.dimensionless
 
         # Compute the radial mass-weighted temperature profile
@@ -265,13 +268,44 @@ class HydrostaticEstimator:
             self.radial_bin_centres,
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
-        print(temperatures_hse)
-        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c) * temperatures_hse * (drho_hse + dT_hse)
+        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (drho_hse + dT_hse) * unyt.Solar_Mass
 
         return cfr, cft, masses_hse
+
+    def interpolate_hse(self):
+
+        _, _, masses_hse = self.run_hse_fit()
+        mass_interpolate = interp1d(self.radial_bin_centres, masses_hse, kind='linear')
+        densities_hse = (3 * masses_hse) / (4 * np.pi * self.radial_bin_centres ** 3) / self.rho_crit
+        density_interpolate = interp1d(densities_hse, self.radial_bin_centres, kind='linear')
+
+        self.R200hse = density_interpolate(200)
+        self.R500hse = density_interpolate(500)
+        self.R2500hse = density_interpolate(2500)
+
+        self.M200hse = mass_interpolate(self.R200hse)
+        self.M500hse = mass_interpolate(self.R500hse)
+        self.M2500hse = mass_interpolate(self.R2500hse)
+
+        self.P200hse = (200 * fbary * self.rho_crit * unyt.G * self.M200hse / self.R200hse / 2).to('keV/cm**3')
+        self.P500hse = (500 * fbary * self.rho_crit * unyt.G * self.M500hse / self.R500hse / 2).to('keV/cm**3')
+        self.P2500hse = (2500 * fbary * self.rho_crit * unyt.G * self.M2500hse / self.R2500hse / 2).to('keV/cm**3')
+
+        self.kBT200hse = (unyt.G * mean_molecular_weight * self.M200hse * unyt.mass_proton / self.R200hse / 2).to('keV')
+        self.kBT500hse = (unyt.G * mean_molecular_weight * self.M500hse * unyt.mass_proton / self.R500hse / 2).to('keV')
+        self.kBT2500hse = (unyt.G * mean_molecular_weight * self.M2500hse * unyt.mass_proton / self.R2500hse / 2).to('keV')
+
+        self.K200hse = (self.kBT200hse / (3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
+        self.K500hse = (self.kBT500hse / (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
+        self.K2500hse = (self.kBT2500hse / (3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
+
+
 
 
 if __name__ == "__main__":
     hse_test = HydrostaticEstimator(zooms_register[0])
-    print(np.log10(hse_test.run_hse_fit()[-1]))
-    print(hse_test.run_hse_fit()[-1])
+    print(hse_test.R500hse)
+    print(hse_test.M500hse)
+    print(hse_test.P500hse)
+    print(hse_test.kBT500hse)
+    print(hse_test.K500hse)
