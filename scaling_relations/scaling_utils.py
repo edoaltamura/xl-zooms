@@ -33,6 +33,7 @@ try:
 except:
     pass
 
+print(name_list)
 
 def set_output_names(dataset_names: List[str]):
     """
