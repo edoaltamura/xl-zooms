@@ -106,9 +106,9 @@ class HydrostaticEstimator:
         index = np.where(deltaR < 5 * self.R500c)[0]
         radial_distance_scaled = deltaR[index] / self.R500c
         assert radial_distance_scaled.units == unyt.dimensionless
-        gas_densities = data.gas.densities[index]
         gas_masses = data.gas.masses[index]
-        gas_mass_weighted_temperatures = gas_densities * gas_masses
+        gas_temperatures = data.gas.temperatures[index]
+        gas_mass_weighted_temperatures = gas_temperatures * gas_masses
 
         # Set bounds for the radial profiles
         radius_bounds = [0.15, 5]
