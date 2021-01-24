@@ -132,7 +132,7 @@ def m_500_ysz(results: pd.DataFrame):
     # ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$Y_{{\rm tSZ},5 \times 500{\rm crit}}$')
+    ax.set_ylabel(r'$Y_{{\rm tSZ},5 \times 500{\rm crit}}\ [{\rm Mpc}^2]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/m_500_ysz.png', dpi=300)
