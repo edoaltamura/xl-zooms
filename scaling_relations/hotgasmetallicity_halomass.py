@@ -8,8 +8,6 @@ import h5py as h5
 import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
 sys.path.append("../zooms")
@@ -18,7 +16,7 @@ sys.path.append("../observational_data")
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
 import scaling_utils as utils
-
+import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
