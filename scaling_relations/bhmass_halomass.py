@@ -138,7 +138,7 @@ def plot_bhmass_halomass(results: pd.DataFrame):
     # ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$M_{{\rm BH}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'$M_{\rm BH}\ [{\rm M}_{\odot}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/bhmass_halomass.png', dpi=300)
