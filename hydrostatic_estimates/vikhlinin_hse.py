@@ -257,11 +257,11 @@ class HydrostaticEstimator:
             self.radial_bin_centres,
             cft.x[0], cft.x[1], cft.x[2], cft.x[3], cft.x[4], cft.x[5], cft.x[6], cft.x[7]
         )
-        dT_hse = self.equation_of_state_dlogkT_dlogr(
+        dT_hse = self.equation_hse_dlogkT_dlogr(
             self.radial_bin_centres,
             cft.x[0], cft.x[1], cft.x[2], cft.x[3], cft.x[4], cft.x[5], cft.x[6], cft.x[7]
         )
-        drho_hse = self.equation_of_state_dlogrho_dlogr(
+        drho_hse = self.equation_hse_dlogrho_dlogr(
             self.radial_bin_centres,
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
@@ -274,3 +274,4 @@ class HydrostaticEstimator:
 if __name__ == "__main__":
     hse_test = HydrostaticEstimator(zooms_register[0])
     print(hse_test.run_hse_fit())
+    print(np.log10(hse_test.run_hse_fit()[-1]))
