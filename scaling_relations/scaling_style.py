@@ -32,6 +32,6 @@ style_subgrid_model = pd.DataFrame(
 
 
 def get_style_for_object(run_name: str):
-    for i in style_subgrid_model:
+    for i in len(style_subgrid_model):
         if run_name.endswith(style_subgrid_model.loc[i, 'Run name keyword']):
             return style_subgrid_model.loc[i]
