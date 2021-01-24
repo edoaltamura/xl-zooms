@@ -146,9 +146,6 @@ def m_500_hotgas(results: pd.DataFrame):
             marker=marker, c=color, alpha=0.7, s=markersize, edgecolors='none', zorder=5
         )
 
-        if 'Ref' in results.loc[i, "Run name"]:
-            print(results.loc[i, "M_500crit (M_Sun)"] / 1.e10, results.loc[i, "M_hot (< R_500crit) (M_Sun)"] / 1.e10)
-
     # Display observational data
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
