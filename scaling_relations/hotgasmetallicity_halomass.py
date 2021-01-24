@@ -100,7 +100,7 @@ def m500_Fe500(results: pd.DataFrame):
 
         ax.scatter(
             results.loc[i, "M_500crit"],
-            results.loc[i, "iron_fraction_500c"],
+            results.loc[i, "Zhot500c"],
             marker=run_style['Marker style'],
             c=run_style['Color'],
             s=run_style['Marker size'],
@@ -133,10 +133,10 @@ def m500_Fe500(results: pd.DataFrame):
     # ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'${\rm Fe}_{500{\rm crit}}\ [{\rm Z}_{\odot}]$')
+    ax.set_ylabel(r'${\rm Z}_{500{\rm crit}}\ [{\rm Z}_{\odot}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    fig.savefig(f'{zooms_register[0].output_directory}/m500_Fe500.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/m500_z500.png', dpi=300)
     plt.show()
     plt.close()
 
