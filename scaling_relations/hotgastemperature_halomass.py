@@ -64,6 +64,10 @@ def process_single_halo(
     index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
     Thot500c_nocore = np.sum(mass_weighted_temperatures[index]) / np.sum(massGas[index])
 
+    # Convert temperatures to keV
+    Thot500c = (Thot500c * unyt.boltzmann_constant).to('keV')
+    Thot500c_nocore = (Thot500c_nocore * unyt.boltzmann_constant).to('keV')
+
     return M500c, Thot500c, Thot500c_nocore
 
 
@@ -121,7 +125,7 @@ def m500_t500(results: pd.DataFrame):
     # ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$T_{500{\rm crit}}\ [{\rm K}]$')
+    ax.set_ylabel(r'$k_B T_{500{\rm crit}}\ [{\rm keV}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/m500_t500.png', dpi=300)
@@ -173,7 +177,7 @@ def m500_t500_nocore(results: pd.DataFrame):
     # ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$T_{500{\rm crit}, core-excised}\ [{\rm K}]$')
+    ax.set_ylabel(r'$k_B T_{500{\rm crit, core-excised}}\ [{\rm keV}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/m500_t500_nocore.png', dpi=300)
