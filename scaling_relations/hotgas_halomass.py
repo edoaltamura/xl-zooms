@@ -93,8 +93,8 @@ def m_500_hotgas(results: pd.DataFrame):
     for i in range(len(results)):
 
         run_style = style.get_style_for_object(results.loc[i, "Run name"])
-        legend_tuple = (run_style['Run name keyword'], run_style['Legend handle'])
-
+        if run_style['Legend handle'] not in legend_handles:
+            legend_handles.append(run_style['Legend handle'])
 
         ax.scatter(
             results.loc[i, "M_500crit"],
@@ -106,6 +106,9 @@ def m_500_hotgas(results: pd.DataFrame):
             edgecolors='none', zorder=5
         )
 
+    # Build legends
+    legend_sims = plt.legend(handles=legend_handles, loc=2)
+
     # Display observational data
     Sun09 = obs.Sun09()
     Lovisari15 = obs.Lovisari15()
@@ -114,22 +117,6 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Lovisari15.M500, Lovisari15.Mgas500, marker='s', s=8, alpha=1,
                color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
 
-    # Build legends
-    handles = [
-        Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
-               linestyle='None', markersize=6, label='-8 Res'),
-        Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
-               linestyle='None', markersize=3, label='+1 Res'),
-        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
-        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
-        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
-        # Patch(facecolor='blue', edgecolor='None', label='dT9.5'),
-        # Patch(facecolor='black', edgecolor='None', label='dT9'),
-        # Patch(facecolor='red', edgecolor='None', label='dT8.5'),
-        # Patch(facecolor='orange', edgecolor='None', label='dT8'),
-        # Patch(facecolor='lime', edgecolor='None', label='dT7.5'),
-    ]
-    legend_sims = plt.legend(handles=handles, loc=2)
     handles = [
         Line2D([], [], color=(0.65, 0.65, 0.65), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.paper_name),
