@@ -200,7 +200,7 @@ class HydrostaticEstimator:
 
         p0 = [100.0, 0.1, 1.0, 1.0, 0.8 * self.R500c.v, 1.0]
         coeff_rho = minimize(
-            self.residuals_density.v, p0, args=(y, x), method='L-BFGS-B',
+            self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
                 (1.0e2, 1.0e4),
                 (0.0, 10.0),
@@ -222,13 +222,13 @@ class HydrostaticEstimator:
         bnds = ([0.0, 0.0, -3.0, 1.0, 0.0, 0.0, 1.0e-10, 0.0],
                 [np.inf, np.inf, 3.0, 5.0, 10.0, np.inf, 3.0, np.inf])
 
-        cf1 = least_squares(self.residuals_temperature.v, p0, bounds=bnds, args=(y, x), max_nfev=2000)
+        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=2000)
         mod1 = self.temperature_profile_model(
             x, cf1.x[0], cf1.x[1], cf1.x[2], cf1.x[3], cf1.x[4], cf1.x[5], cf1.x[6], cf1.x[7]
         )
         xis1 = np.sum((mod1 - y) ** 2.0 / y) / len(y)
 
-        cf2 = minimize(self.residuals_temperature.v, p0, args=(y, x), method='Nelder-Mead',
+        cf2 = minimize(self.residuals_temperature, p0, args=(y, x), method='Nelder-Mead',
                        options={'maxiter': 2000, 'ftol': 1e-5})
         mod2 = self.temperature_profile_model(
             x, cf2.x[0], cf2.x[1], cf2.x[2], cf2.x[3], cf2.x[4], cf2.x[5], cf2.x[6], cf2.x[7]
