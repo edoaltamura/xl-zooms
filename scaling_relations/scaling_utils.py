@@ -7,8 +7,24 @@ from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
 
 # Make the register backend visible to the script
-sys.path.append("../zooms")
-sys.path.append("../observational_data")
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir,
+            'observational_data'
+        )
+    )
+)
+sys.path.append(
+    os.path.abspath(
+        os.path.join(
+            os.path.dirname(__file__),
+            os.path.pardir,
+            'zooms'
+        )
+    )
+)
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 

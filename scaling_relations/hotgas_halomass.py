@@ -107,8 +107,6 @@ def _process_single_halo(zoom: Zoom):
 
 
 def m_500_hotgas(results: pd.DataFrame):
-
-
     fig, ax = plt.subplots()
     for i in range(len(results)):
 
