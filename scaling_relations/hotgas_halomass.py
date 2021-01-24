@@ -4,7 +4,6 @@ import os
 import unyt
 import numpy as np
 from typing import Tuple
-from multiprocessing import Pool, cpu_count
 import h5py as h5
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -12,31 +11,13 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
-# Make the register backend visible to the script
-sys.path.append(
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir,
-            'observational_data'
-        )
-    )
-)
-sys.path.append(
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir,
-            'zooms'
-        )
-    )
-)
-# sys.path.append("../zooms")
-# sys.path.append("../observational_data")
+sys.path.append("../zooms")
+sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
 import scaling_utils as utils
+import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -108,42 +89,21 @@ def _process_single_halo(zoom: Zoom):
 
 def m_500_hotgas(results: pd.DataFrame):
     fig, ax = plt.subplots()
+    legend_handles = []
     for i in range(len(results)):
 
-        marker = ''
-        if '-8res' in results.loc[i, "Run name"]:
-            marker = '.'
-        elif '+1res' in results.loc[i, "Run name"]:
-            marker = '^'
+        run_style = style.get_style_for_object(results.loc[i, "Run name"])
+        legend_tuple = (run_style['Run name keyword'], run_style['Legend handle'])
 
-        color = ''
-        if 'Ref' in results.loc[i, "Run name"]:
-            color = '#660099'
-        elif 'MinimumDistance' in results.loc[i, "Run name"]:
-            color = 'orange'
-        elif 'Isotropic' in results.loc[i, "Run name"]:
-            color = 'lime'
-
-        # color = ''
-        # if 'dT9.5_' in results.loc[i, "Run name"]:
-        #     color = 'blue'
-        # elif 'dT9_' in results.loc[i, "Run name"]:
-        #     color = 'black'
-        # elif 'dT8.5_' in results.loc[i, "Run name"]:
-        #     color = 'red'
-        # elif 'dT8_' in results.loc[i, "Run name"]:
-        #     color = 'orange'
-        # elif 'dT7.5_' in results.loc[i, "Run name"]:
-        #     color = 'lime'
-
-        markersize = 14
-        if marker == '.':
-            markersize *= 1.5
 
         ax.scatter(
             results.loc[i, "M_500crit"],
             results.loc[i, "Mhot500c"],
-            marker=marker, c=color, alpha=0.7, s=markersize, edgecolors='none', zorder=5
+            marker=run_style['Marker style'],
+            c=run_style['Color'],
+            alpha=0.7,
+            s=run_style['Marker size'],
+            edgecolors='none', zorder=5
         )
 
     # Display observational data
