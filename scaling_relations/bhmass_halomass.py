@@ -1,9 +1,9 @@
 # Plot scaling relations for EAGLE-XL tests
 import sys
+import os
 import unyt
 import numpy as np
 from typing import Tuple
-from multiprocessing import Pool, cpu_count
 import swiftsimio as sw
 import h5py as h5
 import pandas as pd
@@ -17,6 +17,7 @@ sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
+import scaling_utils as utils
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -81,47 +82,17 @@ def process_single_halo(
     return M500c, Mbh_aperture50kpc, Mbh_max, central_bh_mass, central_bh_dr, Mstar_bcg_50kpc
 
 
+@utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
+@utils.set_output_names([
+    'M_500crit',
+    'Mbh_aperture50kpc',
+    'Mbh_max',
+    'central_bh_mass',
+    'central_bh_dr',
+    'Mstar_bcg_50kpc',
+])
 def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
-
-
-def process_catalogue(find_keyword: str = '', savefile: bool = False) -> pd.DataFrame:
-    if find_keyword == '':
-        _zooms_register = zooms_register
-    else:
-        _zooms_register = [zoom for zoom in zooms_register if f"{find_keyword}" in zoom.run_name]
-
-    _name_list = [zoom.run_name for zoom in _zooms_register]
-
-    if len(_zooms_register) == 1:
-        print("Analysing one object only. Not using multiprocessing features.")
-        results = [_process_single_halo(_zooms_register[0])]
-    else:
-        num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
-        # The results of the multiprocessing Pool are returned in the same order as inputs
-        print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
-        with Pool(num_threads) as pool:
-            results = pool.map(_process_single_halo, iter(_zooms_register))
-
-    # Recast output into a Pandas dataframe for further manipulation
-    columns = [
-        'M_500crit',
-        'Mbh_aperture50kpc',
-        'Mbh_max',
-        'central_bh_mass',
-        'central_bh_dr',
-        'Mstar_bcg_50kpc',
-    ]
-    results = pd.DataFrame(list(results), columns=columns)
-    results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
-    print(results.head())
-
-    if savefile:
-        file_name = f'{zooms_register[0].output_directory}/median_radial_profiles_catalogue.pkl'
-        results.to_pickle(file_name)
-        print(f"Catalogue file saved to {file_name}")
-
-    return results
 
 
 def plot_bhmass_halomass(object_database: pd.DataFrame) -> None:
@@ -152,7 +123,6 @@ def plot_bhmass_halomass(object_database: pd.DataFrame) -> None:
             object_database.loc[i, "central_bh_mass"],
             marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
         )
-
 
     # Display observational data
     Budzynski14 = obs.Budzynski14()

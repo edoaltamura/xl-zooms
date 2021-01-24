@@ -1,5 +1,6 @@
 # Plot scaling relations for EAGLE-XL tests
 import sys
+import os
 import unyt
 from typing import Tuple
 from multiprocessing import Pool, cpu_count
@@ -15,6 +16,7 @@ sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 import observational_data as obs
+import scaling_utils as utils
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -44,6 +46,12 @@ def process_single_halo(
     return M500c, Mstar500c, Mhot500c
 
 
+@utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
+@utils.set_output_names([
+    'M_500crit',
+    'Mstar500c',
+    'Mhot500c'
+])
 def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
