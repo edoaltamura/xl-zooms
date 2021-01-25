@@ -279,13 +279,13 @@ class HydrostaticEstimator:
         densities_hse = (3 * masses_hse) / (4 * np.pi * self.radial_bin_centres ** 3) / self.rho_crit
         density_interpolate = interp1d(densities_hse, self.radial_bin_centres, kind='linear')
 
-        self.R200hse = density_interpolate(200)
-        self.R500hse = density_interpolate(500)
-        self.R2500hse = density_interpolate(2500)
+        self.R200hse = density_interpolate(200) * unyt.Mpc
+        self.R500hse = density_interpolate(500) * unyt.Mpc
+        self.R2500hse = density_interpolate(2500) * unyt.Mpc
 
-        self.M200hse = mass_interpolate(self.R200hse)
-        self.M500hse = mass_interpolate(self.R500hse)
-        self.M2500hse = mass_interpolate(self.R2500hse)
+        self.M200hse = mass_interpolate(self.R200hse) * unyt.Solar_Mass
+        self.M500hse = mass_interpolate(self.R500hse) * unyt.Solar_Mass
+        self.M2500hse = mass_interpolate(self.R2500hse) * unyt.Solar_Mass
 
         self.ne500hse = (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
 
