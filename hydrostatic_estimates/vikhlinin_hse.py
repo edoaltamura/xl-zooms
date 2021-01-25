@@ -286,7 +286,7 @@ class HydrostaticEstimator:
         self.M200hse = mass_interpolate(self.R200hse) * unyt.Solar_Mass
         self.M500hse = mass_interpolate(self.R500hse) * unyt.Solar_Mass
         self.M2500hse = mass_interpolate(self.R2500hse) * unyt.Solar_Mass
-
+        print(fbary)
         self.ne500hse = (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
 
         self.kBT200hse = (unyt.G * mean_molecular_weight * self.M200hse * unyt.mass_proton / self.R200hse / 2).to('keV')
