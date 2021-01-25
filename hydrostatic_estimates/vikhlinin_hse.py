@@ -97,7 +97,7 @@ class HydrostaticEstimator:
         self.rho_crit = unyt.unyt_quantity(
             data.metadata.cosmology_raw['Critical density [internal units]'],
             unitMass / unitLength ** 3
-        )
+        ).to('Msun/Mpc**3')
 
         # Select hot gas within sphere and without core
         deltaX = data.gas.coordinates[:, 0] - XPotMin
@@ -287,13 +287,15 @@ class HydrostaticEstimator:
         self.M500hse = mass_interpolate(self.R500hse)
         self.M2500hse = mass_interpolate(self.R2500hse)
 
-        self.P200hse = (200 * fbary * self.rho_crit * unyt.G * self.M200hse / self.R200hse / 2).to('keV/cm**3')
-        self.P500hse = (500 * fbary * self.rho_crit * unyt.G * self.M500hse / self.R500hse / 2).to('keV/cm**3')
-        self.P2500hse = (2500 * fbary * self.rho_crit * unyt.G * self.M2500hse / self.R2500hse / 2).to('keV/cm**3')
+        self.ne500hse = (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
 
         self.kBT200hse = (unyt.G * mean_molecular_weight * self.M200hse * unyt.mass_proton / self.R200hse / 2).to('keV')
         self.kBT500hse = (unyt.G * mean_molecular_weight * self.M500hse * unyt.mass_proton / self.R500hse / 2).to('keV')
         self.kBT2500hse = (unyt.G * mean_molecular_weight * self.M2500hse * unyt.mass_proton / self.R2500hse / 2).to('keV')
+
+        self.P200hse = (200 * fbary * self.rho_crit * unyt.G * self.M200hse / self.R200hse / 2).to('keV/cm**3')
+        self.P500hse = (500 * fbary * self.rho_crit * unyt.G * self.M500hse / self.R500hse / 2).to('keV/cm**3')
+        self.P2500hse = (2500 * fbary * self.rho_crit * unyt.G * self.M2500hse / self.R2500hse / 2).to('keV/cm**3')
 
         self.K200hse = (self.kBT200hse / (3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
         self.K500hse = (self.kBT500hse / (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
