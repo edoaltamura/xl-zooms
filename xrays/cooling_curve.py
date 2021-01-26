@@ -1,29 +1,4 @@
 import pyatomdb, numpy, os, pylab
-"""
-This code is an example of generating a cooling curve: the total power
-radiated in keV cm3 s-1 by each element at each temperature. It will
-generate a text file with the emission per element at each temperature
-from 1e4 to 1e9K.
-
-This is similar to the atomdb.lorentz_power function, but with a few
-normalizations removed to run a little quicker.
-
-Note that the Anders and Grevesse (1989) abundances are built in to
-this. These can be looked up using atomdb.get_abundance(abundset='AG89'),
-or the 'angr' column of the table at
-https://heasarc.nasa.gov/xanadu/xspec/xspec11/manual/node33.html#SECTION00631000000000000000
-
-Adjustable parameters (energy range, element choice) are in the block
-marked #### ADJUST THINGS HERE
-
-Note that any warnings of the nature:
-"kT = 0.000862 is below minimum range of 0.000862. Returning lowest kT spectrum available"
-should be ignored. This is returning the temperature at our lowest tabulated value but is
-a rounding error making it think it is outside our range.
-
-Usage: python3 calc_power.py
-"""
-
 
 def calc_power(Zlist, cie, Tlist):
 
@@ -88,63 +63,21 @@ if __name__ == '__main__':
     # temperatures at which to calculate curve (K)
     Tlist = numpy.logspace(4, 9, 51)
 
-    # specify output file name (default output.txt)
-    outfile = 'output.txt'
-
     ################################
     #### END ADJUST THINGS HERE ####
     ################################
-
-    # set up the spectrum
     cie = pyatomdb.spectrum.CIESession()
     ebins = numpy.linspace(Elo, Ehi, 10001)
     cie.set_response(ebins, raw=True)
     cie.set_eebrems(True)
-    # crunch the numbers
     k = calc_power(Zlist, cie, Tlist)
-
-    # output generation
-    o = open(outfile, 'w')
-
-    # header row
-    s = '# Temperature log10(K)'
-    for i in range(len(Zlist)):
-        s += ' %12i' % (Zlist[i])
-    o.write(s + '\n')
-
-    # for each temperature
-    k['totpower'] = numpy.zeros(len(k['temperature']))
-
-    for i in range(len(k['temperature'])):
-        s = '%22e' % (numpy.log10(k['temperature'][i]))
-        for Z in Zlist:
-            s += ' %12e' % (k['power'][i][Z])
-            k['totpower'][i] += k['power'][i][Z]
-        o.write(s + '\n')
-
-    # notes
-    o.write("# Total Emissivity in keV cm^3 s^-1 for each element with AG89 abundances, between %e and %e keV\n" % (
-    Elo, Ehi))
-    o.write("# To get cooling power, multiply by Ne NH")
-    o.write("# Z=0 component is electron-electron bremsstrahlung component, only significant at high T")
-    o.close
 
     fig = pylab.figure()
     fig.show()
     ax = fig.add_subplot(111)
-
     ax.loglog(k['temperature'], k['totpower'] * pyatomdb.const.ERG_KEV)
-
     ax.set_xlabel('Temperature (K)')
     ax.set_ylabel('Radiated Power (erg cm$^3$ s$^{-1}$)')
-
     ax.set_xlim(min(Tlist), max(Tlist))
-
-    # draw graphs
     pylab.draw()
-
-    zzz = input("Press enter to continue")
-
-    # save image files
-    fig.savefig('calc_power_examples_1_1.pdf')
-    fig.savefig('calc_power_examples_1_1.svg')
+    # fig.savefig('calc_power_examples_1_1.svg')
