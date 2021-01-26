@@ -1,4 +1,5 @@
-import pyatomdb, numpy, os, pylab
+import pyatomdb, numpy
+from matplotlib import pyplot as plt
 
 def calc_power(Zlist, cie, Tlist):
 
@@ -66,10 +67,8 @@ if __name__ == '__main__':
     spec = numpy.append(0, spec)
 
     # Returned spectrum has units of photons cm^5 s^-1 bin^-1
-    fig = pylab.figure()
-    fig.show()
-    ax = fig.add_subplot(211)
+    fig, ax = plt.subplots()
     ax.plot(sess.ebins_out, spec, drawstyle='steps', label='dummy response')
     ax.set_xlabel('Energy (keV)')
     ax.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
-    pylab.draw()
+    plt.show()
