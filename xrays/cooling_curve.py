@@ -45,39 +45,54 @@ def calc_power(Zlist, cie, Tlist):
 
 if __name__ == '__main__':
 
-    ############################
-    #### ADJUST THINGS HERE ####
-    ############################
-
     # Elements to include
     # ['hydrogen', 'helium', 'carbon', 'nitrogen', 'oxygen', 'neon', 'magnesium', 'silicon', 'iron']
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
-    # Note that for this purpose, Z=0 is the electron-electron bremsstrahlung
-    # continuum. This is not a general AtomDB convention, just what I've done here
-    # to make this work.
-
-    # specify photon energy range you want to integrate over (min = 0.001keV, max=100keV)
     Elo = 0.001  # keV
     Ehi = 100.0  #
-
     # temperatures at which to calculate curve (K)
     Tlist = numpy.logspace(4, 9, 51)
 
-    ################################
-    #### END ADJUST THINGS HERE ####
-    ################################
-    cie = pyatomdb.spectrum.CIESession()
-    ebins = numpy.linspace(Elo, Ehi, 10001)
-    cie.set_response(ebins, raw=True)
-    cie.set_eebrems(True)
-    k = calc_power(Zlist, cie, Tlist)
+    # declare the Collisional Ionization Equilibrium session
+    sess = pyatomdb.spectrum.CIESession()
 
+    # create a set of energy bins (in keV) for the response. Note these are
+    # the n edges of the n-1 bins.
+    energy_bins = numpy.linspace(0.3, 1.0, 10000)
+    sess.set_response(energy_bins, raw=True)
+
+    kT = 0.4  # temperature in keV
+    spec = sess.return_spectrum(kT)
+    spec = numpy.append(0, spec)
+
+    # Returned spectrum has units of photons cm^5 s^-1 bin^-1
     fig = pylab.figure()
     fig.show()
-    ax = fig.add_subplot(111)
-    ax.loglog(k['temperature'], k['totpower'] * pyatomdb.const.ERG_KEV)
-    ax.set_xlabel('Temperature (K)')
-    ax.set_ylabel('Radiated Power (erg cm$^3$ s$^{-1}$)')
-    ax.set_xlim(min(Tlist), max(Tlist))
+    ax = fig.add_subplot(211)
+    ax.plot(sess.ebins_out, spec, drawstyle='steps', label='dummy response')
+    ax.set_xlabel('Energy (keV)')
+    ax.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
+
+    sess.set_response('aciss_meg1_cy22.grmf', arf='aciss_meg1_cy22.garf')
+    spec = sess.return_spectrum(kT)
+    spec = numpy.append(0, spec)
+
+    ax2 = fig.add_subplot(212)
+    ax2.plot(sess.ebins_out, spec, drawstyle='steps', label='Chandra MEG')
+
+    ax.legend(loc=0)
+    ax2.legend(loc=0)
+
+    # zoom in on small sections of the spectrum
+    ax.set_xlim([0.7, 0.9])
+    ax2.set_xlim([0.7, 0.9])
+
+    # set axes
+    ax2.set_xlabel('Energy (keV)')
+    ax2.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
+
+    # adjust plot spacing so labels are visible
+    pylab.matplotlib.pyplot.subplots_adjust(hspace=0.34)
+
+    # draw graphs
     pylab.draw()
-    # fig.savefig('calc_power_examples_1_1.svg')
