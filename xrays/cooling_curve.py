@@ -72,27 +72,4 @@ if __name__ == '__main__':
     ax.plot(sess.ebins_out, spec, drawstyle='steps', label='dummy response')
     ax.set_xlabel('Energy (keV)')
     ax.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
-
-    sess.set_response('aciss_meg1_cy22.grmf', arf='aciss_meg1_cy22.garf')
-    spec = sess.return_spectrum(kT)
-    spec = numpy.append(0, spec)
-
-    ax2 = fig.add_subplot(212)
-    ax2.plot(sess.ebins_out, spec, drawstyle='steps', label='Chandra MEG')
-
-    ax.legend(loc=0)
-    ax2.legend(loc=0)
-
-    # zoom in on small sections of the spectrum
-    ax.set_xlim([0.7, 0.9])
-    ax2.set_xlim([0.7, 0.9])
-
-    # set axes
-    ax2.set_xlabel('Energy (keV)')
-    ax2.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
-
-    # adjust plot spacing so labels are visible
-    pylab.matplotlib.pyplot.subplots_adjust(hspace=0.34)
-
-    # draw graphs
     pylab.draw()
