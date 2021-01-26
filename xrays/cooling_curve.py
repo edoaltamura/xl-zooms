@@ -57,6 +57,11 @@ if __name__ == '__main__':
     # declare the Collisional Ionization Equilibrium session
     sess = pyatomdb.spectrum.CIESession()
 
+    # Turn on free-free emission
+    sess.set_abund(Zlist[1:], 1.0)
+    # turn on e-e bremsstrahlung
+    sess.set_eebrems(True)
+
     # create a set of energy bins (in keV) for the response. Note these are
     # the n edges of the n-1 bins.
     energy_bins = numpy.linspace(0.3, 1.0, 10000)
