@@ -50,7 +50,7 @@ if __name__ == '__main__':
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
     Elo = 0.1  # keV
     Ehi = 10.0  #
-    energy_bins = numpy.logspace(-2, 3, 10000)
+    energy_bins = numpy.logspace(-3, 2, 10000)
 
     # declare the Collisional Ionization Equilibrium session
     sess = pyatomdb.spectrum.CIESession()
