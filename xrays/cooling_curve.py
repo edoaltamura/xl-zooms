@@ -1,8 +1,8 @@
 import pyatomdb, numpy
 from matplotlib import pyplot as plt
 
-def calc_power(Zlist, cie, Tlist):
 
+def calc_power(Zlist, cie, Tlist):
     res = {}
     res['power'] = {}
     res['temperature'] = []
@@ -45,7 +45,6 @@ def calc_power(Zlist, cie, Tlist):
 
 
 if __name__ == '__main__':
-
     # Elements to include
     # ['hydrogen', 'helium', 'carbon', 'nitrogen', 'oxygen', 'neon', 'magnesium', 'silicon', 'iron']
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
@@ -56,6 +55,7 @@ if __name__ == '__main__':
     sess = pyatomdb.spectrum.CIESession()
     sess.set_abund(Zlist[1:], 1.0)
     sess.set_eebrems(True)
+    sess.set_broadening(True, velocity_broadening=400.)  # velocity in km/s
     energy_bins = numpy.linspace(Elo, Ehi, 10000)
     sess.set_response(energy_bins, raw=True)
 
