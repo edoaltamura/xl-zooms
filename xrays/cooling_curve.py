@@ -50,15 +50,16 @@ if __name__ == '__main__':
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
     Elo = 0.1  # keV
     Ehi = 10.0  #
-    energy_bins = numpy.logspace(-3, 2, 10000)
+    energy_bins = numpy.logspace(-2, 2, 10000)
 
     # declare the Collisional Ionization Equilibrium session
     sess = pyatomdb.spectrum.CIESession()
     sess.set_abund(Zlist[1:], 1.0)
     sess.set_eebrems(True)
     sess.set_broadening(True, velocity_broadening=400.)  # velocity in km/s
-    sess.set_response(energy_bins, raw=True)
-
+    # sess.set_response(energy_bins, raw=True)
+    # now repeat the process with a real response
+    sess.set_response('aciss_meg1_cy22.grmf', arf='aciss_meg1_cy22.garf')
     kT = 8.  # temperature in keV
     spec = sess.return_spectrum(kT)
     spec = numpy.append(0, spec)
