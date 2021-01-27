@@ -59,13 +59,14 @@ if __name__ == '__main__':
     energy_bins = numpy.linspace(Elo, Ehi, 10000)
     sess.set_response(energy_bins, raw=True)
 
-    kT = 9.4  # temperature in keV
+    kT = 8.  # temperature in keV
     spec = sess.return_spectrum(kT)
     spec = numpy.append(0, spec)
 
     # Returned spectrum has units of photons cm^5 s^-1 bin^-1
     fig, ax = plt.subplots()
-    ax.plot(sess.ebins_out, spec, drawstyle='steps', label='dummy response')
+    ax.plot(sess.ebins_out, spec, drawstyle='steps')
+    ax.set_yscale('log')
     ax.set_xlabel('Energy (keV)')
     ax.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
     plt.show()
