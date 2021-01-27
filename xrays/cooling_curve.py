@@ -50,13 +50,13 @@ if __name__ == '__main__':
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
     Elo = 0.1  # keV
     Ehi = 10.0  #
+    energy_bins = numpy.logspace(-2, 3, 10000)
 
     # declare the Collisional Ionization Equilibrium session
     sess = pyatomdb.spectrum.CIESession()
     sess.set_abund(Zlist[1:], 1.0)
     sess.set_eebrems(True)
     sess.set_broadening(True, velocity_broadening=400.)  # velocity in km/s
-    energy_bins = numpy.linspace(Elo, Ehi, 10000)
     sess.set_response(energy_bins, raw=True)
 
     kT = 8.  # temperature in keV
@@ -66,6 +66,7 @@ if __name__ == '__main__':
     # Returned spectrum has units of photons cm^5 s^-1 bin^-1
     fig, ax = plt.subplots()
     ax.plot(sess.ebins_out, spec, drawstyle='steps')
+    ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel('Energy (keV)')
     ax.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
