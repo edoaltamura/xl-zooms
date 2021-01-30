@@ -197,6 +197,6 @@ def f_500_hotgas(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword='_Nheat1_SNnobirth')
+    results = utils.process_catalogue(_process_single_halo, find_keyword='MinimumDistance')
     m_500_hotgas(results)
     f_500_hotgas(results)
