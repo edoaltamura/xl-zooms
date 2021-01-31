@@ -1,3 +1,4 @@
+import sys
 import unyt
 import numpy as np
 from typing import Tuple
@@ -9,6 +10,11 @@ import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
+# Make the register backend visible to the script
+sys.path.append("../zooms")
+sys.path.append("../scaling_relations")
+
+
 from register import (
     zooms_register,
     Zoom,
@@ -19,6 +25,8 @@ from register import (
 
 from convergence_radius import convergence_radius
 import observational_data as obs
+import scaling_utils as utils
+import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")

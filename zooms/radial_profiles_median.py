@@ -10,24 +10,8 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
-sys.path.append(
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir,
-            'scaling_relations'
-        )
-    )
-)
-sys.path.append(
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir,
-            'zooms'
-        )
-    )
-)
+sys.path.append("../zooms")
+sys.path.append("../scaling_relations")
 
 from radial_profiles import profile_3d_single_halo as profiles
 from mass_scaling_entropy import process_single_halo as entropy_scaling
@@ -42,6 +26,7 @@ from register import (
     get_snip_handles,
     dump_memory_usage,
 )
+
 
 FIELD_NAME = 'entropy_physical'
 
