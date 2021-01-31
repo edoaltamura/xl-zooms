@@ -10,7 +10,7 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
-sys.path.append("../zooms")
+sys.path.append("../observational_data")
 sys.path.append("../scaling_relations")
 
 from radial_profiles import profile_3d_single_halo as profiles
