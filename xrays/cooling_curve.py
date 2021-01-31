@@ -3,7 +3,7 @@ from matplotlib import pyplot as plt
 
 import sys
 
-sys.path.append('/cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis/xray-analysis/pyatomdb/pyatomdb/examples')
+chandra = '/cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis/xray-analysis/pyatomdb/pyatomdb/examples'
 
 
 def calc_power(Zlist, cie, Tlist):
@@ -63,7 +63,7 @@ if __name__ == '__main__':
     sess.set_broadening(True, velocity_broadening=400.)  # velocity in km/s
     # sess.set_response(energy_bins, raw=True)
     # now repeat the process with a real response
-    sess.set_response('aciss_meg1_cy22.grmf', arf='aciss_meg1_cy22.garf')
+    sess.set_response(chandra + '/aciss_meg1_cy22.grmf', arf=chandra + '/aciss_meg1_cy22.garf')
     kT = 8.  # temperature in keV
     spec = sess.return_spectrum(kT)
     spec = numpy.append(0, spec)
