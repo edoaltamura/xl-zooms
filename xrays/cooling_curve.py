@@ -1,6 +1,10 @@
 import pyatomdb, numpy
 from matplotlib import pyplot as plt
 
+import sys
+
+sys.path.append('/cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis/xray-analysis/pyatomdb/pyatomdb/examples')
+
 
 def calc_power(Zlist, cie, Tlist):
     res = {}
