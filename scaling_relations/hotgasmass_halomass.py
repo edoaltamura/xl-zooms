@@ -197,6 +197,12 @@ def f_500_hotgas(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword='MinimumDistance')
+    import sys
+    if sys.argv[1]:
+        keyword = sys.argv[1]
+    else:
+        keyword = 'Ref'
+
+    results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
     m_500_hotgas(results)
     f_500_hotgas(results)

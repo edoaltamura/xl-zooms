@@ -3,25 +3,14 @@ import sys
 import os
 import unyt
 import numpy as np
-from typing import Tuple
-from multiprocessing import Pool, cpu_count
 import h5py as h5
 import swiftsimio as sw
 import pandas as pd
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
-sys.path.append(
-    os.path.abspath(
-        os.path.join(
-            os.path.dirname(__file__),
-            os.path.pardir,
-            'zooms'
-        )
-    )
-)
+sys.path.append("../zooms")
+sys.path.append("../observational_data")
 
 from register import (
     SILENT_PROGRESSBAR,
@@ -34,13 +23,17 @@ from register import (
     get_snip_handles,
     dump_memory_usage,
 )
+import observational_data as obs
+import scaling_utils as utils
+import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
 
-fbary = 0.15741  # Cosmic baryon fraction
+cosmology = obs.Observations().cosmo_model
+fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
@@ -128,88 +121,42 @@ def process_single_halo(
 
     return M500c.to(unyt.Solar_Mass), Mhot500c.to(unyt.Solar_Mass), fhot500c, entropy, kBT_500crit
 
-
+@utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
+@utils.set_output_names([
+    'M_500crit',
+    'Mhot500c',
+    'fhot500c',
+    'entropy',
+    'kBT_500crit'
+])
 def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
 
-def m_500_entropy():
-    vr_num = 'fixedAGNdT'
-
-    _zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
-    _name_list = [zoom.run_name for zoom in _zooms_register]
-
-    if len(zooms_register) == 1:
-        print("Analysing one object only. Not using multiprocessing features.")
-        results = [_process_single_halo(_zooms_register[0])]
-    else:
-        num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
-        # The results of the multiprocessing Pool are returned in the same order as inputs
-        print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
-        with Pool(num_threads) as pool:
-            results = pool.map(_process_single_halo, iter(_zooms_register))
-
-    # Recast output into a Pandas dataframe for further manipulation
-    columns = [
-        'M_500crit (M_Sun)',
-        'M_hot (< R_500crit) (M_Sun)',
-        'f_hot (< R_500crit)',
-        'entropy',
-        'kBT_500crit'
-    ]
-    results = pd.DataFrame(list(results), columns=columns)
-    results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
-    print(results.head())
-    dump_memory_usage()
-
+def m_500_entropy(results: pd.DataFrame):
     fig, ax = plt.subplots()
-
-    # Display zoom data
+    legend_handles = []
     for i in range(len(results)):
 
-        marker = ''
-        if '-8res' in results.loc[i, "Run name"]:
-            marker = '.'
-        elif '+1res' in results.loc[i, "Run name"]:
-            marker = '^'
-
-        color = ''
-        if 'dT9.5_' in results.loc[i, "Run name"]:
-            color = 'blue'
-        elif 'dT9_' in results.loc[i, "Run name"]:
-            color = 'black'
-        elif 'dT8.5_' in results.loc[i, "Run name"]:
-            color = 'red'
-        elif 'dT8_' in results.loc[i, "Run name"]:
-            color = 'orange'
-        elif 'dT7.5_' in results.loc[i, "Run name"]:
-            color = 'lime'
-
-        markersize = 14
-        if marker == '.':
-            markersize *= 1.5
+        run_style = style.get_style_for_object(results.loc[i, "Run name"])
+        if run_style['Legend handle'] not in legend_handles:
+            legend_handles.append(run_style['Legend handle'])
 
         ax.scatter(
-            results.loc[i, "M_500crit (M_Sun)"],
+            results.loc[i, "M_500crit"],
             results.loc[i, "entropy"],
-            marker=marker, c=color, alpha=0.5, s=markersize, edgecolors='none', zorder=5
+            marker=run_style['Marker style'],
+            c=run_style['Color'],
+            s=run_style['Marker size'],
+            alpha=1,
+            edgecolors='none',
+            zorder=5
         )
 
     # Build legends
-    handles = [
-        Line2D([], [], marker='.', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
-               linestyle='None', markersize=6, label='-8 Res'),
-        Line2D([], [], marker='^', markeredgecolor='black', markerfacecolor='none', markeredgewidth=1,
-               linestyle='None', markersize=3, label='+1 Res'),
-        Patch(facecolor='blue', edgecolor='None', label='dT9.5'),
-        Patch(facecolor='black', edgecolor='None', label='dT9'),
-        Patch(facecolor='red', edgecolor='None', label='dT8.5'),
-        Patch(facecolor='orange', edgecolor='None', label='dT8'),
-        Patch(facecolor='lime', edgecolor='None', label='dT7.5'),
-    ]
-    legend_sims = plt.legend(handles=handles, loc=2)
-
+    legend_sims = plt.legend(handles=legend_handles, loc=2)
     ax.add_artist(legend_sims)
+
     ax.set_xlabel(r'$M_{{500{{\rm crit}}}}$ [${0}$]'.format(
         results.loc[0, "M_500crit (M_Sun)"].units.latex_repr
     ))
@@ -227,5 +174,12 @@ def m_500_entropy():
 
 
 if __name__ == "__main__":
+    import sys
 
-    m_500_entropy()
+    if sys.argv[1]:
+        keyword = sys.argv[1]
+    else:
+        keyword = 'Ref'
+
+    results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
+    m_500_entropy(results)
