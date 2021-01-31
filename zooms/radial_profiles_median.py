@@ -149,7 +149,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(plot_database.iloc[0]['ylabel'])
-
+    ax.set_ylim([70, 2000])
+    ax.set_xlim([0.02, 5])
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
