@@ -8,7 +8,7 @@ from matplotlib.cm import get_cmap
 name = "Spectral"
 cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
 # colors = cmap.colors  # type: list
-colors = cmap(np.linspace(0, 255, 10, dtype=np.int))
+colors = cmap(np.linspace(0, 255, 8, dtype=np.int))
 
 style_subgrid_model = pd.DataFrame(
     [
