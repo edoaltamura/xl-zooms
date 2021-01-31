@@ -1,12 +1,14 @@
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 from matplotlib.cm import get_cmap
 
-name = "Set2"
+name = "Spectral"
 cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
-colors = cmap.colors[::-1]  # type: list
+# colors = cmap.colors  # type: list
+colors = cmap(np.linspace(0, 255, 10, dtype=np.int))
 
 style_subgrid_model = pd.DataFrame(
     [
