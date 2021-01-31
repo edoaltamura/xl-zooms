@@ -147,5 +147,12 @@ def plot_bhmass_halomass(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword='Ref')
+    import sys
+
+    if sys.argv[1]:
+        keyword = sys.argv[1]
+    else:
+        keyword = 'Ref'
+
+    results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
     plot_bhmass_halomass(results)
