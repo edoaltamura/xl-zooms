@@ -1,4 +1,7 @@
-Cluster z kT {a} M500 {b} K (0.1 R200) K (R2500) K (R1000) K (R500) CC Disturbed
+# (a) Temperature in keV, measured in the [0.15 − 0.75] R500 aperture
+# (b) Mass in units of h^−1_70 1014 M⊙, estimated from the M500 − YX relation given in Eqn. 1 (Arnaud et al. 2009).
+
+# Cluster z kT {a} M500 {b} K (0.1 R200) K (R2500) K (R1000) K (R500) CC Disturbed
 RXC-J0003.8+0203 0.0924 3.83+0.11−0.11 2.11+0.04−0.04 273.35 17.67 619.88  50.40  913.29  114.31 none    none   none
 RXC-J0006.0-3443 0.1147 5.24+0.21−0.21 3.95+0.12−0.12 469.36 55.82 786.71  80.54  1040.90 98.14  none    none   D
 RXC-J0020.7-2542 0.1410 5.54+0.13−0.13 3.84+0.06−0.06 347.10 28.49 727.97  58.46  1085.23 143.63 1498.66 687.71 none
