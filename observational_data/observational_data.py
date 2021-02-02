@@ -114,6 +114,11 @@ except ImportError:
 
 unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
 
+# Define atomic masses
+atomic_mass_h = 1.00794
+atomic_mass_fe = 55.845
+atomic_mass_o = 15.999
+atomic_mass_si = 28.0855
 
 class Observations:
 
@@ -506,3 +511,99 @@ class Pratt10(Observations):
     def plot_on_axes(self, ax, **kwargs):
         k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(np.array(ax.get_xlim())))
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
+
+
+class Pratt18(Observations):
+    paper_name = "Pratt et al. (2019)"
+    notes = (
+        "REXCESS sample. Entropy properties."
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(Pratt18, self).__init__(*args, **kwargs)
+
+        properties = np.genfromtxt('./repository/pratt2018_properties.dat')
+        profiles = np.genfromtxt('./repository/pratt2018_profiles.dat')
+        entropy_relations = np.genfromtxt('./repository/pratt2018_excessrelations.dat')
+
+
+
+def GS98():
+    X_sol = 0.735
+    Y_sol = 0.248
+    Z_sol = 0.017
+
+    # log(Fe)+12 = 7.50
+    Nfe_h = 10.0 ** (7.50 - 12.0)
+    Zfe_h = Nfe_h * (atomic_mass_fe / atomic_mass_h)
+    Zfe_tot = Zfe_h * X_sol
+
+    # log(O)+12 = 8.83
+    No_h = 10.0 ** (8.83 - 12.0)
+    Zo_h = No_h * (atomic_mass_o / atomic_mass_h)
+    Zo_tot = Zo_h * X_sol
+
+    # log(Si)+12 = 7.55
+    Nsi_h = 10.0 ** (7.55 - 12.0)
+    Zsi_h = Nsi_h * (atomic_mass_si / atomic_mass_h)
+    Zsi_tot = Zsi_h * X_sol
+
+    return Z_sol, np.around(Zfe_tot, decimals=5), np.around(Zo_tot, decimals=5), np.around(Zsi_tot, decimals=6)
+
+
+class Yates17(Observations):
+    kT500 = [np.average([2.01, 2.26, 1.96, 2.00, 2.14]),
+             np.average([4.21, 4.56, 4.17, 3.87]),
+             np.average([3.73, 3.78]),
+             2.63, 0.91,
+             np.average([1.44, 1.29, 1.47, 1.67]),
+             4.14, 1.54,
+             np.average([4.53, 4.46, 4.34, 4.07]),
+             4.61,
+             np.average([2.76, 2.95, 2.88, 2.94, 2.94]),
+             2.16,
+             np.average([6.29, 5.34, 5.74]),
+             np.average([2.16, 2.00]),
+             np.average([2.37, 2.20]),
+             3.07, 4.41,
+             np.average([5.60, 6.14, 5.01, 5.21]),
+             7.96, 2.19,
+             np.average([3.93, 3.37, 3.87, 4.32, 3.87]),
+             np.average([5.82, 4.81]),
+             np.average([5.19, 5.94, 4.94]), np.average([2.08, 2.07, 2.28, 2.07]),
+             np.average([2.46, 2.60]), 5.78, 3.28, np.average([2.74, 3.08, 3.02, 2.80]), 6.19,
+             np.average([4.73, 4.65, 4.21]), np.average([5.94, 6.56]), np.average([2.14, 2.40]),
+             np.average([2.47, 1.38]), np.average([3.00, 3.53]), np.average([5.99, 5.81, 5.61]), 2.66,
+             np.average([2.46, 2.67]), 2.21, np.average([3.42, 4.96, 3.61]), 2.02, np.average([3.22, 3.21]),
+             np.average([4.49, 4.34]), 1.31, np.average([4.19, 3.67]), 6.00, 2.00,
+             np.average([2.65, 3.68, 2.67, 2.65]), np.average([2.50, 2.40]), 0.80, 0.54,
+             np.average([0.70, 0.67, 0.67]), 0.60, np.average([2.38, 3.68, 2.27, 2.34]), 0.44,
+             np.average([2.46, 2.27, 2.34, 2.66, 2.47]), np.average([1.15, 1.19, 1.19]), 1.11,
+             np.average([0.84, 0.87]), np.average([0.92, 0.87, 0.82]), np.average([0.91, 0.95]), 0.68, 0.72,
+             np.average([0.59, 0.56, 0.52]), 0.44, 0.22, 0.83, 0.66, 0.57, np.average([0.72, 0.90, 0.75, 0.75]),
+             0.70, 0.64, np.average([0.51, 0.44]), 1.42, 0.71, 0.84, 6.85, 5.56, np.average([2.33, 1.60, 1.89]),
+             6.71]
+
+    Fe = [np.average([0.31, 0.25, 0.29, 0.43, 0.43]), np.average([0.26, 0.25, 0.35, 0.41]),
+          np.average([0.26, 0.25]), 0.48, 0.18, np.average([0.30, 0.33, 0.37, 0.39]), 0.31, 0.36,
+          np.average([0.35, 0.26, 0.37, 0.33]), 0.19, np.average([0.30, 0.26, 0.45, 0.36, 0.35]), 0.20,
+          np.average([0.27, 0.34, 0.27]), np.average([0.30, 0.28]), np.average([0.21, 0.45]), 0.37, 0.29,
+          np.average([0.25, 0.24, 0.27, 0.23]), 0.26, 0.48, np.average([0.23, 0.23, 0.29, 0.31, 0.36]),
+          np.average([0.16, 0.35]), np.average([0.28, 0.35, 0.43]), np.average([0.35, 0.42, 0.40, 0.42]),
+          np.average([0.23, 0.53]), 0.22, 0.34, np.average([0.30, 0.24, 0.35, 0.31]), 0.35,
+          np.average([0.25, 0.27, 0.32]), np.average([0.17, 0.32]), np.average([0.43, 0.53]),
+          np.average([0.24, 0.24]), np.average([0.34, 0.42]), np.average([0.23, 0.28, 0.34]), 0.24,
+          np.average([0.44, 0.37]), 0.21, np.average([0.20, 0.31, 0.32]), 0.29, np.average([0.26, 0.45]),
+          np.average([0.23, 0.34]), 0.39, np.average([0.28, 0.28]), 0.24, 0.33,
+          np.average([0.38, 0.33, 0.43, 0.43]), np.average([0.33, 0.45]), 0.22, 0.15,
+          np.average([0.17, 0.13, 0.15]), 0.16, np.average([0.22, 0.27, 0.29, 0.28]), 0.07,
+          np.average([0.27, 0.31, 0.31, 0.34, 0.45]), np.average([0.31, 0.24, 0.51]), 0.26,
+          np.average([0.34, 0.28]), np.average([0.19, 0.27, 0.17]), np.average([0.51, 0.10]), 0.18, 0.10,
+          np.average([0.17, 0.33, 0.18]), 0.15, 0.15, 0.12, 0.18, 0.10, np.average([0.30, 0.27, 0.21, 0.12]), 0.15,
+          0.36, np.average([0.14, 0.18]), 0.18, 0.16, 0.10, 0.19, 0.24, np.average([0.29, 0.23, 0.33]), 0.19]
+
+    Z_sol, Fe_sol, O_sol, Si_sol = GS98()
+
+    self.Yates = {'kT500': [np.asarray(kT500)],
+                  'Fe': [np.asarray(Fe) * Fe_sol / self.Fe_sol]
+                  }

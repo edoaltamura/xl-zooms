@@ -1,0 +1,21 @@
+# Table 2. Best fitting parameters for the entropy-temperature and entropy-mass relations.
+# Radius C α σlnK(keV cm−2) raw int
+
+# Entropy-temperature relation
+
+0.1R200 347  23 0.89  0.15 0.262 0.040 0.254 0.041
+R2500   783  15 0.76  0.06 0.120 0.021 0.083 0.118
+R1000   1152 27 0.83  0.06 0.093 0.015 none none
+R500    1489 125 0.92 0.24 0.265 0.055 none none
+
+# Entropy-mass relation
+
+R2500 864  27 0.42  0.05 0.155 0.025 0.136 0.031
+R1000 1308 52 0.48  0.04 0.119 0.017 0.052 0.162
+R500  1748 237 0.62 0.17 0.265 0.055 0.221 0.160
+
+# T is the spectroscopic temperature in the [0.15 − 0.75] R500 region; masses are estimated from the
+# M − YX relation given in Eqn. 1. Data were fitted with a power law of the form E(z) nK = C (A/A0)^α,
+# with A0 = 5 keV and 5.3 × 1014 M⊙, and n = 4/3 and 2/3, for temperature and mass respectively.
+# Fits used orthogonal BCES regression with errors estimated using bootstrap resampling.
+# The raw and intrinsic logarithmic scatter about the best fitting relations are given in the final two columns.

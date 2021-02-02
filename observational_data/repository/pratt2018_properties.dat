@@ -1,5 +1,10 @@
+# Table 1. Basic cluster data. K(Rδ) is the entropy measured at the radius corresponding to density contrast δ.
+# Cool core and morphological classification from Pratt et al. (2009).
+
 # (a) Temperature in keV, measured in the [0.15 − 0.75] R500 aperture
-# (b) Mass in units of h^−1_70 1014 M⊙, estimated from the M500 − YX relation given in Eqn. 1 (Arnaud et al. 2009).
+# (b) Mass in units of h^−1_70 1.e14 MSun, estimated from the M500 − YX relation given in Eqn. 1 (Arnaud et al. 2009).
+# systems classified as cool cores on the basis of central density vs. cooling time (see Sect. 2.3);
+# systems classified as disturbed on the basis of the centre shift parameter <w>.
 
 # Cluster z kT {a} M500 {b} K (0.1 R200) K (R2500) K (R1000) K (R500) CC Disturbed
 RXC-J0003.8+0203 0.0924 3.83+0.11−0.11 2.11+0.04−0.04 273.35 17.67 619.88  50.40  913.29  114.31 none    none   none
