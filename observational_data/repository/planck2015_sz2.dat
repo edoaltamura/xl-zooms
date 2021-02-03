@@ -1,8 +1,7 @@
-
-
+# Planck 2015 results.
+# XXVII. The second Planck catalogue of Sunyaev-Zeldovich sources.
 # Results from heasarc_plancksz2: Planck 2nd Sunyaev-Zeldovich Source Catalog
 # Coordinate system:  Equatorial
-
 # The assumed cosmology for this calculation is h = 0.7, OmegaM = 0.3 and OmegaLambda = 0.7
 # Units of 1014 solar masses. This is defined as the hydrostatic mass, M500, assuming the Y-M scaling relation of
 # Eq. (7) of Planck Collaboration XX (2014, A&A, 571, A20).

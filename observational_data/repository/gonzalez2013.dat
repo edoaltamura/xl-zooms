@@ -1,0 +1,29 @@
+# Data assumes WMAP7 as fiducial model.
+# The quoted stellar baryon fractions include a deprojection correction.
+# A0478, A2029, and A2390 are not part of the main sample.
+# These clusters were included only in the X-ray analysis to extend the baseline to higher mass, but
+# they have no photometry equivalent to the other systems with which to measure the stellar mass.
+# At the high mass end, however, the stellar component contributes
+# a relatively small fraction of the total baryons.
+# The luminosities include appropriate e + k corrections for each galaxy from GZZ07.
+# The stellar masses are quoted as observed, with no deprojection correction applied.
+
+# ClusterID redshift TX2 Delta_TX2 L(BCG+ICL) Delta_L(BCG+ICL) LTotal Delta_LTotal r500 Delta_r500 M500
+# Delta_M500 M500_gas Delta_M500_gas M500_2D_star Delta_M500_2D_star M500_3D_star Delta_M500_3D_star
+# fgas Delta_fgas fstar Delta_fstar fbaryons Delta_fbaryons
+
+A0122 0.1134 3.65 0.15 0.84 0.03 2.57 0.16 0.89 0.03 2.26 0.19 1.98 0.21 0.68 0.04 0.55 0.03 0.088 0.012 0.024 0.002 0.112 0.012
+A1651 0.0845 6.10 0.25 0.87 0.09 3.11 0.22 1.18 0.03 5.15 0.42 6.70 0.32 0.82 0.06 0.65 0.05 0.130 0.012 0.013 0.001 0.143 0.012
+A2401 0.0571 2.06 0.07 0.33 0.01 1.30 0.09 0.68 0.02 0.95 0.10 0.85 0.09 0.35 0.03 0.27 0.02 0.089 0.013 0.028 0.003 0.118 0.014
+A2721 0.1144 4.78 0.23 0.57 0.01 2.81 0.21 1.03 0.03 3.46 0.32 4.36 0.57 0.74 0.06 0.57 0.04 0.126 0.020 0.017 0.002 0.143 0.020
+A2811 0.1079 4.89 0.20 0.85 0.14 2.13 0.18 1.04 0.03 3.59 0.28 4.47 0.17 0.56 0.05 0.47 0.04 0.125 0.011 0.013 0.002 0.138 0.011
+A2955 0.0943 2.13 0.10 0.60 0.03 1.33 0.08 0.68 0.04 0.99 0.11 0.66 0.05 0.35 0.02 0.30 0.02 0.067 0.010 0.030 0.004 0.097 0.011
+A2984 0.1042 2.08 0.07 0.86 0.03 1.72 0.08 0.67 0.01 0.95 0.10 1.05 0.08 0.46 0.02 0.39 0.02 0.111 0.014 0.041 0.005 0.152 0.015
+A3112 0.0750 4.54 0.11 0.93 0.05 3.33 0.23 1.02 0.02 3.23 0.19 4.29 0.16 0.88 0.06 0.70 0.04 0.133 0.009 0.022 0.002 0.155 0.009
+A3693 0.1237 3.63 0.20 0.71 0.07 2.42 0.18 0.90 0.03 2.26 0.23 2.49 0.15 0.64 0.05 0.51 0.04 0.110 0.013 0.023 0.003 0.133 0.013
+A4010 0.0963 3.78 0.13 0.81 0.12 2.65 0.21 0.92 0.02 2.41 0.18 2.87 0.11 0.70 0.06 0.56 0.05 0.119 0.010 0.023 0.003 0.143 0.010
+AS0084 0.1100 3.75 0.20 0.70 0.02 2.46 0.16 0.91 0.03 2.37 0.24 2.09 0.16 0.65 0.04 0.52 0.03  0.088 0.011 0.022 0.003 0.110 0.011
+AS0296 0.0696 2.70 0.21 0.57 0.01 1.30 0.07 0.78 0.04 1.45 0.21 1.09 0.10 0.35 0.02 0.29 0.01  0.075 0.013 0.020 0.003 0.095 0.013
+A0478 0.0881 7.09 0.12 none none none none 1.28 0.03 6.58 0.38 11.5 0.8 none none none none 0.173 0.016 none none none none
+A2029 0.0773 8.41 0.12 none none none none 1.42 0.03 8.71 0.55 12.0 0.4 none none none none 0.130 0.009 none none none none
+A2390 0.2329 10.6 0.8 none none none none 1.50 0.07 11.8 1.8 17.2 1.0 none none none none 0.144 0.023 none none none none
