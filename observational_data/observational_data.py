@@ -428,7 +428,7 @@ class Voit05(Observations):
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
 
 
-class Pratt10(Observations):
+class Pratt10_(Observations):
     paper_name = "Pratt et al. (2010)"
     notes = (
         "Dimensionless entropy profiles. "
@@ -440,7 +440,7 @@ class Pratt10(Observations):
     b = 1.1
 
     def __init__(self, *args, **kwargs):
-        super(Pratt10, self).__init__(*args, **kwargs)
+        super(Pratt10_, self).__init__(*args, **kwargs)
 
         self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
 
@@ -449,7 +449,7 @@ class Pratt10(Observations):
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
 
 
-class Pratt18(Observations):
+class Pratt10(Observations):
     paper_name = "Pratt et al. (2010)"
     hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..85P/abstract'
     notes = (
@@ -457,7 +457,7 @@ class Pratt18(Observations):
     )
 
     def __init__(self, *args, **kwargs):
-        super(Pratt18, self).__init__(*args, **kwargs)
+        super(Pratt10, self).__init__(*args, **kwargs)
 
         self.process_properties()
 
