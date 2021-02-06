@@ -450,7 +450,8 @@ class Pratt10(Observations):
 
 
 class Pratt18(Observations):
-    paper_name = "Pratt et al. (2019)"
+    paper_name = "Pratt et al. (2010)"
+    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..85P/abstract'
     notes = (
         "REXCESS sample. Entropy properties."
     )
@@ -458,9 +459,34 @@ class Pratt18(Observations):
     def __init__(self, *args, **kwargs):
         super(Pratt18, self).__init__(*args, **kwargs)
 
-        properties = np.genfromtxt('./repository/pratt2018_properties.dat')
-        profiles = np.genfromtxt('./repository/pratt2018_profiles.dat')
-        entropy_relations = np.genfromtxt('./repository/pratt2018_excessrelations.dat')
+        self.process_properties()
+
+    def process_properties(self):
+        h_conv = 0.7 / self.cosmo_model.h
+
+        data = []
+
+        with open('repository/pratt2018_properties.dat') as f:
+            lines = f.readlines()
+            for line in lines:
+                if not line.startswith('#') and not line.isspace():
+                    line_data = line.split()
+                    for i, element_data in enumerate(line_data):
+                        if element_data.isspace():
+                            # If no data, replace with Nan
+                            line_data[i] = np.nan
+                        elif re.search('[a-df-zA-Z]', element_data):
+                            # If contains letters, remove white spaces
+                            line_data[i] = element_data.strip()
+                        else:
+                            line_data[i] = float(element_data.strip())
+                    data.append(line_data)
+
+        data = list(map(list, itertools.zip_longest(*data, fillvalue=None)))
+        for i, field in enumerate(data):
+            data[i] = np.array(field)
+
+        print(data)
 
 
 class PlanckSZ2015(Observations):
