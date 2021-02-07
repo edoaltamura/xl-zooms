@@ -136,7 +136,7 @@ def relaxation(results: pd.DataFrame):
 
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
-    ax.axhline(y=0.1, linestyle='--')
+    ax.axhline(y=0.1, linestyle='--', linewidth=1, color='k')
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$E_{\rm kin}\ /E_{\rm therm}\ (R_{500{\rm crit}})$')
     ax.set_xscale('log')
