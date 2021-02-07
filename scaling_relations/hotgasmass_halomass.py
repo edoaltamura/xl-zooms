@@ -129,7 +129,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='x', s=5, alpha=1,
                color=observations_color, edgecolors='none', zorder=0)
     handles.append(
-        Line2D([], [], color=observations_color, marker='x', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='x', markeredgecolor='k', linestyle='None', markersize=4,
                label=Lovisari15.citation)
     )
     del Lovisari15
@@ -169,7 +169,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm < 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm < 0.1],
                marker='s', s=5, alpha=1, color='k', edgecolors='none', zorder=0)
     ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm > 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm > 0.1],
-               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', zorder=0)
+               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', redgewidth=0.1, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Barnes17.citation)
