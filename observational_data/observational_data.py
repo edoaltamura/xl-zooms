@@ -476,7 +476,7 @@ class Gonzalez13(Observations):
 
 
 class Barnes17(Observations):
-    paper_name = "Barnes et al. (2017)"
+    citation = "Barnes et al. (2017) (C-EAGLE)"
     notes = "Assumes Planck13. Values for snapshots at z=0.1."
 
     def __init__(self, *args, **kwargs):
@@ -485,7 +485,7 @@ class Barnes17(Observations):
 
     def process_data(self):
         h_conv_Barn = cosmology.Planck13.h / self.cosmo_model.h
-        data = np.loadtxt('repository/barnes2017_ceagle_properties.dat').T
+        data = np.loadtxt(f'{repository_dir}/barnes2017_ceagle_properties.dat').T
 
         self.m_500true = np.power(10, data[0]) * Solar_Mass
         self.m_500hse = np.power(10, data[1]) * Solar_Mass
@@ -645,7 +645,7 @@ class PlanckSZ2015(Observations):
 
         data = []
 
-        with open('repository/planck2015_sz2.dat') as f:
+        with open(f'{repository_dir}/planck2015_sz2.dat') as f:
             lines = f.readlines()
             for line in lines:
                 if not line.startswith('#') and not line.isspace():

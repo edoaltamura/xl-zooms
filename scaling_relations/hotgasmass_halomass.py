@@ -165,6 +165,15 @@ def m_500_hotgas(results: pd.DataFrame):
     )
     del Vikhlinin06
 
+    Barnes17 = obs.Barnes17()
+    ax.scatter(Barnes17.m_500true, Barnes17.m_gas,
+               marker='.', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    handles.append(
+        Line2D([], [], color=observations_color, marker='.', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Barnes17.citation)
+    )
+    del Barnes17
+
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
