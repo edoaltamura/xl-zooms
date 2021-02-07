@@ -141,6 +141,7 @@ def relaxation(results: pd.DataFrame):
     ax.set_ylabel(r'$E_{\rm kin}\ /E_{\rm therm}\ (R_{500{\rm crit}})$')
     ax.set_xscale('log')
     ax.set_yscale('log')
+    ax.set_ylim([0.01, 1.2])
     fig.savefig(f'{zooms_register[0].output_directory}/relaxation.png', dpi=300)
     plt.show()
     plt.close()
