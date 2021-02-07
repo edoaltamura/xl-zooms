@@ -74,10 +74,10 @@ def process_single_halo(
 
     Ekin = np.sum(
         0.5 * massGas[index] * (velGas[index, 0] ** 2 + velGas[index, 1] ** 2 + velGas[index, 2] ** 2)
-    )
+    ).to("1.e10*Mpc**2*Msun/Gyr**2")
     Etherm = np.sum(
         1.5 * unyt.boltzmann_constant * mass_weighted_temperatures[index] / (unyt.hydrogen_mass / 1.16)
-    )
+    ).to("1.e10*Mpc**2*Msun/Gyr**2")
 
     return M500c, Ekin, Etherm
 
@@ -101,14 +101,18 @@ def relaxation(results: pd.DataFrame):
         if run_style['Legend handle'] not in legend_handles:
             legend_handles.append(run_style['Legend handle'])
 
+        energy_ratio = results.loc[i, "Ekin_500crit"] / results.loc[i, "Etherm_500crit"]
+
         ax.scatter(
             results.loc[i, "M_500crit"],
-            results.loc[i, "Ekin_500crit"] / results.loc[i, "Etherm_500crit"],
+            energy_ratio,
             marker=run_style['Marker style'],
             c=run_style['Color'],
             s=run_style['Marker size'],
             alpha=1,
-            edgecolors='none',
+            edgecolors='k' if energy_ratio.value > 0.1 else 'none',
+            facecolors='w'if energy_ratio.value > 0.1 else 'k',
+            linewidth=0.4 if energy_ratio.value > 0.1 else 0,
             zorder=5
         )
 
@@ -137,6 +141,7 @@ def relaxation(results: pd.DataFrame):
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$E_{\rm kin}\ /E_{\rm therm}\ (R_{500{\rm crit}})$')
     ax.set_xscale('log')
+    ax.set_yscale('log')
     fig.savefig(f'{zooms_register[0].output_directory}/relaxation.png', dpi=300)
     plt.show()
     plt.close()
