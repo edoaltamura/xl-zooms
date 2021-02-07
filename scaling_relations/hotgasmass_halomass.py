@@ -294,7 +294,7 @@ def f_500_hotgas(results: pd.DataFrame):
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$f_{{\rm gas},500{\rm crit}}$')
     ax.set_xscale('log')
-    ax.set_ylim([-0.07, 0.25])
+    ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
     ax.plot(ax.get_xlim(), [fbary for _ in ax.get_xlim()], '--', color='k')
 
