@@ -107,7 +107,7 @@ def m_500_hotgas(results: pd.DataFrame):
         )
 
     # Build legends
-    legend_sims = plt.legend(handles=legend_handles, loc=2, frameon=True, facecolor='w')
+    legend_sims = plt.legend(handles=legend_handles, loc=2, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_sims)
 
     # Display observational data
@@ -180,7 +180,7 @@ def m_500_hotgas(results: pd.DataFrame):
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
-    legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w')
+    legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
@@ -215,7 +215,7 @@ def f_500_hotgas(results: pd.DataFrame):
         )
 
     # Build legends
-    legend_sims = plt.legend(handles=legend_handles, loc=2, frameon=True, facecolor='w')
+    legend_sims = plt.legend(handles=legend_handles, loc=1, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_sims)
 
     # Display observational data
@@ -288,13 +288,13 @@ def f_500_hotgas(results: pd.DataFrame):
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
-    legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w')
+    legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$f_{{\rm gas},500{\rm crit}}$')
     ax.set_xscale('log')
-    ax.set_yscale('log')
+    # ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [fbary for _ in ax.get_xlim()], '--', color='k')
 
     fig.savefig(f'{zooms_register[0].output_directory}/f_500_hotgas.png', dpi=300)
