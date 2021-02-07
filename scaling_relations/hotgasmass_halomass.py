@@ -173,7 +173,7 @@ def m_500_hotgas(results: pd.DataFrame):
                marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Barnes17.citation)
+               label=obs.Barnes17().citation)
     )
     del Barnes17
 
