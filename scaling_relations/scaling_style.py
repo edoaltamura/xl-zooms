@@ -5,7 +5,7 @@ from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 from matplotlib.cm import get_cmap
 
-name = "jet"
+name = "hsv"
 cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
 # colors = cmap.colors  # type: list
 colors = cmap(np.linspace(0, 255, 8, dtype=np.int))
