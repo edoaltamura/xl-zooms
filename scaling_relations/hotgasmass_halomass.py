@@ -165,10 +165,11 @@ def m_500_hotgas(results: pd.DataFrame):
     )
     del Vikhlinin06
 
-    Barnes17 = obs.Barnes17()
-    ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm < 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm < 0.1],
+    Barnes17 = obs.Barnes17().hdf5.z000p000['True']
+    relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
+    ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1],
                marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
-    ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm > 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm > 0.1],
+    ax.scatter(Barnes17.M500[relaxed > 0.1], Barnes17.Mgas_500[relaxed > 0.1],
                marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,

@@ -1,6 +1,7 @@
 import re
 import os
 import numpy as np
+import h5py
 import itertools
 from typing import Union, List
 from astropy import cosmology
@@ -119,6 +120,38 @@ except ImportError:
 # === End of imports ===
 unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
 repository_dir = os.path.join(os.path.dirname(__file__), 'repository')
+
+
+def load_dict_from_hdf5(filename):
+    with h5py.File(filename, 'r') as h5file:
+        return recursively_load_dict_contents_from_group(h5file, '/')
+
+
+def recursively_load_dict_contents_from_group(h5file, path):
+    ans = {}
+    for key, item in h5file[path].items():
+        if isinstance(item, h5py._hl.dataset.Dataset):
+            ans[key] = item.value
+        elif isinstance(item, h5py._hl.group.Group):
+            ans[key] = recursively_load_dict_contents_from_group(h5file, path + key + '/')
+    return ans
+
+
+def dict2obj(d):
+    # Check if object d is an instance of class list
+    if isinstance(d, list):
+        d = [dict2obj(x) for x in d]
+    if not isinstance(d, dict):
+        return d
+
+    class C:
+        pass
+
+    obj = C()
+    for k in d:
+        obj.__dict__[k] = dict2obj(d[k])
+
+    return obj
 
 
 class Observations:
@@ -482,6 +515,7 @@ class Barnes17(Observations):
     def __init__(self, *args, **kwargs):
         super(Barnes17, self).__init__(*args, **kwargs)
         self.process_data()
+        self.get_from_hdf5()
 
     def process_data(self):
         h_conv_Barn = cosmology.Planck13.h / self.cosmo_model.h
@@ -507,6 +541,11 @@ class Barnes17(Observations):
 
         # Convert self.LX to Solar luminosities
         self.LX = self.LX.to(Solar_Luminosity)
+
+    def get_from_hdf5(self):
+        data = load_dict_from_hdf5(f'{repository_dir}/barnes2017_ceagle.hdf5')
+        data = dict2obj(data)
+        self.hdf5 = data
 
 
 class Voit05(Observations):
