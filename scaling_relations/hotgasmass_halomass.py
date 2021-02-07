@@ -107,7 +107,7 @@ def m_500_hotgas(results: pd.DataFrame):
         )
 
     # Build legends
-    legend_sims = plt.legend(handles=legend_handles, loc=2)
+    legend_sims = plt.legend(handles=legend_handles, loc=2, facecolor='w')
     ax.add_artist(legend_sims)
 
     # Display observational data
@@ -126,10 +126,10 @@ def m_500_hotgas(results: pd.DataFrame):
     del Sun09
 
     Lovisari15 = obs.Lovisari15()
-    ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='x', s=5, alpha=1,
+    ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='^', s=5, alpha=1,
                color=observations_color, edgecolors='none', zorder=0)
     handles.append(
-        Line2D([], [], color=observations_color, marker='x', markeredgecolor='k', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='^', markeredgecolor='k', linestyle='None', markersize=4,
                label=Lovisari15.citation)
     )
     del Lovisari15
@@ -147,9 +147,9 @@ def m_500_hotgas(results: pd.DataFrame):
 
     Eckert16 = obs.Eckert16()
     ax.scatter(Eckert16.M_500, Eckert16.M_500gas,
-               marker='^', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+               marker='<', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     handles.append(
-        Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='<', markeredgecolor='none', linestyle='None', markersize=4,
                label=Eckert16.citation)
     )
     del Eckert16
@@ -167,9 +167,9 @@ def m_500_hotgas(results: pd.DataFrame):
 
     Barnes17 = obs.Barnes17()
     ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm < 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm < 0.1],
-               marker='s', s=5, alpha=1, color='k', edgecolors='none', zorder=0)
+               marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
     ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm > 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm > 0.1],
-               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.1, zorder=0)
+               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.2, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Barnes17.citation)
@@ -179,7 +179,7 @@ def m_500_hotgas(results: pd.DataFrame):
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
-    legend_obs = plt.legend(handles=handles, loc=4)
+    legend_obs = plt.legend(handles=handles, loc=4, facecolor='w')
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
