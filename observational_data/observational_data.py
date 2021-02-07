@@ -1,4 +1,5 @@
 import re
+import os
 import numpy as np
 import itertools
 from typing import Union, List
@@ -117,6 +118,7 @@ except ImportError:
 
 # === End of imports ===
 unyt.define_unit("hubble_parameter", value=1. * Dimensionless, tex_repr="h")
+repository_dir = os.path.join(os.path.dirname(__file__), 'repository')
 
 
 class Observations:
@@ -204,7 +206,7 @@ class Sun09(Observations):
         Omega_b = self.cosmo_model.Ob0
         Omega_m = self.cosmo_model.Om0
 
-        raw = np.loadtxt('repository/Sun2009.dat')
+        raw = np.loadtxt(f'{repository_dir}/Sun2009.dat')
         M_500 = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 1], units="Msun")
         error_M_500_p = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 2], units="Msun")
         error_M_500_m = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 3], units="Msun")
@@ -241,7 +243,7 @@ class Lovisari15(Observations):
         super(Lovisari15, self).__init__(*args, **kwargs)
 
         # Read the data
-        raw = np.loadtxt('repository/Lovisari2015.dat')
+        raw = np.loadtxt(f'{repository_dir}/Lovisari2015.dat')
         self.M_500 = unyt.unyt_array((0.70 / self.cosmo_model.h) * 10 ** raw[:, 0], units="Msun")
         self.fb_500 = unyt.unyt_array(raw[:, 1] * (0.70 / self.cosmo_model.h) ** 2.5, units="dimensionless")
         self.M_gas500 = self.M_500 * self.fb_500
@@ -267,7 +269,7 @@ class Lin12(Observations):
         Omega_m = self.cosmo_model.Om0
 
         # Read the data
-        raw = np.loadtxt('repository/Lin2012.dat')
+        raw = np.loadtxt(f'{repository_dir}/Lin2012.dat')
         M_500 = unyt.unyt_array((0.71 / h_sim) * 10 ** raw[:, 0], units="Msun")
         M_500_error = unyt.unyt_array((0.71 / h_sim) * raw[:, 1], units="Msun")
         M_500_gas = unyt.unyt_array((0.71 / h_sim) * 10 ** raw[:, 2], units="Msun")
@@ -310,7 +312,7 @@ class Eckert16(Observations):
         h_sim = self.cosmo_model.h
 
         # Read the data
-        raw = np.loadtxt('repository/Eckert2016.dat')
+        raw = np.loadtxt(f'{repository_dir}/Eckert2016.dat')
         self.M_500 = unyt.unyt_array((0.70 / h_sim) * 10 ** raw[:, 0], units="Msun")
         self.fb_500 = unyt.unyt_array(raw[:, 1] * (0.70 / h_sim) ** 2.5, units="dimensionless")
         self.M_500gas = self.M_500 * self.fb_500
@@ -335,7 +337,7 @@ class Vikhlinin06(Observations):
         h_sim = self.cosmo_model.h
 
         # Read the data
-        raw = np.loadtxt('repository/Vikhlinin2006.dat')
+        raw = np.loadtxt(f'{repository_dir}/Vikhlinin2006.dat')
         self.M_500 = unyt.unyt_array((10 ** 14) * (0.72 / h_sim) * raw[:, 1], units="Msun")
         self.error_M_500 = unyt.unyt_array((10 ** 14) * (0.72 / h_sim) * raw[:, 2], units="Msun")
         self.fb_500 = unyt.unyt_array((0.72 / h_sim) ** 1.5 * raw[:, 3], units="dimensionless")
