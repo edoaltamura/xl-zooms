@@ -118,7 +118,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Sun09.M_500, Sun09.M_500gas,
                marker='d', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     ax.errorbar(Sun09.M_500, Sun09.M_500gas, yerr=Sun09.M_500gas_error, xerr=Sun09.M_500_error,
-                ms=0, ls='none', elinewidth=1,  color=observations_color, zorder=0)
+                ls='none', elinewidth=0.5,  color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.citation)
@@ -138,7 +138,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Lin12.M_500, Lin12.M_500gas,
                marker='^', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     ax.errorbar(Lin12.M_500, Lin12.M_500gas, yerr=Lin12.M_500gas_error, xerr=Lin12.M_500_error,
-                ms=0, ls='none', elinewidth=1, color=observations_color, zorder=0)
+                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lin12.citation)
@@ -158,7 +158,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
                marker='*', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.M_500gas, yerr=Vikhlinin06.error_M_500gas, xerr=Vikhlinin06.error_M_500,
-                ms=0, ls='none', elinewidth=1, color=observations_color, zorder=0)
+                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                label=Vikhlinin06.citation)
