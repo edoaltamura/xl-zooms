@@ -107,11 +107,10 @@ def relaxation(results: pd.DataFrame):
             results.loc[i, "M_500crit"],
             energy_ratio,
             marker=run_style['Marker style'],
-            c=run_style['Color'],
             s=run_style['Marker size'],
             alpha=1,
-            edgecolors='k' if energy_ratio.value > 0.1 else 'none',
-            facecolors='w'if energy_ratio.value > 0.1 else 'k',
+            edgecolors=run_style['Color'] if energy_ratio.value > 0.1 else 'none',
+            facecolors='w'if energy_ratio.value > 0.1 else run_style['Color'],
             linewidth=0.4 if energy_ratio.value > 0.1 else 0,
             zorder=5
         )
@@ -137,7 +136,7 @@ def relaxation(results: pd.DataFrame):
 
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
-
+    ax.hline(0.1, '--')
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
     ax.set_ylabel(r'$E_{\rm kin}\ /E_{\rm therm}\ (R_{500{\rm crit}})$')
     ax.set_xscale('log')
