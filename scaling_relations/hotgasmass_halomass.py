@@ -169,7 +169,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm < 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm < 0.1],
                marker='s', s=5, alpha=1, color='k', edgecolors='none', zorder=0)
     ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm > 0.1], Barnes17.m_gas[Barnes17.ekin_ethrm > 0.1],
-               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', edgewidths=0.1, zorder=0)
+               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.1, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Barnes17.citation)
