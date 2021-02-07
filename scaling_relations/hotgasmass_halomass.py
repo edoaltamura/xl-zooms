@@ -111,55 +111,56 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.add_artist(legend_sims)
 
     # Display observational data
+    observations_color = (0.65, 0.65, 0.65)
     handles = []
 
     Sun09 = obs.Sun09()
     ax.scatter(Sun09.M_500, Sun09.M_500gas,
-               marker='d', s=8, alpha=1, color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
+               marker='d', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     ax.errorbar(Sun09.M_500, Sun09.M_500gas, yerr=Sun09.M_500gas_error, xerr=Sun09.M_500_error,
-                ms=0, ls='none',  color=(0.65, 0.65, 0.65), zorder=0)
+                ms=0, ls='none', elinewidth=1,  color=observations_color, zorder=0)
     handles.append(
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='d', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.citation)
     )
     del Sun09
 
     Lovisari15 = obs.Lovisari15()
-    ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='s', s=8, alpha=1,
-               color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
+    ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='s', s=5, alpha=1,
+               color=observations_color, edgecolors='none', zorder=0)
     handles.append(
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='s', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lovisari15.citation)
     )
     del Lovisari15
 
     Lin12 = obs.Lin12()
     ax.scatter(Lin12.M_500, Lin12.M_500gas,
-               marker='^', s=8, alpha=1, color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
+               marker='^', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     ax.errorbar(Lin12.M_500, Lin12.M_500gas, yerr=Lin12.M_500gas_error, xerr=Lin12.M_500_error,
-                ms=0, ls='none', color=(0.65, 0.65, 0.65), zorder=0)
+                ms=0, ls='none', elinewidth=1, color=observations_color, zorder=0)
     handles.append(
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='^', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lin12.citation)
     )
     del Lin12
 
     Eckert16 = obs.Eckert16()
     ax.scatter(Eckert16.M_500, Eckert16.M_500gas,
-               marker='v', s=8, alpha=1, color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
+               marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     handles.append(
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='v', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
                label=Eckert16.citation)
     )
     del Eckert16
 
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
-               marker='*', s=8, alpha=1, color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
+               marker='*', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.M_500gas, yerr=Vikhlinin06.error_M_500gas, xerr=Vikhlinin06.error_M_500,
-                ms=0, ls='none', color=(0.65, 0.65, 0.65), zorder=0)
+                ms=0, ls='none', elinewidth=1, color=observations_color, zorder=0)
     handles.append(
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='*', markeredgecolor='none', linestyle='None', markersize=4,
+        Line2D([], [], color=observations_color, marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                label=Vikhlinin06.citation)
     )
     del Vikhlinin06
