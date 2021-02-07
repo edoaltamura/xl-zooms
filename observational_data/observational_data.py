@@ -149,7 +149,8 @@ def dict2obj(d):
 
     obj = C()
     for k in d:
-        obj.__dict__[k] = dict2obj(d[k])
+        k_name = k.lower() if k == 'True' else k
+        obj.__dict__[k_name] = dict2obj(d[k])
 
     return obj
 
