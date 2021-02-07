@@ -140,7 +140,7 @@ class Observations:
         """
         if self.verbose > 0:
             try:
-                print(f"[Literature data] Applied: {self.paper_name}")
+                print(f"[Literature data] Applied: {self.citation}")
             except:
                 pass
 
