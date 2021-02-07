@@ -214,35 +214,88 @@ def f_500_hotgas(results: pd.DataFrame):
         )
 
     # Build legends
-    legend_sims = plt.legend(handles=legend_handles, loc=2)
+    legend_sims = plt.legend(handles=legend_handles, loc=2, frameon=True, facecolor='w')
     ax.add_artist(legend_sims)
 
     # Display observational data
-    Sun09 = obs.Sun09()
-    Lovisari15 = obs.Lovisari15()
-    ax.scatter(Sun09.M500, Sun09.Mgas500 / Sun09.M500,
-               marker='d', s=8, alpha=1,
-               color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
-    ax.scatter(Lovisari15.M500, Lovisari15.Mgas500 / Lovisari15.M500,
-               marker='s', s=8, alpha=1,
-               color=(0.65, 0.65, 0.65), edgecolors='none', zorder=0)
+    observations_color = (0.65, 0.65, 0.65)
+    handles = []
 
-    handles = [
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='d', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Sun09.paper_name),
-        Line2D([], [], color=(0.65, 0.65, 0.65), marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Lovisari15.paper_name),
-        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}"),
-    ]
-    del Sun09, Lovisari15
-    legend_obs = plt.legend(handles=handles, loc=4)
+    Sun09 = obs.Sun09()
+    ax.scatter(Sun09.M_500, Sun09.fb_500,
+               marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    ax.errorbar(Sun09.M_500, Sun09.fb_500, yerr=Sun09.fb_500_error, xerr=Sun09.M_500_error,
+                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    handles.append(
+        Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Sun09.citation)
+    )
+    del Sun09
+
+    Lovisari15 = obs.Lovisari15()
+    ax.scatter(Lovisari15.M_500, Lovisari15.fb_500, marker='^', s=5, alpha=1,
+               color=observations_color, edgecolors='none', zorder=0)
+    handles.append(
+        Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Lovisari15.citation)
+    )
+    del Lovisari15
+
+    Lin12 = obs.Lin12()
+    ax.scatter(Lin12.M_500, Lin12.fb_500,
+               marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    ax.errorbar(Lin12.M_500, Lin12.fb_500, yerr=Lin12.fb_500_error, xerr=Lin12.M_500_error,
+                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    handles.append(
+        Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Lin12.citation)
+    )
+    del Lin12
+
+    Eckert16 = obs.Eckert16()
+    ax.scatter(Eckert16.M_500, Eckert16.fb_500,
+               marker='<', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    handles.append(
+        Line2D([], [], color=observations_color, marker='<', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Eckert16.citation)
+    )
+    del Eckert16
+
+    Vikhlinin06 = obs.Vikhlinin06()
+    ax.scatter(Vikhlinin06.M_500, Vikhlinin06.fb_500,
+               marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.fb_500, yerr=Vikhlinin06.error_fb_500, xerr=Vikhlinin06.error_M_500,
+                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    handles.append(
+        Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Vikhlinin06.citation)
+    )
+    del Vikhlinin06
+
+    Barnes17 = obs.Barnes17()
+    ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm < 0.1],
+               Barnes17.m_gas[Barnes17.ekin_ethrm < 0.1] / Barnes17.m_500spec[Barnes17.ekin_ethrm < 0.1],
+               marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
+    ax.scatter(Barnes17.m_500true[Barnes17.ekin_ethrm > 0.1],
+               Barnes17.m_gas[Barnes17.ekin_ethrm < 0.1] / Barnes17.m_500spec[Barnes17.ekin_ethrm < 0.1],
+               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
+    handles.append(
+        Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+               label=Barnes17.citation)
+    )
+    del Barnes17
+
+    handles.append(
+        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
+    )
+    legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w')
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$M_{{\rm gas},500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'$f_{{\rm gas},500{\rm crit}}$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.plot(ax.get_xlim(), [fbary for lim in ax.get_xlim()], '--', color='k')
+    ax.plot(ax.get_xlim(), [fbary for _ in ax.get_xlim()], '--', color='k')
 
     fig.savefig(f'{zooms_register[0].output_directory}/f_500_hotgas.png', dpi=300)
     plt.show()
