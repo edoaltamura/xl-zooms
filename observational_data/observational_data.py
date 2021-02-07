@@ -287,11 +287,11 @@ class Lin12(Observations):
         # Select only the low-z data
         self.M_500 = M_500[z < 0.25]
         self.fb_500 = fb_500[z < 0.25]
-        self.M_500_gas = M_500_gas[z < 0.25]
+        self.M_500gas = M_500_gas[z < 0.25]
 
         self.M_500_error = M_500_error[z < 0.25]
         self.fb_500_error = fb_500_error[z < 0.25]
-        self.M_500_gas_error = M_500_gas_error[z < 0.25]
+        self.M_500gas_error = M_500_gas_error[z < 0.25]
 
 
 class Eckert16(Observations):
