@@ -185,51 +185,163 @@ class Observations:
 
 
 class Sun09(Observations):
-    paper_name = "Sun et al. (2009)"
-    notes = "Data in h_73 units."
-
-    M500_Sun = np.array(
-        [3.18, 4.85, 3.90, 1.48, 4.85, 5.28, 8.49, 10.3,
-         2.0, 7.9, 5.6, 12.9, 8.0, 14.1, 3.22, 14.9, 13.4,
-         6.9, 8.95, 8.8, 8.3, 9.7, 7.9]
-    ) * 1.e13 * Solar_Mass
-    f500_Sun = np.array(
-        [0.097, 0.086, 0.068, 0.049, 0.069, 0.060, 0.076,
-         0.081, 0.108, 0.086, 0.056, 0.076, 0.075, 0.114,
-         0.074, 0.088, 0.094, 0.094, 0.078, 0.099, 0.065,
-         0.090, 0.093]
+    # Meta-data
+    comment = (
+        "Gas and total mass profiles for 23 low-redshift, relaxed groups spanning "
+        "a temperature range 0.7-2.7 keV, derived from Chandra. "
+        "Data was corrected for the simulation's cosmology. Gas fraction (<R_500)."
     )
-    Mgas500_Sun = M500_Sun * f500_Sun
+    citation = "Sun et al. (2009)"
+    bibcode = "2009ApJ...693.1142S"
+    name = "Halo mass - Gas fraction relation from 43 low-redshift Chandra-observed groups."
+    plot_as = "points"
+    redshift = 0.1
 
     def __init__(self, *args, **kwargs):
         super(Sun09, self).__init__(*args, **kwargs)
 
-        h70_Sun = 0.73 / self.cosmo_model.h
-        self.M500 = self.M500_Sun * h70_Sun
-        self.Mgas500 = self.Mgas500_Sun * (h70_Sun ** 2.5)
+        h_sim = self.cosmo_model.h
+        Omega_b = self.cosmo_model.Ob0
+        Omega_m = self.cosmo_model.Om0
+
+        raw = np.loadtxt('repository/Sun2009.dat')
+        M_500 = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 1], units="Msun")
+        error_M_500_p = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 2], units="Msun")
+        error_M_500_m = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 3], units="Msun")
+        fb_500 = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 4], units="dimensionless")
+        error_fb_500_p = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 5], units="dimensionless")
+        error_fb_500_m = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 6], units="dimensionless")
+
+        # Class parser
+        # Define the scatter as offset from the mean value
+        self.M_500 = M_500
+        self.M_500_error = unyt.unyt_array((error_M_500_m, error_M_500_p))
+        self.fb_500 = fb_500
+        self.fb_500_error = unyt.unyt_array((error_fb_500_m, error_fb_500_p))
+        self.M_500gas = M_500 * fb_500
+        self.M_500gas_error = unyt.unyt_array((
+            self.M_500gas * (error_M_500_m / M_500 + error_fb_500_m / fb_500),
+            self.M_500gas * (error_M_500_p / M_500 + error_fb_500_p / fb_500)
+        ))
 
 
 class Lovisari15(Observations):
-    paper_name = "Lovisari et al. (2015)"
-    notes = "Data in h_70 units."
-
-    M500_Lov = np.array(
-        [2.07, 4.67, 2.39, 2.22, 2.95, 2.83, 3.31, 3.53, 3.49,
-         3.35, 14.4, 2.34, 4.78, 8.59, 9.51, 6.96, 10.8, 4.37,
-         8.00, 12.1]
-    ) * 1.e13 * Solar_Mass
-    Mgas500_Lov = np.array(
-        [0.169, 0.353, 0.201, 0.171, 0.135, 0.272, 0.171,
-         0.271, 0.306, 0.247, 1.15, 0.169, 0.379, 0.634,
-         0.906, 0.534, 0.650, 0.194, 0.627, 0.817]
-    ) * 1.e13 * Solar_Mass
+    # Meta-data
+    comment = (
+        "23 Galaxy groups observed with XMM-Newton"
+        "Corrected for the original cosmology which had h=0.7"
+    )
+    citation = "Lovisari et al. (2015)"
+    bibcode = "2015A&A...573A.118L"
+    name = "Scaling Properties of a Complete X-ray Selected Galaxy Group Sample"
+    plot_as = "points"
+    redshift = 0.1
 
     def __init__(self, *args, **kwargs):
         super(Lovisari15, self).__init__(*args, **kwargs)
 
-        h70_Lov = 0.70 / self.cosmo_model.h
-        self.M500 = self.M500_Lov * h70_Lov
-        self.Mgas500 = self.Mgas500_Lov * (h70_Lov ** 2.5)
+        # Read the data
+        raw = np.loadtxt('repository/Lovisari2015.dat')
+        self.M_500 = unyt.unyt_array((0.70 / self.cosmo_model.h) * 10 ** raw[:, 0], units="Msun")
+        self.fb_500 = unyt.unyt_array(raw[:, 1] * (0.70 / self.cosmo_model.h) ** 2.5, units="dimensionless")
+        self.M_gas500 = self.M_500 * self.fb_500
+
+
+class Lin12(Observations):
+    # Meta-data
+    comment = (
+        "Ionized gas out of 94 clusters combining Chandra, WISE and 2MASS. "
+        "Data was corrected for the simulation's cosmology."
+    )
+    citation = "Lin et al. (2012; $z<0.25$ only)"
+    bibcode = "2012ApJ...745L...3L"
+    name = "Halo mass - Gas fraction relation from Chandra-observed clusters."
+    plot_as = "points"
+    redshift = 0.1
+
+    def __init__(self, *args, **kwargs):
+        super(Lin12, self).__init__(*args, **kwargs)
+
+        h_sim = self.cosmo_model.h
+        Omega_b = self.cosmo_model.Ob0
+        Omega_m = self.cosmo_model.Om0
+
+        # Read the data
+        raw = np.loadtxt('repository/Lin2012.dat')
+        M_500 = unyt.unyt_array((0.71 / h_sim) * 10 ** raw[:, 0], units="Msun")
+        M_500_error = unyt.unyt_array((0.71 / h_sim) * raw[:, 1], units="Msun")
+        M_500_gas = unyt.unyt_array((0.71 / h_sim) * 10 ** raw[:, 2], units="Msun")
+        M_500_gas_error = unyt.unyt_array((0.71 / h_sim) * raw[:, 3], units="Msun")
+        z = raw[:, 6]
+
+        # Compute the gas fractions
+        fb_500 = (M_500_gas / M_500) * (0.71 / h_sim) ** 2.5
+        fb_500_error = fb_500 * ((M_500_error / M_500) + (M_500_gas_error / M_500_gas))
+
+        # Normalise by the cosmic mean
+        # fb_500 = fb_500 / (Omega_b / Omega_m)
+        # fb_500_error = fb_500_error / (Omega_b / Omega_m)
+
+        # Select only the low-z data
+        self.M_500 = M_500[z < 0.25]
+        self.fb_500 = fb_500[z < 0.25]
+        self.M_500_gas = M_500_gas[z < 0.25]
+
+        self.M_500_error = M_500_error[z < 0.25]
+        self.fb_500_error = fb_500_error[z < 0.25]
+        self.M_500_gas_error = M_500_gas_error[z < 0.25]
+
+
+class Eckert16(Observations):
+    # Meta-data
+    comment = (
+        "Based on observations obtained with XMM-Newton. "
+        "Corrected for the original cosmology which had h=0.7"
+    )
+    citation = "Eckert et al. (2016)"
+    bibcode = "2016A&A...592A..12E"
+    name = "The XXL Survey. XIII. Baryon content of the bright cluster sample"
+    plot_as = "points"
+    redshift = 0.1
+
+    def __init__(self, *args, **kwargs):
+        super(Eckert16, self).__init__(*args, **kwargs)
+
+        h_sim = self.cosmo_model.h
+
+        # Read the data
+        raw = np.loadtxt('repository/Eckert2016.dat')
+        self.M_500 = unyt.unyt_array((0.70 / h_sim) * 10 ** raw[:, 0], units="Msun")
+        self.fb_500 = unyt.unyt_array(raw[:, 1] * (0.70 / h_sim) ** 2.5, units="dimensionless")
+        self.M_500gas = self.M_500 * self.fb_500
+
+
+class Vikhlinin06(Observations):
+    # Meta-data
+    comment = (
+        "Gas and total mass profiles for 13 low-redshift, relaxed clusters spanning "
+        "a temperature range 0.7-9 keV, derived from all available Chandra data of "
+        "sufficient quality. Data was corrected for the simulation's cosmology."
+    )
+    citation = "Vikhlinin et al. (2006)"
+    bibcode = "2006ApJ...640..691V"
+    name = "Halo mass - Gas fraction relation from 13 low-redshift Chandra-observed relaxed clusters."
+    plot_as = "points"
+    redshift = 0.1
+
+    def __init__(self, *args, **kwargs):
+        super(Vikhlinin06, self).__init__(*args, **kwargs)
+
+        h_sim = self.cosmo_model.h
+
+        # Read the data
+        raw = np.loadtxt('repository/Vikhlinin2006.dat')
+        self.M_500 = unyt.unyt_array((10 ** 14) * (0.72 / h_sim) * raw[:, 1], units="Msun")
+        self.error_M_500 = unyt.unyt_array((10 ** 14) * (0.72 / h_sim) * raw[:, 2], units="Msun")
+        self.fb_500 = unyt.unyt_array((0.72 / h_sim) ** 1.5 * raw[:, 3], units="dimensionless")
+        self.error_fb_500 = unyt.unyt_array((0.72 / h_sim) ** 1.5 * raw[:, 4], units="dimensionless")
+        self.M_500gas = self.M_500 * self.fb_500
+        self.error_M_500gas = self.M_500gas * (self.error_M_500 / self.M_500 + self.error_fb_500 / self.fb_500)
 
 
 class Kravtsov18(Observations):
@@ -463,7 +575,9 @@ class Pratt10(Observations):
 
     def process_properties(self):
         h_conv = 0.7 / self.cosmo_model.h
-
+        field_names = (
+            'Cluster_name z kT M500 Delta_hi_M500 Delta_lo_M500 K0p1R200 Delta_hi_K0p1R200 Delta_lo_K0p1R200 '
+            'KR2500 Delta_KR2500 KR1000 Delta_KR1000 KR500 CC Disturbed').split()
         data = []
 
         with open('repository/pratt2018_properties.dat') as f:
@@ -472,7 +586,7 @@ class Pratt10(Observations):
                 if not line.startswith('#') and not line.isspace():
                     line_data = line.split()
                     for i, element_data in enumerate(line_data):
-                        if element_data.isspace():
+                        if element_data.strip() == 'none':
                             # If no data, replace with Nan
                             line_data[i] = np.nan
                         elif re.search('[a-df-zA-Z]', element_data):
@@ -485,6 +599,29 @@ class Pratt10(Observations):
         data = list(map(list, itertools.zip_longest(*data, fillvalue=None)))
         for i, field in enumerate(data):
             data[i] = np.array(field)
+
+        # Redshift columns: data[5]
+        ez = self.ez_function(data[1])
+        luminosity_distance = self.luminosity_distance(data[1]) / ((data[1] + 1) ** 2)
+
+        conversion_factors = [
+            None,
+            1,
+            ez ** (-2 / 3) * (luminosity_distance.value * h_conv * (np.pi / 10800.0) * unyt.arcmin) ** 2.0,
+            ez ** (-2 / 3) * (luminosity_distance.value * h_conv * (np.pi / 10800.0) * unyt.arcmin) ** 2.0,
+            1,
+            1,
+            None,
+            1.e14 * h_conv * Solar_Mass,
+            1.e14 * h_conv * Solar_Mass,
+
+        ]
+
+        for i, (field, conversion) in enumerate(zip(self.field_names, conversion_factors)):
+            if isinstance(data[i][0], str):
+                setattr(self, field, data[i])
+            else:
+                setattr(self, field, data[i] * conversion)
 
         print(data)
 
@@ -834,5 +971,4 @@ class Mernier17(MetallicityScale):
 
 
 if __name__ == '__main__':
-    obs = PlanckSZ2015()
-    obs.quick_display()
+    obs = Pratt10()

@@ -2,7 +2,7 @@
 # K(R) = K0 + K100 (R/100 h^−1_70 kpc)^α
 # Entropy is measured in units of keV cm−2
 
-# Cluster_name K0 Delta(K0) K100 Delta(K100) α Delta(α)
+# Cluster_name   K0 Delta(K0) K100 Delta(K100) α Delta(α)
 RXC-J0003.8+0203 39.33 2.20 196.25 3.93 0.77 0.02
 RXC-J0006.6-3443 97.68 26.02 280.10 30.12 0.58 0.05
 RXC-J0020.7-2542 177.45 10.39 87.07 9.76 1.15 0.07
