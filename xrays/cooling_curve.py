@@ -52,9 +52,9 @@ if __name__ == '__main__':
     # Elements to include
     # ['hydrogen', 'helium', 'carbon', 'nitrogen', 'oxygen', 'neon', 'magnesium', 'silicon', 'iron']
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
-    Elo = 0.1  # keV
-    Ehi = 10.0  #
-    energy_bins = numpy.logspace(-2, 2, 10000)
+    Elo = 0.5  # keV
+    Ehi = 2.0  #
+    energy_bins = numpy.logspace(numpy.log10(Elo), numpy.log10(Ehi), 10000)
 
     # declare the Collisional Ionization Equilibrium session
     sess = pyatomdb.spectrum.CIESession()
