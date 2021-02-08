@@ -1,12 +1,32 @@
-import pyatomdb, numpy
+import pyatomdb, numpy, os
 from matplotlib import pyplot as plt
 
-import sys
+"""
+This code is an example of generating a cooling curve: the total power
+radiated in keV cm3 s-1 by each element at each temperature. It will
+generate a text file with the emission per element at each temperature
+from 1e4 to 1e9K.
 
-chandra = '/cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis/xray-analysis/pyatomdb/pyatomdb/examples'
+This is similar to the atomdb.lorentz_power function, but with a few
+normalizations removed to run a little quicker.
+
+Note that the Anders and Grevesse (1989) abundances are built in to
+this. These can be looked up using atomdb.get_abundance(abundset='AG89'),
+or the 'angr' column of the table at
+https://heasarc.nasa.gov/xanadu/xspec/xspec11/manual/node33.html#SECTION00631000000000000000
+"""
 
 
 def calc_power(Zlist, cie, Tlist):
+    """
+  Zlist : [int]
+    List of element nuclear charges
+  cie : CIESession
+    The CIEsession object with all the relevant data predefined.
+  Tlist : array(float)
+    The temperatures at which to calculate the power (in K)
+  """
+
     res = {}
     res['power'] = {}
     res['temperature'] = []
@@ -42,37 +62,55 @@ def calc_power(Zlist, cie, Tlist):
                 cie.set_eebrems(False)
 
                 spec = cie.return_spectrum(kT)
+            # if Z = 1, do the eebrems (only want to calculate this once)
+            #      if Z == 1:
+            #        cie.set_eebrems(True)
+            #      else:
+            #        cie.set_eebrems(False)
 
+            # get spectrum in ph cm3 s-1
+            # spec = cie.return_spectrum(kT)
+
+            # convert to keV cm3 s-1, sum
             res['power'][i][Z] = sum(spec * en)
 
     return res
 
 
 if __name__ == '__main__':
-    # Elements to include
+
     # ['hydrogen', 'helium', 'carbon', 'nitrogen', 'oxygen', 'neon', 'magnesium', 'silicon', 'iron']
     Zlist = [0, 1, 2, 6, 7, 8, 10, 12, 13, 14, 26]
-    Elo = 0.5  # keV
-    Ehi = 2.0  #
-    energy_bins = numpy.logspace(numpy.log10(Elo), numpy.log10(Ehi), 10000)
+    Elo = 0.001  # keV
+    Ehi = 100.0
 
-    # declare the Collisional Ionization Equilibrium session
-    sess = pyatomdb.spectrum.CIESession()
-    sess.set_abund(Zlist[1:], 1.0)
-    sess.set_eebrems(True)
-    sess.set_broadening(True, velocity_broadening=400.)  # velocity in km/s
-    # sess.set_response(energy_bins, raw=True)
-    # now repeat the process with a real response
-    sess.set_response(chandra + '/aciss_meg1_cy22.grmf', arf=chandra + '/aciss_meg1_cy22.garf')
-    kT = 8.  # temperature in keV
-    spec = sess.return_spectrum(kT)
-    spec = numpy.append(0, spec)
+    # temperatures at which to calculate curve (K)
+    Tlist = numpy.logspace(4, 10, 101)
 
-    # Returned spectrum has units of photons cm^5 s^-1 bin^-1
+    # set up the spectrum
+    cie = pyatomdb.spectrum.CIESession()
+    ebins = numpy.linspace(Elo, Ehi, 10001)
+    cie.set_response(ebins, raw=True)
+    cie.set_eebrems(True)
+    k = calc_power(Zlist, cie, Tlist)
+
+    s = '# Temperature log10(K)'
+    for i in range(len(Zlist)):
+        s += ' %12i' % (Zlist[i])
+
+    k['totpower'] = numpy.zeros(len(k['temperature']))
+
+    for i in range(len(k['temperature'])):
+        s = '%22e' % (numpy.log10(k['temperature'][i]))
+        for Z in Zlist:
+            s += ' %12e' % (k['power'][i][Z])
+            k['totpower'][i] += k['power'][i][Z]
+
     fig, ax = plt.subplots()
-    ax.plot(sess.ebins_out, spec, drawstyle='steps')
+    ax.plot(k['temperature'], k['totpower'] * pyatomdb.const.ERG_KEV)
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_xlabel('Energy (keV)')
-    ax.set_ylabel('Intensity (ph cm$^5$ s$^{-1}$ bin$^{-1}$)')
+    ax.set_xlabel('Temperature (K)')
+    ax.set_ylabel('Radiated Power (erg cm$^3$ s$^{-1}$)')
+    ax.set_xlim(min(Tlist), max(Tlist))
     plt.show()
