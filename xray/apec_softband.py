@@ -187,62 +187,124 @@ def calc_spec(data):
                 511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
                        data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
-    print(Ypar)
+    print(EMM)
 
-    # mass = data['GASmass_p']
-    # temp = data['GAStemp_p']
-    # iron = data['Fe_p']
-    #
-    # nbins = 25 + 1
-    # rm = np.log10(0.001 * data['R500'])
-    # rx = np.log10(5.0 * data['R500'])
-    # rbin = np.logspace(rm, rx, num=nbins, base=10.0)
-    # rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
-    # vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0))
-    #
-    # mpro = radial_bin(data['GASradiald_p'], mass, rmin=np.min(rbin), rmax=np.max(rbin), nb=nbins)[1]
-    # data['Srho'] = mpro / vol
-    # data['Svol'] = vol
-    # tpro = radial_bin(data['GASradiald_p'], mass * temp, rmin=np.min(rbin), rmax=np.max(rbin), nb=nbins)[1]
-    # data['Stmp'] = (tpro / mpro) * (kb / erg2keV)
-    # zpro = radial_bin(data['GASradiald_p'], mass * iron, rmin=np.min(rbin), rmax=np.max(rbin), nb=nbins)[1]
-    # data['Smet'] = (zpro / mpro) / 1.29e-3
-    # del vol, mpro, tpro, zpro
-    #
-    # spectrum = np.zeros((len(rcen), len(energies)))
-    #
-    # for k in range(0, len(rcen), 1):
-    #     idx = np.where((data['GASradiald_p'] > rbin[k]) & (data['GASradiald_p'] <= rbin[k + 1]))[0]
-    #     if len(idx) <= 0:
-    #         continue
-    #     itemp = locate(temptab, np.log10(temp[idx]))
-    #     for j in range(0, len(energies), 1):
-    #         spectrum[k, j] += np.sum(
-    #             EMM[idx] * (APECtab['Hydrogen'][itemp, j] +
-    #             APECtab['Helium'][itemp, j] * He_H[idx] +
-    #             APECtab['Carbon'][itemp, j] * C_H[idx] +
-    #             APECtab['Nitrogen'][itemp, j] * N_H[idx] +
-    #             APECtab['Oxygen'][itemp, j] * O_H[idx] +
-    #             APECtab['Neon'][itemp, j] * Ne_H[idx] +
-    #             APECtab['Magnesium'][itemp, j] * Mg_H[idx] +
-    #             APECtab['Silicon'][itemp, j] * Si_H[idx] +
-    #             APECtab['Sulphur'][itemp, j] * S_H[idx] +
-    #             APECtab['Calcium'][itemp, j] * Ca_H[idx] +
-    #             APECtab['Iron'][itemp, j] * Fe_H[idx])
-    #         )
-    #
-    # spectrum = spectrum.reshape(len(rcen), len(energies))
-    #
-    # del temp, He_H, C_H, N_H, O_H, Ne_H, Mg_H, Ca_H, S_H, Si_H, Fe_H, rm, rx
-    # del data['GASpos_p'], data['GASmass_p'], data['GASrho_p'], data['GAStemp_p'], data['H_p'], data['He_p'], data['C_p'], data['N_p'], \
-    #         data['O_p'], data['Ne_p'], data['Mg_p'], data['Si_p'], data['Fe_p'], data['GASradiald_p']
-    #
-    # data['Rspec'] = rcen
-    # data['Spectrum'] = spectrum
-    # data['EMM'] = EMM
-    # data['Ypar'] = Ypar
-    # del rcen, spectrum, EMM, Ypar
-    # return
+
+def cool_func_soft(comm, NProcs, MyRank, x, data, pix):
+
+    from scipy.io.idl import readsav
+
+    APEC = readsav('APEC_0.5_2.0keV_interp.idl')
+
+    inde = 0  # 0 - erg/s, 1 - photons
+    indz = locate(APEC['redshift'], data['halo_' + x]['zred'])
+    indT = locate(APEC["ltemp"], np.log10(data['halo_' + x]['GAStemp']))
+
+    ne_nH = np.zeros(len(data.gas.masses.value)) + 1
+    ni_nH = np.zeros(len(data.gas.masses.value)) + 1
+    mu = np.zeros(len(data.gas.masses.value))
+    Lambda = np.zeros(len(data.gas.masses.value), dtype=np.float64)
+
+    # --- Sum element contributions
+    # Hydrogen
+    H = data.gas.element_mass_fractions.hydrogen.value['H']
+    mu += 1.0 / (1.0 + 1.0)
+    lN_H_AG = 12.00
+    Lambda += APEC["Lambda_hydrogen"][indz, indT, inde]
+    # Helium
+    He_H = data.gas.element_mass_fractions.helium.value / H
+    ne_nH += (He_H) * (1.00794 / 4.002602) * (2.0 / 1.0)
+    ni_nH += (He_H) * (1.00794 / 4.002602)
+    mu += (He_H) / (1.0 + 2.0)
+    AG_He = 10.99 - lN_H_AG
+    He_H = 10.0 ** (np.log10(He_H * (1.00794 / 4.002602)) - AG_He)
+    Lambda += He_H * APEC["Lambda_helium"][indz, indT, inde]
+    del He_H
+    # Carbon
+    C_H = data.gas.element_mass_fractions.carbon.value / H
+    ne_nH += (C_H) * (1.00794 / 12.0107) * (6.0 / 1.0)
+    ni_nH += (C_H) * (1.00794 / 12.0107)
+    mu += (C_H) / (1.0 + 6.0)
+    AG_C = 8.56 - lN_H_AG
+    C_H = 10.0 ** (np.log10(C_H * (1.00794 / 12.0107)) - AG_C)
+    C_H = 10.0 ** (np.log10(C_H * (1.00794 / 12.0107)) - AG_C)
+    Lambda += C_H * APEC["Lambda_carbon"][indz, indT, inde]
+    # Nitrogen
+    N_H = data.gas.element_mass_fractions.nitrogen.value / H
+    ne_nH += (N_H) * (1.00794 / 14.0067) * (7.0 / 1.0)
+    ni_nH += (N_H) * (1.00794 / 14.0067)
+    mu += (N_H) / (1.0 + 7.0)
+    AG_N = 8.05 - lN_H_AG
+    N_H = 10.0 ** (np.log10(N_H * (1.00794 / 14.0067)) - AG_N)
+    Lambda += N_H * APEC["Lambda_nitrogen"][indz, indT, inde]
+    del N_H
+    # Oxygen
+    O_H = data.gas.element_mass_fractions.oxygen.value / H
+    ne_nH += (O_H) * (1.00794 / 15.9994) * (8.0 / 1.0)
+    ni_nH += (O_H) * (1.00794 / 15.9994)
+    mu += (O_H) / (1.0 + 8.0)
+    AG_O = 8.83 - lN_H_AG
+    O_H = 10.0 ** (np.log10(O_H * (1.00794 / 15.9994)) - AG_O)
+    Lambda += O_H * APEC["Lambda_oxygen"][indz, indT, inde]
+    del O_H
+    # Neon
+    Ne_H = data.gas.element_mass_fractions.neon.value / H
+    ne_nH += (Ne_H) * (1.00794 / 20.1797) * (10.0 / 1.0)
+    ni_nH += (Ne_H) * (1.00794 / 20.1797)
+    mu += (Ne_H) / (1.0 + 10.0)
+    AG_Ne = 8.09 - lN_H_AG
+    Ne_H = 10.0 ** (np.log10(Ne_H * (1.00794 / 20.1797)) - AG_Ne)
+    Lambda += Ne_H * APEC["Lambda_neon"][indz, indT, inde]
+    del Ne_H
+    # Magnesium
+    Mg_H = data.gas.element_mass_fractions.magnesium.value / H
+    ne_nH += (Mg_H) * (1.00794 / 24.3050) * (12.0 / 1.0)
+    ni_nH += (Mg_H) * (1.00794 / 24.3050)
+    mu += (Mg_H) / (1.0 + 12.0)
+    AG_Mg = 7.58 - lN_H_AG
+    Mg_H = 10.0 ** (np.log10(Mg_H * (1.00794 / 24.3050)) - AG_Mg)
+    Lambda += Mg_H * APEC["Lambda_magnesium"][indz, indT, inde]
+    del Mg_H
+    # Silicon, Sulphur & Calcium
+    Si_H = data.gas.element_mass_fractions.silicon.value / H
+    Ca_Si = 0.0941736
+    S_Si = 0.6054160
+    ne_nH += (Si_H) * (1.00794 / 28.0855) * (14.0 / 1.0)
+    ne_nH += (Si_H * Ca_Si) * (1.00794 / 40.078) * (20.0 / 1.0)
+    ne_nH += (Si_H * S_Si) * (1.00794 / 32.065) * (16.0 / 1.0)
+    ni_nH += (Si_H) * (1.00794 / 28.0855)
+    ni_nH += (Si_H * Ca_Si) * (1.00794 / 40.078)
+    ni_nH += (Si_H * S_Si) * (1.00794 / 32.065)
+    mu += (Si_H) / (1.0 + 14.0)
+    mu += (Si_H * Ca_Si) / (1.0 + 20.0)
+    mu += (Si_H * S_Si) / (1.0 + 16.0)
+    AG_Si = 7.55 - lN_H_AG
+    AG_Ca = 6.36 - lN_H_AG
+    AG_S = 7.21 - lN_H_AG
+    Ca_H = 10.0 ** (np.log10((Ca_Si * Si_H) * (1.00794 / 40.078)) - AG_Ca)
+    S_H = 10.0 ** (np.log10((S_Si * Si_H) * (1.00794 / 32.065)) - AG_S)
+    Si_H = 10.0 ** (np.log10(Si_H * (1.00794 / 28.0855)) - AG_Si)
+    Lambda += Si_H * APEC["Lambda_silicon"][indz, indT, inde]
+    Lambda += Ca_H * APEC["Lambda_calcium"][indz, indT, inde]
+    Lambda += S_H * APEC["Lambda_sulphur"][indz, indT, inde]
+    del Si_H, Ca_H, S_H
+    # Iron
+    Fe_H = data.gas.element_mass_fractions.iron.value / H
+    ne_nH += (Fe_H) * (1.00794 / 55.845) * (26.0 / 1.0)
+    ni_nH += (Fe_H) * (1.00794 / 55.845)
+    mu += (Fe_H) / (1.0 + 26.0)
+    AG_Fe = 7.67 - lN_H_AG
+    Fe_H = 10.0 ** (np.log10(Fe_H * (1.00794 / 55.845)) - AG_Fe)
+    Lambda += Fe_H * APEC["Lambda_iron"][indz, indT, inde]
+    del H, Fe_H, indT
+
+    # --- Calculate observables
+    Lx = Lambda * (data.gas.densities * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0) * data.gas.masses / ne_nH
+    Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
+    Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
+                data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
+
+    print(Lx)
 
 
 if __name__ == '__main__':
@@ -282,5 +344,5 @@ if __name__ == '__main__':
         path_to_snap=d + 'snapshots/L0300N0564_VR3032_-8res_MinimumDistance_2749.hdf5',
         path_to_catalogue=d + 'stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties',
     )
-
+    cool_func_soft(data, 1)
     calc_spec(data)
