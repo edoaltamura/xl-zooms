@@ -187,6 +187,8 @@ def cool_func_soft(data, pix):
     Lx = Lambda * (data.gas.densities.in_cgs() * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass_cgs)) ** 2.0) * data.gas.masses.in_cgs() / ne_nH
     Sx = Lx / (4.0 * np.pi * pix ** 2) / ((180.0 * 60.0 / np.pi) ** 2)
     Ypix = (unyt.thompson_cross_section_cgs / ((unyt.electron_mass * unyt.speed_of_light**2).to('erg'))) * unyt.boltzmann_constant_cgs * data.gas.temperatures * (data.gas.masses.in_cgs() / (mu * unyt.proton_mass_cgs)) * (ne_nH / (ne_nH + ni_nH)) / (pix **2)
+
+    Lx[~np.isfinite(Lx)] = 0
     print(np.sum(Lx))
 
     # Remove cold, dense gas
