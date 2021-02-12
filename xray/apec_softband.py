@@ -1,5 +1,5 @@
 import numpy as np
-from scipy.io.idl import readsav
+import h5py
 from scipy.interpolate import interp1d
 import unyt
 
@@ -54,7 +54,7 @@ def wabs(E, col):
     C2 = np.array([-2150.0, -476.1, 4.3, -51.4, -61.1, 294.0, -47.7, -31.5, -17.0, 0.000, 0.000, 0.750, 0.000, 0.000])
     ii = locate(EX, E)
     E3 = E ** 3
-    AXS = (C0[ii] + C1[ii] * E + C2[ii] * E **2)
+    AXS = (C0[ii] + C1[ii] * E + C2[ii] * E ** 2)
     BGDIF = AXS / E3
     BGDIF = -BGDIF * 1.0e-4
     arg = col / 1.0e20 * BGDIF
@@ -78,24 +78,37 @@ def mu2(zmet):
     return rtn
 
 
-def cool_func_soft(data, pix):
-    APEC = readsav('APEC_0.5_2.0keV_interp.idl')
+def calc_spec(data):
+    # Read APEC look up table: 0.05-100.0keV
+    APEC_spec = h5py.File(f'APEC_spectra_0.05-100.0keV.hdf5', 'r')
+    temptab = APEC_spec['Log_Plasma_Temp'][:]
+    energies = APEC_spec['Energies'][:]
+    APECtab = {}
+    APECtab['Hydrogen'] = APEC_spec['Hydrogen'][:]
+    APECtab['Helium'] = APEC_spec['Helium'][:]
+    APECtab['Carbon'] = APEC_spec['Carbon'][:]
+    APECtab['Nitrogen'] = APEC_spec['Nitrogen'][:]
+    APECtab['Oxygen'] = APEC_spec['Oxygen'][:]
+    APECtab['Neon'] = APEC_spec['Neon'][:]
+    APECtab['Magnesium'] = APEC_spec['Magnesium'][:]
+    APECtab['Silicon'] = APEC_spec['Silicon'][:]
+    APECtab['Sulphur'] = APEC_spec['Sulphur'][:]
+    APECtab['Calcium'] = APEC_spec['Calcium'][:]
+    APECtab['Iron'] = APEC_spec['Iron'][:]
 
-    inde = 0  # 0 - erg/s, 1 - photons
-    indz = locate(APEC['redshift'], data.metadata.z)
-    indT = locate(APEC["ltemp"], np.log10(data.gas.temperatures.value))
+    data['SpecEngr'] = energies
+    data['SpecTemp'] = temptab
+    data['SpecAPEC'] = APECtab
 
-    ne_nH = np.zeros(len(data.gas.temperatures.value)) + 1
-    ni_nH = np.zeros(len(data.gas.temperatures.value)) + 1
-    mu = np.zeros(len(data.gas.temperatures.value))
-    Lambda = np.zeros(len(data.gas.temperatures.value), dtype=np.float64)
+    ne_nH = np.zeros(len(data['GASpos_p'])) + 1
+    ni_nH = np.zeros(len(data['GASpos_p'])) + 1
+    mu = np.zeros(len(data['GASpos_p']))
 
-    # --- Sum element contributions
+    # -- Sum element contributions
     # Hydrogen
     H = data.gas.element_mass_fractions.hydrogen.value
     mu += 1.0 / (1.0 + 1.0)
     lN_H_AG = 12.00
-    Lambda += APEC["Lambda_hydrogen"][indz, indT, inde]
     # Helium
     He_H = data.gas.element_mass_fractions.helium.value / H
     ne_nH += (He_H) * (1.00794 / 4.002602) * (2.0 / 1.0)
@@ -103,8 +116,6 @@ def cool_func_soft(data, pix):
     mu += (He_H) / (1.0 + 2.0)
     AG_He = 10.99 - lN_H_AG
     He_H = 10.0 ** (np.log10(He_H * (1.00794 / 4.002602)) - AG_He)
-    Lambda += He_H * APEC["Lambda_helium"][indz, indT, inde]
-    del He_H
     # Carbon
     C_H = data.gas.element_mass_fractions.carbon.value / H
     ne_nH += (C_H) * (1.00794 / 12.0107) * (6.0 / 1.0)
@@ -112,8 +123,6 @@ def cool_func_soft(data, pix):
     mu += (C_H) / (1.0 + 6.0)
     AG_C = 8.56 - lN_H_AG
     C_H = 10.0 ** (np.log10(C_H * (1.00794 / 12.0107)) - AG_C)
-    C_H = 10.0 ** (np.log10(C_H * (1.00794 / 12.0107)) - AG_C)
-    Lambda += C_H * APEC["Lambda_carbon"][indz, indT, inde]
     # Nitrogen
     N_H = data.gas.element_mass_fractions.nitrogen.value / H
     ne_nH += (N_H) * (1.00794 / 14.0067) * (7.0 / 1.0)
@@ -121,17 +130,13 @@ def cool_func_soft(data, pix):
     mu += (N_H) / (1.0 + 7.0)
     AG_N = 8.05 - lN_H_AG
     N_H = 10.0 ** (np.log10(N_H * (1.00794 / 14.0067)) - AG_N)
-    Lambda += N_H * APEC["Lambda_nitrogen"][indz, indT, inde]
-    del N_H
     # Oxygen
     O_H = data.gas.element_mass_fractions.oxygen.value / H
     ne_nH += (O_H) * (1.00794 / 15.9994) * (8.0 / 1.0)
     ni_nH += (O_H) * (1.00794 / 15.9994)
     mu += (O_H) / (1.0 + 8.0)
-    AG_O = 8.83 - lN_H_AG
+    AG_O = 8.93 - lN_H_AG
     O_H = 10.0 ** (np.log10(O_H * (1.00794 / 15.9994)) - AG_O)
-    Lambda += O_H * APEC["Lambda_oxygen"][indz, indT, inde]
-    del O_H
     # Neon
     Ne_H = data.gas.element_mass_fractions.neon.value / H
     ne_nH += (Ne_H) * (1.00794 / 20.1797) * (10.0 / 1.0)
@@ -139,8 +144,6 @@ def cool_func_soft(data, pix):
     mu += (Ne_H) / (1.0 + 10.0)
     AG_Ne = 8.09 - lN_H_AG
     Ne_H = 10.0 ** (np.log10(Ne_H * (1.00794 / 20.1797)) - AG_Ne)
-    Lambda += Ne_H * APEC["Lambda_neon"][indz, indT, inde]
-    del Ne_H
     # Magnesium
     Mg_H = data.gas.element_mass_fractions.magnesium.value / H
     ne_nH += (Mg_H) * (1.00794 / 24.3050) * (12.0 / 1.0)
@@ -148,19 +151,17 @@ def cool_func_soft(data, pix):
     mu += (Mg_H) / (1.0 + 12.0)
     AG_Mg = 7.58 - lN_H_AG
     Mg_H = 10.0 ** (np.log10(Mg_H * (1.00794 / 24.3050)) - AG_Mg)
-    Lambda += Mg_H * APEC["Lambda_magnesium"][indz, indT, inde]
-    del Mg_H
     # Silicon, Sulphur & Calcium
     Si_H = data.gas.element_mass_fractions.silicon.value / H
     Ca_Si = 0.0941736
     S_Si = 0.6054160
-    ne_nH += (Si_H) * (1.00794 / 28.0855) * (14.0 / 1.0)
+    ne_nH += Si_H * (1.00794 / 28.0855) * (14.0 / 1.0)
     ne_nH += (Si_H * Ca_Si) * (1.00794 / 40.078) * (20.0 / 1.0)
     ne_nH += (Si_H * S_Si) * (1.00794 / 32.065) * (16.0 / 1.0)
-    ni_nH += (Si_H) * (1.00794 / 28.0855)
+    ni_nH += Si_H * (1.00794 / 28.0855)
     ni_nH += (Si_H * Ca_Si) * (1.00794 / 40.078)
     ni_nH += (Si_H * S_Si) * (1.00794 / 32.065)
-    mu += (Si_H) / (1.0 + 14.0)
+    mu += Si_H / (1.0 + 14.0)
     mu += (Si_H * Ca_Si) / (1.0 + 20.0)
     mu += (Si_H * S_Si) / (1.0 + 16.0)
     AG_Si = 7.55 - lN_H_AG
@@ -169,10 +170,6 @@ def cool_func_soft(data, pix):
     Ca_H = 10.0 ** (np.log10((Ca_Si * Si_H) * (1.00794 / 40.078)) - AG_Ca)
     S_H = 10.0 ** (np.log10((S_Si * Si_H) * (1.00794 / 32.065)) - AG_S)
     Si_H = 10.0 ** (np.log10(Si_H * (1.00794 / 28.0855)) - AG_Si)
-    Lambda += Si_H * APEC["Lambda_silicon"][indz, indT, inde]
-    Lambda += Ca_H * APEC["Lambda_calcium"][indz, indT, inde]
-    Lambda += S_H * APEC["Lambda_sulphur"][indz, indT, inde]
-    del Si_H, Ca_H, S_H
     # Iron
     Fe_H = data.gas.element_mass_fractions.iron.value / H
     ne_nH += (Fe_H) * (1.00794 / 55.845) * (26.0 / 1.0)
@@ -180,39 +177,77 @@ def cool_func_soft(data, pix):
     mu += (Fe_H) / (1.0 + 26.0)
     AG_Fe = 7.67 - lN_H_AG
     Fe_H = 10.0 ** (np.log10(Fe_H * (1.00794 / 55.845)) - AG_Fe)
-    Lambda += Fe_H * APEC["Lambda_iron"][indz, indT, inde]
-    del H, Fe_H, indT
 
-    # --- Calculate observables
-    Lx = Lambda * (data.gas.densities.in_cgs() * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass_cgs)) ** 2.0) * data.gas.masses.in_cgs() / ne_nH
-    Sx = Lx / (4.0 * np.pi * pix ** 2) / ((180.0 * 60.0 / np.pi) ** 2)
-    Ypix = (unyt.thompson_cross_section_cgs / ((unyt.electron_mass * unyt.speed_of_light**2).to('erg'))) * unyt.boltzmann_constant_cgs * data.gas.temperatures * (data.gas.masses.in_cgs() / (mu * unyt.proton_mass_cgs)) * (ne_nH / (ne_nH + ni_nH)) / (pix **2)
+    # Emission measure & Y parameter
+    EMM = (data.gas.densities.in_cgs() * (
+                (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass_cgs)) ** 2.0)) * data.gas.masses.in_cgs() / ne_nH
 
-    Lx[~np.isfinite(Lx)] = 0
-    print(np.sum(Lx))
+    Ypar = (unyt.thompson_cross_section_cgs / (
+                511.0 * unyt.keV)) * unyt.boltzmann_constant_cgs * data.gas.temperatures * (
+                       data.gas.masses.in_cgs() * 0.752 * ne_nH / unyt.proton_mass_cgs) / unyt.Mpc ** 2
 
-    # Remove cold, dense gas
-    # idx = np.where(
-    #     (data['GAStemp'] <= 10.0 ** 5.2) | (data['GASrho'] * 0.752 / bsc.mp >= 0.1) | (
-    #             data['GASeos'] > 0.999))[0]
-    # if len(idx) > 0:
-    #     Sx[idx] = 0.0
-    #     Ypix[idx] = 0.0
-    # del idx
+    print(EMM)
+
+    # mass = data['GASmass_p']
+    # temp = data['GAStemp_p']
+    # iron = data['Fe_p']
     #
-    # data['Sx'] = Sx
-    # data['Ypix'] = Ypix
-    # del Sx, Ypix
+    # nbins = 25 + 1
+    # rm = np.log10(0.001 * data['R500'])
+    # rx = np.log10(5.0 * data['R500'])
+    # rbin = np.logspace(rm, rx, num=nbins, base=10.0)
+    # rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
+    # vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0))
+    #
+    # mpro = radial_bin(data['GASradiald_p'], mass, rmin=np.min(rbin), rmax=np.max(rbin), nb=nbins)[1]
+    # data['Srho'] = mpro / vol
+    # data['Svol'] = vol
+    # tpro = radial_bin(data['GASradiald_p'], mass * temp, rmin=np.min(rbin), rmax=np.max(rbin), nb=nbins)[1]
+    # data['Stmp'] = (tpro / mpro) * (kb / erg2keV)
+    # zpro = radial_bin(data['GASradiald_p'], mass * iron, rmin=np.min(rbin), rmax=np.max(rbin), nb=nbins)[1]
+    # data['Smet'] = (zpro / mpro) / 1.29e-3
+    # del vol, mpro, tpro, zpro
+    #
+    # spectrum = np.zeros((len(rcen), len(energies)))
+    #
+    # for k in range(0, len(rcen), 1):
+    #     idx = np.where((data['GASradiald_p'] > rbin[k]) & (data['GASradiald_p'] <= rbin[k + 1]))[0]
+    #     if len(idx) <= 0:
+    #         continue
+    #     itemp = locate(temptab, np.log10(temp[idx]))
+    #     for j in range(0, len(energies), 1):
+    #         spectrum[k, j] += np.sum(
+    #             EMM[idx] * (APECtab['Hydrogen'][itemp, j] +
+    #             APECtab['Helium'][itemp, j] * He_H[idx] +
+    #             APECtab['Carbon'][itemp, j] * C_H[idx] +
+    #             APECtab['Nitrogen'][itemp, j] * N_H[idx] +
+    #             APECtab['Oxygen'][itemp, j] * O_H[idx] +
+    #             APECtab['Neon'][itemp, j] * Ne_H[idx] +
+    #             APECtab['Magnesium'][itemp, j] * Mg_H[idx] +
+    #             APECtab['Silicon'][itemp, j] * Si_H[idx] +
+    #             APECtab['Sulphur'][itemp, j] * S_H[idx] +
+    #             APECtab['Calcium'][itemp, j] * Ca_H[idx] +
+    #             APECtab['Iron'][itemp, j] * Fe_H[idx])
+    #         )
+    #
+    # spectrum = spectrum.reshape(len(rcen), len(energies))
+    #
+    # del temp, He_H, C_H, N_H, O_H, Ne_H, Mg_H, Ca_H, S_H, Si_H, Fe_H, rm, rx
+    # del data['GASpos_p'], data['GASmass_p'], data['GASrho_p'], data['GAStemp_p'], data['H_p'], data['He_p'], data['C_p'], data['N_p'], \
+    #         data['O_p'], data['Ne_p'], data['Mg_p'], data['Si_p'], data['Fe_p'], data['GASradiald_p']
+    #
+    # data['Rspec'] = rcen
+    # data['Spectrum'] = spectrum
+    # data['EMM'] = EMM
+    # data['Ypar'] = Ypar
+    # del rcen, spectrum, EMM, Ypar
     # return
 
 
-
-
-
 if __name__ == '__main__':
-
     import swiftsimio as sw
     import h5py as h5
+
     d = '/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance/'
 
 
@@ -241,9 +276,10 @@ if __name__ == '__main__':
         )
         return sw.load(f'{path_to_snap}', mask=mask)
 
+
     data = process_single_halo(
         path_to_snap=d + 'snapshots/L0300N0564_VR3032_-8res_MinimumDistance_2749.hdf5',
         path_to_catalogue=d + 'stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties',
     )
 
-    cool_func_soft(data, 1)
+    calc_spec(data)
