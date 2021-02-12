@@ -96,13 +96,14 @@ def calc_spec(data):
     APECtab['Calcium'] = APEC_spec['Calcium'][:]
     APECtab['Iron'] = APEC_spec['Iron'][:]
 
-    data['SpecEngr'] = energies
-    data['SpecTemp'] = temptab
-    data['SpecAPEC'] = APECtab
+    table = dict()
+    table['SpecEngr'] = energies
+    table['SpecTemp'] = temptab
+    table['SpecAPEC'] = APECtab
 
-    ne_nH = np.zeros(len(data['GASpos_p'])) + 1
-    ni_nH = np.zeros(len(data['GASpos_p'])) + 1
-    mu = np.zeros(len(data['GASpos_p']))
+    ne_nH = np.zeros(len(data.gas.element_mass_fractions.hydrogen.value)) + 1
+    ni_nH = np.zeros(len(data.gas.element_mass_fractions.hydrogen.value)) + 1
+    mu = np.zeros(len(data.gas.element_mass_fractions.hydrogen.value))
 
     # -- Sum element contributions
     # Hydrogen
