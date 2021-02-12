@@ -180,15 +180,14 @@ def calc_spec(data):
     Fe_H = 10.0 ** (np.log10(Fe_H * (1.00794 / 55.845)) - AG_Fe)
 
     # Emission measure & Y parameter
-    EMM = (data.gas.densities * (
-                (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0)) * data.gas.masses / ne_nH
+    EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0
 
 
     Ypar = (unyt.thompson_cross_section_cgs / (
                 511.0 * unyt.keV)) * unyt.boltzmann_constant_cgs * data.gas.temperatures * (
                        data.gas.masses.in_cgs() * 0.752 * ne_nH / unyt.proton_mass_cgs) / unyt.Mpc ** 2
 
-    print(EMM.in_cgs())
+    print(Ypar.in_cgs())
 
     # mass = data['GASmass_p']
     # temp = data['GAStemp_p']
