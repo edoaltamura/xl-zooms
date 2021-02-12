@@ -187,7 +187,7 @@ def calc_spec(data):
                 511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
                        data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
-    print(EMM)
+    print(EMM.in_cgs())
 
 
 def cool_func_soft(data, pix):
@@ -304,7 +304,7 @@ def cool_func_soft(data, pix):
     Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
                 data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
-    print(Lx)
+    print(Lx.in_cgs())
 
 
 if __name__ == '__main__':
