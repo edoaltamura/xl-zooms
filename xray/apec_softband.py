@@ -183,9 +183,9 @@ def calc_spec(data):
     EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0
 
 
-    Ypar = (unyt.thompson_cross_section_cgs / (
-                511.0 * unyt.keV)) * unyt.boltzmann_constant_cgs * data.gas.temperatures * (
-                       data.gas.masses.in_cgs() * 0.752 * ne_nH / unyt.proton_mass_cgs) / unyt.Mpc ** 2
+    Ypar = (unyt.thompson_cross_section / (
+                511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
+                       data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
     print(Ypar.in_cgs())
 
