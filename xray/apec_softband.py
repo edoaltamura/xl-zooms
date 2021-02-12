@@ -187,7 +187,7 @@ def calc_spec(data):
                 511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
                        data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
-    print(Ypar.in_cgs())
+    print(Ypar)
 
     # mass = data['GASmass_p']
     # temp = data['GAStemp_p']
