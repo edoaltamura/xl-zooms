@@ -190,15 +190,15 @@ def calc_spec(data):
     print(EMM)
 
 
-def cool_func_soft(comm, NProcs, MyRank, x, data, pix):
+def cool_func_soft(data, pix):
 
     from scipy.io.idl import readsav
 
     APEC = readsav('APEC_0.5_2.0keV_interp.idl')
 
     inde = 0  # 0 - erg/s, 1 - photons
-    indz = locate(APEC['redshift'], data['halo_' + x]['zred'])
-    indT = locate(APEC["ltemp"], np.log10(data['halo_' + x]['GAStemp']))
+    indz = locate(APEC['redshift'], data.metadata.z)
+    indT = locate(APEC["ltemp"], np.log10(data.gas.temperatures))
 
     ne_nH = np.zeros(len(data.gas.masses.value)) + 1
     ni_nH = np.zeros(len(data.gas.masses.value)) + 1
