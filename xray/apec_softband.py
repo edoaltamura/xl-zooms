@@ -79,7 +79,7 @@ def mu2(zmet):
 
 
 def cool_func_soft(data, pix):
-    APEC = readsav('src/APEC_0.5_2.0keV_interp.idl')
+    APEC = readsav('APEC_0.5_2.0keV_interp.idl')
 
     inde = 0  # 0 - erg/s, 1 - photons
     indz = locate(APEC['redshift'], data.metadata.z)
