@@ -337,12 +337,41 @@ if __name__ == '__main__':
             1.e5 * mask.units.temperature,
             1.e10 * mask.units.temperature
         )
-        return sw.load(f'{path_to_snap}', mask=mask)
+        print(f"M_500_crit: {M500c:.3E}")
+
+        data = sw.load(f'{path_to_snap}', mask=mask)
+
+        # Select hot gas within sphere and without core
+        deltaX = data.gas.coordinates[:, 0] - XPotMin
+        deltaY = data.gas.coordinates[:, 1] - YPotMin
+        deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+
+        # Keep only particles inside 5 R500crit
+        index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
+
+        data.gas.densities = data.gas.densities[index]
+        data.gas.masses = data.gas.masses[index]
+        data.gas.temperatures = data.gas.temperatures[index]
+
+        data.gas.element_mass_fractions.hydrogen = data.gas.element_mass_fractions.hydrogen[index]
+        data.gas.element_mass_fractions.helium = data.gas.element_mass_fractions.helium[index]
+        data.gas.element_mass_fractions.carbon = data.gas.element_mass_fractions.carbon[index]
+        data.gas.element_mass_fractions.nitrogen = data.gas.element_mass_fractions.nitrogen[index]
+        data.gas.element_mass_fractions.oxygen = data.gas.element_mass_fractions.oxygen[index]
+        data.gas.element_mass_fractions.neon = data.gas.element_mass_fractions.neon[index]
+        data.gas.element_mass_fractions.magnesium = data.gas.element_mass_fractions.magnesium[index]
+        data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
+        data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
+
+        return data
 
 
     data = process_single_halo(
         path_to_snap=d + 'snapshots/L0300N0564_VR3032_-8res_MinimumDistance_2749.hdf5',
         path_to_catalogue=d + 'stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties',
     )
+
+
     cool_func_soft(data, 1)
     calc_spec(data)
