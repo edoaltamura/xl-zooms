@@ -207,7 +207,7 @@ def cool_func_soft(data, pix):
 
     # --- Sum element contributions
     # Hydrogen
-    H = data.gas.element_mass_fractions.hydrogen.value['H']
+    H = data.gas.element_mass_fractions.hydrogen.value
     mu += 1.0 / (1.0 + 1.0)
     lN_H_AG = 12.00
     Lambda += APEC["Lambda_hydrogen"][indz, indT, inde]
