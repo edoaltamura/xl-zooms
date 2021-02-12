@@ -298,6 +298,7 @@ def cool_func_soft(data, pix):
     Lambda += Fe_H * APEC["Lambda_iron"][indz, indT, inde]
     del H, Fe_H, indT
 
+    Lambda = unyt.unyt_array(Lambda, 'erg/s*cm**3')
     # --- Calculate observables
     Lx = Lambda * (data.gas.densities * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
