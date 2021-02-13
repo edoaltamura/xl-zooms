@@ -299,11 +299,11 @@ def cool_func_soft(data, pix):
     del H, Fe_H, indT
 
     Lambda = unyt.unyt_array(Lambda, 'erg/s*cm**3')
+
     # --- Calculate observables
     Lx = Lambda * (data.gas.densities * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
-    Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
-                data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
+    Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
     print(np.sum(Lx.in_cgs()))
 
@@ -369,8 +369,8 @@ if __name__ == '__main__':
 
 
     data = process_single_halo(
-        path_to_snap=d + 'snapshots/L0300N0564_VR3032_-8res_MinimumDistance_2749.hdf5',
-        path_to_catalogue=d + 'stf/L0300N0564_VR3032_-8res_MinimumDistance_2749/L0300N0564_VR3032_-8res_MinimumDistance_2749.properties',
+        path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_MinimumDistance_2749.hdf5',
+        path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_MinimumDistance_2749/L0300N0564_VR18_-8res_MinimumDistance_2749.properties',
     )
 
 
