@@ -312,7 +312,7 @@ if __name__ == '__main__':
     import swiftsimio as sw
     import h5py as h5
 
-    d = '/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_MinimumDistance/'
+    d = '/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/'
 
 
     def process_single_halo(
