@@ -78,7 +78,7 @@ def mu2(zmet):
     return rtn
 
 
-def calc_spec(data):
+def bolometric(data):
     # Read APEC look up table: 0.05-100.0keV
     APEC_spec = h5py.File(f'APEC_spectra_0.05-100.0keV.hdf5', 'r')
     temptab = APEC_spec['Log_Plasma_Temp'][:]
@@ -187,10 +187,10 @@ def calc_spec(data):
                 511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
                        data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
-    print(EMM.in_cgs())
+    print("Bolometric LX", np.sum(EMM.in_cgs()))
 
 
-def cool_func_soft(data, pix):
+def soft_band(data, pix):
 
     from scipy.io.idl import readsav
 
@@ -305,7 +305,7 @@ def cool_func_soft(data, pix):
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
     Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
-    print(np.sum(Lx.in_cgs()))
+    print("Soft band LX", np.sum(Lx.in_cgs()))
 
 
 if __name__ == '__main__':
@@ -374,5 +374,5 @@ if __name__ == '__main__':
     )
 
 
-    cool_func_soft(data, 1)
-    calc_spec(data)
+    soft_band(data, 1)
+    bolometric(data)
