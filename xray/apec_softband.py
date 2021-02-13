@@ -181,11 +181,7 @@ def bolometric(data):
 
     # Emission measure & Y parameter
     EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0
-
-
-    Ypar = (unyt.thompson_cross_section / (
-                511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
-                       data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
+    Ypar = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
     print("Bolometric LX", np.sum(EMM.in_cgs()))
 
@@ -306,6 +302,8 @@ def soft_band(data, pix):
     Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
     print("Soft band LX", np.sum(Lx.in_cgs()))
+    print("Soft band LX", np.sum(Sx.in_cgs()))
+    print("Soft band LX", np.sum(Ypix.in_cgs()))
 
 
 if __name__ == '__main__':
