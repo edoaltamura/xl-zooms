@@ -369,8 +369,8 @@ if __name__ == '__main__':
 
 
     data = process_single_halo(
-        path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_MinimumDistance_2749.hdf5',
-        path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_MinimumDistance_2749/L0300N0564_VR18_-8res_MinimumDistance_2749.properties',
+        path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5',
+        path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
     )
 
 
