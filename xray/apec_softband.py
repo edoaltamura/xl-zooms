@@ -551,7 +551,7 @@ def soft_band(data, pix):
     Lx = Lambda * (data.gas.densities * (
             ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
-    Ypix = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * kb * data.gas.temperatures * (
+    Ypix = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * unyt.kb_cgs * data.gas.temperatures * (
             data.gas.masses / (mu * unyt.mp_cgs.v)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
     print("Soft band LX", np.sum(Lx.in_cgs()))
