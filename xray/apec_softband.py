@@ -214,6 +214,7 @@ def calc_spectrum(data, R500c):
     spectrum = np.zeros((len(rcen), len(energies)))
 
     for k in range(len(rcen)):
+        print(f"Calculating spectrum in shell ({k + 1}/{len(rcen)})")
         idx = np.where((r > rbin[k]) & (r <= rbin[k + 1]))[0]
         if len(idx) <= 0:
             continue
@@ -283,6 +284,7 @@ def fit_spectrum(spectrum_data):
         Dg = (spectrum_data['Srho'][k] ** 2.0) * (vol / 1.0e66) * (
                 ((Xe(Zg) / ((Xe(Zg) + Xi(Zg)) * mu2(Zg) * unyt.proton_mass)) ** 2.0) / Xe(Zg))
 
+        print(f"Fitting spectrum for shell ({k + 1}/{nbins})")
         params, fitxi, spec_mod = specfit(
             spectrum, Tg, Dg, Zg,
             spectrum_data['SpecEngr'],
