@@ -190,7 +190,7 @@ def calc_spectrum(data, R500c):
     Fe_H = 10.0 ** (np.log10(Fe_H * (1.00794 / 55.845)) - AG_Fe)
 
     # Emission measure & Y parameter
-    EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0
+    EMM = data.gas.densities.to('g/cm**3').value * data.gas.masses.to('g').value / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass_cgs.value)) ** 2.0
     Ypar = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
             data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
