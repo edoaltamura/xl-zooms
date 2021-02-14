@@ -600,7 +600,7 @@ if __name__ == '__main__':
 
         # Keep only particles inside 5 R500crit
         index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
-
+        data.gas.radial_distances = deltaR[index]
         data.gas.densities = data.gas.densities[index]
         data.gas.masses = data.gas.masses[index]
         data.gas.temperatures = data.gas.temperatures[index]
