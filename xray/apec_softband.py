@@ -85,7 +85,7 @@ def mu2(zmet):
     return rtn
 
 
-def bolometric(data, R500c):
+def calc_spectrum(data, R500c):
     # Read APEC look up table: 0.05-100.0keV
     APEC_spec = h5py.File(f'APEC_spectra_0.05-100.0keV.hdf5', 'r')
     temptab = APEC_spec['Log_Plasma_Temp'][:]
@@ -240,9 +240,16 @@ def bolometric(data, R500c):
     data_out['Spectrum'] = spectrum
     data_out['EMM'] = EMM
     data_out['Ypar'] = Ypar
+    data_out['rho_crit'] = data.metadata.cosmology.critical_density(data.metadata.z)
+
+    return data_out
 
 
 def fit_spectrum(spectrum_data):
+    kb = 1.3807e-16       # Boltzmann's constant [erg/K]
+    mpc = 3.0857e24       # Megaparsec [cm]
+    erg2keV = 1.60215e-9  # erg --> keV conversion factor
+
     chand_area = np.loadtxt('chandra_acis-i_.area')
     etmp = chand_area[:, 0]
     atmp = chand_area[:, 1]
@@ -250,7 +257,7 @@ def fit_spectrum(spectrum_data):
     idxa = locate(etmp, spectrum_data['SpecEngr'])
     aeff = atmp[idxa]
     del idxa
-    DL = 250.0 * unyt.Mpc
+    DL = 250.0 * mpc
     tint = 1.0e6
     mabs = wabs(spectrum_data['SpecEngr'], 2.0e20)
     spec_sfac = mabs * aeff * tint / (4.0 * np.pi * DL * DL) / erg2keV
@@ -275,7 +282,7 @@ def fit_spectrum(spectrum_data):
         Tg = np.log10(spectrum_data['Stmp'][k] * (erg2keV / kb))
         Zg = spectrum_data['Smet'][k] * (1.29e-3 / 1.89e-3)
         Dg = (spectrum_data['Srho'][k] ** 2.0) * (vol / 1.0e66) * (
-                    ((Xe(Zg) / ((Xe(Zg) + Xi(Zg)) * mu2(Zg) * unyt.proton_mass)) ** 2.0) / Xe(Zg))
+                ((Xe(Zg) / ((Xe(Zg) + Xi(Zg)) * mu2(Zg) * unyt.proton_mass)) ** 2.0) / Xe(Zg))
 
         params, fitxi, spec_mod = specfit(
             spectrum, Tg, Dg, Zg,
@@ -292,20 +299,17 @@ def fit_spectrum(spectrum_data):
 
     spectrum_data['Tspec'] = (kb / erg2keV) * (10.0 ** temp)
 
-    ez2 = spectrum_data['OmgM'] * (1.0 + spectrum_data['zred']) ** 3.0 + spectrum_data['OmgL']
-    rho_crit = 1.878e-29 * spectrum_data['Hub'] * spectrum_data['Hub'] * ez2
     rho_spec = np.zeros(len(rho))
     for k in range(len(rho)):
         rho_spec[k] = np.sqrt(
             (rho[k] * 1.0e66 / spectrum_data['Svol'][k]) / (((Xe(zmet[k]) /
-                                                              ((Xe(zmet[k]) + Xi(zmet[k])) * mu2(
-                                                                  zmet[k]) * unyt.proton_mass)) ** 2.0) / Xe(zmet[k]))
-        ) / rho_crit
+            ((Xe(zmet[k]) + Xi(zmet[k])) * mu2(zmet[k]) * unyt.proton_mass)) ** 2.0) / Xe(zmet[k]))
+        ) / spectrum_data['rho_crit']
     spectrum_data['RHOspec'] = rho_spec
     spectrum_data['Zspec'] = zmet * (1.89e-3 / 1.29e-3)
     spectrum_data['XIspec'] = xisq
 
-    del nbins, rho, temp, zmet, xisq, ez2, rho_crit, rho_spec
+    del nbins, rho, temp, zmet, xisq, rho_spec
     return
 
 
@@ -321,18 +325,19 @@ def specfit(spectrum, Tg, Dg, Zg, energies, spec_sfac, temptab, APECtab):
     ebins = np.arange(len(energies))
 
     coef = []
-    coef.append(
-        minimize(spec_model, ini_guess, args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
-                 method='L-BFGS-B', bounds=lims, tol=1.0e-4, options={'maxiter': 1000}))
+    coef.append(minimize(spec_model, ini_guess,
+                         args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                         method='L-BFGS-B', bounds=lims, tol=1.0e-4, options={'maxiter': 1000}))
 
-    coef.append(
-        minimize(spec_model, ini_guess, args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
-                 method='SLSQP', bounds=lims, tol=1.0e-4, options={'maxiter': 500}))
+    coef.append(minimize(spec_model, ini_guess,
+                         args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                         method='SLSQP', bounds=lims, tol=1.0e-4, options={'maxiter': 500}))
 
-    coef.append(
-        minimize(spec_model, ini_guess, args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
-                 method='Nelder-Mead', tol=1.0e-4, options={'maxiter': 1000}))
-    if coef[-1].x[2] < 0.0: coef[-1].success = False
+    coef.append(minimize(spec_model, ini_guess,
+                         args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                         method='Nelder-Mead', tol=1.0e-4, options={'maxiter': 1000}))
+    if coef[-1].x[2] < 0.0:
+        coef[-1].success = False
 
     try:
         coef.append(least_squares(spec_model, ini_guess,
@@ -345,7 +350,8 @@ def specfit(spectrum, Tg, Dg, Zg, energies, spec_sfac, temptab, APECtab):
     xisq = 1.0e100
 
     for y in coef:
-        if y.success is False: continue
+        if y.success is False:
+            continue
         spec_mod = spec_model(y.x, ppb[tdx], ebins[tdx], temptab, APECtab, energies, spec_sfac, tdx)
         Xsq_m = np.sum((spec_mod[tdx] - ppb[tdx]) ** 2.0 / ppb[tdx] ** 2.0) / (len(ebins[tdx]) - 3)
         if Xsq_m < xisq:
@@ -609,13 +615,16 @@ if __name__ == '__main__':
         data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
         data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
 
-        return data
+        return data, R500c
 
 
-    data = process_single_halo(
+    data, R500c = process_single_halo(
         path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5',
         path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
     )
 
     soft_band(data, 1)
-    bolometric(data)
+    spec = calc_spectrum(data, R500c)
+    fit_spectrum(spec)
+    for k in spec:
+        print(spec[k])
