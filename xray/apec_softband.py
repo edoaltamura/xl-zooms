@@ -297,7 +297,7 @@ def fit_spectrum(spectrum_data):
         xisq[k] = fitxi
         del spectrum, vol, Tg, Dg, Zg, params, fitxi, spec_mod
 
-    spectrum_data['Tspec'] = (kb / erg2keV) * (10.0 ** temp)
+    spectrum_data['Tspec'] = kb * (10.0 ** temp)
 
     rho_spec = np.zeros(len(rho))
     for k in range(len(rho)):
