@@ -195,7 +195,6 @@ def calc_spectrum(data, R500c):
             data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
     # Calculate spectrum
-
     r = data.gas.radial_distances
     mass = data.gas.masses
     temp = data.gas.temperatures
@@ -235,9 +234,9 @@ def calc_spectrum(data, R500c):
             )
     del r, temp, He_H, C_H, N_H, O_H, Ne_H, Mg_H, Ca_H, S_H, Si_H, Fe_H, rm, rx
 
-    data_out['Srho'] = mpro / vol
-    data_out['Svol'] = vol
-    data_out['Stmp'] = (tpro / mpro) * kb
+    data_out['Srho'] = (mpro / vol).to('g/cm**3').value
+    data_out['Svol'] = vol.to('cm**3').value
+    data_out['Stmp'] = ((tpro / mpro) * unyt.boltzmann_constant).to('keV').value
     data_out['Smet'] = (zpro / mpro) / 1.29e-3
     data_out['Rspec'] = rcen
     data_out['Spectrum'] = spectrum
