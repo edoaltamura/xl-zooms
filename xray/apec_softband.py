@@ -12,8 +12,8 @@ erg2keV = 1.60215e-9  # erg --> keV conversion factor
 
 def radial_bin(r_dist, weights, rmin=0.1, rmax=1.0, nbins=50):
     bins = np.logspace(np.log10(rmin), np.log10(rmax), num=nbins)
-    binned = np.histogram(r_dist, bins, weights=weights)[0]
-    return np.array(bins), np.array(binned)
+    binned = np.histogram(r_dist.v, bins, weights=weights.v)[0]
+    return np.array(bins) * r_dist.units, np.array(binned) * weights.units
 
 
 def locate(A, x):
@@ -196,14 +196,14 @@ def calc_spectrum(data, R500c):
 
     # Calculate spectrum
 
-    r = data.gas.radial_distances.in_cgs()
-    mass = data.gas.masses.in_cgs()
+    r = data.gas.radial_distances
+    mass = data.gas.masses
     temp = data.gas.temperatures
     iron = data.gas.element_mass_fractions.iron
 
     nbins = 25 + 1
-    rm = np.log10(0.15 * R500c.to('cm'))
-    rx = np.log10(1 * R500c.to('cm'))
+    rm = np.log10(0.15 * R500c)
+    rx = np.log10(1 * R500c)
     rbin = np.logspace(rm, rx, num=nbins, base=10.0)
     rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
     vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0))
