@@ -370,7 +370,7 @@ def specfit(spectrum, Tg, Dg, Zg, energies, spec_sfac, temptab, APECtab):
     return fitcoef, xisq, model_flux
 
 
-def spec_model(p0, y, temptab, APECtab, energies, spec_sfac, tdx, meth='Mod'):
+def spec_model(p0, x, y, temptab, APECtab, energies, spec_sfac, tdx, meth='Mod'):
     # Locate T in look up table
     T, D, Z = p0
     idx = locate(temptab, T)
