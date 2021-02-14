@@ -197,7 +197,7 @@ def calc_spectrum(data, R500c):
     # Calculate spectrum
 
     r = data.gas.radial_distances.in_cgs()
-    mass = data.gas.masses
+    mass = data.gas.masses.in_cgs()
     temp = data.gas.temperatures
     iron = data.gas.element_mass_fractions.iron
 
