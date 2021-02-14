@@ -548,8 +548,7 @@ def soft_band(data, pix):
     Lambda = unyt.unyt_array(Lambda, 'erg/s*cm**3')
 
     # --- Calculate observables
-    Lx = Lambda * (data.gas.densities * (
-            ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp)) ** 2.0) * data.gas.masses / ne_nH
+    Lx = Lambda * (data.gas.densities * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
     Ypix = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * unyt.kb_cgs * data.gas.temperatures * (
             data.gas.masses / (mu * unyt.mp_cgs.v)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
@@ -624,7 +623,7 @@ if __name__ == '__main__':
         path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
     )
 
-    soft_band(data, 1)
+    soft_band(data, data.metadata.cosmology.luminosity_distance(0.1).in_cgs().value)
     spec = calc_spectrum(data, R500c)
     fit_spectrum(spec)
     print('Tspec', spec['Tspec'])
