@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """
 Usage:
-    combine_ics.py input_file.0.hdf5 merged_file.hdf5 gzip_level
+    python3 combine_ics.py input_file.0.hdf5 merged_file.hdf5 gzip_level
 
 This file combines Gadget-2 type 2 (i.e. hdf5) initial condition files
 into a single file that can be digested by SWIFT.
@@ -14,7 +14,7 @@ to save disk space.
 (Edo Altamura): The script has been updated to work for all partTypes,
 including zoom-in initial conditions and hydro.
 The last argument `gzip_level` is used to specify the level of compression
-to apply to all the fields in the file. Use 0 to cancel all coompression.
+to apply to all the fields in the file. Use 0 to cancel all compression.
 The default value is `4`.
 
 This file is part of SWIFT.

@@ -1,9 +1,16 @@
 import numpy as np
 import h5py
 from scipy.interpolate import interp1d
+from scipy.optimize import minimize, least_squares
 import unyt
 
 np.seterr(divide='ignore')
+
+
+def radial_bin(r_dist, weights, rmin=0.1, rmax=1.0, nbins=50):
+    bins = np.logspace(np.log10(rmin), np.log10(rmax), num=nbins)
+    binned = np.histogram(r_dist, bins, weights=weights)[0]
+    return np.array(bins), np.array(binned)
 
 
 def locate(A, x):
@@ -78,7 +85,7 @@ def mu2(zmet):
     return rtn
 
 
-def bolometric(data):
+def bolometric(data, R500c):
     # Read APEC look up table: 0.05-100.0keV
     APEC_spec = h5py.File(f'APEC_spectra_0.05-100.0keV.hdf5', 'r')
     temptab = APEC_spec['Log_Plasma_Temp'][:]
@@ -96,10 +103,10 @@ def bolometric(data):
     APECtab['Calcium'] = APEC_spec['Calcium'][:]
     APECtab['Iron'] = APEC_spec['Iron'][:]
 
-    table = dict()
-    table['SpecEngr'] = energies
-    table['SpecTemp'] = temptab
-    table['SpecAPEC'] = APECtab
+    data_out = dict()
+    data_out['SpecEngr'] = energies
+    data_out['SpecTemp'] = temptab
+    data_out['SpecAPEC'] = APECtab
 
     ne_nH = np.zeros(len(data.gas.element_mass_fractions.hydrogen.value)) + 1
     ni_nH = np.zeros(len(data.gas.element_mass_fractions.hydrogen.value)) + 1
@@ -181,13 +188,250 @@ def bolometric(data):
 
     # Emission measure & Y parameter
     EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0
-    Ypar = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
+    Ypar = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
+            data.gas.masses * 0.752 * ne_nH / unyt.proton_mass) / unyt.Mpc ** 2
 
-    print("Bolometric LX", np.sum(EMM.in_cgs()))
+    # Calculate spectrum
+
+    r = data.gas.radial_distances
+    mass = data.gas.masses
+    temp = data.gas.temperatures
+    iron = data.gas.element_mass_fractions.iron
+
+    nbins = 25 + 1
+    rm = np.log10(0.15 * R500c)
+    rx = np.log10(4 * R500c)
+    rbin = np.logspace(rm, rx, num=nbins, base=10.0)
+    rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
+    vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0))
+
+    mpro = radial_bin(r, mass, rmin=np.min(rbin), rmax=np.max(rbin), nbins=nbins)[1]
+    tpro = radial_bin(r, mass * temp, rmin=np.min(rbin), rmax=np.max(rbin), nbins=nbins)[1]
+    zpro = radial_bin(r, mass * iron, rmin=np.min(rbin), rmax=np.max(rbin), nbins=nbins)[1]
+
+    spectrum = np.zeros((len(rcen), len(energies)))
+
+    for k in range(len(rcen)):
+        idx = np.where((r > rbin[k]) & (r <= rbin[k + 1]))[0]
+        if len(idx) <= 0:
+            continue
+        itemp = locate(temptab, np.log10(temp[idx]))
+        for j in range(0, len(energies), 1):
+            spectrum[k, j] += np.sum(
+                EMM[idx] * (APECtab['Hydrogen'][itemp, j] +
+                            APECtab['Helium'][itemp, j] * He_H[idx] +
+                            APECtab['Carbon'][itemp, j] * C_H[idx] +
+                            APECtab['Nitrogen'][itemp, j] * N_H[idx] +
+                            APECtab['Oxygen'][itemp, j] * O_H[idx] +
+                            APECtab['Neon'][itemp, j] * Ne_H[idx] +
+                            APECtab['Magnesium'][itemp, j] * Mg_H[idx] +
+                            APECtab['Silicon'][itemp, j] * Si_H[idx] +
+                            APECtab['Sulphur'][itemp, j] * S_H[idx] +
+                            APECtab['Calcium'][itemp, j] * Ca_H[idx] +
+                            APECtab['Iron'][itemp, j] * Fe_H[idx])
+            )
+    del r, temp, He_H, C_H, N_H, O_H, Ne_H, Mg_H, Ca_H, S_H, Si_H, Fe_H, rm, rx
+
+    data_out['Srho'] = mpro / vol
+    data_out['Svol'] = vol
+    data_out['Stmp'] = (tpro / mpro) * unyt.boltzmann_constant
+    data_out['Smet'] = (zpro / mpro) / 1.29e-3
+    data_out['Rspec'] = rcen
+    data_out['Spectrum'] = spectrum
+    data_out['EMM'] = EMM
+    data_out['Ypar'] = Ypar
+
+
+def fit_spectrum(spectrum_data):
+    chand_area = np.loadtxt('chandra_acis-i_.area')
+    etmp = chand_area[:, 0]
+    atmp = chand_area[:, 1]
+
+    idxa = locate(etmp, spectrum_data['SpecEngr'])
+    aeff = atmp[idxa]
+    del idxa
+    DL = 250.0 * unyt.Mpc
+    tint = 1.0e6
+    mabs = wabs(spectrum_data['SpecEngr'], 2.0e20)
+    spec_sfac = mabs * aeff * tint / (4.0 * np.pi * DL * DL) / erg2keV
+    spectrum_data['SpecSFac'] = spec_sfac
+    del chand_area, etmp, atmp, aeff, DL, tint, mabs
+
+    nbins = len(spectrum_data['Spectrum'])
+    temp = np.zeros(nbins)
+    rho = np.zeros(nbins)
+    zmet = np.zeros(nbins)
+    xisq = np.zeros(nbins)
+    for k in range(nbins):
+        spectrum = spectrum_data['Spectrum'][k]
+
+        if np.max(spectrum) <= 0.0:
+            temp[k] = 0.0
+            rho[k] = 0.0
+            zmet[k] = 0.0
+            continue
+
+        vol = spectrum_data['Svol'][k]
+        Tg = np.log10(spectrum_data['Stmp'][k] * (erg2keV / kb))
+        Zg = spectrum_data['Smet'][k] * (1.29e-3 / 1.89e-3)
+        Dg = (spectrum_data['Srho'][k] ** 2.0) * (vol / 1.0e66) * (
+                    ((Xe(Zg) / ((Xe(Zg) + Xi(Zg)) * mu2(Zg) * unyt.proton_mass)) ** 2.0) / Xe(Zg))
+
+        params, fitxi, spec_mod = specfit(
+            spectrum, Tg, Dg, Zg,
+            spectrum_data['SpecEngr'],
+            spectrum_data['SpecSFac'],
+            spectrum_data['SpecTemp'],
+            spectrum_data['SpecAPEC']
+        )
+        temp[k] = params.x[0]
+        rho[k] = params.x[1]
+        zmet[k] = params.x[2]
+        xisq[k] = fitxi
+        del spectrum, vol, Tg, Dg, Zg, params, fitxi, spec_mod
+
+    spectrum_data['Tspec'] = (kb / erg2keV) * (10.0 ** temp)
+
+    ez2 = spectrum_data['OmgM'] * (1.0 + spectrum_data['zred']) ** 3.0 + spectrum_data['OmgL']
+    rho_crit = 1.878e-29 * spectrum_data['Hub'] * spectrum_data['Hub'] * ez2
+    rho_spec = np.zeros(len(rho))
+    for k in range(len(rho)):
+        rho_spec[k] = np.sqrt(
+            (rho[k] * 1.0e66 / spectrum_data['Svol'][k]) / (((Xe(zmet[k]) /
+                                                              ((Xe(zmet[k]) + Xi(zmet[k])) * mu2(
+                                                                  zmet[k]) * unyt.proton_mass)) ** 2.0) / Xe(zmet[k]))
+        ) / rho_crit
+    spectrum_data['RHOspec'] = rho_spec
+    spectrum_data['Zspec'] = zmet * (1.89e-3 / 1.29e-3)
+    spectrum_data['XIspec'] = xisq
+
+    del nbins, rho, temp, zmet, xisq, ez2, rho_crit, rho_spec
+    return
+
+
+def specfit(spectrum, Tg, Dg, Zg, energies, spec_sfac, temptab, APECtab):
+    # Calc photons per bin (1Ms)
+    ppb = (spectrum / energies) * spec_sfac
+    # Set initial guess & fit limits -- 6<log(T)<9, norm > 0, 0<Z/Zsun<10
+    ini_guess = [Tg, Dg, Zg]
+    lims = [(6.0, 9.0), (0.0, np.inf), (0.01, 10.0)]
+    # Fit only bins with ppb > 0 and 0.5 < E < 10.0
+    tdx = np.where((ppb > 0.0) & (energies > 0.5) & (energies < 10.0))[0]
+    # Initial model spectrum fit
+    ebins = np.arange(len(energies))
+
+    coef = []
+    coef.append(
+        minimize(spec_model, ini_guess, args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                 method='L-BFGS-B', bounds=lims, tol=1.0e-4, options={'maxiter': 1000}))
+
+    coef.append(
+        minimize(spec_model, ini_guess, args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                 method='SLSQP', bounds=lims, tol=1.0e-4, options={'maxiter': 500}))
+
+    coef.append(
+        minimize(spec_model, ini_guess, args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                 method='Nelder-Mead', tol=1.0e-4, options={'maxiter': 1000}))
+    if coef[-1].x[2] < 0.0: coef[-1].success = False
+
+    try:
+        coef.append(least_squares(spec_model, ini_guess,
+                                  args=(ebins[tdx], ppb[tdx], temptab, APECtab, energies, spec_sfac, tdx, 'Fln'),
+                                  bounds=([6.0, 0.0, 0.0], [9.0, np.inf, 10.0]), ftol=1.0e-4, max_nfev=1000))
+    except:
+        pass
+
+    fitcoef = None
+    xisq = 1.0e100
+
+    for y in coef:
+        if y.success is False: continue
+        spec_mod = spec_model(y.x, ppb[tdx], ebins[tdx], temptab, APECtab, energies, spec_sfac, tdx)
+        Xsq_m = np.sum((spec_mod[tdx] - ppb[tdx]) ** 2.0 / ppb[tdx] ** 2.0) / (len(ebins[tdx]) - 3)
+        if Xsq_m < xisq:
+            fitcoef = y
+            xisq = Xsq_m
+        del Xsq_m
+
+    if fitcoef is None:
+        fitcoef = coef[0]
+        fitcoef.x = ini_guess
+        spec_mod = spec_model(fitcoef.x, ppb[tdx], ebins[tdx], temptab, APECtab, energies, spec_sfac, tdx)
+        xisq = 1.0e100
+    del coef
+    model_flux = spec_mod * energies / spec_sfac
+    del ppb, ini_guess, lims, tdx, ebins, spec_mod
+    return fitcoef, xisq, model_flux
+
+
+def spec_model(p0, y, temptab, APECtab, energies, spec_sfac, tdx, meth='Mod'):
+    # Locate T in look up table
+    T, D, Z = p0
+    idx = locate(temptab, T)
+    if idx < 0:
+        idx = 0
+    if idx > len(temptab) - 2:
+        idx = len(temptab) - 2
+
+    dlogT = temptab[1] - temptab[0]
+    # -- Element contributions
+    # Hydrogen
+    m = (np.log10(APECtab['Hydrogen'][idx + 1]) - np.log10(APECtab['Hydrogen'][idx])) / dlogT
+    b = np.log10(APECtab['Hydrogen'][idx]) - m * temptab[idx]
+    H = 10.0 ** (m * T + b)
+    # Helium
+    m = (np.log10(APECtab['Helium'][idx + 1]) - np.log10(APECtab['Helium'][idx])) / dlogT
+    b = np.log10(APECtab['Helium'][idx]) - m * temptab[idx]
+    He = 10.0 ** (m * T + b)
+    # Carbon
+    m = (np.log10(APECtab['Carbon'][idx + 1]) - np.log10(APECtab['Carbon'][idx])) / dlogT
+    b = np.log10(APECtab['Carbon'][idx]) - m * temptab[idx]
+    C = 10.0 ** (m * T + b)
+    # Nitrogen
+    m = (np.log10(APECtab['Nitrogen'][idx + 1]) - np.log10(APECtab['Nitrogen'][idx])) / dlogT
+    b = np.log10(APECtab['Nitrogen'][idx]) - m * temptab[idx]
+    N = 10.0 ** (m * T + b)
+    # Oxygen
+    m = (np.log10(APECtab['Oxygen'][idx + 1]) - np.log10(APECtab['Oxygen'][idx])) / dlogT
+    b = np.log10(APECtab['Oxygen'][idx]) - m * temptab[idx]
+    O = 10.0 ** (m * T + b)
+    # Neon
+    m = (np.log10(APECtab['Neon'][idx + 1]) - np.log10(APECtab['Neon'][idx])) / dlogT
+    b = np.log10(APECtab['Neon'][idx]) - m * temptab[idx]
+    Ne = 10.0 ** (m * T + b)
+    # Magnesium
+    m = (np.log10(APECtab['Magnesium'][idx + 1]) - np.log10(APECtab['Magnesium'][idx])) / dlogT
+    b = np.log10(APECtab['Magnesium'][idx]) - m * temptab[idx]
+    Mg = 10.0 ** (m * T + b)
+    # Silcon
+    m = (np.log10(APECtab['Silicon'][idx + 1]) - np.log10(APECtab['Silicon'][idx])) / dlogT
+    b = np.log10(APECtab['Silicon'][idx]) - m * temptab[idx]
+    Si = 10.0 ** (m * T + b)
+    # Sulphur
+    m = (np.log10(APECtab['Sulphur'][idx + 1]) - np.log10(APECtab['Sulphur'][idx])) / dlogT
+    b = np.log10(APECtab['Sulphur'][idx]) - m * temptab[idx]
+    S = 10.0 ** (m * T + b)
+    # Calcium
+    m = (np.log10(APECtab['Calcium'][idx + 1]) - np.log10(APECtab['Calcium'][idx])) / dlogT
+    b = np.log10(APECtab['Calcium'][idx]) - m * temptab[idx]
+    Ca = 10.0 ** (m * T + b)
+    # Iron
+    m = (np.log10(APECtab['Iron'][idx + 1]) - np.log10(APECtab['Iron'][idx])) / dlogT
+    b = np.log10(APECtab['Iron'][idx]) - m * temptab[idx]
+    Fe = 10.0 ** (m * T + b)
+    # -- Model spectrum
+    mod = D * (H + He + Z * (C + N + O + Ne + Mg + Si + S + Ca + Fe))
+    mod = 1.0e66 * (mod / energies) * spec_sfac
+    # -- Return error or model
+    if meth == 'Flg':
+        return np.sum((np.log10(y) - np.log10(mod[tdx])) ** 2.0)
+    elif meth == 'Fln':
+        return np.sum((y - mod[tdx]) ** 2.0)
+    else:
+        return mod
 
 
 def soft_band(data, pix):
-
     from scipy.io.idl import readsav
 
     APEC = readsav('APEC_0.5_2.0keV_interp.idl')
@@ -297,13 +541,15 @@ def soft_band(data, pix):
     Lambda = unyt.unyt_array(Lambda, 'erg/s*cm**3')
 
     # --- Calculate observables
-    Lx = Lambda * (data.gas.densities * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0) * data.gas.masses / ne_nH
+    Lx = Lambda * (data.gas.densities * (
+            ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
-    Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
+    Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
+            data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
     print("Soft band LX", np.sum(Lx.in_cgs()))
-    print("Soft band LX", np.sum(Sx.in_cgs()))
-    print("Soft band LX", np.sum(Ypix.in_cgs()))
+    print("Soft band SX", np.sum(Sx.in_cgs()))
+    print("Soft band YX", np.sum(Ypix.in_cgs()))
 
 
 if __name__ == '__main__':
@@ -370,7 +616,6 @@ if __name__ == '__main__':
         path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5',
         path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
     )
-
 
     soft_band(data, 1)
     bolometric(data)
