@@ -454,27 +454,53 @@ declare -a arr=("18"
 for t in "${arr[@]}"
 do
     echo $t
+    rm -rf L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
     mkdir L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
-    mkdir L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/ics
     mkdir L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/out_files
     cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/snap_redshifts.txt L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
+    cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/select_output.yml L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
+    cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/stf_redshifts.txt L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
     cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/auto_resubmit L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
     cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/submit L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
     cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/resubmit L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
     cp L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
 
-    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/submit
-    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/resubmit
-    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+    chmod 744 L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/submit
+    chmod 744 L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/resubmit
+    chmod 744 L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/auto_resubmit
 
-    sed -i "s/particle_splitting_mass_threshold: 0.00586782/particle_splitting_mass_threshold: 0.00073348/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
-    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
-    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/submit
+    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/resubmit
+    sed -i "s/_-8res_/_+1res_/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
 
-    sed -i "s/0.00665484 # Comoving softening for DM/0.00332742 # Comoving softening for DM/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
-    sed -i "s/0.00380430 # Comoving softening for baryons/0.00190215 # Comoving softening for baryons/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
-    sed -i "s/0.00295770 # Physical softening for DM/0.00147885 # Physical softening for DM/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
-    sed -i "s/0.00169080 # Physical softening for baryons/0.00084540 # Physical softening for baryons/" L0300N0564_VR"$t"_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+    sed -i "s/particle_splitting_mass_threshold: 0.00586782/particle_splitting_mass_threshold: 0.00073348/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+
+    sed -i "s/file_name:  .\/ics\/L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth.hdf5/file_name:  \/cosma7\/data\/dp004\/dc-alta2\/xl-zooms\/ics\/ic_gen\/run\/ic_gen_submit_files\/1LPT_8bitID\/L0300N0564_VR"$t"_+1res\/L0300N0564_VR"$t"_+1res.hdf5/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+
+    sed -i "s/0.00665484 # Comoving softening for DM/0.00332742 # Comoving softening for DM/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+    sed -i "s/0.00380430 # Comoving softening for baryons/0.00190215 # Comoving softening for baryons/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+    sed -i "s/0.00295770 # Physical softening for DM/0.00147885 # Physical softening for DM/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+    sed -i "s/0.00169080 # Physical softening for baryons/0.00084540 # Physical softening for baryons/" L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/params.yml
+
+done
 
 
+for i in L0300N0564_VR*_-8res
+do
+    echo $i
+    python3 /cosma/home/dp004/dc-alta2/xl-zooms/parent/combine_ics.py ./"$i"/ICs/"$i".0.hdf5 ./"$i"/"$i".hdf5
+done
+
+
+
+for t in "${arr[@]}"
+do
+    echo $t
+    chmod 744 L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/submit
+    chmod 744 L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/resubmit
+    chmod 744 L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/auto_resubmit
+
+    cd L0300N0564_VR"$t"_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth
+    sbatch submit
+    cd ..
 done

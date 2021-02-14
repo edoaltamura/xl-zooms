@@ -26,6 +26,8 @@ except:
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 
+plot_observation_errorbars = False
+
 
 def process_single_halo(
         path_to_snap: str,
@@ -117,8 +119,9 @@ def m_500_hotgas(results: pd.DataFrame):
     Sun09 = obs.Sun09()
     ax.scatter(Sun09.M_500, Sun09.M_500gas,
                marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    ax.errorbar(Sun09.M_500, Sun09.M_500gas, yerr=Sun09.M_500gas_error, xerr=Sun09.M_500_error,
-                ls='none', elinewidth=0.5,  color=observations_color, zorder=0)
+    if plot_observation_errorbars:
+        ax.errorbar(Sun09.M_500, Sun09.M_500gas, yerr=Sun09.M_500gas_error, xerr=Sun09.M_500_error,
+                    ls='none', elinewidth=0.5,  color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.citation)
@@ -137,8 +140,9 @@ def m_500_hotgas(results: pd.DataFrame):
     Lin12 = obs.Lin12()
     ax.scatter(Lin12.M_500, Lin12.M_500gas,
                marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    ax.errorbar(Lin12.M_500, Lin12.M_500gas, yerr=Lin12.M_500gas_error, xerr=Lin12.M_500_error,
-                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    if plot_observation_errorbars:
+        ax.errorbar(Lin12.M_500, Lin12.M_500gas, yerr=Lin12.M_500gas_error, xerr=Lin12.M_500_error,
+                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lin12.citation)
@@ -157,15 +161,16 @@ def m_500_hotgas(results: pd.DataFrame):
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
                marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.M_500gas, yerr=Vikhlinin06.error_M_500gas, xerr=Vikhlinin06.error_M_500,
-                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    if plot_observation_errorbars:
+        ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.M_500gas, yerr=Vikhlinin06.error_M_500gas, xerr=Vikhlinin06.error_M_500,
+                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
                label=Vikhlinin06.citation)
     )
     del Vikhlinin06
 
-    Barnes17 = obs.Barnes17().hdf5.z000p000.true
+    Barnes17 = obs.Barnes17().hdf5.z000p101.true
     relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
     ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1],
                marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
@@ -173,7 +178,7 @@ def m_500_hotgas(results: pd.DataFrame):
                marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=obs.Barnes17().citation + ' $z=0$')
+               label=obs.Barnes17().citation + ' $z=0.1$')
     )
     del Barnes17
 
@@ -225,8 +230,9 @@ def f_500_hotgas(results: pd.DataFrame):
     Sun09 = obs.Sun09()
     ax.scatter(Sun09.M_500, Sun09.fb_500,
                marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    ax.errorbar(Sun09.M_500, Sun09.fb_500, yerr=Sun09.fb_500_error, xerr=Sun09.M_500_error,
-                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    if plot_observation_errorbars:
+        ax.errorbar(Sun09.M_500, Sun09.fb_500, yerr=Sun09.fb_500_error, xerr=Sun09.M_500_error,
+                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
                label=Sun09.citation)
@@ -245,8 +251,9 @@ def f_500_hotgas(results: pd.DataFrame):
     Lin12 = obs.Lin12()
     ax.scatter(Lin12.M_500, Lin12.fb_500,
                marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    ax.errorbar(Lin12.M_500, Lin12.fb_500, yerr=Lin12.fb_500_error, xerr=Lin12.M_500_error,
-                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    if plot_observation_errorbars:
+        ax.errorbar(Lin12.M_500, Lin12.fb_500, yerr=Lin12.fb_500_error, xerr=Lin12.M_500_error,
+                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
                label=Lin12.citation)
@@ -265,15 +272,16 @@ def f_500_hotgas(results: pd.DataFrame):
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.fb_500,
                marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.fb_500, yerr=Vikhlinin06.error_fb_500, xerr=Vikhlinin06.error_M_500,
-                ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+    if plot_observation_errorbars:
+        ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.fb_500, yerr=Vikhlinin06.error_fb_500, xerr=Vikhlinin06.error_M_500,
+                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
                label=Vikhlinin06.citation)
     )
     del Vikhlinin06
 
-    Barnes17 = obs.Barnes17().hdf5.z000p000.true
+    Barnes17 = obs.Barnes17().hdf5.z000p101.true
     relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
     ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1] / Barnes17.M500[relaxed < 0.1],
                marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
@@ -281,7 +289,7 @@ def f_500_hotgas(results: pd.DataFrame):
                marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
     handles.append(
         Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=obs.Barnes17().citation + ' $z=0$')
+               label=obs.Barnes17().citation + ' $z=0.1$')
     )
     del Barnes17
 
