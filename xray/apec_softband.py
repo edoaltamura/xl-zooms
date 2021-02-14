@@ -626,5 +626,7 @@ if __name__ == '__main__':
     soft_band(data, 1)
     spec = calc_spectrum(data, R500c)
     fit_spectrum(spec)
-    for k in spec:
-        print(spec[k])
+    print('Tspec', spec['Tspec'])
+    print('RHOspec', spec['RHOspec'])
+    print('Zspec', spec['Zspec'])
+    print('XIspec', spec['XIspec'])
