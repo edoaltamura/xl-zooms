@@ -196,14 +196,14 @@ def calc_spectrum(data, R500c):
 
     # Calculate spectrum
 
-    r = data.gas.radial_distances
+    r = data.gas.radial_distances.to('cm')
     mass = data.gas.masses
     temp = data.gas.temperatures
     iron = data.gas.element_mass_fractions.iron
 
     nbins = 25 + 1
-    rm = np.log10(0.15 * R500c)
-    rx = np.log10(1 * R500c)
+    rm = np.log10(0.15 * R500c.to('cm'))
+    rx = np.log10(1 * R500c.to('cm'))
     rbin = np.logspace(rm, rx, num=nbins, base=10.0)
     rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
     vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0))
@@ -235,8 +235,8 @@ def calc_spectrum(data, R500c):
             )
     del r, temp, He_H, C_H, N_H, O_H, Ne_H, Mg_H, Ca_H, S_H, Si_H, Fe_H, rm, rx
 
-    data_out['Srho'] = mpro / vol.to('cm**3')
-    data_out['Svol'] = vol.to('cm**3')
+    data_out['Srho'] = mpro / vol
+    data_out['Svol'] = vol
     data_out['Stmp'] = (tpro / mpro) * kb
     data_out['Smet'] = (zpro / mpro) / 1.29e-3
     data_out['Rspec'] = rcen
