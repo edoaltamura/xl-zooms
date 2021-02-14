@@ -556,7 +556,7 @@ def soft_band(data, pix):
 
     print("Soft band LX", np.sum(Lx.in_cgs()))
     print("Soft band SX", np.sum(Sx.in_cgs()))
-    print("Soft band YX", np.sum(Ypix.in_cgs()))
+    print("Soft band YX", np.sum(Ypix.to('Msun*keV')))
 
 
 if __name__ == '__main__':
