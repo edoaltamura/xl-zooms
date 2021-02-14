@@ -629,3 +629,5 @@ if __name__ == '__main__':
     print('RHOspec', spec['RHOspec'])
     print('Zspec', spec['Zspec'])
     print('XIspec', spec['XIspec'])
+    print('EMM', np.sum(spec['EMM']))
+    print('Ypar', np.sum(spec['Ypar']))
