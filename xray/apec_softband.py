@@ -243,7 +243,7 @@ def calc_spectrum(data, R500c):
     data_out['Spectrum'] = spectrum
     data_out['EMM'] = EMM
     data_out['Ypar'] = Ypar
-    data_out['rho_crit'] = data.metadata.cosmology.critical_density(data.metadata.z).in_cgs().value
+    data_out['rho_crit'] = data.metadata.cosmology.critical_density(data.metadata.z).to('g/cm**3').value
 
     return data_out
 
