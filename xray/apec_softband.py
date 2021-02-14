@@ -5,6 +5,9 @@ from scipy.optimize import minimize, least_squares
 import unyt
 
 np.seterr(divide='ignore')
+kb = 1.3807e-16       # Boltzmann's constant [erg/K]
+mpc = 3.0857e24       # Megaparsec [cm]
+erg2keV = 1.60215e-9  # erg --> keV conversion factor
 
 
 def radial_bin(r_dist, weights, rmin=0.1, rmax=1.0, nbins=50):
@@ -234,21 +237,18 @@ def calc_spectrum(data, R500c):
 
     data_out['Srho'] = mpro / vol
     data_out['Svol'] = vol
-    data_out['Stmp'] = (tpro / mpro) * unyt.boltzmann_constant
+    data_out['Stmp'] = (tpro / mpro) * kb
     data_out['Smet'] = (zpro / mpro) / 1.29e-3
     data_out['Rspec'] = rcen
     data_out['Spectrum'] = spectrum
     data_out['EMM'] = EMM
     data_out['Ypar'] = Ypar
-    data_out['rho_crit'] = data.metadata.cosmology.critical_density(data.metadata.z)
+    data_out['rho_crit'] = data.metadata.cosmology.critical_density(data.metadata.z).in_cgs().value
 
     return data_out
 
 
 def fit_spectrum(spectrum_data):
-    kb = 1.3807e-16       # Boltzmann's constant [erg/K]
-    mpc = 3.0857e24       # Megaparsec [cm]
-    erg2keV = 1.60215e-9  # erg --> keV conversion factor
 
     chand_area = np.loadtxt('chandra_acis-i_.area')
     etmp = chand_area[:, 0]
@@ -297,7 +297,7 @@ def fit_spectrum(spectrum_data):
         xisq[k] = fitxi
         del spectrum, vol, Tg, Dg, Zg, params, fitxi, spec_mod
 
-    spectrum_data['Tspec'] = kb * (10.0 ** temp)
+    spectrum_data['Tspec'] = (kb / erg2keV) * (10.0 ** temp)
 
     rho_spec = np.zeros(len(rho))
     for k in range(len(rho)):
