@@ -205,7 +205,7 @@ def calc_spectrum(data, R500c):
     rx = np.log10(1 * R500c)
     rbin = np.logspace(rm, rx, num=nbins, base=10.0)
     rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
-    vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0))
+    vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0)) * unyt.Mpc ** 3
 
     mpro = radial_bin(r, mass, rmin=np.min(rbin), rmax=np.max(rbin), nbins=nbins)[1]
     tpro = radial_bin(r, mass * temp, rmin=np.min(rbin), rmax=np.max(rbin), nbins=nbins)[1]
