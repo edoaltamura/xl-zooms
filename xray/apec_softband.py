@@ -191,7 +191,7 @@ def calc_spectrum(data, R500c):
 
     # Emission measure & Y parameter
     EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp_cgs.v)) ** 2.0
-    Ypar = (unyt.thompson_cross_section / (511.0 * erg2keV)) * kb * data.gas.temperatures * (
+    Ypar = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * kb * data.gas.temperatures * (
             data.gas.masses * 0.752 * ne_nH / unyt.mp_cgs.v) / mpc ** 2
 
     # Calculate spectrum
@@ -549,10 +549,10 @@ def soft_band(data, pix):
 
     # --- Calculate observables
     Lx = Lambda * (data.gas.densities * (
-            ne_nH / ((ne_nH + ni_nH) * mu * unyt.proton_mass)) ** 2.0) * data.gas.masses / ne_nH
+            ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
-    Ypix = (unyt.thompson_cross_section / (511.0 * unyt.keV)) * unyt.boltzmann_constant * data.gas.temperatures * (
-            data.gas.masses / (mu * unyt.proton_mass)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
+    Ypix = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * kb * data.gas.temperatures * (
+            data.gas.masses / (mu * unyt.mp_cgs.v)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
     print("Soft band LX", np.sum(Lx.in_cgs()))
     print("Soft band SX", np.sum(Sx.in_cgs()))
