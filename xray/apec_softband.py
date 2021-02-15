@@ -5,6 +5,8 @@ from scipy.optimize import minimize, least_squares
 import unyt
 
 np.seterr(divide='ignore')
+np.seterr(invalid='ignore')
+
 kb = 1.3807e-16       # Boltzmann's constant [erg/K]
 mpc = 3.0857e24       # Megaparsec [cm]
 erg2keV = 1.60215e-9  # erg --> keV conversion factor
