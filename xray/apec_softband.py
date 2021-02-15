@@ -193,7 +193,7 @@ def calc_spectrum(data, R500c):
 
     # Emission measure & Y parameter
     EMM = data.gas.densities * data.gas.masses / ne_nH * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp_cgs.v)) ** 2.0
-    Ypar = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * kb * data.gas.temperatures * (
+    Ypar = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * unyt.kb_cgs * data.gas.temperatures * (
             data.gas.masses * 0.752 * ne_nH / unyt.mp_cgs.v) / mpc ** 2
 
     # Calculate spectrum
@@ -625,7 +625,7 @@ if __name__ == '__main__':
         path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
     )
 
-    soft_band(data, data.metadata.cosmology.luminosity_distance(0.1).in_cgs().value)
+    soft_band(data, data.metadata.cosmology.luminosity_distance(0.1).to('cm').v)
     spec = calc_spectrum(data, R500c)
     fit_spectrum(spec)
     print('Tspec', spec['Tspec'])
