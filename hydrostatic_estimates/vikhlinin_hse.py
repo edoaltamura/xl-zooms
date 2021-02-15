@@ -254,7 +254,7 @@ class HydrostaticEstimator:
             (self.radial_bin_centres > spec_fit_data['Rspec'].min()) &
             (self.radial_bin_centres < spec_fit_data['Rspec'].max())
         )[0]
-        self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect]
+        self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect] * radial_distance_scaled.units
 
         print("self.radial_bin_centres", self.radial_bin_centres)
 
