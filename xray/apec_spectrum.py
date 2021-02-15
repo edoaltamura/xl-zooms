@@ -499,11 +499,11 @@ def process_single_halo(
 
     spec_fit_data = calc_spectrum(data, R500c)
     fit_spectrum(spec_fit_data)
-    print('Rspec', spec_fit_data['Rspec'])
-    print('Tspec', spec_fit_data['Tspec'])
-    print('RHOspec', spec_fit_data['RHOspec'])
-    print('Zspec', spec_fit_data['Zspec'])
-    print('XIspec', spec_fit_data['XIspec'])
+    # print('Rspec', spec_fit_data['Rspec'])
+    # print('Tspec', spec_fit_data['Tspec'])
+    # print('RHOspec', spec_fit_data['RHOspec'])
+    # print('Zspec', spec_fit_data['Zspec'])
+    # print('XIspec', spec_fit_data['XIspec'])
 
     hse_spec = HydrostaticEstimator.from_data_paths(
         catalog_file=path_to_catalogue,

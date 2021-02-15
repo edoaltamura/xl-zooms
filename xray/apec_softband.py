@@ -1,6 +1,14 @@
+import os
+import sys
 import numpy as np
 import unyt
+import h5py
+import swiftsimio as sw
 from scipy.io.idl import readsav
+
+sys.path.append("../zooms")
+
+from register import zooms_register, Zoom, Tcut_halogas, name_list
 
 np.seterr(divide='ignore')
 np.seterr(invalid='ignore')
@@ -129,74 +137,73 @@ def soft_band(data, pix):
     Ypix = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * unyt.kb_cgs * data.gas.temperatures * (
             data.gas.masses / (mu * unyt.mp_cgs.v)) * (ne_nH / (ne_nH + ni_nH)) / (pix * pix)
 
-    print("Soft band LX", np.sum(Lx.in_cgs()))
-    print("Soft band SX", np.sum(Sx.in_cgs()))
-    print("Soft band YX", np.sum(Ypix.to('Msun*keV')))
+    return Lx, Sx, Ypix
+
+
+def process_single_halo(
+        path_to_snap: str,
+        path_to_catalogue: str
+):
+    # Read in halo properties
+    with h5py.File(f'{path_to_catalogue}', 'r') as h5file:
+        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+    # Read in gas particles to compute the core-excised temperature
+    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    region = [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
+              [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
+              [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
+    mask.constrain_spatial(region)
+    mask.constrain_mask(
+        "gas", "temperatures",
+        1.e5 * mask.units.temperature,
+        1.e10 * mask.units.temperature
+    )
+
+    data = sw.load(f'{path_to_snap}', mask=mask)
+
+    # Select hot gas within sphere and without core
+    deltaX = data.gas.coordinates[:, 0] - XPotMin
+    deltaY = data.gas.coordinates[:, 1] - YPotMin
+    deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+
+    # Keep only particles inside 5 R500crit
+    index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
+    data.gas.radial_distances = deltaR[index]
+    data.gas.densities = data.gas.densities[index]
+    data.gas.masses = data.gas.masses[index]
+    data.gas.temperatures = data.gas.temperatures[index]
+
+    data.gas.element_mass_fractions.hydrogen = data.gas.element_mass_fractions.hydrogen[index]
+    data.gas.element_mass_fractions.helium = data.gas.element_mass_fractions.helium[index]
+    data.gas.element_mass_fractions.carbon = data.gas.element_mass_fractions.carbon[index]
+    data.gas.element_mass_fractions.nitrogen = data.gas.element_mass_fractions.nitrogen[index]
+    data.gas.element_mass_fractions.oxygen = data.gas.element_mass_fractions.oxygen[index]
+    data.gas.element_mass_fractions.neon = data.gas.element_mass_fractions.neon[index]
+    data.gas.element_mass_fractions.magnesium = data.gas.element_mass_fractions.magnesium[index]
+    data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
+    data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
+
+    redshift = data.metadata.z
+    if redshift > 1e-4:
+        Lx, Sx, Ypix = soft_band(data, data.metadata.cosmology.luminosity_distance(redshift).to('cm'))
+    else:
+        Lx, Sx, Ypix = soft_band(data, 1)
+
+    print(f"M_500_crit = {M500c:.3E}")
+    print(f'LX = {np.sum(Lx):.3E}')
+
+    return np.sum(Lx), Sx, Ypix
 
 
 if __name__ == '__main__':
-    import swiftsimio as sw
-    import h5py as h5
 
-    d = '/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/'
-
-
-    def process_single_halo(
-            path_to_snap: str,
-            path_to_catalogue: str
-    ):
-        # Read in halo properties
-        with h5.File(f'{path_to_catalogue}', 'r') as h5file:
-            M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
-
-        # Read in gas particles to compute the core-excised temperature
-        mask = sw.mask(f'{path_to_snap}', spatial_only=False)
-        region = [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
-                  [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
-                  [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
-        mask.constrain_spatial(region)
-        mask.constrain_mask(
-            "gas", "temperatures",
-            1.e5 * mask.units.temperature,
-            1.e10 * mask.units.temperature
-        )
-        print(f"M_500_crit: {M500c:.3E}")
-
-        data = sw.load(f'{path_to_snap}', mask=mask)
-
-        # Select hot gas within sphere and without core
-        deltaX = data.gas.coordinates[:, 0] - XPotMin
-        deltaY = data.gas.coordinates[:, 1] - YPotMin
-        deltaZ = data.gas.coordinates[:, 2] - ZPotMin
-        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
-
-        # Keep only particles inside 5 R500crit
-        index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
-        data.gas.radial_distances = deltaR[index]
-        data.gas.densities = data.gas.densities[index]
-        data.gas.masses = data.gas.masses[index]
-        data.gas.temperatures = data.gas.temperatures[index]
-
-        data.gas.element_mass_fractions.hydrogen = data.gas.element_mass_fractions.hydrogen[index]
-        data.gas.element_mass_fractions.helium = data.gas.element_mass_fractions.helium[index]
-        data.gas.element_mass_fractions.carbon = data.gas.element_mass_fractions.carbon[index]
-        data.gas.element_mass_fractions.nitrogen = data.gas.element_mass_fractions.nitrogen[index]
-        data.gas.element_mass_fractions.oxygen = data.gas.element_mass_fractions.oxygen[index]
-        data.gas.element_mass_fractions.neon = data.gas.element_mass_fractions.neon[index]
-        data.gas.element_mass_fractions.magnesium = data.gas.element_mass_fractions.magnesium[index]
-        data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
-        data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
-
-        soft_band(data, data.metadata.cosmology.luminosity_distance(0.1).to('cm').value)
-
-        return data
-
-
-    data, R500c = process_single_halo(
-        path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5',
-        path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
+    process_single_halo(
+        path_to_snap=zooms_register[0].snapshot_file,
+        path_to_catalogue=zooms_register[0].catalog_file
     )
