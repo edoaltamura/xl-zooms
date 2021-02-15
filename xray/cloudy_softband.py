@@ -228,14 +228,14 @@ def process_single_halo(
     ) * unyt.erg * unyt.cm ** -3 / unyt.s
 
     # Compute X-ray luminosities
-    # xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * \
-    #                     data.gas.masses / unyt.proton_mass / 0.6 * \
-    #                     emissivity
-    xray_luminosities = emissivity / (unyt.proton_mass / 0.6) ** 2
+    xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * \
+                        data.gas.masses / unyt.proton_mass / 0.6 * \
+                        emissivity
+    # xray_luminosities = emissivity / (unyt.proton_mass / 0.6) ** 2
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     print(f"M_500_crit: {M500c:.3E}")
-    print(f"X-luminosity (0.15-1 x R500c): {np.sum(xray_luminosities):.3E}")
+    print(f"X-luminosity: {np.sum(xray_luminosities):.3E}")
 
     return np.sum(xray_luminosities)
 
