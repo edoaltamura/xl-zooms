@@ -625,7 +625,7 @@ if __name__ == '__main__':
         path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
     )
 
-    soft_band(data, data.metadata.cosmology.luminosity_distance(0.1).to('cm').v)
+    soft_band(data, data.metadata.cosmology.luminosity_distance(0.1).to('cm').value)
     spec = calc_spectrum(data, R500c)
     fit_spectrum(spec)
     print('Tspec', spec['Tspec'])
