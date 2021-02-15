@@ -518,20 +518,20 @@ def process_single_halo(
         spec_fit_data=spec_fit_data
     )
 
-    print('R500c =', hse_spec.R500c)
-    print('M500c =', hse_spec.M500c)
-
-    print('R500,true,hse =', hse_true.R500hse)
-    print('M500,true,hse =', hse_true.M500hse)
-    print('P500,true,hse =', hse_true.P500hse)
-    print('kBT500,true,hse =', hse_true.kBT500hse)
-    print('K500,true,hse =', hse_true.K500hse)
-
-    print('R500,spec,hse =', hse_spec.R500hse)
-    print('M500,spec,hse =', hse_spec.M500hse)
-    print('P500,spec,hse =', hse_spec.P500hse)
-    print('kBT500,spec,hse =', hse_spec.kBT500hse)
-    print('K500,spec,hse =', hse_spec.K500hse)
+    print(f'R500c = {hse_spec.R500c:.3E}')
+    print(f'M500c = {hse_spec.M500c:.3E}')
+    print()
+    print(f'R500,true,hse = {hse_true.R500hse:.3E}')
+    print(f'M500,true,hse = {hse_true.M500hse:.3E}')
+    print(f'P500,true,hse = {hse_true.P500hse:.3E}')
+    print(f'kBT500,true,hse = {hse_true.kBT500hse:.3E}')
+    print(f'K500,true,hse = {hse_true.K500hse:.3E}')
+    print()
+    print(f'R500,spec,hse = {hse_spec.R500hse:.3E}')
+    print(f'M500,spec,hse = {hse_spec.M500hse:.3E}')
+    print(f'P500,spec,hse = {hse_spec.P500hse:.3E}')
+    print(f'kBT500,spec,hse = {hse_spec.kBT500hse:.3E}')
+    print(f'K500,spec,hse = {hse_spec.K500hse:.3E}')
 
     return hse_spec
 

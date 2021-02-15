@@ -256,8 +256,6 @@ class HydrostaticEstimator:
         )[0]
         self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect] * radial_distance_scaled.units
 
-        print("self.radial_bin_centres", self.radial_bin_centres)
-
         # Compute the radial gas density profile
         self.density_profile = spec_density_interpolate(self.radial_bin_centres) * unyt.dimensionless
         self.temperature_profile = spec_temperature_interpolate(self.radial_bin_centres) * unyt.keV
