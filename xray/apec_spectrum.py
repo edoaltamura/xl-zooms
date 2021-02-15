@@ -1,9 +1,17 @@
 import os
+import sys
 import unyt
 import h5py
 import numpy as np
+import swiftsimio as sw
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize, least_squares
+
+sys.path.append("../zooms")
+sys.path.append("../hydrostatic_estimates")
+
+from register import zooms_register, Zoom, Tcut_halogas, name_list
+from vikhlinin_hse import HydrostaticEstimator
 
 np.seterr(divide='ignore')
 np.seterr(invalid='ignore')
@@ -441,77 +449,83 @@ def spec_model(p0, x, y, temptab, APECtab, energies, spec_sfac, tdx, meth='Mod')
         return mod
 
 
+def process_single_halo(
+        path_to_snap: str,
+        path_to_catalogue: str
+):
+    # Read in halo properties
+    with h5py.File(f'{path_to_catalogue}', 'r') as h5file:
+        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+    # Read in gas particles to compute the core-excised temperature
+    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    region = [[XPotMin - 5 * R500c, XPotMin + 5 * R500c],
+              [YPotMin - 5 * R500c, YPotMin + 5 * R500c],
+              [ZPotMin - 5 * R500c, ZPotMin + 5 * R500c]]
+    mask.constrain_spatial(region)
+    mask.constrain_mask(
+        "gas", "temperatures",
+        1.e5 * mask.units.temperature,
+        1.e10 * mask.units.temperature
+    )
+    print(f"M_500_crit: {M500c:.3E}")
+
+    data = sw.load(f'{path_to_snap}', mask=mask)
+
+    # Select hot gas within sphere and without core
+    deltaX = data.gas.coordinates[:, 0] - XPotMin
+    deltaY = data.gas.coordinates[:, 1] - YPotMin
+    deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+
+    # Keep only particles inside 5 R500crit
+    index = np.where((deltaR > 0.15 * R500c) & (deltaR < 5 * R500c))[0]
+    data.gas.radial_distances = deltaR[index]
+    data.gas.densities = data.gas.densities[index]
+    data.gas.masses = data.gas.masses[index]
+    data.gas.temperatures = data.gas.temperatures[index]
+
+    data.gas.element_mass_fractions.hydrogen = data.gas.element_mass_fractions.hydrogen[index]
+    data.gas.element_mass_fractions.helium = data.gas.element_mass_fractions.helium[index]
+    data.gas.element_mass_fractions.carbon = data.gas.element_mass_fractions.carbon[index]
+    data.gas.element_mass_fractions.nitrogen = data.gas.element_mass_fractions.nitrogen[index]
+    data.gas.element_mass_fractions.oxygen = data.gas.element_mass_fractions.oxygen[index]
+    data.gas.element_mass_fractions.neon = data.gas.element_mass_fractions.neon[index]
+    data.gas.element_mass_fractions.magnesium = data.gas.element_mass_fractions.magnesium[index]
+    data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
+    data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
+
+    spec_fit_data = calc_spectrum(data, R500c)
+    fit_spectrum(spec_fit_data)
+    print('Tspec', spec_fit_data['Tspec'])
+    print('RHOspec', spec_fit_data['RHOspec'])
+    print('Zspec', spec_fit_data['Zspec'])
+    print('XIspec', spec_fit_data['XIspec'])
+
+    hse_spec = HydrostaticEstimator.from_data_paths(
+        catalog_file=path_to_catalogue,
+        snapshot_file=path_to_snap,
+        profile_type='spec',
+        spec_fit_data=spec_fit_data
+    )
+
+    print('R500c =', hse_spec.R500c)
+    print('M500c =', hse_spec.M500c)
+    print('R500,spec,hse =', hse_spec.R500hse)
+    print('M500,spec,hse =', hse_spec.M500hse)
+    print('P500,spec,hse =', hse_spec.P500hse)
+    print('kBT500,spec,hse =', hse_spec.kBT500hse)
+    print('K500,spec,hse =', hse_spec.K500hse)
+
+
 if __name__ == '__main__':
-    import swiftsimio as sw
-    import h5py as h5
 
-    d = '/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR18_-8res_Ref/'
-
-
-    def process_single_halo(
-            path_to_snap: str,
-            path_to_catalogue: str
-    ):
-        # Read in halo properties
-        with h5.File(f'{path_to_catalogue}', 'r') as h5file:
-            M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
-
-        # Read in gas particles to compute the core-excised temperature
-        mask = sw.mask(f'{path_to_snap}', spatial_only=False)
-        region = [[XPotMin - 5 * R500c, XPotMin + 5 * R500c],
-                  [YPotMin - 5 * R500c, YPotMin + 5 * R500c],
-                  [ZPotMin - 5 * R500c, ZPotMin + 5 * R500c]]
-        mask.constrain_spatial(region)
-        mask.constrain_mask(
-            "gas", "temperatures",
-            1.e5 * mask.units.temperature,
-            1.e10 * mask.units.temperature
-        )
-        print(f"M_500_crit: {M500c:.3E}")
-
-        data = sw.load(f'{path_to_snap}', mask=mask)
-
-        # Select hot gas within sphere and without core
-        deltaX = data.gas.coordinates[:, 0] - XPotMin
-        deltaY = data.gas.coordinates[:, 1] - YPotMin
-        deltaZ = data.gas.coordinates[:, 2] - ZPotMin
-        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
-
-        # Keep only particles inside 5 R500crit
-        index = np.where((deltaR > 0.15 * R500c) & (deltaR < 5 * R500c))[0]
-        data.gas.radial_distances = deltaR[index]
-        data.gas.densities = data.gas.densities[index]
-        data.gas.masses = data.gas.masses[index]
-        data.gas.temperatures = data.gas.temperatures[index]
-
-        data.gas.element_mass_fractions.hydrogen = data.gas.element_mass_fractions.hydrogen[index]
-        data.gas.element_mass_fractions.helium = data.gas.element_mass_fractions.helium[index]
-        data.gas.element_mass_fractions.carbon = data.gas.element_mass_fractions.carbon[index]
-        data.gas.element_mass_fractions.nitrogen = data.gas.element_mass_fractions.nitrogen[index]
-        data.gas.element_mass_fractions.oxygen = data.gas.element_mass_fractions.oxygen[index]
-        data.gas.element_mass_fractions.neon = data.gas.element_mass_fractions.neon[index]
-        data.gas.element_mass_fractions.magnesium = data.gas.element_mass_fractions.magnesium[index]
-        data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
-        data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
-
-        spec = calc_spectrum(data, R500c)
-        fit_spectrum(spec)
-        print('Tspec', spec['Tspec'])
-        print('RHOspec', spec['RHOspec'])
-        print('Zspec', spec['Zspec'])
-        print('XIspec', spec['XIspec'])
-        print('EMM', np.sum(spec['EMM']))
-        print('Ypar', np.sum(spec['Ypar']))
-
-        return data
-
-
-    data = process_single_halo(
-        path_to_snap=d + 'snapshots/L0300N0564_VR18_-8res_Ref_2749.hdf5',
-        path_to_catalogue=d + 'stf/L0300N0564_VR18_-8res_Ref_2749/L0300N0564_VR18_-8res_Ref_2749.properties',
+    process_single_halo(
+        path_to_snap=zooms_register[0].snapshot_file,
+        path_to_catalogue=zooms_register[0].catalog_file
     )
 

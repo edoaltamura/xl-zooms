@@ -10,7 +10,6 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize, least_squares, curve_fit
 from scipy.interpolate import interp1d
 
-
 # Make the register backend visible to the script
 sys.path.append("../zooms")
 sys.path.append("../observational_data")
@@ -18,6 +17,7 @@ sys.path.append("../observational_data")
 from register import zooms_register, Zoom, Tcut_halogas, name_list
 from convergence_radius import convergence_radius
 import observational_data as obs
+
 # import scaling_utils as utils
 # import scaling_style as style
 
@@ -62,12 +62,45 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
 
 class HydrostaticEstimator:
 
-    def __init__(self, zoom: Zoom, excise_core: bool = True, using_mcmc: bool = False):
+    def __init__(self, zoom: Zoom, excise_core: bool = True, profile_type: str = 'true',
+                 using_mcmc: bool = False, spec_fit_data: dict = None):
         self.zoom = zoom
         self.using_mcmc = using_mcmc
         self.excise_core = excise_core
-        self.load_zoom_profiles()
+        self.profile_type = profile_type
+
+        if profile_type.lower() == 'true':
+            self.load_zoom_profiles()
+        elif profile_type.lower() == 'spec' or 'xray' in profile_type.lower():
+            assert spec_fit_data, "Spec output data not detected."
+            self.load_xray_profiles(spec_fit_data)
+
         self.interpolate_hse()
+
+    @classmethod
+    def from_data_paths(cls, catalog_file: str, snapshot_file: str,
+                        excise_core: bool = True, profile_type: str = 'true',
+                        using_mcmc: bool = False, spec_fit_data: dict = None):
+        """
+        If you wish not to parse a Zoom object, but the absolute
+        paths for the snapshot and VR catalogue, you may use this
+        class method, which reconstructs the Zoom object from the
+        known zooms register and returns an HydrostaticEstimator
+        instance as normal.
+        """
+        zoom_found = None
+        for zoom in zooms_register:
+            if zoom.catalog_file == catalog_file and zoom.snapshot_file == snapshot_file:
+                zoom_found = zoom
+                break
+
+        assert zoom_found, (
+            f"The catalogue ({catalog_file}) and snapshot ({snapshot_file}) "
+            "paths cannot be found in registered zooms."
+        )
+
+        return cls(zoom_found, excise_core=excise_core, profile_type=profile_type,
+                   using_mcmc=using_mcmc, spec_fit_data=spec_fit_data)
 
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
@@ -146,6 +179,78 @@ class HydrostaticEstimator:
         hist /= mass_weights
         self.temperature_profile = (hist * unyt.boltzmann_constant).to('keV')
 
+    def load_xray_profiles(self, spec_fit_data: dict):
+
+        # Read in halo properties from catalog
+        with h5.File(self.zoom.catalog_file, 'r') as h5file:
+            self.M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+            self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+        # Read in gas particles and parse densities and temperatures
+        mask = sw.mask(self.zoom.snapshot_file, spatial_only=False)
+        region = [[XPotMin - 5 * self.R500c, XPotMin + 5 * self.R500c],
+                  [YPotMin - 5 * self.R500c, YPotMin + 5 * self.R500c],
+                  [ZPotMin - 5 * self.R500c, ZPotMin + 5 * self.R500c]]
+        mask.constrain_spatial(region)
+        mask.constrain_mask(
+            "gas", "temperatures",
+            Tcut_halogas * mask.units.temperature,
+            1.e12 * mask.units.temperature
+        )
+        data = sw.load(self.zoom.snapshot_file, mask=mask)
+
+        # Calculate the critical density for the density profile
+        unitLength = data.metadata.units.length
+        unitMass = data.metadata.units.mass
+        self.rho_crit = unyt.unyt_quantity(
+            data.metadata.cosmology_raw['Critical density [internal units]'],
+            unitMass / unitLength ** 3
+        )[0].to('Msun/Mpc**3')
+
+        # Select hot gas within sphere and without core
+        deltaX = data.gas.coordinates[:, 0] - XPotMin
+        deltaY = data.gas.coordinates[:, 1] - YPotMin
+        deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+
+        # Keep only particles inside 5 R500crit
+        index = np.where(deltaR < 5 * self.R500c)[0]
+        radial_distance_scaled = deltaR[index] / self.R500c
+        assert radial_distance_scaled.units == unyt.dimensionless
+        gas_masses = data.gas.masses[index]
+
+        # Set bounds for the radial profiles
+        radius_bounds = [0.15, 5]
+        if not self.excise_core:
+            # Compute convergence radius and set as inner limit
+            gas_convergence_radius = convergence_radius(
+                deltaR[index],
+                gas_masses.to('Msun'),
+                self.rho_crit.to('Msun/Mpc**3')
+            ) / self.R500c
+            radius_bounds[0] = gas_convergence_radius.value
+
+        # Create the interpolation objects for the x-ray density and temperature
+        assert 'Rspec' in spec_fit_data, f"`Rspec` key not found in the spec data fitting output: {spec_fit_data}."
+        assert 'RHOspec' in spec_fit_data, f"`RHOspec` key not found in the spec data fitting output: {spec_fit_data}."
+        assert 'Tspec' in spec_fit_data, f"`Tspec` key not found in the spec data fitting output: {spec_fit_data}."
+
+        spec_density_interpolate = interp1d(spec_fit_data['Rspec'], spec_fit_data['RHOspec'], kind='linear')
+        spec_temperature_interpolate = interp1d(spec_fit_data['Rspec'], spec_fit_data['Tspec'], kind='linear')
+
+        lbins = np.logspace(
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
+        ) * radial_distance_scaled.units
+
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1]))
+
+        # Compute the radial gas density profile
+        self.density_profile = spec_density_interpolate(self.radial_bin_centres * self.R500c) * unyt.dimensionless
+        self.temperature_profile = spec_temperature_interpolate(self.radial_bin_centres * self.R500c) * unyt.keV
+
     @staticmethod
     def equation_hse_dlogrho_dlogr(x, rho0, rc, alpha, beta, rs, epsilon):
         """
@@ -155,7 +260,7 @@ class HydrostaticEstimator:
         in units of R500.
         """
         return -0.5 * (alpha + (6 * beta - alpha) * (x / rc) ** 2 / (1 + (x / rc) ** 2) + \
-                epsilon * (x / rs) ** 3 / (1 + (x / rs) ** 3))
+                       epsilon * (x / rs) ** 3 / (1 + (x / rs) ** 3))
 
     @staticmethod
     def equation_hse_dlogkT_dlogr(x, T0, rt, a, b, c, rcool, acool, Tmin):
@@ -166,14 +271,14 @@ class HydrostaticEstimator:
         in units of R500.
         """
         return -a + (acool * (x / rcool) ** acool / (
-               (1 + (x / rcool) ** acool) * (Tmin / T0 + (x / rcool) ** acool))) * \
+                (1 + (x / rcool) ** acool) * (Tmin / T0 + (x / rcool) ** acool))) * \
                (1 - Tmin / T0) - c * (x / rt) ** b / (1 + (x / rt) ** b)
 
     @staticmethod
     def density_profile_model(x, rho0, rc, alpha, beta, rs, epsilon):
         return np.log10(rho0 * ((x / rc) ** (-alpha / 2.0) / (1.0 + (x / rc) ** 2.0) ** \
-                    (3.0 * beta / 2.0 - alpha / 4.0)) * (1.0 / ((1.0 + (x / rs) ** 3.0) ** \
-                    (epsilon / 6.0))))
+                                (3.0 * beta / 2.0 - alpha / 4.0)) * (1.0 / ((1.0 + (x / rs) ** 3.0) ** \
+                                                                            (epsilon / 6.0))))
 
     @staticmethod
     def temperature_profile_model(x, T0, rt, a, b, c, rcool, acool, Tmin):
@@ -197,7 +302,6 @@ class HydrostaticEstimator:
         err = np.log10(rho0 * ((x / rc) ** (-alpha * 0.5) / (1 + (x / rc) ** 2) ** (3 * beta / 2 - alpha / 4)) * (
                 1 / ((1 + (x / rs) ** 3) ** (epsilon / 6)))) - y
         return np.sum(err * err)
-
 
     def density_fit(self, x, y):
 
@@ -268,7 +372,8 @@ class HydrostaticEstimator:
             self.radial_bin_centres,
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
-        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (drho_hse + dT_hse) * unyt.Solar_Mass
+        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (
+                    drho_hse + dT_hse) * unyt.Solar_Mass
 
         return cfr, cft, masses_hse
 
@@ -287,23 +392,31 @@ class HydrostaticEstimator:
         self.M500hse = mass_interpolate(self.R500hse) * unyt.Solar_Mass
         self.M2500hse = mass_interpolate(self.R2500hse) * unyt.Solar_Mass
 
-        self.ne200hse = (3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
-        self.ne500hse = (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
-        self.ne2500hse = (3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
+        self.ne200hse = (3 * self.M200hse * fbary / (
+                    4 * np.pi * self.R200hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
+        self.ne500hse = (3 * self.M500hse * fbary / (
+                    4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
+        self.ne2500hse = (3 * self.M2500hse * fbary / (
+                    4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
 
         self.kBT200hse = (unyt.G * mean_molecular_weight * self.M200hse * unyt.mass_proton / self.R200hse / 2).to('keV')
         self.kBT500hse = (unyt.G * mean_molecular_weight * self.M500hse * unyt.mass_proton / self.R500hse / 2).to('keV')
-        self.kBT2500hse = (unyt.G * mean_molecular_weight * self.M2500hse * unyt.mass_proton / self.R2500hse / 2).to('keV')
+        self.kBT2500hse = (unyt.G * mean_molecular_weight * self.M2500hse * unyt.mass_proton / self.R2500hse / 2).to(
+            'keV')
 
         self.P200hse = (200 * fbary * self.rho_crit * unyt.G * self.M200hse / self.R200hse / 2).to('keV/cm**3')
         self.P500hse = (500 * fbary * self.rho_crit * unyt.G * self.M500hse / self.R500hse / 2).to('keV/cm**3')
         self.P2500hse = (2500 * fbary * self.rho_crit * unyt.G * self.M2500hse / self.R2500hse / 2).to('keV/cm**3')
 
-        self.K200hse = (self.kBT200hse / (3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
-        self.K500hse = (self.kBT500hse / (3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
-        self.K2500hse = (self.kBT2500hse / (3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to('keV*cm**2')
-
-
+        self.K200hse = (self.kBT200hse / (
+                    3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+            'keV*cm**2')
+        self.K500hse = (self.kBT500hse / (
+                    3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+            'keV*cm**2')
+        self.K2500hse = (self.kBT2500hse / (
+                    3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+            'keV*cm**2')
 
 
 if __name__ == "__main__":
