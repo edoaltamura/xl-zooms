@@ -101,7 +101,7 @@ def mu2(zmet):
 
 def calc_spectrum(data, R500c):
     # Read APEC look up table: 0.05-100.0keV
-    APEC_spec = h5py.File('~/xl-zooms/xray/APEC_spectra_0.05-100.0keV.hdf5', 'r')
+    APEC_spec = h5py.File('/cosma/home/dp004/dc-alta2/xl-zooms/xray/APEC_spectra_0.05-100.0keV.hdf5', 'r')
     temptab = APEC_spec['Log_Plasma_Temp'][:]
     energies = APEC_spec['Energies'][:]
     APECtab = {}
@@ -260,7 +260,7 @@ def calc_spectrum(data, R500c):
 
 
 def fit_spectrum(spectrum_data):
-    chand_area = np.loadtxt('~/xl-zooms/xray/chandra_acis-i_.area')
+    chand_area = np.loadtxt('/cosma/home/dp004/dc-alta2/xl-zooms/xray/chandra_acis-i_.area')
     etmp = chand_area[:, 0]
     atmp = chand_area[:, 1]
 
