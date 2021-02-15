@@ -6,6 +6,7 @@ import numpy as np
 import swiftsimio as sw
 from scipy.interpolate import interp1d
 from scipy.optimize import minimize, least_squares
+from tqdm import tqdm
 
 sys.path.append("../zooms")
 sys.path.append("../hydrostatic_estimates")
@@ -224,8 +225,7 @@ def calc_spectrum(data, R500c):
 
     spectrum = np.zeros((len(rcen), len(energies)))
 
-    for k in range(len(rcen)):
-        print(f"Calculating spectrum in shell ({k + 1}/{len(rcen)})")
+    for k in tqdm(range(len(rcen)), desc='[ APEC 0.05-100 keV ] Calculating spectrum in shell'):
         idx = np.where((r > rbin[k]) & (r <= rbin[k + 1]))[0]
         if len(idx) <= 0:
             continue
@@ -279,7 +279,7 @@ def fit_spectrum(spectrum_data):
     rho = np.zeros(nbins)
     zmet = np.zeros(nbins)
     xisq = np.zeros(nbins)
-    for k in range(nbins):
+    for k in tqdm(range(nbins), desc='[ APEC 0.05-100 keV ] Fitting spectrum for 3D shell'):
         spectrum = spectrum_data['Spectrum'][k]
 
         if np.max(spectrum) <= 0.0:
@@ -294,7 +294,6 @@ def fit_spectrum(spectrum_data):
         Dg = (spectrum_data['Srho'][k] ** 2.0) * (vol / 1.0e66) * (
                 ((Xe(Zg) / ((Xe(Zg) + Xi(Zg)) * mu2(Zg) * unyt.proton_mass)) ** 2.0) / Xe(Zg))
 
-        print(f"Fitting spectrum for shell ({k + 1}/{nbins})")
         params, fitxi, spec_mod = specfit(
             spectrum, Tg, Dg, Zg,
             spectrum_data['SpecEngr'],
