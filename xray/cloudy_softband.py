@@ -1,7 +1,17 @@
-import h5py
 import os
+import sys
 import numpy as np
+import unyt
+import h5py
+import swiftsimio as sw
 from numba import jit
+
+sys.path.append("../zooms")
+
+from register import zooms_register, Zoom, Tcut_halogas, name_list
+
+np.seterr(divide='ignore')
+np.seterr(invalid='ignore')
 
 
 class interpolate:
@@ -153,3 +163,86 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
     )
 
     return emissivities
+
+
+def process_single_halo(
+        path_to_snap: str,
+        path_to_catalogue: str
+):
+    # Read in halo properties
+    with h5py.File(f'{path_to_catalogue}', 'r') as h5file:
+        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+    # Read in gas particles to compute the core-excised temperature
+    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    region = [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
+              [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
+              [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
+    mask.constrain_spatial(region)
+    mask.constrain_mask(
+        "gas", "temperatures",
+        1.e5 * mask.units.temperature,
+        1.e10 * mask.units.temperature
+    )
+
+    data = sw.load(f'{path_to_snap}', mask=mask)
+
+    # Select hot gas within sphere and without core
+    deltaX = data.gas.coordinates[:, 0] - XPotMin
+    deltaY = data.gas.coordinates[:, 1] - YPotMin
+    deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+
+    # Keep only particles inside 5 R500crit
+    index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
+    data.gas.radial_distances = deltaR[index]
+    data.gas.densities = data.gas.densities[index]
+    data.gas.masses = data.gas.masses[index]
+    data.gas.temperatures = data.gas.temperatures[index]
+
+    data.gas.element_mass_fractions.hydrogen = data.gas.element_mass_fractions.hydrogen[index]
+    data.gas.element_mass_fractions.helium = data.gas.element_mass_fractions.helium[index]
+    data.gas.element_mass_fractions.carbon = data.gas.element_mass_fractions.carbon[index]
+    data.gas.element_mass_fractions.nitrogen = data.gas.element_mass_fractions.nitrogen[index]
+    data.gas.element_mass_fractions.oxygen = data.gas.element_mass_fractions.oxygen[index]
+    data.gas.element_mass_fractions.neon = data.gas.element_mass_fractions.neon[index]
+    data.gas.element_mass_fractions.magnesium = data.gas.element_mass_fractions.magnesium[index]
+    data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
+    data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
+
+    # Compute number density
+    data_n = np.log10((data.gas.densities.in_cgs() / unyt.proton_mass_cgs).value)
+
+    # get temperature
+    data_T = np.log10(data.gas.temperatures.value)
+
+    # interpolate
+    emissivity = 10 ** interpolate_X_Ray(
+        data_n,
+        data_T,
+        data.gas.element_mass_fractions
+    ) * unyt.erg * unyt.cm ** -3 / unyt.s
+
+    # Compute X-ray luminosities
+    # xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * \
+    #                     data.gas.masses / unyt.proton_mass / 0.6 * \
+    #                     emissivity
+    xray_luminosities = emissivity / (unyt.proton_mass / 0.6) ** 2
+    xray_luminosities[~np.isfinite(xray_luminosities)] = 0
+
+    print(f"M_500_crit: {M500c:.3E}")
+    print(f"X-luminosity (0.15-1 x R500c): {np.sum(xray_luminosities):.3E}")
+
+    return np.sum(xray_luminosities)
+
+
+if __name__ == '__main__':
+
+    process_single_halo(
+        path_to_snap=zooms_register[0].snapshot_file,
+        path_to_catalogue=zooms_register[0].catalog_file
+    )
