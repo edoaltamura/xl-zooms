@@ -505,6 +505,12 @@ def process_single_halo(
     # print('Zspec', spec_fit_data['Zspec'])
     # print('XIspec', spec_fit_data['XIspec'])
 
+    hse_true = HydrostaticEstimator.from_data_paths(
+        catalog_file=path_to_catalogue,
+        snapshot_file=path_to_snap,
+        profile_type='true'
+    )
+
     hse_spec = HydrostaticEstimator.from_data_paths(
         catalog_file=path_to_catalogue,
         snapshot_file=path_to_snap,
@@ -514,11 +520,20 @@ def process_single_halo(
 
     print('R500c =', hse_spec.R500c)
     print('M500c =', hse_spec.M500c)
+
+    print('R500,true,hse =', hse_true.R500hse)
+    print('M500,true,hse =', hse_true.M500hse)
+    print('P500,true,hse =', hse_true.P500hse)
+    print('kBT500,true,hse =', hse_true.kBT500hse)
+    print('K500,true,hse =', hse_true.K500hse)
+
     print('R500,spec,hse =', hse_spec.R500hse)
     print('M500,spec,hse =', hse_spec.M500hse)
     print('P500,spec,hse =', hse_spec.P500hse)
     print('kBT500,spec,hse =', hse_spec.kBT500hse)
     print('K500,spec,hse =', hse_spec.K500hse)
+
+    return hse_spec
 
 
 if __name__ == '__main__':
