@@ -251,7 +251,7 @@ class HydrostaticEstimator:
         # outside the spec_fit_data['Rspec'] range
         # Prevents ValueError: A value in x_new is below the interpolation range.
         radial_bins_intersect = np.where(
-            spec_fit_data['Rspec'].min() < self.radial_bin_centres.value < spec_fit_data['Rspec'].max()
+            spec_fit_data['Rspec'].min() < self.radial_bin_centres < spec_fit_data['Rspec'].max()
         )[0]
         self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect]
 
