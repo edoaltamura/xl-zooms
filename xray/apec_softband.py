@@ -16,7 +16,7 @@ def locate(A, x):
 
 
 def soft_band(data, pix):
-    APEC = readsav('~/xl-zooms/xray/APEC_0.5_2.0keV_interp.idl')
+    APEC = readsav('/cosma/home/dp004/dc-alta2/xl-zooms/xray/APEC_0.5_2.0keV_interp.idl')
 
     inde = 0  # 0 - erg/s, 1 - photons
     indz = locate(APEC['redshift'], data.metadata.z)

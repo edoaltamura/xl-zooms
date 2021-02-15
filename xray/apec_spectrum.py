@@ -213,7 +213,7 @@ def calc_spectrum(data, R500c):
 
     nbins = 25 + 1
     rm = np.log10(0.15 * R500c)
-    rx = np.log10(1 * R500c)
+    rx = np.log10(5 * R500c)
     rbin = np.logspace(rm, rx, num=nbins, base=10.0)
     rcen = 10.0 ** (0.5 * np.log10(rbin[1:] * rbin[:-1]))
     vol = (4.0 / 3.0) * np.pi * ((rbin[1:] ** 3.0) - (rbin[:-1] ** 3.0)) * unyt.Mpc ** 3
@@ -501,6 +501,7 @@ def process_single_halo(
 
     spec_fit_data = calc_spectrum(data, R500c)
     fit_spectrum(spec_fit_data)
+    print('Rspec', spec_fit_data['Rspec'])
     print('Tspec', spec_fit_data['Tspec'])
     print('RHOspec', spec_fit_data['RHOspec'])
     print('Zspec', spec_fit_data['Zspec'])
