@@ -242,10 +242,18 @@ class HydrostaticEstimator:
         spec_temperature_interpolate = interp1d(spec_fit_data['Rspec'], spec_fit_data['Tspec'], kind='linear')
 
         lbins = np.logspace(
-            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 1001
         ) * self.R500c
 
         self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1]))
+
+        # Cut ends of the radial bins to interpolate, since they might be
+        # outside the spec_fit_data['Rspec'] range
+        # Prevents ValueError: A value in x_new is below the interpolation range.
+        radial_bins_intersect = np.where(
+            spec_fit_data['Rspec'].min() < self.radial_bin_centres.value < spec_fit_data['Rspec'].max()
+        )[0]
+        self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect]
 
         print("self.radial_bin_centres", self.radial_bin_centres)
 
