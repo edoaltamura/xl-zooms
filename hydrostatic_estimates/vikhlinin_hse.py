@@ -5,9 +5,8 @@ import numpy as np
 from typing import Tuple
 import h5py as h5
 import swiftsimio as sw
-import pandas as pd
 import matplotlib.pyplot as plt
-from scipy.optimize import minimize, least_squares, curve_fit
+from scipy.optimize import minimize, least_squares
 from scipy.interpolate import interp1d
 
 # Make the register backend visible to the script
@@ -382,7 +381,7 @@ class HydrostaticEstimator:
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
         masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (
-                    drho_hse + dT_hse) * unyt.Solar_Mass
+                drho_hse + dT_hse) * unyt.Solar_Mass
 
         return cfr, cft, masses_hse
 
@@ -402,11 +401,11 @@ class HydrostaticEstimator:
         self.M2500hse = mass_interpolate(self.R2500hse) * unyt.Solar_Mass
 
         self.ne200hse = (3 * self.M200hse * fbary / (
-                    4 * np.pi * self.R200hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
+                4 * np.pi * self.R200hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
         self.ne500hse = (3 * self.M500hse * fbary / (
-                    4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
+                4 * np.pi * self.R500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
         self.ne2500hse = (3 * self.M2500hse * fbary / (
-                    4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
+                4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton * mean_molecular_weight)).to('1/cm**3')
 
         self.kBT200hse = (unyt.G * mean_molecular_weight * self.M200hse * unyt.mass_proton / self.R200hse / 2).to('keV')
         self.kBT500hse = (unyt.G * mean_molecular_weight * self.M500hse * unyt.mass_proton / self.R500hse / 2).to('keV')
@@ -418,14 +417,30 @@ class HydrostaticEstimator:
         self.P2500hse = (2500 * fbary * self.rho_crit * unyt.G * self.M2500hse / self.R2500hse / 2).to('keV/cm**3')
 
         self.K200hse = (self.kBT200hse / (
-                    3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+                3 * self.M200hse * fbary / (4 * np.pi * self.R200hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
             'keV*cm**2')
         self.K500hse = (self.kBT500hse / (
-                    3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+                3 * self.M500hse * fbary / (4 * np.pi * self.R500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
             'keV*cm**2')
         self.K2500hse = (self.kBT2500hse / (
-                    3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+                3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
             'keV*cm**2')
+
+    def quick_plot(self):
+        from matplotlib import pyplot as plt
+
+        _, _, masses_hse = self.run_hse_fit()
+        densities_hse = (3 * masses_hse) / (4 * np.pi * self.radial_bin_centres ** 3) / self.rho_crit
+        density_interpolate = interp1d(self.radial_bin_centres, densities_hse, kind='linear')
+
+        fig, ax = plt.subplots()
+        ax.plot(self.radial_bin_centres, self.density_profile, label=f"{self.profile_type} data")
+        ax.plot(self.radial_bin_centres, density_interpolate(self.radial_bin_centres), label="Vikhlinin HSE fit")
+        ax.set_xlabel(r'$R/R_{500c}$')
+        ax.set_ylabel(r'$\rho_{gas}/\rho_{\rm crit}$')
+        plt.legend()
+        plt.show()
+        plt.close()
 
 
 if __name__ == "__main__":
