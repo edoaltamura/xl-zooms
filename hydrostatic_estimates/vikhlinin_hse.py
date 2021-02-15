@@ -245,7 +245,7 @@ class HydrostaticEstimator:
             np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
         ) * radial_distance_scaled.units
 
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1]))
+        self.radial_bin_centres = np.sqrt(lbins[1:] * lbins[:-1])
 
         # Compute the radial gas density profile
         self.density_profile = spec_density_interpolate(self.radial_bin_centres * self.R500c) * unyt.dimensionless

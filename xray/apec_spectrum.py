@@ -472,7 +472,6 @@ def process_single_halo(
         1.e5 * mask.units.temperature,
         1.e10 * mask.units.temperature
     )
-    print(f"M_500_crit: {M500c:.3E}")
 
     data = sw.load(f'{path_to_snap}', mask=mask)
 
