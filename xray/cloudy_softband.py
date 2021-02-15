@@ -22,7 +22,7 @@ class interpolate:
         self.dn = 0.2
         self.dT = 0.1
 
-        self.table = h5py.File(f'{os.path.dirname(__file__)}/X_Ray_table.hdf5', 'r')
+        self.table = h5py.File('/cosma/home/dp004/dc-alta2/xl-zooms/xray/X_Ray_table.hdf5', 'r')
         self.X_Ray = self.table['0.5-2.0keV']['emissivities'][()]
         self.He_bins = self.table['/Bins/He_bins'][()]
         self.missing_elements = self.table['/Bins/Missing_element'][()]
