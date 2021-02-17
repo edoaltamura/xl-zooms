@@ -67,15 +67,15 @@ class HydrostaticDiagnostic:
     def plot_all(self):
         fields = [
             'temperature_profile',
-            'dlogkT_dlogr',
-            'dlogrho_dlogr',
+            # 'dlogkT_dlogr',
+            # 'dlogrho_dlogr',
             'cumulative_mass',
             'density_profile'
         ]
         labels = [
             r'$k_{\rm B}T$ [keV]',
-            r'$d \log k_{\rm B}T / d \log r$',
-            r'$d \log \rho / d \log r$',
+            # r'$d \log k_{\rm B}T / d \log r$',
+            # r'$d \log \rho / d \log r$',
             r'$M(<R)$ [M$_\odot$]',
             r'$\rho / \rho_{\rm crit}$'
         ]
@@ -484,7 +484,7 @@ class HydrostaticEstimator:
         density_interpolate = interp1d(
             mass_in_shell / volume_in_shell / self.rho_crit,
             self.radial_bin_centres[1:] - self.radial_bin_centres[:-1],
-            kind='linear'
+            kind='linear', fill_value="extrapolate"
         )
         setattr(self.diagnostics, 'density_profile_hse', density_interpolate(self.radial_bin_centres))
 
