@@ -151,7 +151,7 @@ class HydrostaticEstimator:
         logrho = np.log10(self.density_profile)
         setattr(self.diagnostics, 'dlogkT_dlogr_input', (logkT[1:] - logkT[:-1]) / (logr[1:] - logr[:-1]))
         setattr(self.diagnostics, 'dlogrho_dlogr_input', (logrho[1:] - logrho[:-1]) / (logr[1:] - logr[:-1]))
-        setattr(self.diagnostics, 'cumulative_mass_input', np.cumsum(self.mass_profile))
+        setattr(self.diagnostics, 'cumulative_mass_input', np.cumsum(self.mass_profile).to('Msun'))
         setattr(self.diagnostics, 'density_profile_input', self.density_profile)
 
         self.interpolate_hse()
@@ -481,7 +481,12 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
         mass_in_shell = masses_hse[1:] - masses_hse[:-1]
         volume_in_shell = 4 / 3 * np.pi * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
-        setattr(self.diagnostics, 'density_profile_hse', mass_in_shell / volume_in_shell / self.rho_crit)
+        density_interpolate = interp1d(
+            mass_in_shell / volume_in_shell / self.rho_crit,
+            self.radial_bin_centres[1:] - self.radial_bin_centres[:-1],
+            kind='linear'
+        )
+        setattr(self.diagnostics, 'density_profile_hse', density_interpolate(self.radial_bin_centres))
 
         return cfr, cft, masses_hse
 
