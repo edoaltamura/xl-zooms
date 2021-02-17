@@ -476,9 +476,9 @@ class HydrostaticEstimator:
         # Parse fitted profiles to diagnostic container
         setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
-        setattr(self.diagnostics, 'dlogkT_dlogr_hse', (dT_hse[1:] - dT_hse[:-1]) / 2)
-        setattr(self.diagnostics, 'dlogrho_dlogr_hse', (drho_hse[1:] - drho_hse[:-1]) / 2)
-        setattr(self.diagnostics, 'cumulative mass_hse', masses_hse)
+        setattr(self.diagnostics, 'dlogkT_dlogr_hse', (dT_hse[1:] + dT_hse[:-1]) / 2)
+        setattr(self.diagnostics, 'dlogrho_dlogr_hse', (drho_hse[1:] + drho_hse[:-1]) / 2)
+        setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
         mass_in_shell = masses_hse[1:] - masses_hse[:-1]
         volume_in_shell = 4 / 3 * np.pi * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
         setattr(self.diagnostics, 'density_profile_hse', mass_in_shell / volume_in_shell / self.rho_crit)
