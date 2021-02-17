@@ -12,8 +12,10 @@ from matplotlib.lines import Line2D
 # Make the register backend visible to the script
 sys.path.append("../zooms")
 sys.path.append("../observational_data")
+sys.path.append("../hydrostatic_estimates")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
+from vikhlinin_hse import HydrostaticEstimator
 import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
@@ -259,11 +261,9 @@ def f_500_hotgas(results: pd.DataFrame):
     del Lin12
 
     Eckert16 = obs.Eckert16()
-    ax.scatter(Eckert16.M_500, Eckert16.fb_500,
-               marker='<', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    ax.plot(Eckert16.M_500_fit, Eckert16.fgas_500_fit, color=observations_color, zorder=0)
     handles.append(
-        Line2D([], [], color=observations_color, marker='<', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Eckert16.citation)
+        Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
     )
     del Eckert16
 

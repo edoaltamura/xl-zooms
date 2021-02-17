@@ -59,6 +59,72 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
     return res * data.units
 
 
+class HydrostaticDiagnostic:
+
+    def __init__(self):
+        pass
+
+    def plot_all(self):
+        fields = [
+            'temperature_profile',
+            'dlogkT_dlogr',
+            'dlogrho_dlogr',
+            'cumulative_mass',
+            'density_profile'
+        ]
+        labels = [
+            r'$k_{\rm B}T$ [keV]',
+            r'$d \log k_{\rm B}T / d \log r$',
+            r'$d \log \rho / d \log r$',
+            r'$M(<R)$ [M$_\odot$]',
+            r'$\rho / \rho_{\rm crit}$'
+        ]
+        for i, (field, label) in enumerate(zip(fields, labels)):
+            print(f"({i + 1}/{len(fields)}) Generating diagnostic plot: {field}.")
+            self.plot_profile(
+                field_name=field,
+                ylabel=label,
+                filename=f"diagnostic_{field}"
+            )
+
+    def plot_profile(self, field_name: str = 'radial_bin_centres',
+                     ylabel: str = 'y', filename: str = 'diagnostics.png'):
+
+        fig, (ax, ax_residual) = plt.subplots(
+            nrows=2,
+            ncols=1,
+            figsize=(7, 8),
+            dpi=300,
+            sharex=True,
+            gridspec_kw={'height_ratios': [3, 1]}
+        )
+
+        x_input = self.radial_bin_centres_input
+        if 'dlog' in field_name:
+            x_input = (self.radial_bin_centres_input[1:] + self.radial_bin_centres_input[:-1]) / 2
+
+        ax.plot(x_input, getattr(self, field_name + '_input'), label=f"{self.profile_type} data")
+
+        x_hse = self.radial_bin_centres_hse
+        if 'dlog' in field_name:
+            x_hse = (self.radial_bin_centres_hse[1:] + self.radial_bin_centres_hse[:-1]) / 2
+
+        ax.plot(x_hse, getattr(self, field_name + '_hse'), label="Vikhlinin HSE fit")
+        ax_residual.plot(x_hse, (getattr(self, field_name + '_hse') - getattr(self, field_name + '_input')) / \
+                         getattr(self, field_name + '_input'))
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_ylabel(ylabel)
+        ax_residual.set_ylabel(r"$\Delta($" + ylabel + "$)$")
+        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
+        ax.legend(loc="upper right")
+        fig.tight_layout()
+        plt.savefig(f"{self.output_directory}/{filename}")
+        plt.show()
+        plt.close()
+
+
 class HydrostaticEstimator:
 
     def __init__(self, zoom: Zoom, excise_core: bool = True, profile_type: str = 'true',
@@ -68,11 +134,28 @@ class HydrostaticEstimator:
         self.excise_core = excise_core
         self.profile_type = profile_type
 
+        # Initialise an HydrostaticDiagnostic instance
+        # Parse to this objects all profiles and quantities for external checks
+        self.diagnostics = HydrostaticDiagnostic()
+
         if profile_type.lower() == 'true':
             self.load_zoom_profiles()
         elif profile_type.lower() == 'spec' or 'xray' in profile_type.lower():
             assert spec_fit_data, "Spec output data not detected."
             self.load_xray_profiles(spec_fit_data)
+
+        # Parse fitted profiles to diagnostic container
+        setattr(self.diagnostics, 'profile_type', self.profile_type)
+        setattr(self.diagnostics, 'output_directory', self.zoom.output_directory)
+        setattr(self.diagnostics, 'radial_bin_centres_input', self.radial_bin_centres)
+        setattr(self.diagnostics, 'temperature_profile_input', self.temperature_profile)
+        logr = np.log10(self.radial_bin_centres)
+        logkT = np.log10(self.temperature_profile)
+        logrho = np.log10(self.density_profile)
+        setattr(self.diagnostics, 'dlogkT_dlogr_input', (logkT[1:] - logkT[:-1]) / (logr[1:] - logr[:-1]))
+        setattr(self.diagnostics, 'dlogrho_dlogr_input', (logrho[1:] - logrho[:-1]) / (logr[1:] - logr[:-1]))
+        setattr(self.diagnostics, 'cumulative_mass_input', np.cumsum(self.mass_profile))
+        setattr(self.diagnostics, 'density_profile_input', self.density_profile)
 
         self.interpolate_hse()
 
@@ -387,8 +470,19 @@ class HydrostaticEstimator:
             self.radial_bin_centres,
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
+
         masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (
                 drho_hse + dT_hse) * unyt.Solar_Mass
+
+        # Parse fitted profiles to diagnostic container
+        setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
+        setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse)
+        setattr(self.diagnostics, 'dlogkT_dlogr_hse', dT_hse)
+        setattr(self.diagnostics, 'dlogrho_dlogr_hse', drho_hse)
+        setattr(self.diagnostics, 'cumulative mass_hse', masses_hse)
+        mass_in_shell = masses_hse[1:] - masses_hse[:-1]
+        volume_in_shell = 4 / 3 * np.pi * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
+        setattr(self.diagnostics, 'density_profile_hse', mass_in_shell / volume_in_shell / self.rho_crit)
 
         return cfr, cft, masses_hse
 
@@ -433,71 +527,8 @@ class HydrostaticEstimator:
                 3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
             'keV*cm**2')
 
-    def quick_plot_density(self):
-        from matplotlib import pyplot as plt
-
-        _, _, masses_hse = self.run_hse_fit()
-        densities_hse = (3 * masses_hse) / (4 * np.pi * self.radial_bin_centres ** 3) / self.rho_crit
-        density_interpolate = interp1d(self.radial_bin_centres, densities_hse, kind='linear')
-
-        fig, (ax, ax_residual) = plt.subplots(
-            nrows=2,
-            ncols=1,
-            figsize=(7, 8),
-            dpi=300,
-            sharex=True,
-            gridspec_kw={'height_ratios': [3, 1]}
-        )
-        ax.plot(self.radial_bin_centres, self.density_profile, label=f"{self.profile_type} data")
-        ax.plot(self.radial_bin_centres, density_interpolate(self.radial_bin_centres), label="Vikhlinin HSE fit")
-        ax_residual.plot(
-            self.radial_bin_centres,
-            (density_interpolate(self.radial_bin_centres) - self.density_profile) / self.density_profile
-        )
-
-        ax.set_xscale('log')
-        ax.set_yscale('log')
-        ax.set_ylabel(r'$\rho_{gas}/\rho_{\rm crit}$')
-        ax_residual.set_ylabel(r"$\Delta \rho\ /\ \rho_{{\rm true}}$")
-        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
-        ax.legend(loc="upper right")
-        fig.tight_layout()
-        plt.show()
-        plt.close()
-
-    def quick_plot_cumulative_mass(self):
-        from matplotlib import pyplot as plt
-
-        _, _, masses_hse = self.run_hse_fit()
-        mass_interpolate = interp1d(self.radial_bin_centres, masses_hse, kind='linear')
-
-        cumulative_mass_data = np.cumsum(self.mass_profile)
-        cumulative_mass_interpolate = np.cumsum(mass_interpolate(self.radial_bin_centres))
-
-        fig, (ax, ax_residual) = plt.subplots(
-            nrows=2,
-            ncols=1,
-            figsize=(7, 8),
-            dpi=300,
-            sharex=True,
-            gridspec_kw={'height_ratios': [3, 1]}
-        )
-        ax.plot(self.radial_bin_centres, cumulative_mass_data, label=f"{self.profile_type} data")
-        ax.plot(self.radial_bin_centres, cumulative_mass_interpolate, label="Vikhlinin HSE fit")
-        ax_residual.plot(
-            self.radial_bin_centres,
-            (cumulative_mass_interpolate - cumulative_mass_data) / cumulative_mass_data
-        )
-
-        ax.set_xscale('log')
-        ax.set_yscale('log')
-        ax.set_ylabel(r'$M_{gas}(< R)$')
-        ax_residual.set_ylabel(r"$\Delta M_{\rm gas}\ /\ \rho_{{\rm true}}$")
-        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
-        ax.legend(loc="upper right")
-        fig.tight_layout()
-        plt.show()
-        plt.close()
+    def plot_diagnostics(self):
+        self.diagnostics.plot_all()
 
 
 if __name__ == "__main__":
@@ -510,3 +541,5 @@ if __name__ == "__main__":
     print('P500hse =', hse_test.P500hse)
     print('kBT500hse =', hse_test.kBT500hse)
     print('K500hse =', hse_test.K500hse)
+
+    hse_test.plot_diagnostics()
