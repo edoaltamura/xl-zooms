@@ -150,11 +150,9 @@ def m_500_hotgas(results: pd.DataFrame):
     del Lin12
 
     Eckert16 = obs.Eckert16()
-    ax.scatter(Eckert16.M_500, Eckert16.M_500gas,
-               marker='<', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+    ax.plot(Eckert16.M_500_fit, Eckert16.M_500gas_fit, color=observations_color, edgecolors='none', zorder=0)
     handles.append(
-        Line2D([], [], color=observations_color, marker='<', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Eckert16.citation)
+        Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
     )
     del Eckert16
 

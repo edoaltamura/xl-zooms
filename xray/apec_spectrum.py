@@ -532,6 +532,9 @@ def process_single_halo(
     print(f'P500,spec,hse = {hse_spec.P500hse:.3E}')
     print(f'kBT500,spec,hse = {hse_spec.kBT500hse:.3E}')
     print(f'K500,spec,hse = {hse_spec.K500hse:.3E}')
+    print()
+    print(f"[Bias] M500 (hse/true) = {hse_true.M500hse / hse_spec.M500c:.3f}")
+    print(f"[Bias] M500 (spec/true) = {hse_spec.M500hse / hse_spec.M500c:.3f}")
 
     return hse_spec
 

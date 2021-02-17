@@ -167,6 +167,7 @@ class HydrostaticEstimator:
 
         # Set the radial bins as object attribute
         self.radial_bin_centres = np.sqrt(bin_edges[1:] * bin_edges[:-1])
+        self.mass_profile = mass_weights
 
         # Compute the radial gas density profile
         volume_shell = (4. * np.pi / 3.) * (self.R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
@@ -244,7 +245,13 @@ class HydrostaticEstimator:
             np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 1001
         ) * self.R500c
 
+        mass_weights, bin_edges = histogram_unyt(radial_distance_scaled, bins=lbins, weights=gas_masses)
+
+        # Replace zeros with Nans
+        mass_weights[mass_weights == 0] = np.nan
+
         self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1]))
+        self.mass_profile = mass_weights
 
         # Cut ends of the radial bins to interpolate, since they might be
         # outside the spec_fit_data['Rspec'] range
@@ -426,19 +433,69 @@ class HydrostaticEstimator:
                 3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
             'keV*cm**2')
 
-    def quick_plot(self):
+    def quick_plot_density(self):
         from matplotlib import pyplot as plt
 
         _, _, masses_hse = self.run_hse_fit()
         densities_hse = (3 * masses_hse) / (4 * np.pi * self.radial_bin_centres ** 3) / self.rho_crit
         density_interpolate = interp1d(self.radial_bin_centres, densities_hse, kind='linear')
 
-        fig, ax = plt.subplots()
+        fig, (ax, ax_residual) = plt.subplots(
+            nrows=2,
+            ncols=1,
+            figsize=(7, 8),
+            dpi=300,
+            sharex=True,
+            gridspec_kw={'height_ratios': [3, 1]}
+        )
         ax.plot(self.radial_bin_centres, self.density_profile, label=f"{self.profile_type} data")
         ax.plot(self.radial_bin_centres, density_interpolate(self.radial_bin_centres), label="Vikhlinin HSE fit")
-        ax.set_xlabel(r'$R/R_{500c}$')
+        ax_residual.plot(
+            self.radial_bin_centres,
+            (density_interpolate(self.radial_bin_centres) - self.density_profile) / self.density_profile
+        )
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
         ax.set_ylabel(r'$\rho_{gas}/\rho_{\rm crit}$')
-        plt.legend()
+        ax_residual.set_ylabel(r"$\Delta \rho\ /\ \rho_{{\rm true}}$")
+        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
+        ax.legend(loc="upper right")
+        fig.tight_layout()
+        plt.show()
+        plt.close()
+
+    def quick_plot_cumulative_mass(self):
+        from matplotlib import pyplot as plt
+
+        _, _, masses_hse = self.run_hse_fit()
+        mass_interpolate = interp1d(self.radial_bin_centres, masses_hse, kind='linear')
+
+        cumulative_mass_data = np.cumsum(self.mass_profile)
+        cumulative_mass_interpolate = np.cumsum(mass_interpolate(self.radial_bin_centres))
+
+        fig, (ax, ax_residual) = plt.subplots(
+            nrows=2,
+            ncols=1,
+            figsize=(7, 8),
+            dpi=300,
+            sharex=True,
+            gridspec_kw={'height_ratios': [3, 1]}
+        )
+        ax.plot(self.radial_bin_centres, cumulative_mass_data, label=f"{self.profile_type} data")
+        ax.plot(self.radial_bin_centres, cumulative_mass_interpolate, label="Vikhlinin HSE fit")
+        ax_residual.plot(
+            self.radial_bin_centres,
+            (cumulative_mass_interpolate - cumulative_mass_data) / cumulative_mass_data
+        )
+
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        ax.set_ylabel(r'$M_{gas}(< R)$')
+        ax_residual.set_ylabel(r"$\Delta M_{\rm gas}\ /\ \rho_{{\rm true}}$")
+        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
+        ax.legend(loc="upper right")
+        fig.tight_layout()
         plt.show()
         plt.close()
 
