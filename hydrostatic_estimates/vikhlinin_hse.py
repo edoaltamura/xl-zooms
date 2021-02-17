@@ -217,16 +217,18 @@ class HydrostaticEstimator:
         deltaZ = data.gas.coordinates[:, 2] - ZPotMin
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
 
+        # Set bounds for the radial profiles
+        radius_bounds = [0.15, 1.5]
+
         # Keep only particles inside 5 R500crit
-        index = np.where(deltaR < 1.5 * self.R500c)[0]
+        index = np.where(deltaR < radius_bounds[1] * self.R500c)[0]
         radial_distance_scaled = deltaR[index] / self.R500c
         assert radial_distance_scaled.units == unyt.dimensionless
         gas_masses = data.gas.masses[index]
         gas_temperatures = data.gas.temperatures[index]
         gas_mass_weighted_temperatures = gas_temperatures * gas_masses
 
-        # Set bounds for the radial profiles
-        radius_bounds = [0.15, 5]
+
         if not self.excise_core:
             # Compute convergence radius and set as inner limit
             gas_convergence_radius = convergence_radius(
