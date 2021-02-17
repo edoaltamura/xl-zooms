@@ -93,22 +93,19 @@ class HydrostaticDiagnostic:
         fig, (ax, ax_residual) = plt.subplots(
             nrows=2,
             ncols=1,
-            figsize=(7, 8),
+            figsize=(4, 5),
             dpi=300,
             sharex=True,
             gridspec_kw={'height_ratios': [3, 1]}
         )
 
         x_input = self.radial_bin_centres_input
-        if 'dlog' in field_name:
-            x_input = (self.radial_bin_centres_input[1:] + self.radial_bin_centres_input[:-1]) / 2
-
-        ax.plot(x_input, getattr(self, field_name + '_input'), label=f"{self.profile_type} data")
-
         x_hse = self.radial_bin_centres_hse
         if 'dlog' in field_name:
+            x_input = (self.radial_bin_centres_input[1:] + self.radial_bin_centres_input[:-1]) / 2
             x_hse = (self.radial_bin_centres_hse[1:] + self.radial_bin_centres_hse[:-1]) / 2
 
+        ax.plot(x_input, getattr(self, field_name + '_input'), label=f"{self.profile_type} data")
         ax.plot(x_hse, getattr(self, field_name + '_hse'), label="Vikhlinin HSE fit")
         ax_residual.plot(x_hse, (getattr(self, field_name + '_hse') - getattr(self, field_name + '_input')) / \
                          getattr(self, field_name + '_input'))
@@ -221,7 +218,7 @@ class HydrostaticEstimator:
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
 
         # Keep only particles inside 5 R500crit
-        index = np.where(deltaR < 5 * self.R500c)[0]
+        index = np.where(deltaR < 1.5 * self.R500c)[0]
         radial_distance_scaled = deltaR[index] / self.R500c
         assert radial_distance_scaled.units == unyt.dimensionless
         gas_masses = data.gas.masses[index]
