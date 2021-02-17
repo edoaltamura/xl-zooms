@@ -93,7 +93,7 @@ class HydrostaticDiagnostic:
         fig, (ax, ax_residual) = plt.subplots(
             nrows=2,
             ncols=1,
-            figsize=(4, 5),
+            figsize=(4, 3),
             dpi=300,
             sharex=True,
             gridspec_kw={'height_ratios': [3, 1]}
@@ -101,7 +101,7 @@ class HydrostaticDiagnostic:
 
         x_input = self.radial_bin_centres_input
         x_hse = self.radial_bin_centres_hse
-        if 'dlog' in field_name:
+        if '__dlogr' in field_name:
             x_input = (self.radial_bin_centres_input[1:] + self.radial_bin_centres_input[:-1]) / 2
             x_hse = (self.radial_bin_centres_hse[1:] + self.radial_bin_centres_hse[:-1]) / 2
 
