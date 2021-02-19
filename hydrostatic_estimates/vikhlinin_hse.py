@@ -163,13 +163,13 @@ class HydrostaticDiagnostic:
 
     def plot_all(self):
         fields = [
-            # 'temperature_profile',
-            # 'cumulative_mass',
+            'temperature_profile',
+            'cumulative_mass',
             'density_profile'
         ]
         labels = [
-            # r'$k_{\rm B}T$ [keV]',
-            # r'$M(<R)$ [M$_\odot$]',
+            r'$k_{\rm B}T$ [keV]',
+            r'$M(<R)$ [M$_\odot$]',
             r'$\rho / \rho_{\rm crit}$'
         ]
         for i, (field, label) in enumerate(zip(fields, labels)):
