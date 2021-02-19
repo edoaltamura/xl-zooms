@@ -76,7 +76,8 @@ class HydrostaticDiagnostic:
         'density_profile_hse',
     )
 
-    def __init__(self):
+    def __init__(self, zoom: Zoom):
+        self.zoom = zoom
         self.total_mass_profiles()
 
     def total_mass_profiles(self):
@@ -202,8 +203,8 @@ class HydrostaticDiagnostic:
             x_input = (self.radial_bin_centres_input[1:] + self.radial_bin_centres_input[:-1]) / 2
             x_hse = (self.radial_bin_centres_hse[1:] + self.radial_bin_centres_hse[:-1]) / 2
 
-        ax.plot(x_input, getattr(self, field_name + '_input'), label=f"{self.profile_type} data")
-        ax.plot(x_hse, getattr(self, field_name + '_hse'), label="Vikhlinin HSE fit")
+        ax.plot(x_input, getattr(self, field_name + '_input'), label="True data")
+        ax.plot(x_hse, getattr(self, field_name + '_hse'), label=f"Vikhlinin HSE fit from {self.profile_type} data")
         ax_residual.plot(x_hse, (getattr(self, field_name + '_hse') - getattr(self, field_name + '_input')) / \
                          getattr(self, field_name + '_input'))
 
@@ -231,7 +232,7 @@ class HydrostaticEstimator:
 
         # Initialise an HydrostaticDiagnostic instance
         # Parse to this objects all profiles and quantities for external checks
-        self.diagnostics = HydrostaticDiagnostic()
+        self.diagnostics = HydrostaticDiagnostic(zoom)
 
         if profile_type.lower() == 'true':
             self.load_zoom_profiles()
@@ -241,7 +242,6 @@ class HydrostaticEstimator:
 
         # Parse fitted profiles to diagnostic container
         setattr(self.diagnostics, 'profile_type', self.profile_type)
-        setattr(self.diagnostics, 'zoom', self.zoom)
         setattr(self.diagnostics, 'output_directory', self.zoom.output_directory)
         setattr(self.diagnostics, 'temperature_profile_input', self.temperature_profile)
 
