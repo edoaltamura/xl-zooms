@@ -163,13 +163,13 @@ class HydrostaticDiagnostic:
 
     def plot_all(self):
         fields = [
-            'temperature_profile',
-            'cumulative_mass',
+            # 'temperature_profile',
+            # 'cumulative_mass',
             'density_profile'
         ]
         labels = [
-            r'$k_{\rm B}T$ [keV]',
-            r'$M(<R)$ [M$_\odot$]',
+            # r'$k_{\rm B}T$ [keV]',
+            # r'$M(<R)$ [M$_\odot$]',
             r'$\rho / \rho_{\rm crit}$'
         ]
         for i, (field, label) in enumerate(zip(fields, labels)):
@@ -194,12 +194,15 @@ class HydrostaticDiagnostic:
 
         x_input = self.radial_bin_centres_input
         x_hse = self.radial_bin_centres_hse
-        print(getattr(self, field_name + '_hse'))
-        ax.plot(x_input, getattr(self, field_name + '_input'), label="True data")
-        ax.plot(x_hse, getattr(self, field_name + '_hse'), label=f"Vikhlinin HSE fit from {self.profile_type} data")
-        ax_residual.plot(x_hse, (getattr(self, field_name + '_hse') - getattr(self, field_name + '_input')) / \
-                         getattr(self, field_name + '_input'))
+        y_input = getattr(self, field_name + '_input')
+        y_hse = getattr(self, field_name + '_hse')
 
+        print(y_hse)
+
+        ax.plot(x_input, y_input, label="True data")
+        ax.plot(x_hse, y_hse, label=f"Vikhlinin HSE fit from {self.profile_type} data")
+        ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0])
+        ax_residual.plot(x_hse, (y_hse - y_input) / y_input)
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_ylabel(ylabel)
