@@ -150,7 +150,6 @@ class HydrostaticDiagnostic:
 
         self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         self.cumulative_mass_input = cumulative_mass.to('Msun')
-        print(self.cumulative_mass_input)
         shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
 
         unitLength = data.metadata.units.length
@@ -161,7 +160,6 @@ class HydrostaticDiagnostic:
         )[0].to('Msun/Mpc**3')
 
         self.density_profile_input = mass_weights / shell_volume / critical_density
-        print(self.density_profile_input)
 
     def plot_all(self):
         fields = [
@@ -196,7 +194,7 @@ class HydrostaticDiagnostic:
 
         x_input = self.radial_bin_centres_input
         x_hse = self.radial_bin_centres_hse
-
+        print(getattr(self, field_name + '_hse'))
         ax.plot(x_input, getattr(self, field_name + '_input'), label="True data")
         ax.plot(x_hse, getattr(self, field_name + '_hse'), label=f"Vikhlinin HSE fit from {self.profile_type} data")
         ax_residual.plot(x_hse, (getattr(self, field_name + '_hse') - getattr(self, field_name + '_input')) / \
