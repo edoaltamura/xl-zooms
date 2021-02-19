@@ -617,12 +617,12 @@ if __name__ == "__main__":
 
     hse_test = HydrostaticEstimator(zoom_choice)
 
-    print('R500c =', hse_test.R500c)
-    print('M500c =', hse_test.M500c)
-    print('R500hse =', hse_test.R500hse)
-    print('M500hse =', hse_test.M500hse)
-    print('P500hse =', hse_test.P500hse)
-    print('kBT500hse =', hse_test.kBT500hse)
-    print('K500hse =', hse_test.K500hse)
+    print(f'R500c = {hse_test.R500c:.3E}')
+    print(f'M500c = {hse_test.M500c:.3E}')
+    print(f'R500hse = {hse_test.R500hse:.3E}')
+    print(f'M500hse = {hse_test.M500hse:.3E}')
+    print(f'P500hse = {hse_test.P500hse:.3E}')
+    print(f'kBT500hse = {hse_test.kBT500hse:.3E}')
+    print(f'K500hse = {hse_test.K500hse:.3E}')
 
     hse_test.plot_diagnostics()
