@@ -143,7 +143,7 @@ class HydrostaticDiagnostic:
         masses = np.append(masses, data.stars.masses[index])
 
         lbins = np.logspace(
-            np.log10(1e-7), np.log10(radius_bounds[1]), 501
+            np.log10(1e-3), np.log10(radius_bounds[1]), 501
         ) * radial_distance.units
 
         mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=masses * unyt.Solar_Mass)
