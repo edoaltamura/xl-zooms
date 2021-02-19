@@ -333,7 +333,6 @@ class HydrostaticEstimator:
         # Set the radial bins as object attribute
         self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
         self.radial_bin_edges = lbins
-        self.mass_profile = mass_weights
 
         # Compute the radial gas density profile
         volume_shell = (4. * np.pi / 3.) * (self.R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
@@ -549,7 +548,7 @@ class HydrostaticEstimator:
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
 
-        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c ** 2 / unyt.Mpc) * temperatures_hse * (
+        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (
                 drho_hse + dT_hse) * unyt.Solar_Mass
 
         # Parse fitted profiles to diagnostic container
@@ -561,7 +560,7 @@ class HydrostaticEstimator:
         mass_interpolate = UnivariateSpline(self.radial_bin_centres.v, masses_hse.v).derivative(n=1)
         volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (self.radial_bin_edges[1:] ** 3 - self.radial_bin_edges[:-1] ** 3)
         total_density = mass_interpolate(self.radial_bin_centres.v) * unyt.Solar_Mass / volume_in_shell / self.rho_crit
-        print(total_density)
+        print(total_density[-1])
         setattr(self.diagnostics, 'density_profile_hse', total_density)
 
         return cfr, cft, masses_hse
