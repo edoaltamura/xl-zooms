@@ -60,22 +60,119 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
 
 
 class HydrostaticDiagnostic:
+    # This class is to be used for debugging purposes and
+    # the allowed attributes are specified in __slots__.
+    __slots__ = (
+        'profile_type',
+        'zoom',
+        'output_directory',
+        'radial_bin_centres_input',
+        'temperature_profile_input',
+        'cumulative_mass_input',
+        'density_profile_input',
+        'radial_bin_centres_hse',
+        'temperature_profile_hse',
+        'cumulative_mass_hse',
+        'density_profile_hse',
+    )
 
     def __init__(self):
-        pass
+        self.total_mass_profiles()
+
+    def total_mass_profiles(self):
+
+        # Read in halo properties from catalog
+        with h5.File(self.zoom.catalog_file, 'r') as h5file:
+            self.M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+            self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
+            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
+            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+        # Read in gas particles and parse densities and temperatures
+        mask = sw.mask(self.zoom.snapshot_file, spatial_only=False)
+        region = [[XPotMin - 1.5 * self.R500c, XPotMin + 1.5 * self.R500c],
+                  [YPotMin - 1.5 * self.R500c, YPotMin + 1.5 * self.R500c],
+                  [ZPotMin - 1.5 * self.R500c, ZPotMin + 1.5 * self.R500c]]
+        mask.constrain_spatial(region)
+        mask.constrain_mask(
+            "gas", "temperatures",
+            Tcut_halogas * mask.units.temperature,
+            1.e12 * mask.units.temperature
+        )
+        data = sw.load(self.zoom.snapshot_file, mask=mask)
+
+        # Set bounds for the radial profiles
+        radius_bounds = [0.15, 1.5]
+
+        # Select hot gas within sphere and without core
+        deltaX = data.gas.coordinates[:, 0] - XPotMin
+        deltaY = data.gas.coordinates[:, 1] - YPotMin
+        deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / self.R500c
+
+        # Keep only particles inside 1.5 R500crit
+        index = np.where(
+            (deltaR > radius_bounds[0]) &
+            (deltaR < radius_bounds[1])
+        )[0]
+
+        radial_distance = deltaR[index]
+        masses = data.gas.masses[index]
+
+        # Select DM within sphere and without core
+        deltaX = data.dark_matter.coordinates[:, 0] - XPotMin
+        deltaY = data.dark_matter.coordinates[:, 1] - YPotMin
+        deltaZ = data.dark_matter.coordinates[:, 2] - ZPotMin
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / self.R500c
+
+        # Keep only particles inside 1.5 R500crit
+        index = np.where(
+            (deltaR > radius_bounds[0]) &
+            (deltaR < radius_bounds[1])
+        )[0]
+
+        radial_distance = np.append(radial_distance, deltaR[index])
+        masses = np.append(masses, data.dark_matter.masses[index])
+
+        # Select stars within sphere and without core
+        deltaX = data.stars.coordinates[:, 0] - XPotMin
+        deltaY = data.stars.coordinates[:, 1] - YPotMin
+        deltaZ = data.stars.coordinates[:, 2] - ZPotMin
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / self.R500c
+
+        # Keep only particles inside 1.5 R500crit
+        index = np.where(
+            (deltaR > radius_bounds[0]) &
+            (deltaR < radius_bounds[1])
+        )[0]
+
+        radial_distance = np.append(radial_distance, deltaR[index])
+        masses = np.append(masses, data.stars.masses[index])
+
+        lbins = np.logspace(
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
+        ) * radial_distance.units
+
+        mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=masses)
+
+        # Replace zeros with Nans
+        mass_weights[mass_weights == 0] = np.nan
+
+        self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
+        self.cumulative_mass_input = cumsum_unyt(mass_weights)
+        shell_volume = (4 / 3 * np.pi) * self.R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
+        critical_density = data.metadata.cosmology.critical_density(data.metadata.z)
+        self.density_profile_input = mass_weights / shell_volume / critical_density
 
     def plot_all(self):
         fields = [
             'temperature_profile',
-            # 'dlogkT_dlogr',
-            # 'dlogrho_dlogr',
             'cumulative_mass',
             'density_profile'
         ]
         labels = [
             r'$k_{\rm B}T$ [keV]',
-            # r'$d \log k_{\rm B}T / d \log r$',
-            # r'$d \log \rho / d \log r$',
             r'$M(<R)$ [M$_\odot$]',
             r'$\rho / \rho_{\rm crit}$'
         ]
@@ -84,7 +181,7 @@ class HydrostaticDiagnostic:
             self.plot_profile(
                 field_name=field,
                 ylabel=label,
-                filename=f"diagnostic_{field}"
+                filename=f"diagnostic_{field}.png"
             )
 
     def plot_profile(self, field_name: str = 'radial_bin_centres',
@@ -93,7 +190,7 @@ class HydrostaticDiagnostic:
         fig, (ax, ax_residual) = plt.subplots(
             nrows=2,
             ncols=1,
-            figsize=(3.5, 5),
+            figsize=(4, 5),
             dpi=300,
             sharex=True,
             gridspec_kw={'height_ratios': [3, 1]}
@@ -113,10 +210,11 @@ class HydrostaticDiagnostic:
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_ylabel(ylabel)
-        ax_residual.set_ylabel(r"$\Delta($" + ylabel + "$)$")
+        ax_residual.set_ylabel(r"$\Delta$" + ylabel)
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
         ax.legend(loc="upper right")
         fig.tight_layout()
+        plt.title(self.zoom.run_name)
         plt.savefig(f"{self.output_directory}/{filename}")
         plt.show()
         plt.close()
@@ -143,16 +241,9 @@ class HydrostaticEstimator:
 
         # Parse fitted profiles to diagnostic container
         setattr(self.diagnostics, 'profile_type', self.profile_type)
+        setattr(self.diagnostics, 'zoom', self.zoom)
         setattr(self.diagnostics, 'output_directory', self.zoom.output_directory)
-        setattr(self.diagnostics, 'radial_bin_centres_input', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_input', self.temperature_profile)
-        logr = np.log10(self.radial_bin_centres)
-        logkT = np.log10(self.temperature_profile)
-        logrho = np.log10(self.density_profile)
-        setattr(self.diagnostics, 'dlogkT_dlogr_input', (logkT[1:] - logkT[:-1]) / (logr[1:] - logr[:-1]))
-        setattr(self.diagnostics, 'dlogrho_dlogr_input', (logrho[1:] - logrho[:-1]) / (logr[1:] - logr[:-1]))
-        setattr(self.diagnostics, 'cumulative_mass_input', np.cumsum(self.mass_profile).to('Msun'))
-        setattr(self.diagnostics, 'density_profile_input', self.density_profile)
 
         self.interpolate_hse()
 
@@ -227,7 +318,6 @@ class HydrostaticEstimator:
         gas_masses = data.gas.masses[index]
         gas_temperatures = data.gas.temperatures[index]
         gas_mass_weighted_temperatures = gas_temperatures * gas_masses
-
 
         if not self.excise_core:
             # Compute convergence radius and set as inner limit
@@ -476,8 +566,6 @@ class HydrostaticEstimator:
         # Parse fitted profiles to diagnostic container
         setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
-        setattr(self.diagnostics, 'dlogkT_dlogr_hse', (dT_hse[1:] + dT_hse[:-1]) / 2)
-        setattr(self.diagnostics, 'dlogrho_dlogr_hse', (drho_hse[1:] + drho_hse[:-1]) / 2)
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
         mass_in_shell = masses_hse[1:] - masses_hse[:-1]
         volume_in_shell = 4 / 3 * np.pi * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
@@ -536,7 +624,10 @@ class HydrostaticEstimator:
 
 
 if __name__ == "__main__":
-    hse_test = HydrostaticEstimator(zooms_register[0])
+    zoom_choice = [z for z in zooms_register if "VR3032_-8res" in z.run_name][0]
+    print(zoom_choice.run_name)
+
+    hse_test = HydrostaticEstimator(zoom_choice)
 
     print('R500c =', hse_test.R500c)
     print('M500c =', hse_test.M500c)
