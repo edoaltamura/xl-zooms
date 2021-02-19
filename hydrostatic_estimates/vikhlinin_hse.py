@@ -162,6 +162,7 @@ class HydrostaticDiagnostic:
 
         self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         self.cumulative_mass_input = cumsum_unyt(mass_weights)
+        print(self.cumulative_mass_input)
         shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
 
         unitLength = data.metadata.units.length
@@ -172,6 +173,7 @@ class HydrostaticDiagnostic:
         )[0].to('Msun/Mpc**3')
 
         self.density_profile_input = mass_weights / shell_volume / critical_density
+        print(self.density_profile_input)
 
     def plot_all(self):
         fields = [
@@ -219,7 +221,7 @@ class HydrostaticDiagnostic:
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
         ax.legend(loc="upper right")
         fig.tight_layout()
-        plt.title(self.zoom.run_name)
+        fig.suptitle(self.zoom.run_name)
         plt.savefig(f"{self.output_directory}/{filename}")
         plt.show()
         plt.close()
