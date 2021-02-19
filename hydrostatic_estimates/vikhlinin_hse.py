@@ -562,14 +562,12 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
-        mass_in_shell = masses_hse[1:] - masses_hse[:-1]
+
+        from scipy.interpolate import UnivariateSpline
+        cumulative_mass_interpolate = UnivariateSpline(self.radial_bin_centres, masses_hse, k=1)
         volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
-        density_interpolate = interp1d(
-            mass_in_shell / volume_in_shell / self.rho_crit,
-            10.0 ** (0.5 * np.log10(self.radial_bin_centres[1:] * self.radial_bin_centres[:-1])),
-            kind='linear', fill_value="extrapolate"
-        )
-        setattr(self.diagnostics, 'density_profile_hse', density_interpolate(self.radial_bin_centres))
+        total_density = cumulative_mass_interpolate.derivative(self.radial_bin_centres) / volume_in_shell / self.rho_crit
+        setattr(self.diagnostics, 'density_profile_hse', total_density)
 
         return cfr, cft, masses_hse
 
