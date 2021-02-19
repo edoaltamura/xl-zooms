@@ -106,7 +106,7 @@ class HydrostaticDiagnostic:
         # Set bounds for the radial profiles
         radius_bounds = [0.15, 1.5]
         lbins = np.logspace(
-            np.log10(1e-3), np.log10(radius_bounds[1]), 501
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
         ) * unyt.dimensionless
 
         # Select hot gas within sphere and without core
@@ -116,8 +116,8 @@ class HydrostaticDiagnostic:
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
-        index = np.where(deltaR > radius_bounds[0])[0]
-
+        index = np.where(deltaR < radius_bounds[1])[0]
+        central_mass = sum(data.gas.masses[np.where(deltaR < radius_bounds[0])[0]])
         mass_weights, _ = histogram_unyt(deltaR[index], bins=lbins, weights=data.gas.masses[index])
 
         # Select DM within sphere and without core
@@ -128,7 +128,7 @@ class HydrostaticDiagnostic:
 
         # Keep only particles inside 1.5 R500crit
         index = np.where(deltaR < radius_bounds[1])[0]
-
+        central_mass += sum(data.dark_matter.masses[np.where(deltaR < radius_bounds[0])[0]])
         _mass_weights, _ = histogram_unyt(deltaR[index], bins=lbins, weights=data.dark_matter.masses[index])
         mass_weights += _mass_weights
 
@@ -139,16 +139,17 @@ class HydrostaticDiagnostic:
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
-        index = np.where(deltaR > radius_bounds[0])[0]
-
+        index = np.where(deltaR < radius_bounds[1])[0]
+        central_mass += sum(data.stars.masses[np.where(deltaR < radius_bounds[0])[0]])
         _mass_weights, bin_edges = histogram_unyt(deltaR[index], bins=lbins, weights=data.stars.masses[index])
         mass_weights += _mass_weights
 
         # Replace zeros with Nans
         mass_weights[mass_weights == 0] = np.nan
+        cumulative_mass = central_mass + cumsum_unyt(mass_weights)
 
         self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
-        self.cumulative_mass_input = cumsum_unyt(mass_weights)
+        self.cumulative_mass_input = cumulative_mass.to('Msun')
         print(self.cumulative_mass_input)
         shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
 
