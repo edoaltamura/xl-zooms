@@ -105,6 +105,9 @@ class HydrostaticDiagnostic:
 
         # Set bounds for the radial profiles
         radius_bounds = [0.15, 1.5]
+        lbins = np.logspace(
+            np.log10(1e-3), np.log10(radius_bounds[1]), 501
+        ) * unyt.dimensionless
 
         # Select hot gas within sphere and without core
         deltaX = data.gas.coordinates[:, 0] - XPotMin
@@ -115,8 +118,7 @@ class HydrostaticDiagnostic:
         # Keep only particles inside 1.5 R500crit
         index = np.where(deltaR > radius_bounds[0])[0]
 
-        radial_distance = deltaR[index]
-        masses = data.gas.masses[index]
+        mass_weights, _ = histogram_unyt(deltaR[index], bins=lbins, weights=data.gas.masses[index])
 
         # Select DM within sphere and without core
         deltaX = data.dark_matter.coordinates[:, 0] - XPotMin
@@ -127,8 +129,8 @@ class HydrostaticDiagnostic:
         # Keep only particles inside 1.5 R500crit
         index = np.where(deltaR < radius_bounds[1])[0]
 
-        radial_distance = np.append(radial_distance, deltaR[index])
-        masses = np.append(masses, data.dark_matter.masses[index])
+        _mass_weights, _ = histogram_unyt(deltaR[index], bins=lbins, weights=data.dark_matter.masses[index])
+        mass_weights += _mass_weights
 
         # Select stars within sphere and without core
         deltaX = data.stars.coordinates[:, 0] - XPotMin
@@ -139,14 +141,8 @@ class HydrostaticDiagnostic:
         # Keep only particles inside 1.5 R500crit
         index = np.where(deltaR > radius_bounds[0])[0]
 
-        radial_distance = np.append(radial_distance, deltaR[index])
-        masses = np.append(masses, data.stars.masses[index])
-
-        lbins = np.logspace(
-            np.log10(1e-3), np.log10(radius_bounds[1]), 501
-        ) * radial_distance.units
-
-        mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=masses * unyt.Solar_Mass)
+        _mass_weights, bin_edges = histogram_unyt(deltaR[index], bins=lbins, weights=data.stars.masses[index])
+        mass_weights += _mass_weights
 
         # Replace zeros with Nans
         mass_weights[mass_weights == 0] = np.nan
