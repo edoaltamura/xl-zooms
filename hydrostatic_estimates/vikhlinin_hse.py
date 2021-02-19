@@ -331,7 +331,7 @@ class HydrostaticEstimator:
         mass_weights[mass_weights == 0] = np.nan
 
         # Set the radial bins as object attribute
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1]))
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
         self.radial_bin_edges = lbins
         self.mass_profile = mass_weights
 
@@ -416,7 +416,7 @@ class HydrostaticEstimator:
         # Replace zeros with Nans
         mass_weights[mass_weights == 0] = np.nan
 
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1]))
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
         self.radial_bin_edges = lbins
         self.mass_profile = mass_weights
 
