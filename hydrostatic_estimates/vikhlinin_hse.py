@@ -197,8 +197,6 @@ class HydrostaticDiagnostic:
         y_input = getattr(self, field_name + '_input')
         y_hse = getattr(self, field_name + '_hse')
 
-        print(y_hse)
-
         ax.plot(x_input, y_input, label="True data")
         ax.plot(x_hse, y_hse, label=f"Vikhlinin HSE fit from {self.profile_type} data")
         ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0])
@@ -564,9 +562,10 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
 
         from scipy.interpolate import UnivariateSpline
-        cumulative_mass_interpolate = UnivariateSpline(self.radial_bin_centres, masses_hse, k=1)
+        cumulative_mass_interpolate = UnivariateSpline(self.radial_bin_centres, masses_hse)
         volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
         total_density = cumulative_mass_interpolate.derivative(self.radial_bin_centres) / volume_in_shell / self.rho_crit
+        print(total_density)
         setattr(self.diagnostics, 'density_profile_hse', total_density)
 
         return cfr, cft, masses_hse
