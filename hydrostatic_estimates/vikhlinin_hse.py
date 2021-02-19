@@ -155,10 +155,11 @@ class HydrostaticDiagnostic:
             np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
         ) * radial_distance.units
 
-        mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=masses)
+        mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=masses.to('Msun'))
 
         # Replace zeros with Nans
         mass_weights[mass_weights == 0] = np.nan
+        mass_weights *= unyt.Msun
 
         self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         self.cumulative_mass_input = cumsum_unyt(mass_weights)
