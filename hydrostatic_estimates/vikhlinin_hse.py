@@ -331,7 +331,7 @@ class HydrostaticEstimator:
         mass_weights[mass_weights == 0] = np.nan
 
         # Set the radial bins as object attribute
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.Mpc
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
         self.radial_bin_edges = lbins
         self.mass_profile = mass_weights
 
@@ -409,29 +409,23 @@ class HydrostaticEstimator:
 
         lbins = np.logspace(
             np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 1001
-        ) * self.R500c
+        ) * radial_distance_scaled.units
 
-        mass_weights, bin_edges = histogram_unyt(radial_distance_scaled, bins=lbins, weights=gas_masses)
-
-        # Replace zeros with Nans
-        mass_weights[mass_weights == 0] = np.nan
-
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.Mpc
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
         self.radial_bin_edges = lbins
-        self.mass_profile = mass_weights
 
         # Cut ends of the radial bins to interpolate, since they might be
         # outside the spec_fit_data['Rspec'] range
         # Prevents ValueError: A value in x_new is below the interpolation range.
         radial_bins_intersect = np.where(
-            (self.radial_bin_centres > spec_fit_data['Rspec'].min()) &
-            (self.radial_bin_centres < spec_fit_data['Rspec'].max())
+            (self.radial_bin_centres * self.R500c > spec_fit_data['Rspec'].min()) &
+            (self.radial_bin_centres * self.R500c < spec_fit_data['Rspec'].max())
         )[0]
-        self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect] * radial_distance_scaled.units
+        self.radial_bin_centres = self.radial_bin_centres[radial_bins_intersect]
 
         # Compute the radial gas density profile
-        self.density_profile = spec_density_interpolate(self.radial_bin_centres) * unyt.dimensionless
-        self.temperature_profile = spec_temperature_interpolate(self.radial_bin_centres) * unyt.keV
+        self.density_profile = spec_density_interpolate(self.radial_bin_centres * self.R500c) * unyt.dimensionless
+        self.temperature_profile = spec_temperature_interpolate(self.radial_bin_centres * self.R500c) * unyt.keV
 
     @staticmethod
     def equation_hse_dlogrho_dlogr(x, rho0, rc, alpha, beta, rs, epsilon):
@@ -564,9 +558,9 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
 
         from scipy.interpolate import UnivariateSpline
-        mass_interpolate = UnivariateSpline(self.radial_bin_centres, masses_hse).derivative(n=1)
-        volume_in_shell = 4 / 3 * np.pi * (self.radial_bin_edges[1:] ** 3 - self.radial_bin_edges[:-1] ** 3)
-        total_density = mass_interpolate(self.radial_bin_centres) * unyt.Solar_Mass / volume_in_shell / self.rho_crit
+        mass_interpolate = UnivariateSpline(self.radial_bin_centres.v, masses_hse.v).derivative(n=1)
+        volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (self.radial_bin_edges[1:] ** 3 - self.radial_bin_edges[:-1] ** 3)
+        total_density = mass_interpolate(self.radial_bin_centres.v) * unyt.Solar_Mass / volume_in_shell / self.rho_crit
         print(total_density)
         setattr(self.diagnostics, 'density_profile_hse', total_density)
 
