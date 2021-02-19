@@ -549,7 +549,7 @@ class HydrostaticEstimator:
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
 
-        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (
+        masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c ** 2 / unyt.Mpc) * temperatures_hse * (
                 drho_hse + dT_hse) * unyt.Solar_Mass
 
         # Parse fitted profiles to diagnostic container
