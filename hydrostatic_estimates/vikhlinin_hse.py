@@ -163,7 +163,14 @@ class HydrostaticDiagnostic:
         self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         self.cumulative_mass_input = cumsum_unyt(mass_weights)
         shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
-        critical_density = data.metadata.cosmology.critical_density(data.metadata.z)
+
+        unitLength = data.metadata.units.length
+        unitMass = data.metadata.units.mass
+        critical_density = unyt.unyt_quantity(
+            data.metadata.cosmology_raw['Critical density [internal units]'],
+            unitMass / unitLength ** 3
+        )[0].to('Msun/Mpc**3')
+
         self.density_profile_input = mass_weights / shell_volume / critical_density
 
     def plot_all(self):
