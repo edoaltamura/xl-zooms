@@ -331,7 +331,7 @@ class HydrostaticEstimator:
         mass_weights[mass_weights == 0] = np.nan
 
         # Set the radial bins as object attribute
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.Mpc
         self.radial_bin_edges = lbins
         self.mass_profile = mass_weights
 
@@ -416,7 +416,7 @@ class HydrostaticEstimator:
         # Replace zeros with Nans
         mass_weights[mass_weights == 0] = np.nan
 
-        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
+        self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.Mpc
         self.radial_bin_edges = lbins
         self.mass_profile = mass_weights
 
@@ -566,7 +566,7 @@ class HydrostaticEstimator:
         from scipy.interpolate import UnivariateSpline
         mass_interpolate = UnivariateSpline(self.radial_bin_centres, masses_hse).derivative(n=1)
         volume_in_shell = 4 / 3 * np.pi * (self.radial_bin_edges[1:] ** 3 - self.radial_bin_edges[:-1] ** 3)
-        total_density = mass_interpolate(self.radial_bin_centres) / volume_in_shell / self.rho_crit
+        total_density = mass_interpolate(self.radial_bin_centres) * unyt.Solar_Mass / volume_in_shell / self.rho_crit
         print(total_density)
         setattr(self.diagnostics, 'density_profile_hse', total_density)
 
