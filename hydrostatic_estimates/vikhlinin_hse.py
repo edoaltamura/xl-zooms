@@ -84,17 +84,17 @@ class HydrostaticDiagnostic:
 
         # Read in halo properties from catalog
         with h5.File(self.zoom.catalog_file, 'r') as h5file:
-            self.M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-            self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+            M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
 
         # Read in gas particles and parse densities and temperatures
         mask = sw.mask(self.zoom.snapshot_file, spatial_only=False)
-        region = [[XPotMin - 1.5 * self.R500c, XPotMin + 1.5 * self.R500c],
-                  [YPotMin - 1.5 * self.R500c, YPotMin + 1.5 * self.R500c],
-                  [ZPotMin - 1.5 * self.R500c, ZPotMin + 1.5 * self.R500c]]
+        region = [[XPotMin - 1.5 * R500c, XPotMin + 1.5 * R500c],
+                  [YPotMin - 1.5 * R500c, YPotMin + 1.5 * R500c],
+                  [ZPotMin - 1.5 * R500c, ZPotMin + 1.5 * R500c]]
         mask.constrain_spatial(region)
         mask.constrain_mask(
             "gas", "temperatures",
@@ -110,7 +110,7 @@ class HydrostaticDiagnostic:
         deltaX = data.gas.coordinates[:, 0] - XPotMin
         deltaY = data.gas.coordinates[:, 1] - YPotMin
         deltaZ = data.gas.coordinates[:, 2] - ZPotMin
-        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / self.R500c
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
         index = np.where(
@@ -125,7 +125,7 @@ class HydrostaticDiagnostic:
         deltaX = data.dark_matter.coordinates[:, 0] - XPotMin
         deltaY = data.dark_matter.coordinates[:, 1] - YPotMin
         deltaZ = data.dark_matter.coordinates[:, 2] - ZPotMin
-        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / self.R500c
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
         index = np.where(
@@ -140,7 +140,7 @@ class HydrostaticDiagnostic:
         deltaX = data.stars.coordinates[:, 0] - XPotMin
         deltaY = data.stars.coordinates[:, 1] - YPotMin
         deltaZ = data.stars.coordinates[:, 2] - ZPotMin
-        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / self.R500c
+        deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
         index = np.where(
@@ -162,7 +162,7 @@ class HydrostaticDiagnostic:
 
         self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
         self.cumulative_mass_input = cumsum_unyt(mass_weights)
-        shell_volume = (4 / 3 * np.pi) * self.R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
+        shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
         critical_density = data.metadata.cosmology.critical_density(data.metadata.z)
         self.density_profile_input = mass_weights / shell_volume / critical_density
 
@@ -199,9 +199,6 @@ class HydrostaticDiagnostic:
 
         x_input = self.radial_bin_centres_input
         x_hse = self.radial_bin_centres_hse
-        if '_dlogr' in field_name:
-            x_input = (self.radial_bin_centres_input[1:] + self.radial_bin_centres_input[:-1]) / 2
-            x_hse = (self.radial_bin_centres_hse[1:] + self.radial_bin_centres_hse[:-1]) / 2
 
         ax.plot(x_input, getattr(self, field_name + '_input'), label="True data")
         ax.plot(x_hse, getattr(self, field_name + '_hse'), label=f"Vikhlinin HSE fit from {self.profile_type} data")
