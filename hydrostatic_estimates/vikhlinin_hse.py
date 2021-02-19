@@ -113,10 +113,7 @@ class HydrostaticDiagnostic:
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
-        index = np.where(
-            (deltaR > radius_bounds[0]) &
-            (deltaR < radius_bounds[1])
-        )[0]
+        index = np.where(deltaR > radius_bounds[0])[0]
 
         radial_distance = deltaR[index]
         masses = data.gas.masses[index]
@@ -128,10 +125,7 @@ class HydrostaticDiagnostic:
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
-        index = np.where(
-            (deltaR > radius_bounds[0]) &
-            (deltaR < radius_bounds[1])
-        )[0]
+        index = np.where(deltaR < radius_bounds[1])[0]
 
         radial_distance = np.append(radial_distance, deltaR[index])
         masses = np.append(masses, data.dark_matter.masses[index])
@@ -143,16 +137,13 @@ class HydrostaticDiagnostic:
         deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
         # Keep only particles inside 1.5 R500crit
-        index = np.where(
-            (deltaR > radius_bounds[0]) &
-            (deltaR < radius_bounds[1])
-        )[0]
+        index = np.where(deltaR > radius_bounds[0])[0]
 
         radial_distance = np.append(radial_distance, deltaR[index])
         masses = np.append(masses, data.stars.masses[index])
 
         lbins = np.logspace(
-            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
+            np.log10(1e-7), np.log10(radius_bounds[1]), 501
         ) * radial_distance.units
 
         mass_weights, bin_edges = histogram_unyt(radial_distance, bins=lbins, weights=masses * unyt.Solar_Mass)
