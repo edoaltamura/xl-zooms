@@ -539,19 +539,19 @@ class HydrostaticEstimator:
         and the total mass within the each radial bin, using the
         hydrostatic mass estimate (HSE).
         """
-        cfr = self.density_fit(self.radial_bin_centres.v, np.log10(self.density_profile.v))
-        cft = self.temperature_fit(self.radial_bin_centres.v, self.temperature_profile.v)
+        cfr = self.density_fit((self.radial_bin_centres / self.R500c).v, np.log10(self.density_profile.v))
+        cft = self.temperature_fit((self.radial_bin_centres / self.R500c).v, self.temperature_profile.v)
 
         temperatures_hse = self.temperature_profile_model(
-            self.radial_bin_centres,
+            (self.radial_bin_centres / self.R500c).v,
             cft.x[0], cft.x[1], cft.x[2], cft.x[3], cft.x[4], cft.x[5], cft.x[6], cft.x[7]
         )
         dT_hse = self.equation_hse_dlogkT_dlogr(
-            self.radial_bin_centres,
+            (self.radial_bin_centres / self.R500c).v,
             cft.x[0], cft.x[1], cft.x[2], cft.x[3], cft.x[4], cft.x[5], cft.x[6], cft.x[7]
         )
         drho_hse = self.equation_hse_dlogrho_dlogr(
-            self.radial_bin_centres,
+            (self.radial_bin_centres / self.R500c).v,
             cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
         )
 
