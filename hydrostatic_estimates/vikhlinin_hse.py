@@ -559,7 +559,7 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
 
         gas_density = 10 ** self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
-        setattr(self.diagnostics, 'density_profile_hse', gas_density * self.density_profile.units / self.rho_crit)
+        setattr(self.diagnostics, 'density_profile_hse', gas_density)
 
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
 
@@ -618,6 +618,11 @@ class HydrostaticEstimator:
         self.b200hse = 1 - self.M200hse / self.M200c
         self.b500hse = 1 - self.M500hse / self.M500c
         self.b2500hse = 1 - self.M2500hse / self.M2500c
+
+        # Transfer bias info to the diagnostics instance
+        setattr(self.diagnostics, 'b200hse', self.b200hse)
+        setattr(self.diagnostics, 'b500hse', self.b500hse)
+        setattr(self.diagnostics, 'b2500hse', self.b2500hse)
 
     def plot_diagnostics(self):
         self.diagnostics.plot_all()
