@@ -176,7 +176,7 @@ class HydrostaticDiagnostic:
         fig, (ax, ax_residual) = plt.subplots(
             nrows=2,
             ncols=1,
-            figsize=(3.5, 4.5),
+            figsize=(3, 4),
             sharex=True,
             gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.02}
         )
