@@ -189,7 +189,7 @@ class HydrostaticDiagnostic:
             figsize=(4, 5),
             dpi=300,
             sharex=True,
-            gridspec_kw={'height_ratios': [3, 1]}
+            gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.025}
         )
 
         x_input = self.radial_bin_centres_input
@@ -206,9 +206,8 @@ class HydrostaticDiagnostic:
         ax.set_ylabel(ylabel)
         ax_residual.set_ylabel(r"$\Delta$" + ylabel)
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
-        ax.legend(loc="upper right")
+        ax.legend(loc="upper right", title=self.zoom.run_name, font='small')
         fig.tight_layout()
-        fig.suptitle(self.zoom.run_name)
         plt.savefig(f"{self.output_directory}/{filename}")
         plt.show()
         plt.close()
