@@ -151,16 +151,16 @@ class HydrostaticDiagnostic:
 
     def plot_all(self):
         fields = [
-            # 'temperature_profile',
+            'temperature_profile',
             'cumulative_mass',
-            # 'density_profile',
-            # 'total_density_profile',
+            'density_profile',
+            'total_density_profile',
         ]
         labels = [
-            # r'$k_{\rm B}T$ [keV]',
+            r'$k_{\rm B}T$ [keV]',
             r'$M(<R)$ [M$_\odot$]',
-            # r'$\rho_{\rm gas} / \rho_{\rm crit}$',
-            # r'$\rho / \rho_{\rm crit}$',
+            r'$\rho_{\rm gas} / \rho_{\rm crit}$',
+            r'$\rho / \rho_{\rm crit}$',
         ]
         for i, (field, label) in enumerate(zip(fields, labels)):
             print(f"({i + 1}/{len(fields)}) Generating diagnostic plot: {field}.")
@@ -202,7 +202,7 @@ class HydrostaticDiagnostic:
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_ylabel(ylabel)
-        ax_residual.set_ylabel(r"$\Delta$" + ylabel)
+        ax_residual.set_ylabel(r"$1-({\rm hse} / {\rm true})$")
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
         ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
