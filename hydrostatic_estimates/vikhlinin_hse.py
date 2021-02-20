@@ -188,8 +188,8 @@ class HydrostaticDiagnostic:
 
         ax.plot(x_input, y_input, label="True data", color='lime')
         ax.plot(x_hse, y_hse, label=f"Vikhlinin HSE fit from {self.profile_type} data", color='orange')
-        ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0], color='lime')
         ax_residual.plot(x_hse, 1 - y_hse / y_input, color='orange')
+        ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0], color='lime')
 
         # If plotting cumulative mass, display HSE biases
         if field_name == 'cumulative_mass':
@@ -200,9 +200,9 @@ class HydrostaticDiagnostic:
 
         ax.set_xscale('log')
         ax.set_yscale('log')
-        ax.set_ylabel(ylabel)
-        ax_residual.set_ylabel(r"$1-({\rm hse} / {\rm true})$")
-        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
+        ax.set_ylabel(ylabel, fontsize='large')
+        ax_residual.set_ylabel(r"$1-({\rm hse} / {\rm true})$", fontsize='large')
+        ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$", fontsize='large')
         ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         plt.tight_layout()
