@@ -176,10 +176,9 @@ class HydrostaticDiagnostic:
         fig, (ax, ax_residual) = plt.subplots(
             nrows=2,
             ncols=1,
-            figsize=(4, 5),
-            dpi=300,
+            figsize=(3.5, 4.5),
             sharex=True,
-            gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.025}
+            gridspec_kw={'height_ratios': [3, 1], 'hspace': 0.02}
         )
 
         x_input = self.radial_bin_centres_input
@@ -208,7 +207,7 @@ class HydrostaticDiagnostic:
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         fig.tight_layout()
         plt.savefig(f"{self.output_directory}/{filename}")
-        plt.show()
+        # plt.show()
         plt.close()
 
 
