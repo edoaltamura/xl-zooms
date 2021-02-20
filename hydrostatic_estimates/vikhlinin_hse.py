@@ -452,13 +452,12 @@ class HydrostaticEstimator:
         """
         return -a + (acool * (x / rcool) ** acool / (
                 (1 + (x / rcool) ** acool) * (Tmin / T0 + (x / rcool) ** acool))) * \
-               (1 - Tmin / T0) - c * (x / rt) ** b / (1 + (x / rt) ** b)
+                (1 - Tmin / T0) - c * (x / rt) ** b / (1 + (x / rt) ** b)
 
     @staticmethod
     def density_profile_model(x, rho0, rc, alpha, beta, rs, epsilon):
-        return np.log10(rho0 * ((x / rc) ** (-alpha / 2.0) / (1.0 + (x / rc) ** 2.0) ** \
-                                (3.0 * beta / 2.0 - alpha / 4.0)) * (1.0 / ((1.0 + (x / rs) ** 3.0) ** \
-                                                                            (epsilon / 6.0))))
+        return np.log10(rho0 * ((x / rc) ** (-alpha / 2) / (1 + (x / rc) ** 2) ** \
+                        (3 * beta / 2 - alpha / 4)) * (1 / ((1 + (x / rs) ** 3) ** (epsilon / 6))))
 
     @staticmethod
     def temperature_profile_model(x, T0, rt, a, b, c, rcool, acool, Tmin):
@@ -536,31 +535,28 @@ class HydrostaticEstimator:
         Returns the coefficients from the density and temperature fits
         and the total mass within the each radial bin, using the
         hydrostatic mass estimate (HSE).
+        Notes:
+            density_fit returns 6 parameters
+            temperature_fit returns 8 parameters
+            temperatures_hse wants 9 arguments (1 radial bins + 8 parameters)
+            dlogkT_dlogr_hse wants 9 arguments (1 radial bins + 8 parameters)
+            dlogrho_dlogr_hse wants 7 arguments (1 radial bins + 6 parameters)
         """
         cfr = self.density_fit(self.radial_bin_centres.v, np.log10(self.density_profile.v))
         cft = self.temperature_fit(self.radial_bin_centres.v, self.temperature_profile.v)
 
-        temperatures_hse = self.temperature_profile_model(
-            self.radial_bin_centres.v,
-            cft.x[0], cft.x[1], cft.x[2], cft.x[3], cft.x[4], cft.x[5], cft.x[6], cft.x[7]
-        )
-        dT_hse = self.equation_hse_dlogkT_dlogr(
-            self.radial_bin_centres.v,
-            cft.x[0], cft.x[1], cft.x[2], cft.x[3], cft.x[4], cft.x[5], cft.x[6], cft.x[7]
-        )
-        drho_hse = self.equation_hse_dlogrho_dlogr(
-            self.radial_bin_centres.v,
-            cfr.x[0], cfr.x[1], cfr.x[2], cfr.x[3], cfr.x[4], cfr.x[5]
-        )
+        temperatures_hse = self.temperature_profile_model(self.radial_bin_centres.v, *cft.x)
+        dlogkT_dlogr_hse = self.equation_hse_dlogkT_dlogr(self.radial_bin_centres.v, *cft.x)
+        dlogrho_dlogr_hse = self.equation_hse_dlogrho_dlogr(self.radial_bin_centres.v, *cfr.x)
 
         masses_hse = - 3.68e13 * (self.radial_bin_centres * self.R500c / unyt.Mpc) * temperatures_hse * (
-                drho_hse + dT_hse) * unyt.Solar_Mass
+                dlogrho_dlogr_hse + dlogkT_dlogr_hse) * unyt.Solar_Mass
 
         # Parse fitted profiles to diagnostic container
         setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
 
-        gas_density = self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
+        gas_density = 10 ** self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
         setattr(self.diagnostics, 'density_profile_hse', gas_density)
 
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
