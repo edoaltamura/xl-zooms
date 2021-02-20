@@ -70,9 +70,9 @@ class HydrostaticDiagnostic:
 
         # Read in halo properties from catalog
         with h5.File(self.zoom.catalog_file, 'r') as h5file:
-            self.R2500c = unyt.unyt_quantity(h5file['/SO_Rass_2500_rhocrit'][0], unyt.Mpc)
-            self.R500c = unyt.unyt_quantity(h5file['/SO_Rass_500_rhocrit'][0], unyt.Mpc)
-            self.R200c = unyt.unyt_quantity(h5file['/Rass_200crit'][0], unyt.Mpc)
+            self.R2500c = unyt.unyt_quantity(h5file['/SO_R_2500_rhocrit'][0], unyt.Mpc)
+            self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+            self.R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc)
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
@@ -627,9 +627,14 @@ if __name__ == "__main__":
     hse_test = HydrostaticEstimator(zoom_choice)
 
     print(f'R500c = {hse_test.R500c:.3E}')
-    print(f'M500c = {hse_test.M500c:.3E}')
     print(f'R500hse = {hse_test.R500hse:.3E}')
+    print()
+    print(f'M500c = {hse_test.M500c:.3E}')
     print(f'M500hse = {hse_test.M500hse:.3E}')
+    print(f"Mass bias (200hse) = {hse_test.b200hse:.3f}")
+    print(f"Mass bias (500hse) = {hse_test.b500hse:.3f}")
+    print(f"Mass bias (2500hse) = {hse_test.b2500hse:.3f}")
+    print()
     print(f'P500hse = {hse_test.P500hse:.3E}')
     print(f'kBT500hse = {hse_test.kBT500hse:.3E}')
     print(f'K500hse = {hse_test.K500hse:.3E}')
