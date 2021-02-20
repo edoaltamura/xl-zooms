@@ -70,10 +70,12 @@ class HydrostaticDiagnostic:
         'temperature_profile_input',
         'cumulative_mass_input',
         'density_profile_input',
+        'total_density_profile_input',
         'radial_bin_centres_hse',
         'temperature_profile_hse',
         'cumulative_mass_hse',
         'density_profile_hse',
+        'total_density_profile_hse',
     )
 
     def __init__(self, zoom: Zoom):
@@ -163,13 +165,13 @@ class HydrostaticDiagnostic:
 
     def plot_all(self):
         fields = [
-            'temperature_profile',
-            'cumulative_mass',
+            # 'temperature_profile',
+            # 'cumulative_mass',
             'density_profile'
         ]
         labels = [
-            r'$k_{\rm B}T$ [keV]',
-            r'$M(<R)$ [M$_\odot$]',
+            # r'$k_{\rm B}T$ [keV]',
+            # r'$M(<R)$ [M$_\odot$]',
             r'$\rho / \rho_{\rm crit}$'
         ]
         for i, (field, label) in enumerate(zip(fields, labels)):
@@ -200,13 +202,13 @@ class HydrostaticDiagnostic:
         ax.plot(x_input, y_input, label="True data")
         ax.plot(x_hse, y_hse, label=f"Vikhlinin HSE fit from {self.profile_type} data")
         ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0])
-        ax_residual.plot(x_hse, (y_hse - y_input) / y_input)
+        ax_residual.plot(x_hse, 1 - y_hse / y_input)
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_ylabel(ylabel)
         ax_residual.set_ylabel(r"$\Delta$" + ylabel)
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
-        ax.legend(loc="upper right", title=self.zoom.run_name, font='small')
+        ax.legend(loc="upper right", title=self.zoom.run_name, fontsize='small')
         fig.tight_layout()
         plt.savefig(f"{self.output_directory}/{filename}")
         plt.show()
@@ -267,7 +269,9 @@ class HydrostaticEstimator:
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
         with h5.File(self.zoom.catalog_file, 'r') as h5file:
+            self.M2500c = unyt.unyt_quantity(h5file['/SO_Mass_2500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
             self.M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+            self.M200c = unyt.unyt_quantity(h5file['/Mass_200crit'][0] * 1.e10, unyt.Solar_Mass)
             self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
@@ -347,7 +351,9 @@ class HydrostaticEstimator:
 
         # Read in halo properties from catalog
         with h5.File(self.zoom.catalog_file, 'r') as h5file:
+            self.M2500c = unyt.unyt_quantity(h5file['/SO_Mass_2500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
             self.M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+            self.M200c = unyt.unyt_quantity(h5file['/Mass_200crit'][0] * 1.e10, unyt.Solar_Mass)
             self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
@@ -553,17 +559,19 @@ class HydrostaticEstimator:
         # Parse fitted profiles to diagnostic container
         setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
+
+        gas_density = self.density_profile_model(self.radial_bin_centres.v, *cft.x)
+        setattr(self.diagnostics, 'density_profile_hse', gas_density)
+
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
 
-        # from scipy.interpolate import UnivariateSpline
-        # mass_interpolate = UnivariateSpline(self.radial_bin_centres * self.R500c, masses_hse.v).derivative(n=1)
+        # Compute density profile from cumulative mass
         mass_in_shell = masses_hse[1:] - masses_hse[:-1]
         volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
         density_in_shell = mass_in_shell / volume_in_shell / self.rho_crit
         mass_interpolate = interp1d(self.radial_bin_edges[1:-1], density_in_shell, fill_value='extrapolate')
         total_density = mass_interpolate(self.radial_bin_centres)
-        print(total_density[-1])
-        setattr(self.diagnostics, 'density_profile_hse', total_density)
+        setattr(self.diagnostics, 'total_density_profile_hse', total_density)
 
         return cfr, cft, masses_hse
 
@@ -607,6 +615,11 @@ class HydrostaticEstimator:
         self.K2500hse = (self.kBT2500hse / (
                 3 * self.M2500hse * fbary / (4 * np.pi * self.R2500hse ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
             'keV*cm**2')
+
+        # Hydrostatic bias
+        self.b200hse = 1 - self.M200hse / self.M200c
+        self.b500hse = 1 - self.M500hse / self.M500c
+        self.b2500hse = 1 - self.M2500hse / self.M2500c
 
     def plot_diagnostics(self):
         self.diagnostics.plot_all()
