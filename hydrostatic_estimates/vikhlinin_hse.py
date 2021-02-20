@@ -202,7 +202,7 @@ class HydrostaticDiagnostic:
         ax_residual.set_ylabel(r"$\Delta$" + ylabel)
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
         ax.legend(loc="upper right")
-        ax.set_title(f"\\texttt{{self.zoom.run_name}}", fontsize=5)
+        ax.set_title(f"\\texttt{{{self.zoom.run_name}}}", fontsize=5)
         fig.tight_layout()
         plt.savefig(f"{self.output_directory}/{filename}")
         plt.show()
