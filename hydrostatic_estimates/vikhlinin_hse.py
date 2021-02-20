@@ -560,7 +560,7 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
 
-        gas_density = self.density_profile_model(self.radial_bin_centres.v, *cft.x)
+        gas_density = self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
         setattr(self.diagnostics, 'density_profile_hse', gas_density)
 
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
