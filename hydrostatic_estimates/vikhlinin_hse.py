@@ -111,6 +111,15 @@ class HydrostaticDiagnostic:
             np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
         ) * unyt.dimensionless
 
+        shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (lbins[1:] ** 3 - lbins[:-1] ** 3)
+
+        unitLength = data.metadata.units.length
+        unitMass = data.metadata.units.mass
+        critical_density = unyt.unyt_quantity(
+            data.metadata.cosmology_raw['Critical density [internal units]'],
+            unitMass / unitLength ** 3
+        )[0].to('Msun/Mpc**3')
+
         # Select hot gas within sphere and without core
         deltaX = data.gas.coordinates[:, 0] - XPotMin
         deltaY = data.gas.coordinates[:, 1] - YPotMin
@@ -121,6 +130,8 @@ class HydrostaticDiagnostic:
         index = np.where(deltaR < radius_bounds[1])[0]
         central_mass = sum(data.gas.masses[np.where(deltaR < radius_bounds[0])[0]])
         mass_weights, _ = histogram_unyt(deltaR[index], bins=lbins, weights=data.gas.masses[index])
+
+        self.density_profile_input = mass_weights / shell_volume / critical_density
 
         # Select DM within sphere and without core
         deltaX = data.dark_matter.coordinates[:, 0] - XPotMin
@@ -143,25 +154,16 @@ class HydrostaticDiagnostic:
         # Keep only particles inside 1.5 R500crit
         index = np.where(deltaR < radius_bounds[1])[0]
         central_mass += sum(data.stars.masses[np.where(deltaR < radius_bounds[0])[0]])
-        _mass_weights, bin_edges = histogram_unyt(deltaR[index], bins=lbins, weights=data.stars.masses[index])
+        _mass_weights, _ = histogram_unyt(deltaR[index], bins=lbins, weights=data.stars.masses[index])
         mass_weights += _mass_weights
 
         # Replace zeros with Nans
         mass_weights[mass_weights == 0] = np.nan
         cumulative_mass = central_mass + cumsum_unyt(mass_weights)
 
-        self.radial_bin_centres_input = np.sqrt(bin_edges[1:] * bin_edges[:-1])
+        self.radial_bin_centres_input = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
         self.cumulative_mass_input = cumulative_mass.to('Msun')
-        shell_volume = (4 / 3 * np.pi) * R500c ** 3 * (bin_edges[1:] ** 3 - bin_edges[:-1] ** 3)
-
-        unitLength = data.metadata.units.length
-        unitMass = data.metadata.units.mass
-        critical_density = unyt.unyt_quantity(
-            data.metadata.cosmology_raw['Critical density [internal units]'],
-            unitMass / unitLength ** 3
-        )[0].to('Msun/Mpc**3')
-
-        self.density_profile_input = mass_weights / shell_volume / critical_density
+        self.total_density_profile_input = mass_weights / shell_volume / critical_density
 
     def plot_all(self):
         fields = [
@@ -208,7 +210,7 @@ class HydrostaticDiagnostic:
         ax.set_ylabel(ylabel)
         ax_residual.set_ylabel(r"$\Delta$" + ylabel)
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
-        ax.legend(loc="upper right", title=self.zoom.run_name, fontsize='small')
+        ax.legend(loc="upper right", title=self.zoom.run_name, fontsize=5)
         fig.tight_layout()
         plt.savefig(f"{self.output_directory}/{filename}")
         plt.show()
@@ -557,7 +559,7 @@ class HydrostaticEstimator:
         setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
 
         gas_density = 10 ** self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
-        setattr(self.diagnostics, 'density_profile_hse', gas_density)
+        setattr(self.diagnostics, 'density_profile_hse', gas_density * self.density_profile.units / self.rho_crit)
 
         setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
 
