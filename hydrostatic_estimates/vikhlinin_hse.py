@@ -76,6 +76,9 @@ class HydrostaticDiagnostic:
         'cumulative_mass_hse',
         'density_profile_hse',
         'total_density_profile_hse',
+        'b200hse',
+        'b500hse',
+        'b2500hse',
     )
 
     def __init__(self, zoom: Zoom):
