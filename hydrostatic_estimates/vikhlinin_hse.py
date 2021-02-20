@@ -215,15 +215,17 @@ class HydrostaticDiagnostic:
 class HydrostaticEstimator:
 
     def __init__(self, zoom: Zoom, excise_core: bool = True, profile_type: str = 'true',
-                 using_mcmc: bool = False, spec_fit_data: dict = None):
+                 using_mcmc: bool = False, spec_fit_data: dict = None, diagnostics_on: bool = False):
         self.zoom = zoom
         self.using_mcmc = using_mcmc
         self.excise_core = excise_core
         self.profile_type = profile_type
+        self.diagnostics_on = diagnostics_on
 
         # Initialise an HydrostaticDiagnostic instance
         # Parse to this objects all profiles and quantities for external checks
-        self.diagnostics = HydrostaticDiagnostic(zoom)
+        if self.diagnostics_on:
+            self.diagnostics = HydrostaticDiagnostic(zoom)
 
         if profile_type.lower() == 'true':
             self.load_zoom_profiles()
@@ -232,9 +234,10 @@ class HydrostaticEstimator:
             self.load_xray_profiles(spec_fit_data)
 
         # Parse fitted profiles to diagnostic container
-        setattr(self.diagnostics, 'profile_type', self.profile_type)
-        setattr(self.diagnostics, 'output_directory', self.zoom.output_directory)
-        setattr(self.diagnostics, 'temperature_profile_input', self.temperature_profile)
+        if self.diagnostics_on:
+            setattr(self.diagnostics, 'profile_type', self.profile_type)
+            setattr(self.diagnostics, 'output_directory', self.zoom.output_directory)
+            setattr(self.diagnostics, 'temperature_profile_input', self.temperature_profile)
 
         self.interpolate_hse()
 
@@ -449,12 +452,12 @@ class HydrostaticEstimator:
         """
         return -a + (acool * (x / rcool) ** acool / (
                 (1 + (x / rcool) ** acool) * (Tmin / T0 + (x / rcool) ** acool))) * \
-                (1 - Tmin / T0) - c * (x / rt) ** b / (1 + (x / rt) ** b)
+               (1 - Tmin / T0) - c * (x / rt) ** b / (1 + (x / rt) ** b)
 
     @staticmethod
     def density_profile_model(x, rho0, rc, alpha, beta, rs, epsilon):
         return np.log10(rho0 * ((x / rc) ** (-alpha / 2) / (1 + (x / rc) ** 2) ** \
-                        (3 * beta / 2 - alpha / 4)) * (1 / ((1 + (x / rs) ** 3) ** (epsilon / 6))))
+                                (3 * beta / 2 - alpha / 4)) * (1 / ((1 + (x / rs) ** 3) ** (epsilon / 6))))
 
     @staticmethod
     def temperature_profile_model(x, T0, rt, a, b, c, rcool, acool, Tmin):
@@ -550,21 +553,22 @@ class HydrostaticEstimator:
                 dlogrho_dlogr_hse + dlogkT_dlogr_hse) * unyt.Solar_Mass
 
         # Parse fitted profiles to diagnostic container
-        setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
-        setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
+        if self.diagnostics_on:
+            setattr(self.diagnostics, 'radial_bin_centres_hse', self.radial_bin_centres)
+            setattr(self.diagnostics, 'temperature_profile_hse', temperatures_hse * unyt.keV)
+            setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
 
-        gas_density = 10 ** self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
-        setattr(self.diagnostics, 'density_profile_hse', gas_density)
+            gas_density = 10 ** self.density_profile_model(self.radial_bin_centres.v, *cfr.x)
+            setattr(self.diagnostics, 'density_profile_hse', gas_density)
 
-        setattr(self.diagnostics, 'cumulative_mass_hse', masses_hse)
-
-        # Compute density profile from cumulative mass
-        mass_in_shell = masses_hse[1:] - masses_hse[:-1]
-        volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
-        density_in_shell = mass_in_shell / volume_in_shell / self.rho_crit
-        mass_interpolate = interp1d(self.radial_bin_edges[1:-1], density_in_shell, fill_value='extrapolate')
-        total_density = mass_interpolate(self.radial_bin_centres)
-        setattr(self.diagnostics, 'total_density_profile_hse', total_density)
+            # Compute density profile from cumulative mass
+            mass_in_shell = masses_hse[1:] - masses_hse[:-1]
+            volume_in_shell = 4 / 3 * np.pi * self.R500c ** 3 * (
+                    self.radial_bin_centres[1:] ** 3 - self.radial_bin_centres[:-1] ** 3)
+            density_in_shell = mass_in_shell / volume_in_shell / self.rho_crit
+            mass_interpolate = interp1d(self.radial_bin_edges[1:-1], density_in_shell, fill_value='extrapolate')
+            total_density = mass_interpolate(self.radial_bin_centres)
+            setattr(self.diagnostics, 'total_density_profile_hse', total_density)
 
         return cfr, cft, masses_hse
 
@@ -615,11 +619,17 @@ class HydrostaticEstimator:
         self.b2500hse = 1 - self.M2500hse / self.M2500c
 
         # Transfer bias info to the diagnostics instance
-        setattr(self.diagnostics, 'b200hse', self.b200hse)
-        setattr(self.diagnostics, 'b500hse', self.b500hse)
-        setattr(self.diagnostics, 'b2500hse', self.b2500hse)
+        if self.diagnostics_on:
+            setattr(self.diagnostics, 'b200hse', self.b200hse)
+            setattr(self.diagnostics, 'b500hse', self.b500hse)
+            setattr(self.diagnostics, 'b2500hse', self.b2500hse)
 
     def plot_diagnostics(self):
+        if not self.diagnostics_on:
+            raise ValueError((
+                "Diagnostic plots cannot be produced as diagnostics class instance not initialised. "
+                "Select `diagnostics_on: bool = True` when initialising HydrostaticEstimator."
+            ))
         self.diagnostics.plot_all()
 
 
@@ -627,7 +637,7 @@ if __name__ == "__main__":
     zoom_choice = [z for z in zooms_register if "VR139_-8res" in z.run_name][0]
     print(zoom_choice.run_name)
 
-    hse_test = HydrostaticEstimator(zoom_choice)
+    hse_test = HydrostaticEstimator(zoom_choice, diagnostics_on=True)
 
     print(f'R500c = {hse_test.R500c:.3E}')
     print(f'R500hse = {hse_test.R500hse:.3E}')
