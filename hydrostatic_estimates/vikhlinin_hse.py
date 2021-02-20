@@ -187,21 +187,24 @@ class HydrostaticDiagnostic:
         y_input = getattr(self, field_name + '_input')
         y_hse = getattr(self, field_name + '_hse')
 
-        ax.plot(x_input, y_input, label="True data", color='blue')
+        ax.plot(x_input, y_input, label="True data", color='lime')
         ax.plot(x_hse, y_hse, label=f"Vikhlinin HSE fit from {self.profile_type} data", color='orange')
-        ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0], color='blue')
+        ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0], color='lime')
         ax_residual.plot(x_hse, 1 - y_hse / y_input, color='orange')
+
+        # If plotting cumulative mass, display HSE biases
         if field_name == 'cumulative_mass':
             ax_residual.plot([self.R2500c / self.R500c] * 2, [0, self.b2500hse], color='grey', marker='.')
             ax_residual.plot([1, 1], [0, self.b500hse], color='grey', marker='.')
-            ax_residual.text(self.R2500c / self.R500c * 1.1, self.b2500hse / 2, r"$b_{\rm 2500,hse}$", color='grey')
-            ax_residual.text(1.1, self.b500hse / 2, r"$b_{\rm 500,hse}$", color='grey')
+            ax_residual.text(self.R2500c / self.R500c * 1.05, self.b2500hse / 2, r"$b_{\rm 2500,hse}$", color='grey')
+            ax_residual.text(1.05, self.b500hse / 2, r"$b_{\rm 500,hse}$", color='grey')
+
         ax.set_xscale('log')
         ax.set_yscale('log')
         ax.set_ylabel(ylabel)
         ax_residual.set_ylabel(r"$\Delta$" + ylabel)
         ax_residual.set_xlabel(r"$R\ /\ R_{\rm 500c\ (true)}$")
-        ax.legend(loc="upper right")
+        ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         fig.tight_layout()
         plt.savefig(f"{self.output_directory}/{filename}")
