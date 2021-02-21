@@ -191,12 +191,20 @@ class HydrostaticDiagnostic:
         ax_residual.plot(x_hse, 1 - y_hse / y_input, color='orange')
         ax_residual.plot([x_hse.min(), x_hse.max()], [0, 0], color='lime')
 
+        ax.axvline(x=1, color='grey')
+        ax.axvline(x=self.R500hse / self.R500c, color='grey')
+        y_center = np.sqrt(np.prod(np.asarray(ax.get_ylims())))
+        ax.text(1.05, y_center, r"$R_{500, \rm crit}$", rotation=90, color='grey')
+        ax.text(self.R500hse / self.R500c * 1.05, y_center, r"$R_{500, \rm hse}$", rotation=90, color='grey')
+
         # If plotting cumulative mass, display HSE biases
         if field_name == 'cumulative_mass':
             ax_residual.plot([self.R2500c / self.R500c] * 2, [0, self.b2500hse], color='grey', marker='.')
             ax_residual.plot([1, 1], [0, self.b500hse], color='grey', marker='.')
-            ax_residual.text(self.R2500c / self.R500c * 1.05, self.b2500hse / 2, r"$b_{\rm 2500,hse}$", color='grey')
-            ax_residual.text(1.05, self.b500hse / 2, r"$b_{\rm 500,hse}$", color='grey')
+            ax_residual.text(self.R2500c / self.R500c * 1.05, self.b2500hse / 2,
+                             f"$b_{{\\rm 2500,hse}}$\n{self.b2500hse.v:.3f}", color='grey')
+            ax_residual.text(1.05, self.b500hse / 2,
+                             f"$b_{{\\rm 500,hse}}$\n{self.b500hse.v:.3f}", color='grey')
 
         ax.set_xscale('log')
         ax.set_yscale('log')
@@ -206,7 +214,7 @@ class HydrostaticDiagnostic:
         ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         plt.tight_layout()
-        plt.savefig(f"{self.output_directory}/{filename}", bbox_inches = "tight")
+        plt.savefig(f"{self.output_directory}/{filename}", bbox_inches="tight")
         # plt.show()
         plt.close()
 
@@ -622,6 +630,7 @@ class HydrostaticEstimator:
             setattr(self.diagnostics, 'b200hse', self.b200hse)
             setattr(self.diagnostics, 'b500hse', self.b500hse)
             setattr(self.diagnostics, 'b2500hse', self.b2500hse)
+            setattr(self.diagnostics, 'R500hse', self.R500hse)
 
     def plot_diagnostics(self):
         if not self.diagnostics_on:
