@@ -197,7 +197,8 @@ class HydrostaticDiagnostic:
             ax.axvline(x=self.R500hse / self.R500c, color='grey')
             y_center = np.sqrt(np.prod(np.asarray(ax.get_ylim())))
             ax.text(1.05, y_center, r"$R_{500, \rm crit}$", rotation=90, va='center', ha='left', color='grey')
-            ax.text(self.R500hse / self.R500c * 1.05, y_center, r"$R_{500, \rm hse}$", rotation=90, va='center', ha='right', color='grey')
+            ax.text(self.R500hse / self.R500c * 1.05, y_center, r"$R_{500, \rm hse}$", rotation=90,
+                    va='center', ha='right', color='grey')
             ax_residual.plot([self.R2500c / self.R500c] * 2, [0, self.b2500hse], color='grey', marker='.')
             ax_residual.plot([1, 1], [0, self.b500hse], color='grey', marker='.')
             ax_residual.text(self.R2500c / self.R500c * 1.05, self.b2500hse / 2,
