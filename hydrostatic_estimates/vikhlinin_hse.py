@@ -583,9 +583,11 @@ class HydrostaticEstimator:
     def interpolate_hse(self):
 
         _, _, masses_hse = self.run_hse_fit()
-        mass_interpolate = interp1d(self.radial_bin_centres * self.R500c, masses_hse, kind='linear')
+        mass_interpolate = interp1d(self.radial_bin_centres * self.R500c, masses_hse,
+                                    kind='linear', fill_value='extrapolate')
         densities_hse = (3 * masses_hse) / (4 * np.pi * (self.radial_bin_centres * self.R500c) ** 3) / self.rho_crit
-        density_interpolate = interp1d(densities_hse, self.radial_bin_centres * self.R500c, kind='linear')
+        density_interpolate = interp1d(densities_hse, self.radial_bin_centres * self.R500c,
+                                       kind='linear', fill_value='extrapolate')
 
         self.R200hse = density_interpolate(200) * unyt.Mpc
         self.R500hse = density_interpolate(500) * unyt.Mpc
