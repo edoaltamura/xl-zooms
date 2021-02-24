@@ -69,7 +69,8 @@ def set_scaling_relation_name(scaling_relation_name: str):
     return wrapper
 
 
-def process_catalogue(_process_single_halo: Callable, find_keyword: str = '',
+def process_catalogue(_process_single_halo: Callable,
+                      find_keyword: str = '',
                       save_dataframe: bool = False,
                       concurrent_threading: bool = False,
                       no_multithreading: bool = False) -> pd.DataFrame:

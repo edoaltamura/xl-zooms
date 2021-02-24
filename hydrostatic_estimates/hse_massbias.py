@@ -161,5 +161,6 @@ if __name__ == "__main__":
     results = utils.process_catalogue(_process_single_halo,
                                       find_keyword='dT8',
                                       save_dataframe=True,
-                                      asynchronous_threading=True)
+                                      concurrent_threading=True,
+                                      no_multithreading=False)
     true_mass_bias(results)
