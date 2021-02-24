@@ -6,9 +6,6 @@ from typing import Callable, List
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
 import matplotlib.pyplot as plt
-from tqdm import tqdm
-
-from concurrent.futures.process import BrokenProcessPool
 
 # Make the register backend visible to the script
 sys.path.append(
@@ -106,7 +103,8 @@ def process_catalogue(_process_single_halo: Callable,
         if no_multithreading:
             print(f"Running with no multithreading.\nAnalysing {len(_zooms_register):d} zooms serially.")
             results = []
-            for zoom in tqdm(_zooms_register, desc=f"Processing zooms"):
+            for i, zoom in enumerate(_zooms_register):
+                print(f"({i + 1} / {len(_zooms_register)}) Processing: {zoom.run_name}")
                 results.append(
                     _process_single_halo(zoom)
                 )
@@ -124,7 +122,7 @@ def process_catalogue(_process_single_halo: Callable,
                 # The results of the multiprocessing Pool are returned in the same order as inputs
                 with threading_engine as pool:
                     results = pool.map(_process_single_halo, iter(_zooms_register))
-            except BrokenProcessPool or Exception as error:
+            except Exception as error:
                 print((
                     f"The analysis stopped due to the error\n{error}\n"
                     "Please use a different multiprocessing pool or run the code serially."
