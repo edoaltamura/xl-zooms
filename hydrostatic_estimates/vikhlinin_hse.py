@@ -17,8 +17,6 @@ from register import zooms_register, Zoom, Tcut_halogas, name_list
 from convergence_radius import convergence_radius
 import observational_data as obs
 
-# import scaling_utils as utils
-# import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -28,6 +26,7 @@ except:
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 mean_molecular_weight = 0.5954
+true_data_nbins = 101
 
 
 def histogram_unyt(
@@ -92,7 +91,7 @@ class HydrostaticDiagnostic:
         # Set bounds for the radial profiles
         radius_bounds = [0.15, 1.5]
         lbins = np.logspace(
-            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), true_data_nbins
         ) * unyt.dimensionless
 
         shell_volume = (4 / 3 * np.pi) * self.R500c ** 3 * (lbins[1:] ** 3 - lbins[:-1] ** 3)
@@ -167,7 +166,7 @@ class HydrostaticDiagnostic:
             self.plot_profile(
                 field_name=field,
                 ylabel=label,
-                filename=f"diagnostic_{field}.png"
+                filename=f"diagnostic_{field}_{self.zoom.run_name}.png"
             )
 
     def plot_profile(self, field_name: str = 'radial_bin_centres',
@@ -215,8 +214,8 @@ class HydrostaticDiagnostic:
         ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         plt.tight_layout()
-        plt.savefig(f"{self.output_directory}/{filename}", bbox_inches="tight")
-        # plt.show()
+        plt.savefig(f"{self.output_directory}/hse_diagnostic/{filename}", bbox_inches="tight")
+        plt.show()
         plt.close()
 
 
@@ -333,7 +332,7 @@ class HydrostaticEstimator:
             radius_bounds[0] = gas_convergence_radius.value
 
         lbins = np.logspace(
-            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 501
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), true_data_nbins
         ) * radial_distance_scaled.units
 
         mass_weights, bin_edges = histogram_unyt(radial_distance_scaled, bins=lbins, weights=gas_masses)
@@ -420,7 +419,7 @@ class HydrostaticEstimator:
         spec_temperature_interpolate = interp1d(spec_fit_data['Rspec'], spec_fit_data['Tspec'], kind='linear')
 
         lbins = np.logspace(
-            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), 1001
+            np.log10(radius_bounds[0]), np.log10(radius_bounds[1]), true_data_nbins
         ) * radial_distance_scaled.units
 
         self.radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * unyt.dimensionless
@@ -516,14 +515,14 @@ class HydrostaticEstimator:
         bnds = ([0.0, 0.0, -3.0, 1.0, 0.0, 0.0, 1.0e-10, 0.0],
                 [np.inf, np.inf, 3.0, 5.0, 10.0, np.inf, 3.0, np.inf])
 
-        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=10000)
+        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=20000)
         mod1 = self.temperature_profile_model(
             x, cf1.x[0], cf1.x[1], cf1.x[2], cf1.x[3], cf1.x[4], cf1.x[5], cf1.x[6], cf1.x[7]
         )
         xis1 = np.sum((mod1 - y) ** 2.0 / y) / len(y)
 
         cf2 = minimize(self.residuals_temperature, p0, args=(y, x), method='Nelder-Mead',
-                       options={'maxiter': 10000, 'ftol': 1e-5})
+                       options={'maxiter': 30000, 'ftol': 1e-6})
         mod2 = self.temperature_profile_model(
             x, cf2.x[0], cf2.x[1], cf2.x[2], cf2.x[3], cf2.x[4], cf2.x[5], cf2.x[6], cf2.x[7]
         )
