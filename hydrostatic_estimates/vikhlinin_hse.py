@@ -251,7 +251,8 @@ class HydrostaticEstimator:
     @classmethod
     def from_data_paths(cls, catalog_file: str, snapshot_file: str,
                         excise_core: bool = True, profile_type: str = 'true',
-                        using_mcmc: bool = False, spec_fit_data: dict = None):
+                        using_mcmc: bool = False, spec_fit_data: dict = None,
+                        diagnostics_on: bool = False):
         """
         If you wish not to parse a Zoom object, but the absolute
         paths for the snapshot and VR catalogue, you may use this
@@ -271,7 +272,7 @@ class HydrostaticEstimator:
         )
 
         return cls(zoom_found, excise_core=excise_core, profile_type=profile_type,
-                   using_mcmc=using_mcmc, spec_fit_data=spec_fit_data)
+                   using_mcmc=using_mcmc, spec_fit_data=spec_fit_data, diagnostics_on=diagnostics_on)
 
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
