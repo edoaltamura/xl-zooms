@@ -6,6 +6,9 @@ from typing import Callable, List
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
 import matplotlib.pyplot as plt
+from tqdm import tqdm
+
+from concurrent.futures.process import BrokenProcessPool
 
 # Make the register backend visible to the script
 sys.path.append(
@@ -68,7 +71,8 @@ def set_scaling_relation_name(scaling_relation_name: str):
 
 def process_catalogue(_process_single_halo: Callable, find_keyword: str = '',
                       save_dataframe: bool = False,
-                      asynchronous_threading: bool = False) -> pd.DataFrame:
+                      concurrent_threading: bool = False,
+                      no_multithreading: bool = False) -> pd.DataFrame:
     """
     This function performs the collective multi-threaded I/O for processing
     the halos in the catalogue. It can accept different types of function
@@ -97,17 +101,34 @@ def process_catalogue(_process_single_halo: Callable, find_keyword: str = '',
         print("Analysing one object only. Not using multiprocessing features.")
         results = [_process_single_halo(_zooms_register[0])]
     else:
-        num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
-        print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
 
-        if asynchronous_threading:
-            threading_engine = ProcessPoolExecutor(max_workers=num_threads)
+        if no_multithreading:
+            print(f"Running with no multithreading.\nAnalysing {len(_zooms_register):d} zooms serially.")
+            results = []
+            for zoom in tqdm(_zooms_register, desc=f"Processing zooms"):
+                results.append(
+                    _process_single_halo(zoom)
+                )
         else:
-            threading_engine = Pool(num_threads)
 
-        # The results of the multiprocessing Pool are returned in the same order as inputs
-        with threading_engine as pool:
-            results = pool.map(_process_single_halo, iter(_zooms_register))
+            print("Running with multithreading.")
+            num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
+            print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
+
+            threading_engine = Pool(num_threads)
+            if concurrent_threading:
+                threading_engine = ProcessPoolExecutor(max_workers=num_threads)
+
+            try:
+                # The results of the multiprocessing Pool are returned in the same order as inputs
+                with threading_engine as pool:
+                    results = pool.map(_process_single_halo, iter(_zooms_register))
+            except BrokenProcessPool or Exception as error:
+                print((
+                    f"The analysis stopped due to the error\n{error}\n"
+                    "Please use a different multiprocessing pool or run the code serially."
+                ))
+                raise error
 
     # Recast output into a Pandas dataframe for further manipulation
     columns = _process_single_halo.dataset_names
