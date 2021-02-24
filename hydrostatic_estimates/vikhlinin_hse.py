@@ -215,7 +215,7 @@ class HydrostaticDiagnostic:
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         plt.tight_layout()
         plt.savefig(f"{self.output_directory}/hse_diagnostic/{filename}", bbox_inches="tight")
-        plt.show()
+        # plt.show()
         plt.close()
 
 
