@@ -158,5 +158,8 @@ def true_mass_bias(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword='dT8', save_dataframe=True)
+    results = utils.process_catalogue(_process_single_halo,
+                                      find_keyword='dT8',
+                                      save_dataframe=True,
+                                      asynchronous_threading=True)
     true_mass_bias(results)

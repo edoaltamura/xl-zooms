@@ -4,6 +4,7 @@ import os
 import pandas as pd
 from typing import Callable, List
 from multiprocessing import Pool, cpu_count
+from concurrent.futures import ProcessPoolExecutor
 import matplotlib.pyplot as plt
 
 # Make the register backend visible to the script
@@ -66,7 +67,8 @@ def set_scaling_relation_name(scaling_relation_name: str):
 
 
 def process_catalogue(_process_single_halo: Callable, find_keyword: str = '',
-                      save_dataframe: bool = False) -> pd.DataFrame:
+                      save_dataframe: bool = False,
+                      asynchronous_threading: bool = False) -> pd.DataFrame:
     """
     This function performs the collective multi-threaded I/O for processing
     the halos in the catalogue. It can accept different types of function
@@ -98,8 +100,13 @@ def process_catalogue(_process_single_halo: Callable, find_keyword: str = '',
         num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
         print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
 
+        if asynchronous_threading:
+            threading_engine = ProcessPoolExecutor(max_workers=num_threads)
+        else:
+            threading_engine = Pool(num_threads)
+
         # The results of the multiprocessing Pool are returned in the same order as inputs
-        with Pool(num_threads) as pool:
+        with threading_engine as pool:
             results = pool.map(_process_single_halo, iter(_zooms_register))
 
     # Recast output into a Pandas dataframe for further manipulation
