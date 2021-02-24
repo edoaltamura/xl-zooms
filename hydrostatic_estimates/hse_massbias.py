@@ -162,5 +162,5 @@ if __name__ == "__main__":
                                       find_keyword='dT8',
                                       save_dataframe=True,
                                       concurrent_threading=True,
-                                      no_multithreading=False)
+                                      no_multithreading=True)
     true_mass_bias(results)
