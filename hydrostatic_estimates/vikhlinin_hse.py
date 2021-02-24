@@ -26,7 +26,7 @@ except:
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 mean_molecular_weight = 0.5954
-true_data_nbins = 101
+true_data_nbins = 51
 
 
 def histogram_unyt(
@@ -214,8 +214,8 @@ class HydrostaticDiagnostic:
         ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         plt.tight_layout()
-        plt.savefig(f"{self.output_directory}/hse_diagnostic/{filename}", bbox_inches="tight")
-        # plt.show()
+        # plt.savefig(f"{self.output_directory}/hse_diagnostic/{filename}", bbox_inches="tight")
+        plt.show()
         plt.close()
 
 
@@ -645,7 +645,7 @@ class HydrostaticEstimator:
 
 
 if __name__ == "__main__":
-    zoom_choice = [z for z in zooms_register if "VR139_-8res" in z.run_name][0]
+    zoom_choice = [z for z in zooms_register if "VR2915_-8res_MinimumDistance_fixedAGNdT8_" in z.run_name][0]
     print(zoom_choice.run_name)
 
     hse_test = HydrostaticEstimator(zoom_choice, diagnostics_on=True)
