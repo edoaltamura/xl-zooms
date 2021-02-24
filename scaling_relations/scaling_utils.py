@@ -104,7 +104,7 @@ def process_catalogue(_process_single_halo: Callable,
             print(f"Running with no multithreading.\nAnalysing {len(_zooms_register):d} zooms serially.")
             results = []
             for i, zoom in enumerate(_zooms_register):
-                print(f"({i + 1} / {len(_zooms_register)}) Processing: {zoom.run_name}")
+                print(f"({i + 1}/{len(_zooms_register)}) Processing: {zoom.run_name}")
                 results.append(
                     _process_single_halo(zoom)
                 )

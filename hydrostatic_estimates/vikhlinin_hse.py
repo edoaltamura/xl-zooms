@@ -194,7 +194,7 @@ class HydrostaticDiagnostic:
         if field_name == 'cumulative_mass':
             ax.axvline(x=1, color='lime', linestyle='--')
             ax.axvline(x=self.R500hse / self.R500c, color='orange', linestyle='--')
-            y_center = np.sqrt(np.prod(np.asarray(ax.get_ylim())))
+            y_center = 10.0 ** (0.5 * np.log10(y_input.max() * y_input.max()))
             ax.text(1.05, y_center, r"$R_{500, \rm crit}$", rotation=90, va='center', ha='left', color='grey')
             ax.text(self.R500hse / self.R500c * 0.95, y_center, r"$R_{500, \rm hse}$", rotation=90,
                     va='center', ha='right', color='grey')
