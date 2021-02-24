@@ -502,7 +502,7 @@ class HydrostaticEstimator:
                 (0.2 * self.R500c.v, np.inf),
                 (0.0, 5.0)
             ],
-            options={'maxiter': 5e5, 'ftol': 1e-13}
+            options={'maxiter': 50000, 'ftol': 1e-13}
         )
         return coeff_rho
 
@@ -515,14 +515,14 @@ class HydrostaticEstimator:
         bnds = ([0.0, 0.0, -3.0, 1.0, 0.0, 0.0, 1.0e-10, 0.0],
                 [np.inf, np.inf, 3.0, 5.0, 10.0, np.inf, 3.0, np.inf])
 
-        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=5e5)
+        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=50000)
         mod1 = self.temperature_profile_model(
             x, cf1.x[0], cf1.x[1], cf1.x[2], cf1.x[3], cf1.x[4], cf1.x[5], cf1.x[6], cf1.x[7]
         )
         xis1 = np.sum((mod1 - y) ** 2.0 / y) / len(y)
 
         cf2 = minimize(self.residuals_temperature, p0, args=(y, x), method='Nelder-Mead',
-                       options={'maxiter': 5e5, 'ftol': 1e-8})
+                       options={'maxiter': 50000, 'ftol': 1e-8})
         mod2 = self.temperature_profile_model(
             x, cf2.x[0], cf2.x[1], cf2.x[2], cf2.x[3], cf2.x[4], cf2.x[5], cf2.x[6], cf2.x[7]
         )
