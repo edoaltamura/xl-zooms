@@ -128,11 +128,7 @@ def true_mass_bias(results: pd.DataFrame):
             results.loc[i, "M500c"],
             results.loc[i, "M500hse"] / results.loc[i, "M500c"],
             marker=run_style['Marker style'],
-            c=run_style['Color'],
             s=run_style['Marker size'],
-            alpha=1,
-            zorder=5,
-
             edgecolors=run_style['Color'] if results.loc[i, "Ekin/Eth"].value > 0.1 else 'none',
             facecolors='w' if results.loc[i, "Ekin/Eth"].value > 0.1 else run_style['Color'],
             linewidth=0.4 if results.loc[i, "Ekin/Eth"].value > 0.1 else 0,
@@ -172,9 +168,13 @@ def true_mass_bias(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo,
-                                      find_keyword='dT8',
-                                      save_dataframe=True,
-                                      concurrent_threading=False,
-                                      no_multithreading=False)
+
+    if os.path.isfile(f'{zooms_register[0].output_directory}/hse_massbias.pkl'):
+        results = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
+    else:
+        results = utils.process_catalogue(_process_single_halo,
+                                          find_keyword='dT8',
+                                          save_dataframe=True,
+                                          concurrent_threading=False,
+                                          no_multithreading=False)
     true_mass_bias(results)
