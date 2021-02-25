@@ -152,14 +152,14 @@ class HydrostaticDiagnostic:
         fields = [
             'density_profile',
             'temperature_profile',
-            # 'cumulative_mass',
-            # 'total_density_profile',
+            'cumulative_mass',
+            'total_density_profile',
         ]
         labels = [
             r'$\rho_{\rm gas} / \rho_{\rm crit}$',
             r'$k_{\rm B}T$ [keV]',
-            # r'$M(<R)$ [M$_\odot$]',
-            # r'$\rho / \rho_{\rm crit}$',
+            r'$M(<R)$ [M$_\odot$]',
+            r'$\rho / \rho_{\rm crit}$',
         ]
         for i, (field, label) in enumerate(zip(fields, labels)):
             print(f"({i + 1}/{len(fields)}) Generating diagnostic plot: {field}.")
@@ -202,9 +202,9 @@ class HydrostaticDiagnostic:
             ax_residual.plot([self.R2500c / self.R500c] * 2, [0, self.b2500hse], color='grey', marker='.')
             ax_residual.plot([1, 1], [0, self.b500hse], color='grey', marker='.')
             ax_residual.text(self.R2500c / self.R500c * 1.05, self.b2500hse / 2,
-                             f"$b_{{\\rm 2500,hse}}$\n{self.b2500hse.v:.3f}", color='grey')
+                             f"$b_{{\\rm 2500,hse}}$\n{self.b2500hse.v:.3f}", color='grey', va='center')
             ax_residual.text(1.05, self.b500hse / 2,
-                             f"$b_{{\\rm 500,hse}}$\n{self.b500hse.v:.3f}", color='grey')
+                             f"$b_{{\\rm 500,hse}}$\n{self.b500hse.v:.3f}", color='grey', va='center')
 
         ax.set_xscale('log')
         ax.set_yscale('log')
@@ -214,8 +214,8 @@ class HydrostaticDiagnostic:
         ax.legend()
         ax.set_title(f"{self.zoom.run_name}", fontsize=5)
         plt.tight_layout()
-        # plt.savefig(f"{self.output_directory}/hse_diagnostic/{filename}", bbox_inches="tight")
-        plt.show()
+        plt.savefig(f"{self.output_directory}/hse_diagnostic/{filename}", bbox_inches="tight")
+        # plt.show()
         plt.close()
 
 

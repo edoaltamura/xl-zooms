@@ -138,9 +138,15 @@ def process_catalogue(_process_single_halo: Callable,
     if save_dataframe:
         file_name = os.path.join(
             f'{zooms_register[0].output_directory}',
-            f'{_process_single_halo.scaling_relation_name}.pkl'
+            f'{_process_single_halo.scaling_relation_name}'
         )
-        results.to_pickle(file_name)
-        print(f"Catalogue file saved to {file_name}")
+
+        # Save data in pickle format (saves python object)
+        results.to_pickle(f'{file_name}.pkl')
+
+        # Save data in text format (useful for consulting)
+        results.to_csv(f'{file_name}.txt', header=True, index=False, sep='\t', mode='w')
+
+        print(f"Catalogue file saved to {file_name}(.pkl/.txt)")
 
     return results
