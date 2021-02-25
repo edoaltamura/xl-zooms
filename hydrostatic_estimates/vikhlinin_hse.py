@@ -150,16 +150,16 @@ class HydrostaticDiagnostic:
 
     def plot_all(self):
         fields = [
-            'temperature_profile',
-            'cumulative_mass',
             'density_profile',
-            'total_density_profile',
+            # 'temperature_profile',
+            # 'cumulative_mass',
+            # 'total_density_profile',
         ]
         labels = [
-            r'$k_{\rm B}T$ [keV]',
-            r'$M(<R)$ [M$_\odot$]',
             r'$\rho_{\rm gas} / \rho_{\rm crit}$',
-            r'$\rho / \rho_{\rm crit}$',
+            # r'$k_{\rm B}T$ [keV]',
+            # r'$M(<R)$ [M$_\odot$]',
+            # r'$\rho / \rho_{\rm crit}$',
         ]
         for i, (field, label) in enumerate(zip(fields, labels)):
             print(f"({i + 1}/{len(fields)}) Generating diagnostic plot: {field}.")
@@ -492,11 +492,11 @@ class HydrostaticEstimator:
 
     def density_fit(self, x, y):
 
-        p0 = [100.0, 0.1, 1.0, 1.0, 0.8 * self.R500c.v, 1.0]
+        p0 = [300, 0.1, 1.0, 1.0, 0.8 * self.R500c.v, 1.0]
         coeff_rho = minimize(
             self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
-                (1.0e2, 1.0e4),
+                (50, 1e5),
                 (0.0, 10.0),
                 (0.0, 10.0),
                 (0.0, np.inf),
