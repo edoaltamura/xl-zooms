@@ -496,10 +496,10 @@ class HydrostaticEstimator:
         beta0 = 1
         epsilon0 = 1
         # For low mass halos, tweak the initial guess for alpha
-        if self.M500c.v < 2e13:
-            alpha0 = 0.2
-            beta0 = 0.2
-            epsilon0 = 0.2
+        # if self.M500c.v < 2e13:
+        #     alpha0 = 0.2
+        #     beta0 = 0.2
+        #     epsilon0 = 0.2
 
         p0 = [100.0, 0.1, alpha0, beta0, 0.8, epsilon0]
         coeff_rho = minimize(
