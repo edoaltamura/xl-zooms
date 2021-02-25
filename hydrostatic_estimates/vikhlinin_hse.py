@@ -501,7 +501,7 @@ class HydrostaticEstimator:
             beta0 = 0.2
             epsilon0 = 0.2
 
-        p0 = [100.0, 0.1, alpha0, beta0, 0.8 * self.R500c.v, epsilon0]
+        p0 = [100.0, 0.1, alpha0, beta0, 0.8, epsilon0]
         coeff_rho = minimize(
             self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
@@ -509,10 +509,10 @@ class HydrostaticEstimator:
                 (0.0, 10.0),
                 (0.0, 10.0),
                 (0.0, np.inf),
-                (0.2 * self.R500c.v, np.inf),
+                (0.2, np.inf),
                 (0.0, 5.0)
             ],
-            options={'maxiter': 50000, 'ftol': 1e-13}
+            options={'maxiter': 1e5, 'ftol': 1e-13}
         )
         return coeff_rho
 
