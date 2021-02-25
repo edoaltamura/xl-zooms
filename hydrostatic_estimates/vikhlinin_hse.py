@@ -151,13 +151,13 @@ class HydrostaticDiagnostic:
     def plot_all(self):
         fields = [
             'density_profile',
-            # 'temperature_profile',
+            'temperature_profile',
             # 'cumulative_mass',
             # 'total_density_profile',
         ]
         labels = [
             r'$\rho_{\rm gas} / \rho_{\rm crit}$',
-            # r'$k_{\rm B}T$ [keV]',
+            r'$k_{\rm B}T$ [keV]',
             # r'$M(<R)$ [M$_\odot$]',
             # r'$\rho / \rho_{\rm crit}$',
         ]
@@ -492,16 +492,11 @@ class HydrostaticEstimator:
 
     def density_fit(self, x, y):
 
-        alpha0 = 1
-        beta0 = 1
-        epsilon0 = 1
-        # For low mass halos, tweak the initial guess for alpha
-        # if self.M500c.v < 2e13:
-        #     alpha0 = 0.2
-        #     beta0 = 0.2
-        #     epsilon0 = 0.2
+        p0 = [100.0, 0.1, 1, 1, 0.8, 1]
+        # For low mass halos, tweak the initial guess
+        if self.M500c.v < 2e13:
+            p0 = [100.0, 0.1, 0.2, 0.2, 0.8, 0.2]
 
-        p0 = [100.0, 0.1, alpha0, beta0, 0.8, epsilon0]
         coeff_rho = minimize(
             self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
@@ -521,18 +516,18 @@ class HydrostaticEstimator:
         kT500 = (unyt.G * self.M500c * mean_molecular_weight * unyt.mass_proton) / (2 * self.R500c)
         kT500 = kT500.to('keV').v
 
-        p0 = [kT500, self.R500c.v, 0.1, 3.0, 1.0, 0.1, 1.0, kT500]
-        bnds = ([0.0, 0.0, -3.0, 1.0, 0.0, 0.0, 1.0e-10, 0.0],
-                [np.inf, np.inf, 3.0, 5.0, 10.0, np.inf, 3.0, np.inf])
+        p0 = [kT500, 1, 0.1, 3, 1, 0.1, 1, kT500]
+        bnds = ([0, 0, -3, 1, 0, 0, 1e-10, 0],
+                [np.inf, np.inf, 3, 5, 10, np.inf, 3, np.inf])
 
-        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=50000)
+        cf1 = least_squares(self.residuals_temperature, p0, bounds=bnds, args=(y, x), max_nfev=1e5)
         mod1 = self.temperature_profile_model(
             x, cf1.x[0], cf1.x[1], cf1.x[2], cf1.x[3], cf1.x[4], cf1.x[5], cf1.x[6], cf1.x[7]
         )
         xis1 = np.sum((mod1 - y) ** 2.0 / y) / len(y)
 
         cf2 = minimize(self.residuals_temperature, p0, args=(y, x), method='Nelder-Mead',
-                       options={'maxiter': 50000, 'ftol': 1e-8})
+                       options={'maxiter': 1e5, 'ftol': 1e-8})
         mod2 = self.temperature_profile_model(
             x, cf2.x[0], cf2.x[1], cf2.x[2], cf2.x[3], cf2.x[4], cf2.x[5], cf2.x[6], cf2.x[7]
         )
