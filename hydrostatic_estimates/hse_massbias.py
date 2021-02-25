@@ -42,7 +42,7 @@ def process_single_halo(
         catalog_file=path_to_catalogue,
         snapshot_file=path_to_snap,
         profile_type='true',
-        diagnostics_on=True
+        diagnostics_on=False
     )
 
     _, kinetic_energy, thermal_energy = relaxation_index(
@@ -175,6 +175,6 @@ if __name__ == "__main__":
     results = utils.process_catalogue(_process_single_halo,
                                       find_keyword='dT8',
                                       save_dataframe=True,
-                                      concurrent_threading=True,
-                                      no_multithreading=True)
+                                      concurrent_threading=False,
+                                      no_multithreading=False)
     true_mass_bias(results)
