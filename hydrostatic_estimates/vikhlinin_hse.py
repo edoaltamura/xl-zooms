@@ -492,11 +492,11 @@ class HydrostaticEstimator:
 
     def density_fit(self, x, y):
 
-        p0 = [300, 0.1, 1.0, 1.0, 0.8 * self.R500c.v, 1.0]
+        p0 = [100.0, 0.1, 0.5, 1.0, 0.8 * self.R500c.v, 1.0]
         coeff_rho = minimize(
             self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
-                (50, 1e5),
+                (1e2, 1e4),
                 (0.0, 10.0),
                 (0.0, 10.0),
                 (0.0, np.inf),
