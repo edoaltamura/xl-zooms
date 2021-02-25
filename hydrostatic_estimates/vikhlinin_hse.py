@@ -645,7 +645,7 @@ class HydrostaticEstimator:
 
 
 if __name__ == "__main__":
-    zoom_choice = [z for z in zooms_register if "VR2915_-8res_MinimumDistance_fixedAGNdT8_" in z.run_name][0]
+    zoom_choice = [z for z in zooms_register if "VR2915_-8res_MinimumDistance_fixedAGNdT8.5_" in z.run_name][0]
     print(zoom_choice.run_name)
 
     hse_test = HydrostaticEstimator(zoom_choice, diagnostics_on=True)
