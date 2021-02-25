@@ -23,6 +23,9 @@ try:
 except:
     pass
 
+np.seterr(divide='ignore')
+np.seterr(invalid='ignore')
+
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 mean_molecular_weight = 0.5954
