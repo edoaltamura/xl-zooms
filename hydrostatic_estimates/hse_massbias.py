@@ -46,8 +46,8 @@ def process_single_halo(
     )
 
     _, kinetic_energy, thermal_energy = relaxation_index(
-        catalog_file=path_to_catalogue,
-        snapshot_file=path_to_snap
+        path_to_snap,
+        path_to_catalogue
     )
     relaxed = kinetic_energy / thermal_energy
 
