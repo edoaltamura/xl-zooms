@@ -51,7 +51,7 @@ def process_single_halo(
     )
     relaxed = kinetic_energy / thermal_energy
 
-    true_hse.plot_diagnostics()
+    # true_hse.plot_diagnostics()
 
     output = (
         true_hse.R500c,
