@@ -493,15 +493,17 @@ class HydrostaticEstimator:
     def density_fit(self, x, y):
 
         alpha0 = 1
+        beta0 = 1
         # For low mass halos, tweak the initial guess for alpha
         if self.M500c.v < 2e13:
             alpha0 = 0.2
+            beta0 = 0.2
 
-        p0 = [100.0, 0.1, alpha0, 1.0, 0.8 * self.R500c.v, 1.0]
+        p0 = [100.0, 0.1, alpha0, beta0, 0.8 * self.R500c.v, 1.0]
         coeff_rho = minimize(
             self.residuals_density, p0, args=(y, x), method='L-BFGS-B',
             bounds=[
-                (1e1, 1e4),
+                (1e2, 1e4),
                 (0.0, 10.0),
                 (0.0, 10.0),
                 (0.0, np.inf),
