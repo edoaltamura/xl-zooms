@@ -20,6 +20,8 @@ import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
 
+from relaxation import process_single_halo as relaxation_index
+
 try:
     plt.style.use("../mnras.mplstyle")
 except:
@@ -35,12 +37,19 @@ def process_single_halo(
         path_to_snap: str,
         path_to_catalogue: str
 ) -> Tuple[unyt.unyt_quantity]:
+
     true_hse = HydrostaticEstimator.from_data_paths(
         catalog_file=path_to_catalogue,
         snapshot_file=path_to_snap,
         profile_type='true',
         diagnostics_on=True
     )
+
+    _, kinetic_energy, thermal_energy = relaxation_index(
+        catalog_file=path_to_catalogue,
+        snapshot_file=path_to_snap
+    )
+    relaxed = kinetic_energy / thermal_energy
 
     true_hse.plot_diagnostics()
 
@@ -67,7 +76,8 @@ def process_single_halo(
         true_hse.K2500hse,
         true_hse.b200hse,
         true_hse.b500hse,
-        true_hse.b2500hse
+        true_hse.b2500hse,
+        relaxed
     )
 
     return output
@@ -97,7 +107,8 @@ def process_single_halo(
     'K2500hse',
     'b200hse',
     'b500hse',
-    'b2500hse'
+    'b2500hse',
+    'Ekin/Eth'
 ])
 def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
@@ -120,8 +131,11 @@ def true_mass_bias(results: pd.DataFrame):
             c=run_style['Color'],
             s=run_style['Marker size'],
             alpha=1,
-            edgecolors='none',
-            zorder=5
+            zorder=5,
+
+            edgecolors=run_style['Color'] if results.loc[i, "Ekin/Eth"].value > 0.1 else 'none',
+            facecolors='w' if results.loc[i, "Ekin/Eth"].value > 0.1 else run_style['Color'],
+            linewidth=0.4 if results.loc[i, "Ekin/Eth"].value > 0.1 else 0,
         )
 
     # Build legends
