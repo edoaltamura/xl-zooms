@@ -34,7 +34,7 @@ plot_observation_errorbars = False
 def process_single_halo(
         path_to_snap: str,
         path_to_catalogue: str,
-        custom_aperture: unyt.unyt_quantity = None,
+        hse_dataset: pd.Series = None,
 ) -> Tuple[unyt.unyt_quantity]:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
@@ -43,7 +43,7 @@ def process_single_halo(
         # If the hot gas mass already computed by VR, use that instead of calculating it
         Mhot500c_key = "SO_Mass_gas_highT_1.000000_times_500.000000_rhocrit"
 
-        if Mhot500c_key in h5file.keys() and custom_aperture is None:
+        if Mhot500c_key in h5file.keys() and hse_dataset is None:
             Mhot500c = unyt.unyt_quantity(h5file[f'/{Mhot500c_key}'][0] * 1.e10, unyt.Solar_Mass)
 
         else:
@@ -53,25 +53,26 @@ def process_single_halo(
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
 
             # If no custom aperture, select R500c as default
-            aperture = R500c
-            if custom_aperture:
-                assert R500c.units == custom_aperture.units
-                aperture = custom_aperture
+            if hse_dataset:
+                assert R500c.units == hse_dataset["R500hse"].units
+                assert M500c.units == hse_dataset["M500hse"].units
+                R500c = hse_dataset["R500hse"]
+                M500c = hse_dataset["M500hse"]
 
             import swiftsimio as sw
 
             # Read in gas particles
-            mask = sw.mask(f'{path_to_snap}', spatial_only=False)
-            region = [[XPotMin - aperture, XPotMin + aperture],
-                      [YPotMin - aperture, YPotMin + aperture],
-                      [ZPotMin - aperture, ZPotMin + aperture]]
+            mask = sw.mask(path_to_snap, spatial_only=False)
+            region = [[XPotMin - R500c, XPotMin + R500c],
+                      [YPotMin - R500c, YPotMin + R500c],
+                      [ZPotMin - R500c, ZPotMin + R500c]]
             mask.constrain_spatial(region)
             mask.constrain_mask(
                 "gas", "temperatures",
                 Tcut_halogas * mask.units.temperature,
                 1.e12 * mask.units.temperature
             )
-            data = sw.load(f'{path_to_snap}', mask=mask)
+            data = sw.load(path_to_snap, mask=mask)
             posGas = data.gas.coordinates
             massGas = data.gas.masses
 
@@ -80,7 +81,7 @@ def process_single_halo(
             deltaY = posGas[:, 1] - YPotMin
             deltaZ = posGas[:, 2] - ZPotMin
             deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
-            index = np.where(deltaR < aperture)[0]
+            index = np.where(deltaR < R500c)[0]
             Mhot500c = np.sum(massGas[index])
             Mhot500c = Mhot500c.to(unyt.Solar_Mass)
 
@@ -98,29 +99,20 @@ def _process_single_halo(zoom: Zoom):
     try:
         hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
         hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
-        print(f"Looking for HSE results in the catalogue.")
+        print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
         if zoom.run_name in hse_catalogue_names:
             i = hse_catalogue_names.index(zoom.run_name)
-            R500hse = hse_catalogue.loc[i, "R500hse"]
-            print(f"Found R500hse = {R500hse:.3f} for zoom {zoom.run_name}.")
+            hse_entry = hse_catalogue.loc[i]
 
     except FileExistsError as error:
-        print(error)
-        print(f"Computing HSE fit for the zoom {zoom.run_name}...")
-        hse_estimate = HydrostaticEstimator.from_data_paths(
-            catalog_file=zoom.catalog_file,
-            snapshot_file=zoom.snapshot_file,
-            profile_type='true',
-            diagnostics_on=False
+        raise FileExistsError(
+            f"{error}\n\nPlease, consider first generating the HSE catalogue for better performance."
         )
-        R500hse = hse_estimate.R500hse
-        print(f"Calculated R500hse = {R500hse:.3f} for zoom {zoom.run_name}.")
+
+    return process_single_halo(zoom.snapshot_file, zoom.catalog_file, hse_dataset=hse_entry)
 
 
-    return process_single_halo(zoom.snapshot_file, zoom.catalog_file, custom_aperture=R500hse)
-
-
-def m_500_hotgas(results: pd.DataFrame):
+def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     fig, ax = plt.subplots()
     legend_handles = []
     for i in range(len(results)):
@@ -218,18 +210,18 @@ def m_500_hotgas(results: pd.DataFrame):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$M_{{\rm gas},500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas {data_label}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/m_500_hotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/m500{data_label}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
 
-def f_500_hotgas(results: pd.DataFrame):
+def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     fig, ax = plt.subplots()
     legend_handles = []
     for i in range(len(results)):
@@ -327,14 +319,14 @@ def f_500_hotgas(results: pd.DataFrame):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
-    ax.set_ylabel(r'$f_{{\rm gas},500{\rm crit}}$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$f_{{500{{\\rm gas, {data_label}}} / M_{{500{{\\rm {data_label}}}$')
     ax.set_xscale('log')
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
     ax.plot(ax.get_xlim(), [fbary for _ in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/f_500_hotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/f500{data_label}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
