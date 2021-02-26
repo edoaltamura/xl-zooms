@@ -212,8 +212,8 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas {data_label}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
@@ -321,8 +321,8 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$f_{{500{{\\rm gas, {data_label}}} / M_{{500{{\\rm {data_label}}}$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$f_{{500{{\\rm gas, {data_label}}}}} / M_{{500{{\\rm {data_label}}}$')
     ax.set_xscale('log')
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
