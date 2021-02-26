@@ -53,7 +53,7 @@ def process_single_halo(
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
 
             # If no custom aperture, select R500c as default
-            if hse_dataset:
+            if hse_dataset is not None:
                 assert R500c.units == hse_dataset["R500hse"].units
                 assert M500c.units == hse_dataset["M500hse"].units
                 R500c = hse_dataset["R500hse"]
