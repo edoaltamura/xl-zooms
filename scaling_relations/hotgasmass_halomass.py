@@ -97,7 +97,7 @@ def _process_single_halo(zoom: Zoom):
 
     try:
         hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
-        hse_catalogue_names = hse_catalogue['Run name'].values.to_list()
+        hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
         print(f"Looking for HSE results in the catalogue.")
         if zoom.run_name in hse_catalogue_names:
             i = hse_catalogue_names.index(zoom.run_name)
