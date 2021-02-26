@@ -37,7 +37,6 @@ def process_single_halo(
         path_to_snap: str,
         path_to_catalogue: str
 ) -> Tuple[unyt.unyt_quantity]:
-
     true_hse = HydrostaticEstimator.from_data_paths(
         catalog_file=path_to_catalogue,
         snapshot_file=path_to_snap,
@@ -169,8 +168,12 @@ def true_mass_bias(results: pd.DataFrame):
 
 if __name__ == "__main__":
 
-    if os.path.isfile(f'{zooms_register[0].output_directory}/hse_massbias.pkl'):
+    if utils.check_catalogue_completeness(
+            f'{zooms_register[0].output_directory}/hse_massbias.pkl',
+            find_keyword='dT8'
+    ):
         results = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
+
     else:
         results = utils.process_catalogue(_process_single_halo,
                                           find_keyword='dT8',

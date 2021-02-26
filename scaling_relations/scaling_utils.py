@@ -43,6 +43,7 @@ def set_output_names(dataset_names: List[str]):
     See e.g. `columns = _process_single_halo.dataset_names` assignment
     in `process_catalogue`.
     """
+
     def wrapper(func):
         setattr(func, 'dataset_names', dataset_names)
         return func
@@ -59,11 +60,48 @@ def set_scaling_relation_name(scaling_relation_name: str):
     file used for generating the scaling relation data.
     See `if save_dataframe:` block in `process_catalogue`.
     """
+
     def wrapper(func):
         setattr(func, 'scaling_relation_name', scaling_relation_name)
         return func
 
     return wrapper
+
+
+def check_catalogue_completeness(
+        results_catalogue_path: str,
+        find_keyword: str = ''
+) -> bool:
+    """
+
+    """
+    if not find_keyword:
+        # If find_keyword is empty, collect all zooms
+        _zooms_register = zooms_register
+    else:
+        _zooms_register = [zoom for zoom in zooms_register if find_keyword in zoom.run_name]
+
+    _name_list = [zoom.run_name for zoom in _zooms_register]
+
+    # Import catalogue from pickle file
+    results_catalogue = pd.read_pickle(results_catalogue_path)
+    catalogue_name_list = results_catalogue['Run name'].to_list()
+
+    # Check if all results in query are already in the computed catalogue
+    completeness = all(element in catalogue_name_list for element in _name_list)
+
+    if completeness:
+        print(f"All objects in original query are already in the computed catalogue. {len(catalogue_name_list)} found.")
+    else:
+        missing_zooms = [name for name in _name_list if name not in catalogue_name_list]
+        print((
+            f"Not all objects in original query are already in the computed catalogue. "
+            f"Query has {len(_name_list)} zooms. "
+            f"Computed catalogue has {len(catalogue_name_list)} zooms. "
+            f"Missing zooms:\n{missing_zooms}"
+        ))
+
+    return completeness
 
 
 def process_catalogue(_process_single_halo: Callable,

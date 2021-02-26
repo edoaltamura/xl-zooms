@@ -33,31 +33,38 @@ plot_observation_errorbars = False
 
 def process_single_halo(
         path_to_snap: str,
-        path_to_catalogue: str
+        path_to_catalogue: str,
+        custom_aperture: unyt.unyt_quantity = None,
 ) -> Tuple[unyt.unyt_quantity]:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
 
         # If the hot gas mass already computed by VR, use that instead of calculating it
         Mhot500c_key = "SO_Mass_gas_highT_1.000000_times_500.000000_rhocrit"
 
-        if Mhot500c_key in h5file.keys():
+        if Mhot500c_key in h5file.keys() and custom_aperture is None:
             Mhot500c = unyt.unyt_quantity(h5file[f'/{Mhot500c_key}'][0] * 1.e10, unyt.Solar_Mass)
 
         else:
+            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
             YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+            # If no custom aperture, select R500c as default
+            aperture = R500c
+            if custom_aperture:
+                assert R500c.units == custom_aperture.units
+                aperture = custom_aperture
 
             import swiftsimio as sw
 
             # Read in gas particles
             mask = sw.mask(f'{path_to_snap}', spatial_only=False)
-            region = [[XPotMin - R500c, XPotMin + R500c],
-                      [YPotMin - R500c, YPotMin + R500c],
-                      [ZPotMin - R500c, ZPotMin + R500c]]
+            region = [[XPotMin - aperture, XPotMin + aperture],
+                      [YPotMin - aperture, YPotMin + aperture],
+                      [ZPotMin - aperture, ZPotMin + aperture]]
             mask.constrain_spatial(region)
             mask.constrain_mask(
                 "gas", "temperatures",
@@ -73,7 +80,7 @@ def process_single_halo(
             deltaY = posGas[:, 1] - YPotMin
             deltaZ = posGas[:, 2] - ZPotMin
             deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
-            index = np.where(deltaR < R500c)[0]
+            index = np.where(deltaR < aperture)[0]
             Mhot500c = np.sum(massGas[index])
             Mhot500c = Mhot500c.to(unyt.Solar_Mass)
 
@@ -87,7 +94,25 @@ def process_single_halo(
     'fhot500c'
 ])
 def _process_single_halo(zoom: Zoom):
-    return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+
+    try:
+        hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
+        if zoom.run_name in hse_catalogue['Run name'].to_list():
+            i = hse_catalogue['Run name'].to_list().index(zoom.run_name)
+            R500hse = hse_catalogue.loc[i, "R500hse"]
+
+    except FileExistsError as error:
+        print(error)
+        hse_estimate = HydrostaticEstimator.from_data_paths(
+            catalog_file=zoom.catalog_file,
+            snapshot_file=zoom.snapshot_file,
+            profile_type='true',
+            diagnostics_on=False
+        )
+        R500hse = hse_estimate.R500hse
+
+
+    return process_single_halo(zoom.snapshot_file, zoom.catalog_file, custom_aperture=R500hse)
 
 
 def m_500_hotgas(results: pd.DataFrame):
