@@ -194,17 +194,18 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Vikhlinin06
 
-    Barnes17 = obs.Barnes17().hdf5.z000p101.true
-    relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
-    ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1],
-               marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
-    ax.scatter(Barnes17.M500[relaxed > 0.1], Barnes17.Mgas_500[relaxed > 0.1],
-               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
-    handles.append(
-        Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=obs.Barnes17().citation + ' $z=0.1$')
-    )
-    del Barnes17
+    if data_label.lower() == 'true' or data_label.lower() == 'crit':
+        Barnes17 = obs.Barnes17().hdf5.z000p101.true
+        relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
+        ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1],
+                   marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
+        ax.scatter(Barnes17.M500[relaxed > 0.1], Barnes17.Mgas_500[relaxed > 0.1],
+                   marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
+        handles.append(
+            Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=obs.Barnes17().citation + ' $z=0.1$')
+        )
+        del Barnes17
 
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
@@ -303,17 +304,18 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Vikhlinin06
 
-    Barnes17 = obs.Barnes17().hdf5.z000p101.true
-    relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
-    ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1] / Barnes17.M500[relaxed < 0.1],
-               marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
-    ax.scatter(Barnes17.M500[relaxed > 0.1], Barnes17.Mgas_500[relaxed > 0.1] / Barnes17.M500[relaxed > 0.1],
-               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
-    handles.append(
-        Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=obs.Barnes17().citation + ' $z=0.1$')
-    )
-    del Barnes17
+    if data_label.lower() == 'true' or data_label.lower() == 'crit':
+        Barnes17 = obs.Barnes17().hdf5.z000p101.true
+        relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
+        ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1] / Barnes17.M500[relaxed < 0.1],
+                   marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
+        ax.scatter(Barnes17.M500[relaxed > 0.1], Barnes17.Mgas_500[relaxed > 0.1] / Barnes17.M500[relaxed > 0.1],
+                   marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
+        handles.append(
+            Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=obs.Barnes17().citation + ' $z=0.1$')
+        )
+        del Barnes17
 
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
@@ -322,7 +324,7 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$f_{{500{{\\rm gas, {data_label}}}}} / M_{{500{{\\rm {data_label}}}$')
+    ax.set_ylabel(f'$f_{{500{{\\rm gas, {data_label}}}}} / M_{{500{{\\rm {data_label}}}}}$')
     ax.set_xscale('log')
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
