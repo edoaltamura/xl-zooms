@@ -339,5 +339,5 @@ if __name__ == "__main__":
         keyword = 'Ref'
 
     results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
-    m_500_hotgas(results)
-    f_500_hotgas(results)
+    m_500_hotgas(results, data_label='hse')
+    f_500_hotgas(results, data_label='hse')
