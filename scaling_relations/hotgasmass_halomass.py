@@ -97,12 +97,16 @@ def _process_single_halo(zoom: Zoom):
 
     try:
         hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
-        if zoom.run_name in hse_catalogue['Run name'].to_list():
-            i = hse_catalogue['Run name'].to_list().index(zoom.run_name)
+        hse_catalogue_names = hse_catalogue['Run name'].values.to_list()
+        print(f"Looking for HSE results in the catalogue.")
+        if zoom.run_name in hse_catalogue_names:
+            i = hse_catalogue_names.index(zoom.run_name)
             R500hse = hse_catalogue.loc[i, "R500hse"]
+            print(f"Found R500hse = {R500hse:.3f} for zoom {zoom.run_name}.")
 
     except FileExistsError as error:
         print(error)
+        print(f"Computing HSE fit for the zoom {zoom.run_name}...")
         hse_estimate = HydrostaticEstimator.from_data_paths(
             catalog_file=zoom.catalog_file,
             snapshot_file=zoom.snapshot_file,
@@ -110,6 +114,7 @@ def _process_single_halo(zoom: Zoom):
             diagnostics_on=False
         )
         R500hse = hse_estimate.R500hse
+        print(f"Calculated R500hse = {R500hse:.3f} for zoom {zoom.run_name}.")
 
 
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file, custom_aperture=R500hse)
