@@ -285,12 +285,12 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Lin12
 
-    Eckert16 = obs.Eckert16()
-    ax.plot(Eckert16.M_500_fit, Eckert16.fgas_500_fit, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
-    )
-    del Eckert16
+    # Eckert16 = obs.Eckert16()
+    # ax.plot(Eckert16.M_500_fit, Eckert16.fgas_500_fit, color=observations_color, zorder=0)
+    # handles.append(
+    #     Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
+    # )
+    # del Eckert16
 
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.fb_500,
@@ -338,11 +338,16 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
 if __name__ == "__main__":
     import sys
 
-    if sys.argv[1]:
-        keyword = sys.argv[1]
+    if sys.argv[1] is not None:
+        keywords = sys.argv[1].split(',')
     else:
-        keyword = 'Ref'
+        keywords = 'Ref'
 
-    results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
-    m_500_hotgas(results, data_label='hse')
-    f_500_hotgas(results, data_label='hse')
+    if sys.argv[2] is not None:
+        hse_trigger = sys.argv[2]
+    else:
+        hse_trigger = 'crit'
+
+    results = utils.process_catalogue(_process_single_halo, find_keyword=keywords)
+    m_500_hotgas(results, data_label=hse_trigger)
+    f_500_hotgas(results, data_label=hse_trigger)
