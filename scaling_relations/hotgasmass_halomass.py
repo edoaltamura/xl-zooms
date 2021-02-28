@@ -230,7 +230,7 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas, {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
