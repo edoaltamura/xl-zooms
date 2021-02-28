@@ -95,22 +95,29 @@ def process_single_halo(
     'fhot500c'
 ])
 def _process_single_halo(zoom: Zoom):
-    try:
-        hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
-    except FileExistsError as error:
-        raise FileExistsError(
-            f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
-        )
+    data_label = 'crit'
 
-    hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
-    print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
-    if zoom.run_name in hse_catalogue_names:
-        i = hse_catalogue_names.index(zoom.run_name)
-        hse_entry = hse_catalogue.loc[i]
-    else:
-        raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
+    if data_label == 'crit':
 
-    return process_single_halo(zoom.snapshot_file, zoom.catalog_file, hse_dataset=hse_entry)
+        return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+
+    elif data_label == 'hse':
+        try:
+            hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
+        except FileExistsError as error:
+            raise FileExistsError(
+                f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
+            )
+
+        hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
+        print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
+        if zoom.run_name in hse_catalogue_names:
+            i = hse_catalogue_names.index(zoom.run_name)
+            hse_entry = hse_catalogue.loc[i]
+        else:
+            raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
+
+        return process_single_halo(zoom.snapshot_file, zoom.catalog_file, hse_dataset=hse_entry)
 
 
 def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
