@@ -168,15 +168,20 @@ def true_mass_bias(results: pd.DataFrame):
 
 if __name__ == "__main__":
 
+    if sys.argv[1] is not None:
+        keywords = sys.argv[1].split(',')
+    else:
+        keywords = 'Ref'
+
     if utils.check_catalogue_completeness(
             f'{zooms_register[0].output_directory}/hse_massbias.pkl',
-            find_keyword='dT8'
+            find_keyword=keywords
     ):
         results = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
 
     else:
         results = utils.process_catalogue(_process_single_halo,
-                                          find_keyword='dT8',
+                                          find_keyword=keywords,
                                           save_dataframe=True,
                                           concurrent_threading=False,
                                           no_multithreading=False)
