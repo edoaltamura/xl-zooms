@@ -20,6 +20,8 @@ import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
 
+from relaxation import process_single_halo as relaxation_index
+
 try:
     plt.style.use("../mnras.mplstyle")
 except:
@@ -36,6 +38,13 @@ def process_single_halo(
         path_to_catalogue: str,
         hse_dataset: pd.Series = None,
 ) -> Tuple[unyt.unyt_quantity]:
+
+    _, kinetic_energy, thermal_energy = relaxation_index(
+        path_to_snap,
+        path_to_catalogue
+    )
+    relaxed = kinetic_energy / thermal_energy
+
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
@@ -85,14 +94,15 @@ def process_single_halo(
             Mhot500c = np.sum(massGas[index])
             Mhot500c = Mhot500c.to(unyt.Solar_Mass)
 
-    return M500c, Mhot500c, Mhot500c / M500c
+    return M500c, Mhot500c, Mhot500c / M500c, relaxed
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
     'M_500crit',
     'Mhot500c',
-    'fhot500c'
+    'fhot500c',
+    'Ekin/Eth'
 ])
 def _process_single_halo(zoom: Zoom):
     data_label = 'crit'
@@ -133,11 +143,10 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
             results.loc[i, "M_500crit"],
             results.loc[i, "Mhot500c"],
             marker=run_style['Marker style'],
-            c=run_style['Color'],
             s=run_style['Marker size'],
-            alpha=1,
-            edgecolors='none',
-            zorder=5
+            edgecolors=run_style['Color'] if results.loc[i, "Ekin/Eth"].value > 0.1 else 'none',
+            facecolors='w' if results.loc[i, "Ekin/Eth"].value > 0.1 else run_style['Color'],
+            linewidth=0.4 if results.loc[i, "Ekin/Eth"].value > 0.1 else 0,
         )
 
     # Build legends
@@ -181,12 +190,12 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Lin12
 
-    Eckert16 = obs.Eckert16()
-    ax.plot(Eckert16.M_500_fit, Eckert16.M_500gas_fit, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
-    )
-    del Eckert16
+    # Eckert16 = obs.Eckert16()
+    # ax.plot(Eckert16.M_500_fit, Eckert16.M_500gas_fit, color=observations_color, zorder=0)
+    # handles.append(
+    #     Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
+    # )
+    # del Eckert16
 
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
@@ -244,11 +253,10 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
             results.loc[i, "M_500crit"],
             results.loc[i, "fhot500c"],
             marker=run_style['Marker style'],
-            c=run_style['Color'],
             s=run_style['Marker size'],
-            alpha=1,
-            edgecolors='none',
-            zorder=5
+            edgecolors=run_style['Color'] if results.loc[i, "Ekin/Eth"].value > 0.1 else 'none',
+            facecolors='w' if results.loc[i, "Ekin/Eth"].value > 0.1 else run_style['Color'],
+            linewidth=0.4 if results.loc[i, "Ekin/Eth"].value > 0.1 else 0,
         )
 
     # Build legends
