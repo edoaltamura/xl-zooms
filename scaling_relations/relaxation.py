@@ -150,10 +150,10 @@ def relaxation(results: pd.DataFrame):
 if __name__ == "__main__":
     import sys
 
-    if sys.argv[1]:
-        keyword = sys.argv[1]
+    if sys.argv[1] is not None:
+        keywords = sys.argv[1].split(',')
     else:
-        keyword = 'Ref'
+        keywords = 'Ref'
 
-    results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
+    results = utils.process_catalogue(_process_single_halo, find_keyword=keywords)
     relaxation(results)
