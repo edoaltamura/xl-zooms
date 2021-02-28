@@ -93,7 +93,7 @@ def check_catalogue_completeness(
 
     # Import catalogue from pickle file
     results_catalogue = pd.read_pickle(results_catalogue_path)
-    catalogue_name_list = results_catalogue['Run name'].to_list()
+    catalogue_name_list = results_catalogue['Run name'].values.tolist()
 
     # Check if all results in query are already in the computed catalogue
     completeness = all(element in catalogue_name_list for element in _name_list)
