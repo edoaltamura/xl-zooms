@@ -105,7 +105,7 @@ def process_single_halo(
     'Ekin/Eth'
 ])
 def _process_single_halo(zoom: Zoom):
-    data_label = 'crit'
+    data_label = 'hse'
 
     if data_label == 'crit':
 
