@@ -1,4 +1,9 @@
-# Plot scaling relations for EAGLE-XL tests
+"""
+Plot scaling relations for EAGLE-XL tests
+
+Run using:
+    git pull; python3 hotgasmass_halomass.py dT8_,dT8.5_,dT9_ crit
+"""
 import sys
 import os
 import unyt
@@ -224,8 +229,8 @@ def m_500_hotgas(results: pd.DataFrame):
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
+    handles = list(OrderedDict.fromkeys(handles))
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
-    legend_obs = list(OrderedDict.fromkeys(legend_obs))
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
@@ -327,8 +332,9 @@ def f_500_hotgas(results: pd.DataFrame):
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
+
+    handles = list(OrderedDict.fromkeys(handles))
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
-    legend_obs = list(OrderedDict.fromkeys(legend_obs))
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
