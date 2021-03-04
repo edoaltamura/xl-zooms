@@ -8,6 +8,7 @@ import h5py as h5
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from collections import OrderedDict
 
 # Make the register backend visible to the script
 sys.path.append("../zooms")
@@ -224,6 +225,7 @@ def m_500_hotgas(results: pd.DataFrame):
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
+    legend_obs = list(OrderedDict.fromkeys(legend_obs))
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
@@ -326,6 +328,7 @@ def f_500_hotgas(results: pd.DataFrame):
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
+    legend_obs = list(OrderedDict.fromkeys(legend_obs))
     ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
@@ -342,5 +345,5 @@ def f_500_hotgas(results: pd.DataFrame):
 
 if __name__ == "__main__":
     results = utils.process_catalogue(_process_single_halo, find_keyword=KEYWORDS)
-    m_500_hotgas(results)
+    # m_500_hotgas(results)
     f_500_hotgas(results)
