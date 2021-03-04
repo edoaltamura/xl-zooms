@@ -45,11 +45,11 @@ style_subgrid_model = pd.DataFrame(
          Line2D([], [], marker='^', color=colors[7], markeredgecolor='none', linestyle='None', markersize=4, label=r'AGN: Isotropic, $dT=10^9$ K')],
 
         ['Ref', colors[8], '.', 23, '-', 1,
-         Line2D(facecolor=colors[8], edgecolor='None', label=r'Random AGN variable $dT$')],
+         Line2D([], [], marker='.', color=colors[8], markeredgecolor='none', linestyle='None', label=r'Random AGN variable $dT$')],
         ['MinimumDistance', colors[9], '.', 23, '-', 1,
-         Line2D(facecolor=colors[9], edgecolor='None', label=r'Minimum distance AGN variable $dT$')],
+         Line2D([], [], marker='.', color=colors[9], markeredgecolor='none', linestyle='None', label=r'Minimum distance AGN variable $dT$')],
         ['Isotropic', colors[10], '.', 23, '-', 1,
-         Line2D(facecolor=colors[10], edgecolor='None', label=r'Isotropic AGN variable $dT$')],
+         Line2D([], [], marker='.', color=colors[10], markeredgecolor='none', linestyle='None', label=r'Isotropic AGN variable $dT$')],
     ],
     columns=['Run name keyword', 'Color', 'Marker style', 'Marker size', 'Line style', 'Line width', 'Legend handle']
 )
