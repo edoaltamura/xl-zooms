@@ -148,6 +148,7 @@ def m_500_hotgas(results: pd.DataFrame):
         run_style = style.get_style_for_object(results.loc[i, "Run name"])
         if run_style['Legend handle'] not in legend_handles:
             legend_handles.append(run_style['Legend handle'])
+        legend_handles = list(OrderedDict.fromkeys(legend_handles))
 
         ax.scatter(
             results.loc[i, "M_500crit"],
@@ -229,7 +230,6 @@ def m_500_hotgas(results: pd.DataFrame):
     handles.append(
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
-    handles = list(OrderedDict.fromkeys(handles))
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
@@ -252,6 +252,7 @@ def f_500_hotgas(results: pd.DataFrame):
         run_style = style.get_style_for_object(results.loc[i, "Run name"])
         if run_style['Legend handle'] not in legend_handles:
             legend_handles.append(run_style['Legend handle'])
+        legend_handles = list(OrderedDict.fromkeys(legend_handles))
 
         ax.scatter(
             results.loc[i, "M_500crit"],
@@ -333,7 +334,6 @@ def f_500_hotgas(results: pd.DataFrame):
         Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
     )
 
-    handles = list(OrderedDict.fromkeys(handles))
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
