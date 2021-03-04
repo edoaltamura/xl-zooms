@@ -14,22 +14,27 @@ sys.path.append("../zooms")
 sys.path.append("../observational_data")
 sys.path.append("../hydrostatic_estimates")
 
-from register import zooms_register, Zoom, Tcut_halogas, name_list
-from vikhlinin_hse import HydrostaticEstimator
-import observational_data as obs
-import scaling_utils as utils
-import scaling_style as style
-
-from relaxation import process_single_halo as relaxation_index
-
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
 
+# Import backend utilities
+from register import zooms_register, Zoom, Tcut_halogas, name_list
+import observational_data as obs
+import scaling_utils as utils
+import scaling_style as style
+
+# Import modules for calculating additional quantities
+from relaxation import process_single_halo as relaxation_index
+
+# Make argument parser explicit
+KEYWORDS = sys.argv[1].split(',')
+MASS_ESTIMATOR = sys.argv[2]
+
+# Define constants
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
-
 plot_observation_errorbars = False
 
 
@@ -105,13 +110,12 @@ def process_single_halo(
     'Ekin/Eth'
 ])
 def _process_single_halo(zoom: Zoom):
-    data_label = 'hse'
 
-    if data_label == 'crit':
+    if MASS_ESTIMATOR == 'crit':
 
         return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
-    elif data_label == 'hse':
+    elif MASS_ESTIMATOR == 'hse':
         try:
             hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
         except FileExistsError as error:
@@ -130,7 +134,7 @@ def _process_single_halo(zoom: Zoom):
         return process_single_halo(zoom.snapshot_file, zoom.catalog_file, hse_dataset=hse_entry)
 
 
-def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
+def m_500_hotgas(results: pd.DataFrame):
     fig, ax = plt.subplots()
     legend_handles = []
     for i in range(len(results)):
@@ -190,13 +194,6 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Lin12
 
-    # Eckert16 = obs.Eckert16()
-    # ax.plot(Eckert16.M_500_fit, Eckert16.M_500gas_fit, color=observations_color, zorder=0)
-    # handles.append(
-    #     Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
-    # )
-    # del Eckert16
-
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
                marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
@@ -210,7 +207,7 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Vikhlinin06
 
-    if data_label.lower() == 'true' or data_label.lower() == 'crit':
+    if MASS_ESTIMATOR.lower() == 'true' or MASS_ESTIMATOR.lower() == 'crit':
         Barnes17 = obs.Barnes17().hdf5.z000p101.true
         relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
         ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1],
@@ -229,18 +226,18 @@ def m_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas, {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas, {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/m500{data_label}_hotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/m500{MASS_ESTIMATOR}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
 
-def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
+def f_500_hotgas(results: pd.DataFrame):
     fig, ax = plt.subplots()
     legend_handles = []
     for i in range(len(results)):
@@ -300,13 +297,6 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Lin12
 
-    # Eckert16 = obs.Eckert16()
-    # ax.plot(Eckert16.M_500_fit, Eckert16.fgas_500_fit, color=observations_color, zorder=0)
-    # handles.append(
-    #     Line2D([], [], color=observations_color, linestyle='-', label=Eckert16.citation)
-    # )
-    # del Eckert16
-
     Vikhlinin06 = obs.Vikhlinin06()
     ax.scatter(Vikhlinin06.M_500, Vikhlinin06.fb_500,
                marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
@@ -319,7 +309,7 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     )
     del Vikhlinin06
 
-    if data_label.lower() == 'true' or data_label.lower() == 'crit':
+    if MASS_ESTIMATOR.lower() == 'true' or MASS_ESTIMATOR.lower() == 'crit':
         Barnes17 = obs.Barnes17().hdf5.z000p101.true
         relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
         ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1] / Barnes17.M500[relaxed < 0.1],
@@ -338,31 +328,19 @@ def f_500_hotgas(results: pd.DataFrame, data_label: str = 'crit'):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {data_label}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas, {data_label}}}}} / M_{{500{{\\rm {data_label}}}}}$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas, {MASS_ESTIMATOR}}}}} / M_{{500{{\\rm {MASS_ESTIMATOR}}}}}$')
     ax.set_xscale('log')
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
     ax.plot(ax.get_xlim(), [fbary for _ in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/f500{data_label}_hotgas.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/f500{MASS_ESTIMATOR}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
 
 if __name__ == "__main__":
-    import sys
-
-    if sys.argv[1] is not None:
-        keywords = sys.argv[1].split(',')
-    else:
-        keywords = 'Ref'
-
-    if sys.argv[2] is not None:
-        hse_trigger = sys.argv[2]
-    else:
-        hse_trigger = 'crit'
-
-    results = utils.process_catalogue(_process_single_halo, find_keyword=keywords)
-    m_500_hotgas(results, data_label=hse_trigger)
-    f_500_hotgas(results, data_label=hse_trigger)
+    results = utils.process_catalogue(_process_single_halo, find_keyword=KEYWORDS)
+    m_500_hotgas(results)
+    f_500_hotgas(results)

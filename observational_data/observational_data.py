@@ -3,7 +3,7 @@ import os
 import numpy as np
 import h5py
 import itertools
-from typing import Union, List
+from typing import Union, List, Tuple
 from astropy import cosmology
 from matplotlib import pyplot as plt
 import unyt
@@ -352,10 +352,10 @@ class Eckert16(Observations):
         self.M_500gas = self.M_500 * self.fb_500
 
         self.M_500_fit = np.logspace(raw[:, 0].min(), raw[:, 0].max(), 60)
-        self.fgas_500_fit = 0.055 * (self.M_500_fit * (0.70 / h_sim) / 1e14) ** 0.21 * (0.70 / h_sim) ** (3/2)
+        self.fgas_500_fit = 0.055 * (self.M_500_fit * (0.70 / h_sim) / 1e14) ** 0.21 * (0.70 / h_sim) ** (3 / 2)
         self.M_500gas_fit = self.M_500_fit * self.fgas_500_fit
 
-        #self.fit_line_uncertainty_weights()
+        # self.fit_line_uncertainty_weights()
 
     def fit_line_uncertainty_weights(self):
         np.random.seed(0)
@@ -367,7 +367,7 @@ class Eckert16(Observations):
         fgas_trials = np.empty(0)
         for a in a_trials:
             for b in b_trials:
-                Mstar_trial = a * (M500_trials * (0.70 / h_sim) / 1e14) ** b * (0.70 / h_sim) ** (3/2)
+                Mstar_trial = a * (M500_trials * (0.70 / h_sim) / 1e14) ** b * (0.70 / h_sim) ** (3 / 2)
                 fgas_trials = np.append(fgas_trials, Mstar_trial)
         fgas_trials = fgas_trials.reshape(-1, M500_trials.size)
         self.M500_trials = M500_trials
@@ -595,7 +595,7 @@ class Barnes17(Observations):
 
 
 class Voit05(Observations):
-    paper_name = "Voit et al. (2005)"
+    citation = "Voit et al. (2005)"
     notes = (
         "Dimensionless entropy profiles. "
         "The first set of simulated non-radiative clusters we will consider"
@@ -627,47 +627,39 @@ class Voit05(Observations):
         ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
 
 
-class Pratt10_(Observations):
-    paper_name = "Pratt et al. (2010)"
-    notes = (
-        "Dimensionless entropy profiles. "
-    )
-
-    radial_range_r500c = np.array([0.5, 2])
-
-    a = 1.42
-    b = 1.1
-
-    def __init__(self, *args, **kwargs):
-        super(Pratt10_, self).__init__(*args, **kwargs)
-
-        self.k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(self.radial_range_r500c))
-
-    def plot_on_axes(self, ax, **kwargs):
-        k_k500c = 10 ** (np.log10(self.a) + self.b * np.log10(np.array(ax.get_xlim())))
-        ax.plot(ax.get_xlim(), k_k500c, label=self.paper_name, **kwargs)
-
-
 class Pratt10(Observations):
-    paper_name = "Pratt et al. (2010)"
+    citation = "Pratt et al. (2010)"
     hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..85P/abstract'
     notes = (
-        "REXCESS sample. Entropy properties."
+        "REXCESS sample."
     )
 
     def __init__(self, *args, **kwargs):
         super(Pratt10, self).__init__(*args, **kwargs)
 
         self.process_properties()
+        self.process_entropy_profiles()
 
     def process_properties(self):
         h_conv = 0.7 / self.cosmo_model.h
         field_names = (
-            'Cluster_name z kT M500 Delta_hi_M500 Delta_lo_M500 K0p1R200 Delta_hi_K0p1R200 Delta_lo_K0p1R200 '
-            'KR2500 Delta_KR2500 KR1000 Delta_KR1000 KR500 CC Disturbed').split()
+            'Cluster_name z '
+            'kT Delta_hi_kT Delta_lo_kT '
+            'M500 Delta_hi_M500 Delta_lo_M500 '
+            'K0p1R200 Delta_K0p1R200 '
+            'KR2500 Delta_KR2500 '
+            'KR1000 Delta_KR1000 '
+            'KR500 Delta_KR500 '
+            'kT_R500 Delta_hi_kT_R500 Delta_lo_kT_R500 '
+            'LX_R500 Delta_hi_LX_R500 Delta_lo_LX_R500 '
+            'kT_0p15_1R500 Delta_hi_kT_0p15_1R500 Delta_lo_kT_0p15_1R500 '
+            'LX_0p15_1R500 Delta_hi_LX_0p15_1R500 Delta_lo_LX_0p15_1R500 '
+            'kT_0p15_0p75R500 Delta_hi_kT_0p15_0p75R500 Delta_lo_kT_0p15_0p75R500 '
+            'YX_R500 Delta_hi_YX_R500 Delta_lo_YX_R500 '
+            'R500 Rdet').split()
         data = []
 
-        with open('repository/pratt2018_properties.dat') as f:
+        with open('repository/pratt2010_properties.dat') as f:
             lines = f.readlines()
             for line in lines:
                 if not line.startswith('#') and not line.isspace():
@@ -687,30 +679,171 @@ class Pratt10(Observations):
         for i, field in enumerate(data):
             data[i] = np.array(field)
 
-        # Redshift columns: data[5]
-        ez = self.ez_function(data[1])
-        luminosity_distance = self.luminosity_distance(data[1]) / ((data[1] + 1) ** 2)
-
         conversion_factors = [
             None,
             1,
-            ez ** (-2 / 3) * (luminosity_distance.value * h_conv * (np.pi / 10800.0) * unyt.arcmin) ** 2.0,
-            ez ** (-2 / 3) * (luminosity_distance.value * h_conv * (np.pi / 10800.0) * unyt.arcmin) ** 2.0,
-            1,
-            1,
-            None,
-            1.e14 * h_conv * Solar_Mass,
-            1.e14 * h_conv * Solar_Mass,
-
+            unyt.keV,
+            unyt.keV,
+            unyt.keV,
+            1.e14 / 0.7 * h_conv * Solar_Mass,
+            1.e14 / 0.7 * h_conv * Solar_Mass,
+            1.e14 / 0.7 * h_conv * Solar_Mass,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV,
+            unyt.keV,
+            unyt.keV,
+            unyt.erg / unyt.s,
+            unyt.erg / unyt.s,
+            unyt.erg / unyt.s,
+            unyt.keV,
+            unyt.keV,
+            unyt.keV,
+            unyt.erg / unyt.s,
+            unyt.erg / unyt.s,
+            unyt.erg / unyt.s,
+            unyt.keV,
+            unyt.keV,
+            unyt.keV,
+            10 ** 13 * Solar_Mass * unyt.keV,
+            10 ** 13 * Solar_Mass * unyt.keV,
+            10 ** 13 * Solar_Mass * unyt.keV,
+            unyt.kpc,
+            unyt.dimensionless
         ]
 
-        for i, (field, conversion) in enumerate(zip(self.field_names, conversion_factors)):
+        for i, (field, conversion) in enumerate(zip(field_names, conversion_factors)):
             if isinstance(data[i][0], str):
                 setattr(self, field, data[i])
             else:
                 setattr(self, field, data[i] * conversion)
 
-        print(data)
+        # Compute the characteristic entropy using eq 3 in the paper
+        self.K500 = unyt.unyt_quantity(106, 'keV*cm**2') * \
+                    data[5] ** (2 / 3) * \
+                    0.15 ** (-2 / 3) * \
+                    self.ez_function(self.z) ** (-2 / 3) * \
+                    h_conv ** (-4 / 3)
+
+    def process_entropy_profiles(self):
+        h_conv = 0.7 / self.cosmo_model.h
+        field_names = (
+            'Cluster_name '
+            'K0 Delta_K0 '
+            'KR100 Delta_KR100 '
+            'alpha Delta_alpha').split()
+        data = []
+
+        with open('repository/pratt2010_profiles.dat') as f:
+            lines = f.readlines()
+            for line in lines:
+                if not line.startswith('#') and not line.isspace():
+                    line_data = line.split()
+                    for i, element_data in enumerate(line_data):
+                        if element_data.strip() == 'none':
+                            # If no data, replace with Nan
+                            line_data[i] = np.nan
+                        elif re.search('[a-df-zA-Z]', element_data):
+                            # If contains letters, remove white spaces
+                            line_data[i] = element_data.strip()
+                        else:
+                            line_data[i] = float(element_data.strip())
+                    data.append(line_data)
+
+        data = list(map(list, itertools.zip_longest(*data, fillvalue=None)))
+        conversion_factors = [
+            None,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            unyt.keV * unyt.cm ** 2,
+            1,
+            1,
+        ]
+
+        for i, field in enumerate(data):
+            if isinstance(data[i][0], str):
+                data[i] = np.array(field)
+            else:
+                data[i] = np.array(field) * conversion_factors[i]
+
+        radial_range = np.logspace(-2, 0, 1001)
+        profiles = np.zeros((len(data[0]), len(radial_range)))
+        for i, (K0, K100, alpha, redshift, R500) in enumerate(zip(
+                data[1],
+                data[3],
+                data[5],
+                self.z,
+                self.R500
+        )):
+            if np.isnan(alpha):
+                profiles[i] = np.nan
+            else:
+                ez = self.ez_function(redshift)
+                radius = np.logspace(np.log10(0.01 * R500.v), np.log10(R500.v), len(radial_range))
+                profiles[i] = K0 + K100 * (radius / 100 / h_conv) ** alpha
+                profiles[i] *= ez ** (4 / 3) * h_conv ** (-1 / 3)
+
+        self.entropy_profiles = unyt.unyt_array(profiles, unyt.keV * unyt.cm ** 2)
+        self.radial_bins = unyt.unyt_array(radial_range, unyt.dimensionless)
+        self.entropy_profiles_k500_rescaled = False
+
+    def combine_entropy_profiles(
+            self,
+            m500_limits: Tuple[unyt.unyt_quantity] = (
+                    1e10 * unyt.Solar_Mass,
+                    1e17 * unyt.Solar_Mass
+            ),
+            k500_rescale: bool = True
+    ):
+
+        if k500_rescale:
+            self.entropy_profiles /= self.K500[:, None]
+            self.entropy_profiles_k500_rescaled = True
+
+        mass_bin = np.where(
+            (self.M500.value > m500_limits[0].value) &
+            (self.M500.value < m500_limits[1].value)
+        )[0]
+
+        bin_median = np.nanmedian(self.entropy_profiles[mass_bin], axis=0)
+        bin_perc16 = np.nanpercentile(self.entropy_profiles[mass_bin], 16, axis=0)
+        bin_perc84 = np.nanpercentile(self.entropy_profiles[mass_bin], 84, axis=0)
+
+        return bin_median, bin_perc16, bin_perc84
+
+    def quick_display(self, **kwargs):
+
+        bin_median, bin_perc16, bin_perc84 = self.combine_entropy_profiles(**kwargs)
+
+        # Display the catalogue data
+        for profile in self.entropy_profiles:
+            plt.plot(self.radial_bins, profile, c='k', alpha=0.1)
+
+        plt.fill_between(
+            self.radial_bins,
+            bin_perc16,
+            bin_perc84,
+            color='aqua', alpha=0.85, linewidth=0
+        )
+        plt.plot(self.radial_bins, bin_median, c='k')
+
+        plt.xlabel(r'$r/r_{500}$')
+        y_label = r'$E(z)^{4/3} K$ [keV cm$^2$]'
+        if self.entropy_profiles_k500_rescaled:
+            y_label = r'$K / K_{500}$'
+        plt.ylabel(y_label)
+        plt.title(f"REXCESS sample - {self.citation}")
+        plt.xscale('log')
+        plt.yscale('log')
+        plt.show()
+        plt.close()
 
 
 class PlanckSZ2015(Observations):
@@ -1058,4 +1191,4 @@ class Mernier17(MetallicityScale):
 
 
 if __name__ == '__main__':
-    obs = Eckert16().quick_display()
+    obs = Pratt10().quick_display()
