@@ -250,7 +250,7 @@ class Zoom(object):
 
         # Need extra spaces because pandas doesn't seem to recognise the space after
         # a comma as a valid delimiter by default.
-        redshifts = output_list.as_matrix(columns=" Redshift")
+        redshifts = output_list.as_matrix(columns=output_list.columns[0])
         scale_factors = 1 / (redshifts + 1)
 
         if " Select Output" in output_list.columns:
