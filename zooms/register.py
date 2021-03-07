@@ -306,8 +306,8 @@ class Zoom(object):
 
 zooms_register = []
 calibration_zooms = EXLZooms()
-completed_runs = calibration_zooms.run_directories[
-    calibration_zooms.complete_runs
+completed_runs = [
+    calibration_zooms.run_directories[i] for i in calibration_zooms.complete_runs
 ]
 for run_directory in completed_runs:
     zooms_register.append(
@@ -318,9 +318,7 @@ for run_directory in completed_runs:
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
 
 if __name__ == "__main__":
-    incomplete_runs = calibration_zooms.run_directories[
-        ~calibration_zooms.complete_runs
-    ]
+    incomplete_runs = [run for run in calibration_zooms.run_directories if run not in completed_runs]
     print((
         "\n"
         "The following simulations were found with directory set-up, "
