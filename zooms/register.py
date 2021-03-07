@@ -247,6 +247,7 @@ class Zoom(object):
     def read_output_list(self):
         output_list_file = os.path.join(self.run_directory, 'snap_redshifts.txt')
         output_list = pd.read_csv(output_list_file)
+        print(output_list)
 
         # Need extra spaces because pandas doesn't seem to recognise the space after
         # a comma as a valid delimiter by default.
