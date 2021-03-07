@@ -5,93 +5,19 @@
 import io
 import os
 import h5py
-import zipfile
-from typing import List
-from tqdm import tqdm
 import psutil
+import zipfile
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+from typing import List
 
 Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
-output_dir = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 SILENT_PROGRESSBAR = False
-
-total_memory = psutil.virtual_memory().total
-
-
-def get_vr_number_from_name(name: str) -> int:
-    start = 'VR'
-    end = '_'
-    start_position = name.find(start) + len(start)
-    result = name[start_position:name.find(end, start_position)]
-
-    return int(result)
-
-
-def get_vr_numbers_unique() -> List[int]:
-    vr_nums = [get_vr_number_from_name(name) for name in name_list]
-    vr_nums = set(vr_nums)
-    return list(vr_nums).sort()
-
-
-def get_allpaths_from_last(path_z0: str, z_min: float = 0., z_max: float = 5.) -> list:
-    if path_z0.endswith('.hdf5'):
-        # This is a snapshot
-        snapdir = os.path.dirname(path_z0)
-        allpaths = [os.path.join(snapdir, filepath) for filepath in os.listdir(snapdir) if filepath.endswith('.hdf5')]
-        allpaths = [filepath for filepath in allpaths if os.path.isfile(filepath)]
-        allpaths.sort(key=lambda x: int(x[-9:-5]))
-        # Filter redshifts
-        for path in tqdm(allpaths.copy(), desc=f"Fetching snapshots", disable=SILENT_PROGRESSBAR):
-            with h5py.File(path, 'r') as f:
-                z = f['Header'].attrs['Redshift'][0]
-            if z > z_max or z < z_min:
-                allpaths.remove(path)
-        return allpaths
-
-    else:
-        # This is probably a VR output
-        vrdir = os.path.dirname(os.path.dirname(path_z0))
-        vr_out_section = path_z0.split('.')[-1]
-        allsubpaths = [os.path.join(vrdir, catalog_dir) for catalog_dir in os.listdir(vrdir)]
-
-        allpaths = []
-        for subpath in allsubpaths:
-            for filepath in os.listdir(subpath):
-                filepath = os.path.join(subpath, filepath)
-                if filepath.endswith(vr_out_section):
-                    assert os.path.isfile(filepath)
-                    allpaths.append(filepath)
-                    break
-
-        allpaths.sort(key=lambda x: int(x.rstrip('.' + vr_out_section)[-4:]))
-        # Filter redshifts
-        for path in tqdm(allpaths.copy(), desc=f"Fetching snap catalogues", disable=SILENT_PROGRESSBAR):
-            with h5py.File(path, 'r') as file:
-                scale_factor = float(file['/SimulationInfo'].attrs['ScaleFactor'])
-                z = 1 / scale_factor - 1
-            if z > z_max or z < z_min:
-                allpaths.remove(path)
-        return allpaths
-
-
-def get_snip_handles(path_z0: str, z_min: float = 0., z_max: float = 5.):
-    snip_path = os.path.dirname(path_z0)
-    snip_handles = []
-
-    with zipfile.ZipFile(os.path.join(snip_path, 'snipshots.zip'), 'r') as archive:
-        all_snips = archive.namelist()
-        all_snips.sort(key=lambda x: int(x[-9:-5]))
-        for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=SILENT_PROGRESSBAR):
-            snip_handle = io.BytesIO(archive.open(snip_name).read())
-            with h5py.File(snip_handle, 'r') as f:
-                z = f['Header'].attrs['Redshift'][0]
-            # Filter redshifts
-            if z_min < z < z_max:
-                snip_handles.append(snip_handle)
-
-    return snip_handles
 
 
 def dump_memory_usage() -> None:
+    total_memory = psutil.virtual_memory().total
     process = psutil.Process(os.getpid())
     memory = process.memory_info().rss  # in bytes
     print((
@@ -100,141 +26,301 @@ def dump_memory_usage() -> None:
     ))
 
 
-class Zoom:
+class EXLZooms:
+    name: str = 'Eagle-XL Zooms'
+    output_dir: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
-    def __init__(
-            self,
-            run_name: str,
-            snapshot_file: str,
-            catalog_file: str,
-            output_directory: str
-    ) -> None:
-        self.run_name = run_name
-        self.snapshot_file = snapshot_file
-        self.catalog_file = catalog_file
-        self.output_directory = output_directory
+    # Zooms will be searched in this directories
+    cosma_repositories: List[str] = [
+        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
+        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
+    ]
+
+    name_list: List[str]
+    run_directories: List[str]
+    complete_runs: np.ndarray
+
+    def __init__(self) -> None:
+
+        name_list = []
+        run_directories = []
+
+        # Search for any run directories in repositories
+        for repository in self.cosma_repositories:
+            for run_basename in os.listdir(repository):
+                run_abspath = os.path.join(repository, run_basename)
+                if os.path.isdir(run_abspath) and run_basename.startswith('L0300N0564'):
+                    run_directories.append(run_abspath)
+                    name_list.append(run_basename)
+
+        # Classify complete and incomplete runs
+        complete_runs = np.zeros(len(name_list), dtype=np.bool)
+
+        for i, run_directory in enumerate(run_directories):
+            snaps_path = os.path.join(run_directory, 'snapshots')
+            catalogues_path = os.path.join(run_directory, 'stf')
+
+            if os.path.isdir(snaps_path):
+                number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
+            else:
+                number_snapshots = 0
+
+            if os.path.isdir(catalogues_path):
+                number_catalogues = len([subdir for subdir in os.listdir(catalogues_path)])
+            else:
+                number_catalogues = 0
+
+            if (
+                    (number_snapshots > 0) and
+                    (number_catalogues > 0) and
+                    (number_snapshots == number_catalogues)
+            ):
+                complete_runs[i] = True
+
+        if __name__ == "__main__":
+            print(f"Found {len(name_list):d} zoom directories.")
+            print(f"Runs completed: {complete_runs.sum():d}")
+            print(f"Runs not completed: {len(complete_runs) - complete_runs.sum():d}")
+
+        self.name_list = name_list
+        self.run_directories = run_directories
+        self.complete_runs = complete_runs
+
+    @staticmethod
+    def get_vr_number_from_name(name: str) -> int:
+        start = 'VR'
+        end = '_'
+        start_position = name.find(start) + len(start)
+        result = name[start_position:name.find(end, start_position)]
+        return int(result)
+
+    def get_vr_numbers_unique(self) -> List[int]:
+        vr_nums = [self.get_vr_number_from_name(name) for name in self.name_list]
+        vr_nums = set(vr_nums)
+        return list(vr_nums).sort()
+
+    def analyse_incomplete_runs(self):
+
+        incomplete_name_list = self.name_list[~self.complete_runs]
+        incomplete_run_directories = self.run_directories[~self.complete_runs]
+
+        for run_directory in incomplete_run_directories:
+            for file in os.listdir(run_directory):
+                if file.startswith('timesteps'):
+                    timesteps_file = os.path.join(run_directory, file)
+
+        with open(timesteps_file, 'r') as file_handle:
+            lastlast_line = file_handle.readlines()[-2].split()
+            last_line = file_handle.readlines()[-1].split()
+
+            if len(lastlast_line) == len(last_line):
+                last_redshift = float(last_line[3])
+            elif len(lastlast_line) > len(last_line):
+                last_redshift = float(lastlast_line[3])
+
+
+class Redshift(object):
+    __slots__ = (
+        'run_name',
+        'scale_factor',
+        'a',
+        'redshift',
+        'z',
+        'snapshot_path',
+        'catalogue_properties_path',
+    )
+
+    run_name: str
+    scale_factor: float
+    a: float
+    redshift: float
+    z: float
+    snapshot_path: str
+    catalogue_properties_path: str
+
+    def __init__(self, info_dict: dict):
+        for key in info_dict:
+            setattr(self, key, info_dict[key])
+
+        setattr(self, 'a', self.scale_factor)
+        setattr(self, 'z', self.redshift)
 
     def __str__(self):
         return (
-            "Zoom object:\n"
-            f"\tName:                    {self.run_name}\n"
-            f"\tSnapshot file:           {self.snapshot_file}\n"
-            f"\tCatalog file:            {self.catalog_file}\n"
-            f"\tOutput directory:        {self.output_directory}\n"
+            f"Run name:                 {self.run_name}\n"
+            f"Scale factor (a):         {self.scale_factor}\n"
+            f"Redshift (z):             {self.redshift}\n"
+            f"Snapshot file:            {self.snapshot_path}\n"
+            f"Catalog properties file:  {self.catalogue_properties_path}"
         )
 
 
-class ZoomList:
+class Zoom(object):
 
-    def __init__(self, *args) -> None:
-        args_iter = iter(args)
-        arg_length_iter = len(next(args_iter))
+    def __init__(self, run_directory: str) -> None:
+        self.run_name = os.path.basename(run_directory)
+        self.run_directory = run_directory
+        self.redshifts, self.scale_factors, self.index_snaps, self.index_snips = self.read_output_list()
 
-        # Check that the input lists all have the same length
-        assert all(len(arg_length) == arg_length_iter for arg_length in args_iter), (
-            f"Input lists must have the same length. "
-            f"Detected: {(f'{len(arg_length)}' for arg_length in args_iter)}"
-        )
+        # Retrieve absolute data paths to files
+        self.snapshot_paths = []
+        self.catalogue_properties_paths = []
 
-        # Parse list data into cluster objects
-        obj_list = []
-        for zoom_data in zip(*args):
-            obj_list.append(Zoom(*zoom_data))
+        snapshot_files = os.listdir(os.path.join(self.run_directory, 'snapshots'))
+        snapshot_files = [file_name for file_name in snapshot_files if file_name.endswith('.hdf5')]
 
-        # Sort zooms by VR number
-        obj_list.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
+        # Sort filenames by snapshot file
+        snapshot_files.sort(key=lambda x: int(x[-9:-5]))
 
-        self.obj_list = obj_list
-
-    def get_list(self) -> List[Zoom]:
-        return self.obj_list
-
-    def __str__(self):
-        message = ''
-        for obj in self.obj_list:
-            message += str(obj)
-        return message
-
-
-cosma_repositories = [
-    "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
-    "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
-    "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
-]
-
-name_list = []
-snapshot_filenames = []
-catalogue_filenames = []
-incomplete_runs = []
-
-for repo in cosma_repositories:
-    for run_dir in os.listdir(repo):
-        run_path = os.path.join(repo, run_dir)
-        snaps_path = os.path.join(run_path, 'snapshots')
-        catalogues_path = os.path.join(run_path, 'stf')
-
-        if os.path.isdir(snaps_path):
-            number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
-        else:
-            number_snapshots = 0
-
-        if os.path.isdir(catalogues_path):
-            number_catalogues = len([subdir for subdir in os.listdir(catalogues_path)])
-        else:
-            number_catalogues = 0
-
-        if (
-                run_dir.startswith('L0300N0564') and
-                os.path.isdir(run_path) and
-                number_snapshots > 0 and
-                number_catalogues > 0 and
-                number_snapshots == number_catalogues
-        ):
-            name_list.append(run_dir)
-
-            snap_files = os.listdir(os.path.join(run_path, 'snapshots'))
-            snap_files = [file_name for file_name in snap_files if file_name.endswith('.hdf5')]
-
-            # Sort filenames by snapshot file
-            snap_files.sort(key=lambda x: int(x[-9:-5]))
-
-            snap_z0 = snap_files[-1]
-            snap_z0_path = os.path.join(run_path, 'snapshots', snap_z0)
-            assert os.path.isfile(snap_z0_path)
-            snapshot_filenames.append(snap_z0_path)
-
-            catalogue_filenames.append(
+        for snap_path in snapshot_files:
+            self.snapshot_paths.append(
                 os.path.join(
-                    run_path,
-                    'stf',
-                    os.path.splitext(snap_z0)[0],
-                    f"{os.path.splitext(snap_z0)[0]}.properties"
+                    self.run_directory,
+                    'snapshots',
+                    snap_path
                 )
             )
-        elif (
-                run_dir.startswith('L0300N0564') and
-                os.path.isdir(run_path) and (
-                        ~os.path.isdir(os.path.join(run_path, 'snapshots')) or
-                        ~os.path.isdir(os.path.join(run_path, 'stf')) or
-                        number_snapshots == 0 or
-                        number_catalogues == 0 or
-                        number_snapshots != number_catalogues
+            self.catalogue_properties_paths.append(
+                os.path.join(
+                    self.run_directory,
+                    'stf',
+                    os.path.splitext(snap_path)[0],
+                    f"{os.path.splitext(snap_path)[0]}.properties"
                 )
-        ):
-            incomplete_runs.append(run_path)
+            )
+
+        assert len(self.redshifts) == len(self.scale_factors), (
+            f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.scale_factors)}"
+        )
+        assert len(self.redshifts) == len(self.snapshot_paths), (
+            f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.snapshot_paths)}"
+        )
+        assert len(self.redshifts) == len(self.catalogue_properties_paths), (
+            f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.catalogue_properties_paths)}"
+        )
+
+    def filter_snaps_by_redshift(self, z_min: float = 0., z_max: float = 5., hard_check: bool = False):
+
+        redshifts = self.redshifts[self.index_snaps]
+        index_filter = np.where((redshifts > z_min) & (redshifts < z_max))[0]
+        filtered_snapshot_paths = self.snapshot_paths[index_filter]
+        filtered_catalogue_properties_paths = self.catalogue_properties_paths[index_filter]
+
+        if hard_check:
+            for file in filtered_snapshot_paths:
+                with h5py.File(file, 'r') as f:
+                    z = f['Header'].attrs['Redshift'][0]
+                assert z_min < z < z_max
+
+            for file in filtered_catalogue_properties_paths:
+                with h5py.File(file, 'r') as f:
+                    scale_factor = float(f['/SimulationInfo'].attrs['ScaleFactor'])
+                    z = 1 / scale_factor - 1
+                assert z_min < z < z_max
+
+        return (
+            filtered_snapshot_paths,
+            filtered_catalogue_properties_paths,
+            index_filter
+        )
+
+    def get_snip_handles(self, z_min: float = 0., z_max: float = 5.):
+
+        assert len(self.index_snips) > 0, "No snipshots registered in the output list."
+        snip_path = os.path.join(self.run_directory, 'snapshots')
+        snip_handles = []
+
+        with zipfile.ZipFile(os.path.join(snip_path, 'snipshots.zip'), 'r') as archive:
+            all_snips = archive.namelist()
+            all_snips.sort(key=lambda x: int(x[-9:-5]))
+            for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=SILENT_PROGRESSBAR):
+                snip_handle = io.BytesIO(archive.open(snip_name).read())
+                with h5py.File(snip_handle, 'r') as f:
+                    z = f['Header'].attrs['Redshift'][0]
+                # Filter redshifts
+                if z_min < z < z_max:
+                    snip_handles.append(snip_handle)
+
+        return snip_handles
+
+    def read_output_list(self):
+        output_list_file = os.path.join(self.run_directory, 'snap_redshifts.txt')
+        output_list = pd.read_csv(output_list_file)
+
+        # Need extra spaces because pandas doesn't seem to recognise the space after
+        # a comma as a valid delimiter by default.
+        redshifts = output_list.as_matrix(columns=" Redshift")
+        scale_factors = 1 / (redshifts + 1)
+
+        if " Select Output" in output_list.columns:
+            index_snaps = np.arange(len(output_list))[
+                np.logical_or.reduce(
+                    [output_list[" Select Output"] == f" Snapshot"]
+                )
+            ]
+
+            index_snips = np.arange(len(output_list))[
+                np.logical_or.reduce(
+                    [output_list[" Select Output"] == f" Snipshot"]
+                )
+            ]
+
+        else:
+            index_snaps = np.arange(len(output_list))
+            index_snips = np.empty(0, dtype=np.int)
+
+        return redshifts, scale_factors, index_snaps, index_snips
+
+    def get_redshift(self, index: int = -1):
+        """
+        To get z = 0 data promptly, specify index = -1. This
+        selects the last output in the index list, which is the
+        last redshift produced at runtime.
+
+        :param index: int
+            The integer index describing the output sequence.
+        :return: Redshift instance
+            The Redshift object contains fast-access absolute
+            paths to the key files to read data from.
+        """
+
+        try:
+            redshift_select = self.redshifts[self.index_snaps][index]
+        except IndexError as err:
+            print((
+                f"Trying to access redshift with output index {index:d}, "
+                f"but the maximum index available is {len(self.redshifts) - 1:d}."
+            ))
+            raise err
+
+        redshift_info = dict()
+        redshift_info['run_name'] = self.run_name
+        redshift_info['scale_factor'] = self.scale_factors[self.index_snaps][index]
+        redshift_info['redshift'] = redshift_select
+        redshift_info['snapshot_path'] = self.snapshot_paths[index]
+        redshift_info['catalogue_properties_paths'] = self.catalogue_properties_paths[index]
+
+        return Redshift(redshift_info)
 
 
+zooms_register = []
+calibration_zooms = EXLZooms()
+completed_runs = calibration_zooms.run_directories[
+    calibration_zooms.complete_runs
+]
+for run_directory in completed_runs:
+    zooms_register.append(
+        Zoom(run_directory)
+    )
 
-zooms_register = ZoomList(
-    name_list,
-    snapshot_filenames,
-    catalogue_filenames,
-    [output_dir] * len(name_list),
-).obj_list
-
-vr_numbers = get_vr_numbers_unique()
+# Sort zooms by VR number
+zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
 
 if __name__ == "__main__":
+    incomplete_runs = calibration_zooms.run_directories[
+        ~calibration_zooms.complete_runs
+    ]
     print((
         "\n"
         "The following simulations were found with directory set-up, "
@@ -246,9 +332,5 @@ if __name__ == "__main__":
         print(f"[!] -> {i:s}")
 
     print(f"\n{' Zoom register ':-^40s}")
-    for i in zooms_register:
-        print(
-            os.path.dirname(
-                os.path.dirname(i.snapshot_file)
-            )
-        )
+    for i in completed_runs:
+        print(i)

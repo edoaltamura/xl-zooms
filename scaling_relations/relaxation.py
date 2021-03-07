@@ -24,6 +24,9 @@ try:
 except:
     pass
 
+# Make argument parser explicit
+KEYWORDS = sys.argv[1].split(',')
+
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
 
@@ -148,12 +151,5 @@ def relaxation(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    import sys
-
-    if sys.argv[1] is not None:
-        keywords = sys.argv[1].split(',')
-    else:
-        keywords = 'Ref'
-
-    results = utils.process_catalogue(_process_single_halo, find_keyword=keywords)
+    results = utils.process_catalogue(_process_single_halo, find_keyword=KEYWORDS)
     relaxation(results)
