@@ -103,7 +103,6 @@ class EXLZooms:
         for i, run_directory in enumerate(self.run_directories):
             snaps_path = os.path.join(run_directory, 'snapshots')
             catalogues_path = os.path.join(run_directory, 'stf')
-            print(snaps_path)
 
             if os.path.isdir(snaps_path):
                 number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
@@ -126,6 +125,7 @@ class EXLZooms:
             print(f"Found {len(self.name_list):d} zoom directories.")
             print(f"Runs completed: {self.complete_runs.sum():d}")
             print(f"Runs not completed: {len(self.complete_runs) - self.complete_runs.sum():d}")
+            print(self.name_list)
 
 
     @staticmethod
