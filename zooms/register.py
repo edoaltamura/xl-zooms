@@ -396,8 +396,8 @@ class Redshift(object):
     a: float
     redshift: float
     z: float
-    snapshot_path: str
-    catalogue_properties_path: str
+    snapshot_paths: str
+    catalogue_properties_paths: str
 
     def __init__(self, info_dict: dict):
         for key in info_dict:
@@ -411,8 +411,8 @@ class Redshift(object):
             f"Run name:                 {self.run_name}\n"
             f"Scale factor (a):         {self.scale_factor}\n"
             f"Redshift (z):             {self.redshift}\n"
-            f"Snapshot file:            {self.snapshot_path}\n"
-            f"Catalog properties file:  {self.catalogue_properties_path}"
+            f"Snapshot file:            {self.snapshot_paths}\n"
+            f"Catalog properties file:  {self.catalogue_properties_paths}"
         )
 
 
