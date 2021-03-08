@@ -1,19 +1,17 @@
 #! /usr/bin/env python
 """
-jobber.py
 Summarize status of running jobs under SLURM scheduler.
 """
 
 from __future__ import print_function
 
 import os
-import sys
 import subprocess as sp
 from collections import defaultdict
 from datetime import timedelta
 
 
-## parse runtime as reported by `squeue`, return as hours (floating-point)
+# parse runtime as reported by `squeue`, return as hours (floating-point)
 def parse_runtime(x):
     pieces = x.split(":")
     if len(pieces) == 2:
@@ -36,17 +34,17 @@ def reformat_time(x):
     return str(timedelta(hours=x))
 
 
-## query scheduler for running jobs
+# query scheduler for running jobs
 cmd = os.path.expandvars("squeue -u $USER")
 piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 STAT_CODE = ["PD", "R", "CG", "S", "ST"]
 STAT_DESC = ["pending", "running", "compl", "susp", "stop"]
 
-## slurp off header line
+# slurp off header line
 jobs = iter(piper.stdout.readline, "")
 _ = next(jobs)
 
-## loop on jobs
+# loop on jobs
 counts = defaultdict(int)
 runtimes = defaultdict(list)
 for line in jobs:
@@ -56,7 +54,7 @@ for line in jobs:
     counts[pieces[4]] += 1
     runtimes[pieces[4]].append(parse_runtime(pieces[5]))
 
-## print summary
+# print summary
 print("STATUS", "NJOBS", "MINTIME", "MAXTIME", sep="\t")
 for status, desc in zip(STAT_CODE, STAT_DESC):
     max_time, min_time = "--", "--"

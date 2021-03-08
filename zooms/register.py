@@ -56,6 +56,7 @@ import numpy as np
 import pandas as pd
 from tqdm import tqdm
 from typing import List
+import subprocess as sp
 
 Tcut_halogas = 1.e5
 SILENT_PROGRESSBAR = False
@@ -224,8 +225,8 @@ class EXLZooms:
             'Snapshots number target',
             'Stf initialised',
             'Stf number',
-            'SLURM running',
-            'SLURM queuing'
+            'SLURM SWIFT running',
+            'SLURM SWIFT queuing'
         ]
 
         incomplete_analysis = pd.DataFrame(columns=analysis_criteria)
@@ -283,6 +284,30 @@ class EXLZooms:
 
             number_snapshots_target = len(index_snaps)
 
+            # Analyse queries from SLURM
+            slurm_swift_running = False
+            slurm_swift_queuing = False
+
+            status_code = ["PD", "R", "CG", "S", "ST"]
+            status_description = ["pending", "running", "compl", "susp", "stop"]
+            slurm_status_descriptor = dict(zip(status_code, status_description))
+
+            cmd = os.path.expandvars('squeue -u $USER -o "%j %t"')
+            piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+
+            jobs = iter(piper.stdout.readline, "")
+
+            # slurp off header line
+            _ = next(jobs)
+
+            for line in jobs:
+                job_name, job_status = line.decode().strip().split()
+                if job_name == run_name:
+                    if slurm_status_descriptor[job_status] == 'pending':
+                        slurm_swift_queuing = True
+                    elif slurm_status_descriptor[job_status] == 'running':
+                        slurm_swift_running = True
+
             incomplete_analysis.loc[i] = [
                 run_name,
                 run_directory,
@@ -292,7 +317,9 @@ class EXLZooms:
                 number_snapshots,
                 number_snapshots_target,
                 stf_dir_found,
-                number_catalogues
+                number_catalogues,
+                slurm_swift_running,
+                slurm_swift_queuing
             ]
 
 
