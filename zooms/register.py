@@ -295,7 +295,8 @@ class EXLZooms:
             cmd = os.path.expandvars("squeue -u $USER -o '%j %t'")
             piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 
-            jobs = list(piper.stdout.readline, "")
+            jobs = iter(piper.stdout.readline, "")
+            jobs = list(jobs)
 
             # # slurp off header line
             # _ = next(jobs)
