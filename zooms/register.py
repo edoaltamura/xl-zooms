@@ -37,7 +37,7 @@ Attributes:
     runs that have completed
 
 Todo:
-    * Finish developing the analyse_incomplete_runs method
+    * None
 
 
 To maintain a readable and extensible documentation, please refer to this
@@ -618,4 +618,3 @@ if __name__ == "__main__":
     ))
     if advanced_search == 'y':
         calibration_zooms.analyse_incomplete_runs()
-
