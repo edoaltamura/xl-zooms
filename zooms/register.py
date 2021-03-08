@@ -301,6 +301,7 @@ class EXLZooms:
             _ = next(jobs)
             job_list = []
             for line in jobs:
+                print(line.decode().strip().split())
                 job_list.append(line.decode().strip().split())
 
             for job_info in job_list[:-1]:
