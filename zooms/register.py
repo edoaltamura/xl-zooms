@@ -219,18 +219,17 @@ class EXLZooms:
                 if file.startswith('timesteps_'):
                     timesteps_file = os.path.join(run_directory, file)
 
+                    lastlast_line, last_line = tail(timesteps_file, window=2)
+                    lastlast_line = lastlast_line.split()
 
-                    print(tail(timesteps_file, window=1))
+                    last_line = last_line.split()
 
-                    # lastlast_line = file_handle.readlines()[-2].split()
-                    # last_line = file_handle.readlines()[-1].split()
-                    #
-                    # if len(lastlast_line) == len(last_line):
-                    #     last_redshift = float(last_line[3])
-                    # elif len(lastlast_line) > len(last_line):
-                    #     last_redshift = float(lastlast_line[3])
-                    #
-                    # print(last_redshift)
+                    if len(lastlast_line) == len(last_line):
+                        last_redshift = float(last_line[3])
+                    elif len(lastlast_line) > len(last_line):
+                        last_redshift = float(lastlast_line[3])
+
+                    print(last_redshift)
 
                     break
 
