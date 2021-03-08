@@ -75,7 +75,7 @@ def tail(fname, window=2):
     """Read last N lines from file fname."""
     if window <= 0:
         raise ValueError('invalid window value %r' % window)
-    with open(fname) as f:
+    with open(fname, 'rb') as f:
         BUFSIZ = 1024
         # True if open() was overridden and file was opened in text
         # mode. In that case readlines() will return unicode strings
