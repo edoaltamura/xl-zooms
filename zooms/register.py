@@ -209,7 +209,7 @@ class EXLZooms:
         directories = np.array(self.name_list, dtype=np.str)
         return directories[~self.complete_runs].tolist()
 
-    def analyse_incomplete_runs(self):
+    def analyse_incomplete_runs(self, stdout: bool = True) -> pd.DataFrame:
 
         incomplete_name_list = self.get_incomplete_run_names()
         incomplete_run_directories = self.get_incomplete_run_directories()
@@ -321,8 +321,23 @@ class EXLZooms:
                 slurm_swift_queuing
             ]
 
-        print(incomplete_analysis)
+            if stdout:
 
+                slurm_code = 'x'
+                if slurm_swift_running:
+                    slurm_code = 'run'
+                elif slurm_swift_queuing:
+                    slurm_code = 'que'
+
+                print((
+                    f"[{'!' if last_redshift > 0. else ' '}SW] "
+                    f"[z = {last_redshift:.2f}] "
+                    f"[{'!' if number_catalogues < number_snapshots_target else ' '}VR] "
+                    f"[SLURM {slurm_code:s}] "
+                    f"{run_name}"
+                ))
+
+        return incomplete_analysis
 
 
 class Redshift(object):
