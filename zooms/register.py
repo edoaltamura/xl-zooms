@@ -327,7 +327,11 @@ class EXLZooms:
             ]
 
         # Sort dataframe by SLURM status
-        incomplete_analysis.sort_values(by=['SLURM SWIFT running', 'SLURM SWIFT queuing'], ascending=False)
+        incomplete_analysis.sort_values(
+            by=['SLURM SWIFT running', 'SLURM SWIFT queuing'],
+            ascending=False,
+            inplace=True
+        )
 
         if stdout:
             incomplete_analysis_listform = incomplete_analysis.values.tolist()
