@@ -326,7 +326,7 @@ class EXLZooms:
                 slurm_swift_queuing
             ]
 
-        # Sort dataframe by SLURM status
+        # Sort dataframe by SLURM status and reached redshift
         incomplete_analysis.sort_values(
             by=['SLURM SWIFT running', 'SLURM SWIFT queuing', 'Last redshift'],
             ascending=False,
