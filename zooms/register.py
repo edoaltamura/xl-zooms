@@ -251,8 +251,8 @@ class Zoom(object):
     scale_factors: np.ndarray
     index_snaps: np.ndarray
     index_snips: np.ndarray
-    snapshot_paths: List[str] = []
-    catalogue_properties_paths: List[str] = []
+    snapshot_paths: List[str]
+    catalogue_properties_paths: List[str]
 
     def __init__(self, run_directory: str) -> None:
         self.run_name = os.path.basename(run_directory)
@@ -265,6 +265,8 @@ class Zoom(object):
 
         # Sort filenames by snapshot file
         snapshot_files.sort(key=lambda x: int(x[-9:-5]))
+        self.snapshot_paths = []
+        self.catalogue_properties_paths = []
 
         for snap_path in snapshot_files:
             self.snapshot_paths.append(
