@@ -328,11 +328,14 @@ class EXLZooms:
 
             if stdout:
 
-                slurm_code = 'x'
+                slurm_code = 'xxx'
                 if slurm_swift_running:
                     slurm_code = 'run'
                 elif slurm_swift_queuing:
                     slurm_code = 'que'
+
+                if np.isinf(last_redshift):
+                    last_redshift = 127.
 
                 print((
                     f"[{'!' if last_redshift > 0. else ' '}SW] "
@@ -572,7 +575,7 @@ if __name__ == "__main__":
 
     advanced_search = input((
         "Press `y` to initialise the advanced search on incomplete runs. "
-        "Press any other key to quit."
+        "Press any other key to quit.\t--> "
     ))
     if advanced_search == 'y':
         calibration_zooms.analyse_incomplete_runs()
