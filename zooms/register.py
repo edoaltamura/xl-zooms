@@ -550,7 +550,6 @@ class Zoom(object):
 calibration_zooms = EXLZooms()
 completed_runs = calibration_zooms.get_completed_run_directories()
 zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
-calibration_zooms.analyse_incomplete_runs()
 
 # Sort zooms by VR number
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
@@ -570,3 +569,11 @@ if __name__ == "__main__":
     print(f"\n{' Zoom register ':-^40s}")
     for i in completed_runs:
         print(i)
+
+    advanced_search = input((
+        "Press `y` to initialise the advanced search on incomplete runs. "
+        "Press any other key to quit."
+    ))
+    if advanced_search == 'y':
+        calibration_zooms.analyse_incomplete_runs()
+
