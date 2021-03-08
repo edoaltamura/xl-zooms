@@ -108,11 +108,10 @@ def remove_extracted_snipshots(run_directory: str):
 if __name__ == '__main__':
 
     runs = [
-        "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth",
-        "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth",
-        "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth",
-        "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth",
-        "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR93_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth",
+        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2905_-8res_Ref",
+        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2915_-8res_Ref",
+        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2766_-8res_Ref",
+        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR3032_-8res_Ref",
     ]
 
     for working_run_directory in runs:
