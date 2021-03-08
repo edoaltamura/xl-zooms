@@ -83,8 +83,8 @@ class EXLZooms:
         # "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
-    name_list: List[str]
-    run_directories: List[str]
+    name_list: List[str] = []
+    run_directories: List[str] = []
     complete_runs: np.ndarray
 
     def __init__(self) -> None:
