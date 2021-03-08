@@ -340,7 +340,7 @@ class EXLZooms:
                     number_catalogues,
                     slurm_swift_running,
                     slurm_swift_queuing
-                ) = incomplete_analysis.loc[i]
+                ) = incomplete_analysis.iloc[[i]]
 
                 slurm_code = 'xxx'
                 if slurm_swift_running:
