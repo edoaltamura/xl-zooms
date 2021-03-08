@@ -327,7 +327,7 @@ class EXLZooms:
             ]
 
         if stdout:
-            for i in len(incomplete_analysis):
+            for i in range(len(incomplete_analysis)):
                 (
                     run_name,
                     run_directory,
@@ -340,7 +340,7 @@ class EXLZooms:
                     number_catalogues,
                     slurm_swift_running,
                     slurm_swift_queuing
-                ) = incomplete_analysis.iloc[[i]]
+                ) = incomplete_analysis.iloc[[i]].values
 
                 slurm_code = 'xxx'
                 if slurm_swift_running:
