@@ -92,6 +92,7 @@ class EXLZooms:
         # Search for any run directories in repositories
         for repository in self.cosma_repositories:
             for run_basename in os.listdir(repository)[:15]:
+                print(run_basename)
                 run_abspath = os.path.join(repository, run_basename)
                 if os.path.isdir(run_abspath) and run_basename.startswith('L0300N0564'):
                     self.run_directories.append(run_abspath)
