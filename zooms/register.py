@@ -209,10 +209,25 @@ class EXLZooms:
         directories = np.array(self.name_list, dtype=np.str)
         return directories[~self.complete_runs].tolist()
 
+    @staticmethod
+    def query_slurm() -> List[str]:
+        status_code = ["PD", "R", "CG", "S", "ST"]
+        status_description = ["pending", "running", "compl", "susp", "stop"]
+        slurm_status_descriptor = dict(zip(status_code, status_description))
+
+        cmd = os.path.expandvars("squeue -u $USER -o '%j %t'")
+        piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
+
+        # slurp off header line
+        jobs = piper.stdout.readlines()[1:]
+
+        return jobs
+
     def analyse_incomplete_runs(self, stdout: bool = True) -> pd.DataFrame:
 
         incomplete_name_list = self.get_incomplete_run_names()
         incomplete_run_directories = self.get_incomplete_run_directories()
+        slurm_jobs = self.query_slurm()
 
         analysis_criteria = [
             'Run name',
@@ -287,22 +302,14 @@ class EXLZooms:
             slurm_swift_running = False
             slurm_swift_queuing = False
 
-            status_code = ["PD", "R", "CG", "S", "ST"]
-            status_description = ["pending", "running", "compl", "susp", "stop"]
-            slurm_status_descriptor = dict(zip(status_code, status_description))
 
-            cmd = os.path.expandvars("squeue -u $USER -o '%j %t'")
-            piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 
-            # slurp off header line
-            jobs = piper.stdout.readlines()[1:]
-
-            for line in jobs:
+            for line in slurm_jobs:
                 job_name, job_status = line.strip().split()
                 if job_name == run_name:
-                    if slurm_status_descriptor[job_status] == 'pending':
+                    if job_status == b'PD':
                         slurm_swift_queuing = True
-                    elif slurm_status_descriptor[job_status] == 'running':
+                    elif job_status == b'R':
                         slurm_swift_running = True
 
                     break
