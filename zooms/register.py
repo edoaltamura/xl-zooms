@@ -605,7 +605,10 @@ if __name__ == "__main__":
     for i in completed_runs:
         print(i)
 
-    print(f"\n{' Test: redshift data ':-^40s}")
+    print(f"\n{' Test: redshift data (z = 0) ':-^40s}")
+    print(zooms_register[0].get_redshift())
+
+    print(f"\n{' Test: redshift data (z = 0.1) ':-^40s}")
     print(zooms_register[0].get_redshift(-3))
 
     advanced_search = input((
