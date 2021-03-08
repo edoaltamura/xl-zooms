@@ -221,7 +221,7 @@ class EXLZooms:
         # slurp off header line
         jobs = piper.stdout.readlines()[1:]
 
-        return jobs
+        return [job_info.decode("utf-8") for job_info in jobs]
 
     def analyse_incomplete_runs(self, stdout: bool = True) -> pd.DataFrame:
 
@@ -302,14 +302,12 @@ class EXLZooms:
             slurm_swift_running = False
             slurm_swift_queuing = False
 
-
-
             for line in slurm_jobs:
                 job_name, job_status = line.strip().split()
                 if job_name == run_name:
-                    if job_status == b'PD':
+                    if job_status == 'PD':
                         slurm_swift_queuing = True
-                    elif job_status == b'R':
+                    elif job_status == 'R':
                         slurm_swift_running = True
 
                     break
