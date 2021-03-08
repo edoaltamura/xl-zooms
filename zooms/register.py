@@ -71,32 +71,27 @@ def dump_memory_usage() -> None:
     ))
 
 
-def tail(f, lines=2):
-    total_lines_wanted = lines
-
-    BLOCK_SIZE = 1024
+def tail(f, window=1):
+    """
+    Returns the last `window` lines of file `f` as a list of bytes.
+    """
+    if window == 0:
+        return b''
+    BUFSIZE = 1024
     f.seek(0, 2)
-    block_end_byte = f.tell()
-    lines_to_go = total_lines_wanted
-    block_number = -1
-    blocks = []  # blocks of size BLOCK_SIZE, in reverse order starting
-    # from the end of the file
-    while lines_to_go > 0 and block_end_byte > 0:
-        if (block_end_byte - BLOCK_SIZE > 0):
-            # read the last block we haven't yet read
-            f.seek(block_number * BLOCK_SIZE, 2)
-            blocks.append(f.read(BLOCK_SIZE))
-        else:
-            # file too small, start from begining
-            f.seek(0, 0)
-            # only read what was not read
-            blocks.append(f.read(block_end_byte))
-        lines_found = blocks[-1].count('\n')
-        lines_to_go -= lines_found
-        block_end_byte -= BLOCK_SIZE
-        block_number -= 1
-    all_read_text = ''.join(reversed(blocks))
-    return '\n'.join(all_read_text.splitlines()[-total_lines_wanted:])
+    end = f.tell()
+    nlines = window + 1
+    data = []
+    while nlines > 0 and end > 0:
+        i = max(0, end - BUFSIZE)
+        nread = min(end, BUFSIZE)
+
+        f.seek(i)
+        chunk = f.read(nread)
+        data.append(chunk)
+        nlines -= chunk.count(b'\n')
+        end -= nread
+    return b'\n'.join(b''.join(reversed(data)).splitlines()[-window:]).decode('utf-8')
 
 
 class EXLZooms:
