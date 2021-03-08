@@ -92,8 +92,8 @@ class EXLZooms:
         # Search for any run directories in repositories
         for repository in self.cosma_repositories:
             for run_basename in os.listdir(repository)[:15]:
-                print(run_basename)
                 run_abspath = os.path.join(repository, run_basename)
+                print(run_abspath)
                 if os.path.isdir(run_abspath) and run_basename.startswith('L0300N0564'):
                     self.run_directories.append(run_abspath)
                     self.name_list.append(run_basename)
@@ -104,6 +104,7 @@ class EXLZooms:
         for i, run_directory in enumerate(self.run_directories):
             snaps_path = os.path.join(run_directory, 'snapshots')
             catalogues_path = os.path.join(run_directory, 'stf')
+            print(snaps_path)
 
             if os.path.isdir(snaps_path):
                 number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
