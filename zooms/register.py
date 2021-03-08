@@ -292,7 +292,7 @@ class EXLZooms:
             status_description = ["pending", "running", "compl", "susp", "stop"]
             slurm_status_descriptor = dict(zip(status_code, status_description))
 
-            cmd = os.path.expandvars('squeue -u $USER -o "%j %t"')
+            cmd = os.path.expandvars("squeue -u $USER -o '%j %t'")
             piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
 
             jobs = iter(piper.stdout.readline, "")
