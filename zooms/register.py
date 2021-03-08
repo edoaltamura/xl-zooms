@@ -112,8 +112,8 @@ class EXLZooms:
     # Zooms will be searched in this directories
     cosma_repositories: List[str] = [
         "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
-        # "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
-        # "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
+        "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
+        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
     name_list: List[str] = []
@@ -158,7 +158,6 @@ class EXLZooms:
             print(f"Found {len(self.name_list):d} zoom directories.")
             print(f"Runs completed: {self.complete_runs.sum():d}")
             print(f"Runs not completed: {len(self.complete_runs) - self.complete_runs.sum():d}")
-            print(self.name_list)
 
     @staticmethod
     def get_vr_number_from_name(basename: str) -> int:
@@ -300,6 +299,7 @@ class EXLZooms:
 
             for line in jobs:
                 job_name, job_status = line.strip().split()
+                print(job_name, job_status)
                 if job_name == run_name:
                     if slurm_status_descriptor[job_status] == 'pending':
                         slurm_swift_queuing = True
