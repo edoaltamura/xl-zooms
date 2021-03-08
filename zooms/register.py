@@ -328,6 +328,7 @@ class EXLZooms:
 
         if stdout:
             for i in range(len(incomplete_analysis)):
+                print(incomplete_analysis.iloc[[i]].values)
                 (
                     run_name,
                     run_directory,
