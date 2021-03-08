@@ -294,14 +294,12 @@ class EXLZooms:
 
             cmd = os.path.expandvars("squeue -u $USER -o '%j %t'")
             piper = sp.Popen(cmd, stdout=sp.PIPE, stderr=sp.PIPE, shell=True)
-            print(piper.stdout.readlines().strip().split())
-            jobs = iter(piper.stdout.readline, "")
 
             # slurp off header line
-            _ = next(jobs)
+            jobs = piper.stdout.readlines()[1:]
 
             for line in jobs:
-                job_name, job_status = line.decode().strip().split()
+                job_name, job_status = line.strip().split()
                 if job_name == run_name:
                     if slurm_status_descriptor[job_status] == 'pending':
                         slurm_swift_queuing = True
