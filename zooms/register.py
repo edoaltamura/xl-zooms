@@ -335,11 +335,13 @@ class EXLZooms:
                     slurm_code = 'que'
 
                 if np.isinf(last_redshift):
-                    last_redshift = 127.
+                    last_redshift_label = '127.'
+                else:
+                    last_redshift_label = f"{last_redshift:3.2f}"
 
                 print((
                     f"[{'!' if last_redshift > 0. else ' '}SW] "
-                    f"[z = {last_redshift:3.2f}] "
+                    f"[z = {last_redshift_label:s}] "
                     f"[{'!' if number_catalogues < number_snapshots_target else ' '}VR] "
                     f"[SLURM {slurm_code:s}] "
                     f"{run_name}"
