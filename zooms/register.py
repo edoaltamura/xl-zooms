@@ -328,7 +328,7 @@ class EXLZooms:
 
         # Sort dataframe by SLURM status
         incomplete_analysis.sort_values(
-            by=['SLURM SWIFT running', 'SLURM SWIFT queuing'],
+            by=['SLURM SWIFT running', 'SLURM SWIFT queuing', 'Last redshift'],
             ascending=False,
             inplace=True
         )
