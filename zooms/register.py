@@ -387,8 +387,8 @@ class Redshift(object):
         'a',
         'redshift',
         'z',
-        'snapshot_path',
-        'catalogue_properties_path',
+        'snapshot_paths',
+        'catalogue_properties_paths',
     )
 
     run_name: str
