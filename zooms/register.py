@@ -299,10 +299,12 @@ class EXLZooms:
 
             # slurp off header line
             _ = next(jobs)
-
+            job_list = []
             for line in jobs:
+                job_list.append(line.decode().strip().split())
 
-                job_name, job_status = line.decode().strip().split()
+            for job_info in job_list[:-1]:
+                job_name, job_status = job_info
                 if job_name == run_name:
 
                     if slurm_status_descriptor[job_status] == 'pending':
