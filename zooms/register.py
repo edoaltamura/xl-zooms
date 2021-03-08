@@ -326,7 +326,21 @@ class EXLZooms:
                 slurm_swift_queuing
             ]
 
-            if stdout:
+        if stdout:
+            for i in len(incomplete_analysis):
+                (
+                    run_name,
+                    run_directory,
+                    timesteps_file_found,
+                    last_redshift,
+                    snapshot_dir_found,
+                    number_snapshots,
+                    number_snapshots_target,
+                    stf_dir_found,
+                    number_catalogues,
+                    slurm_swift_running,
+                    slurm_swift_queuing
+                ) = incomplete_analysis.loc[i]
 
                 slurm_code = 'xxx'
                 if slurm_swift_running:
