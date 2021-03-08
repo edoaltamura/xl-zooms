@@ -214,24 +214,87 @@ class EXLZooms:
         incomplete_name_list = self.get_incomplete_run_names()
         incomplete_run_directories = self.get_incomplete_run_directories()
 
-        for run_directory in incomplete_run_directories:
+        analysis_criteria = [
+            'Run name',
+            'Run directory',
+            'Time steps log found',
+            'Last redshift',
+            'Snapshots initialised',
+            'Snapshots number',
+            'Snapshots number target',
+            'Stf initialised',
+            'Stf number',
+            'SLURM running',
+            'SLURM queuing'
+        ]
+
+        incomplete_analysis = pd.DataFrame(columns=analysis_criteria)
+
+        for run_name, run_directory in zip(incomplete_name_list, incomplete_run_directories):
+
+            # Initialise default analysis values
+            timesteps_file_found = False
+            last_redshift = np.inf
+            number_snapshots = 0
+            number_catalogues = 0
+
             for file in os.listdir(run_directory):
+
                 if file.startswith('timesteps_'):
+                    timesteps_file_found = True
+
+                    # Get the last redshift printed to the timesteps logs
                     timesteps_file = os.path.join(run_directory, file)
                     lastlast_line, last_line = tail(timesteps_file, window=2)
-
                     lastlast_line = lastlast_line.split()
                     last_line = last_line.split()
-                    print(lastlast_line, last_line)
 
                     if len(lastlast_line) == len(last_line):
                         last_redshift = float(last_line[3])
                     elif len(lastlast_line) > len(last_line):
                         last_redshift = float(lastlast_line[3])
 
-                    print(last_redshift)
-
                     break
+
+            # Analyse the snapshot and stf directories
+            snaps_path = os.path.join(run_directory, 'snapshots')
+            catalogues_path = os.path.join(run_directory, 'stf')
+            snapshot_dir_found = os.path.isdir(snaps_path)
+            stf_dir_found = os.path.isdir(catalogues_path)
+
+            if snapshot_dir_found:
+                number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
+
+            if stf_dir_found:
+                number_catalogues = len([subdir for subdir in os.listdir(catalogues_path)])
+
+            output_list_file = os.path.join(run_directory, 'snap_redshifts.txt')
+            output_list = pd.read_csv(output_list_file)
+            redshifts = output_list["# Redshift"].values
+
+            if " Select Output" in output_list.columns:
+                index_snaps = np.arange(len(output_list))[
+                    np.logical_or.reduce(
+                        [output_list[" Select Output"] == f" Snapshot"]
+                    )
+                ]
+            else:
+                index_snaps = np.arange(len(redshifts))
+
+            number_snapshots_target = len(index_snaps)
+
+            incomplete_analysis.loc[i] = [
+                run_name,
+                run_directory,
+                timesteps_file_found,
+                last_redshift,
+                snapshot_dir_found,
+                number_snapshots,
+                number_snapshots_target,
+                stf_dir_found,
+                number_catalogues
+            ]
+
 
 
 class Redshift(object):
