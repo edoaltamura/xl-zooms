@@ -1,7 +1,53 @@
-# To integrate the zooms register in external codes, write the following import statement
-#       from register import zooms_register
-# To access the catalog file of the first zoom, use
-#       zooms_register[0].catalog_file
+# -*- coding: utf-8 -*-
+"""Register back-end for EAGLE-XL Zoom calibration
+
+This module contains the classes and handles for retrieving the zoom simulations
+throughout the COSMA system, by specifying some _look-up_ directories.
+The main use of this module includes the interoperability with higher-level
+modules and API for the analysis pipeline.
+
+Example:
+    Running the file will print the current status of the simulations, which can
+    used as a summary list for all runs generated and for their locations in the
+    system. Remember to `git pull` changes from the remote repository regularly.
+
+        $ python3 register.py
+
+    To use the functionalities in `register.py`, use the import statement or
+    import specific attributes/classes.
+
+        import register
+        from register import zooms_register
+
+    From this you can access zoom-specific data, such as
+
+         zooms_register[0].run_name
+
+Attributes:
+    Tcut_halogas (float): Hot gas temperature threshold in Kelvin. The analysis
+    will only consider gas particles above this temperature, excluding cold gas
+    and gas on the equation of state.
+
+    SILENT_PROGRESSBAR (bool): Specifies whether progress-bars called with
+    `tqdm` should appear in the console when the pipeline is run. E.g. for
+    long computations, or when running in the background with `nohup [cmd] &`,
+    you may want to set this to `True` to avoid printing the progress-bar.
+
+    zooms_register (List[Zoom]): specifies the zooms catalogues formed with
+    runs that have completed
+
+Todo:
+    * Finish developing the analyse_incomplete_runs method
+    * Make Zoom attributes slots and static declarations
+
+
+To maintain a readable and extensible documentation, please refer to this
+guidelines:
+.. _Google Python Style Guide:
+   http://google.github.io/styleguide/pyguide.html
+
+"""
+
 import io
 import os
 import h5py
@@ -12,7 +58,7 @@ import pandas as pd
 from tqdm import tqdm
 from typing import List
 
-Tcut_halogas = 1.e5  # Hot gas temperature threshold in K
+Tcut_halogas = 1.e5
 SILENT_PROGRESSBAR = False
 
 
@@ -88,14 +134,35 @@ class EXLZooms:
         self.complete_runs = complete_runs
 
     @staticmethod
-    def get_vr_number_from_name(name: str) -> int:
+    def get_vr_number_from_name(basename: str) -> int:
+        """
+        Takes a zoom run base-name and returns the Velociraptor catalogue number
+        contained in it. Accepts strings and returns the index as integer.
+
+        Example:
+            Accepts: str L0300N0564_VR187_-8res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth
+            Returns: int 187
+
+        Args:
+            basename (str): The basename of the run directory (not absolute path).
+
+        Returns:
+            int: The Velociraptor catalogue number derived from the basename
+        """
         start = 'VR'
         end = '_'
-        start_position = name.find(start) + len(start)
-        result = name[start_position:name.find(end, start_position)]
+        start_position = basename.find(start) + len(start)
+        result = basename[start_position:basename.find(end, start_position)]
         return int(result)
 
     def get_vr_numbers_unique(self) -> List[int]:
+        """
+        Accessed the full name_list attribute from the class and returns a list with
+        the unique VR numbers in the catalogue.
+
+        Returns:
+            List[int]: List of unique VR numbers in the catalogue
+        """
         vr_nums = [self.get_vr_number_from_name(name) for name in self.name_list]
         vr_nums = set(vr_nums)
         return list(vr_nums).sort()
@@ -304,15 +371,9 @@ class Zoom(object):
         return Redshift(redshift_info)
 
 
-zooms_register = []
 calibration_zooms = EXLZooms()
-completed_runs = [
-    calibration_zooms.run_directories[i] for i in calibration_zooms.complete_runs
-]
-for run_directory in completed_runs:
-    zooms_register.append(
-        Zoom(run_directory)
-    )
+completed_runs = [calibration_zooms.run_directories[i] for i in calibration_zooms.complete_runs]
+zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
 
 # Sort zooms by VR number
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
