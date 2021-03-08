@@ -71,35 +71,27 @@ def dump_memory_usage() -> None:
     ))
 
 
-def tail(f, window=20):
+def tail(f, window=1):
     """
-    Returns the last `window` lines of file `f` as a list.
-    f - a byte file-like object
+    Returns the last `window` lines of file `f` as a list of bytes.
     """
     if window == 0:
-        return []
-    BUFSIZ = 1024
+        return b''
+    BUFSIZE = 1024
     f.seek(0, 2)
-    bytes = f.tell()
-    size = window + 1
-    block = -1
+    end = f.tell()
+    nlines = window + 1
     data = []
-    while size > 0 and bytes > 0:
-        if bytes - BUFSIZ > 0:
-            # Seek back one whole BUFSIZ
-            f.seek(block * BUFSIZ, 2)
-            # read BUFFER
-            data.insert(0, f.read(BUFSIZ))
-        else:
-            # file too small, start from begining
-            f.seek(0,0)
-            # only read what was not read
-            data.insert(0, f.read(bytes))
-        linesFound = data[0].count('\n')
-        size -= linesFound
-        bytes -= BUFSIZ
-        block -= 1
-    return ''.join(data).splitlines()[-window:]
+    while nlines > 0 and end > 0:
+        i = max(0, end - BUFSIZE)
+        nread = min(end, BUFSIZE)
+
+        f.seek(i)
+        chunk = f.read(nread)
+        data.append(chunk)
+        nlines -= chunk.count(b'\n')
+        end -= nread
+    return b'\n'.join(b''.join(reversed(data)).splitlines()[-window:]).decode('utf-8')
 
 
 class EXLZooms:
