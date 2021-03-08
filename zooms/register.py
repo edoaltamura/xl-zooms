@@ -127,7 +127,6 @@ class EXLZooms:
             print(f"Runs not completed: {len(self.complete_runs) - self.complete_runs.sum():d}")
             print(self.name_list)
 
-
     @staticmethod
     def get_vr_number_from_name(basename: str) -> int:
         """
@@ -162,12 +161,20 @@ class EXLZooms:
         vr_nums = set(vr_nums)
         return list(vr_nums).sort()
 
-    def get_completed_catalogue(self):
+    def get_completed_run_directories(self) -> List[str]:
         directories = np.array(self.run_directories, dtype=np.str)
         return directories[self.complete_runs].tolist()
 
-    def get_incomplete_catalogue(self):
+    def get_incomplete_run_directories(self) -> List[str]:
         directories = np.array(self.run_directories, dtype=np.str)
+        return directories[~self.complete_runs].tolist()
+
+    def get_completed_run_names(self) -> List[str]:
+        directories = np.array(self.name_list, dtype=np.str)
+        return directories[self.complete_runs].tolist()
+
+    def get_incomplete_run_names(self) -> List[str]:
+        directories = np.array(self.name_list, dtype=np.str)
         return directories[~self.complete_runs].tolist()
 
     def analyse_incomplete_runs(self):
@@ -227,6 +234,25 @@ class Redshift(object):
 
 
 class Zoom(object):
+    __slots__ = (
+        'run_name',
+        'run_directory',
+        'redshifts',
+        'scale_factors',
+        'index_snaps',
+        'index_snips',
+        'snapshot_paths',
+        'catalogue_properties_paths',
+    )
+
+    run_name: str
+    run_directory: str
+    redshifts: np.ndarray[np.float]
+    scale_factors: np.ndarray[np.float]
+    index_snaps: np.ndarray
+    index_snips: np.ndarray
+    snapshot_paths: List[str]
+    catalogue_properties_paths: List[str]
 
     def __init__(self, run_directory: str) -> None:
         self.run_name = os.path.basename(run_directory)
