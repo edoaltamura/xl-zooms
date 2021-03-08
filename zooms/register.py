@@ -162,6 +162,12 @@ class EXLZooms:
         vr_nums = set(vr_nums)
         return list(vr_nums).sort()
 
+    def get_completed_catalogue(self):
+        return [self.run_directories[i] for i in self.complete_runs if i]
+
+    def get_incomplete_catalogue(self):
+        return [self.run_directories[i] for i in self.complete_runs if not i]
+
     def analyse_incomplete_runs(self):
 
         incomplete_name_list = self.name_list[~self.complete_runs]
@@ -367,7 +373,7 @@ class Zoom(object):
 
 
 calibration_zooms = EXLZooms()
-completed_runs = [calibration_zooms.run_directories[i] for i in calibration_zooms.complete_runs]
+completed_runs = calibration_zooms.get_completed_catalogue()
 zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
 
 # Sort zooms by VR number
