@@ -38,7 +38,6 @@ Attributes:
 
 Todo:
     * Finish developing the analyse_incomplete_runs method
-    * Make Zoom attributes slots and static declarations
 
 
 To maintain a readable and extensible documentation, please refer to this
@@ -179,22 +178,26 @@ class EXLZooms:
 
     def analyse_incomplete_runs(self):
 
-        incomplete_name_list = self.name_list[~self.complete_runs]
-        incomplete_run_directories = self.run_directories[~self.complete_runs]
+        incomplete_name_list = self.get_incomplete_run_names()
+        incomplete_run_directories = self.get_incomplete_run_directories()
 
         for run_directory in incomplete_run_directories:
             for file in os.listdir(run_directory):
-                if file.startswith('timesteps'):
+                if file.startswith('timesteps_'):
                     timesteps_file = os.path.join(run_directory, file)
 
-        with open(timesteps_file, 'r') as file_handle:
-            lastlast_line = file_handle.readlines()[-2].split()
-            last_line = file_handle.readlines()[-1].split()
+                    with open(timesteps_file, 'r') as file_handle:
+                        lastlast_line = file_handle.readlines()[-2].split()
+                        last_line = file_handle.readlines()[-1].split()
 
-            if len(lastlast_line) == len(last_line):
-                last_redshift = float(last_line[3])
-            elif len(lastlast_line) > len(last_line):
-                last_redshift = float(lastlast_line[3])
+                        if len(lastlast_line) == len(last_line):
+                            last_redshift = float(last_line[3])
+                        elif len(lastlast_line) > len(last_line):
+                            last_redshift = float(lastlast_line[3])
+
+                        print(last_redshift)
+
+                    break
 
 
 class Redshift(object):
@@ -402,6 +405,7 @@ class Zoom(object):
 calibration_zooms = EXLZooms()
 completed_runs = calibration_zooms.get_completed_run_directories()
 zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
+calibration_zooms.analyse_incomplete_runs()
 
 # Sort zooms by VR number
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
