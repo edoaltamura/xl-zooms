@@ -299,7 +299,7 @@ class EXLZooms:
 
             # slurp off header line
             _ = next(jobs)
-            print(next(jobs))
+            print(next(jobs)[0])
 
             for line in jobs:
                 print(line.decode().strip().split())
