@@ -71,27 +71,37 @@ def dump_memory_usage() -> None:
     ))
 
 
-def tail(f, window=1):
-    """
-    Returns the last `window` lines of file `f` as a list of bytes.
-    """
-    if window == 0:
-        return b''
-    BUFSIZE = 1024
-    f.seek(0, 2)
-    end = f.tell()
-    nlines = window + 1
-    data = []
-    while nlines > 0 and end > 0:
-        i = max(0, end - BUFSIZE)
-        nread = min(end, BUFSIZE)
-
-        f.seek(i)
-        chunk = f.read(nread)
-        data.append(chunk)
-        nlines -= chunk.count(b'\n')
-        end -= nread
-    return b'\n'.join(b''.join(reversed(data)).splitlines()[-window:]).decode('utf-8')
+def tail(fname, window=2):
+    """Read last N lines from file fname."""
+    if window <= 0:
+        raise ValueError('invalid window value %r' % window)
+    with open(fname) as f:
+        BUFSIZ = 1024
+        # True if open() was overridden and file was opened in text
+        # mode. In that case readlines() will return unicode strings
+        # instead of bytes.
+        encoded = getattr(f, 'encoding', False)
+        CR = '\n' if encoded else b'\n'
+        data = '' if encoded else b''
+        f.seek(0, os.SEEK_END)
+        fsize = f.tell()
+        block = -1
+        exit = False
+        while not exit:
+            step = (block * BUFSIZ)
+            if abs(step) >= fsize:
+                f.seek(0)
+                newdata = f.read(BUFSIZ - (abs(step) - fsize))
+                exit = True
+            else:
+                f.seek(step, os.SEEK_END)
+                newdata = f.read(BUFSIZ)
+            data = newdata + data
+            if data.count(CR) >= window:
+                break
+            else:
+                block -= 1
+        return data.splitlines()[-window:]
 
 
 class EXLZooms:
@@ -213,15 +223,15 @@ class EXLZooms:
 
                         print(tail(file_handle))
 
-                        lastlast_line = file_handle.readlines()[-2].split()
-                        last_line = file_handle.readlines()[-1].split()
-
-                        if len(lastlast_line) == len(last_line):
-                            last_redshift = float(last_line[3])
-                        elif len(lastlast_line) > len(last_line):
-                            last_redshift = float(lastlast_line[3])
-
-                        print(last_redshift)
+                        # lastlast_line = file_handle.readlines()[-2].split()
+                        # last_line = file_handle.readlines()[-1].split()
+                        #
+                        # if len(lastlast_line) == len(last_line):
+                        #     last_redshift = float(last_line[3])
+                        # elif len(lastlast_line) > len(last_line):
+                        #     last_redshift = float(lastlast_line[3])
+                        #
+                        # print(last_redshift)
 
                     break
 
