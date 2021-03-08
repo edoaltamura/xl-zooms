@@ -71,6 +71,30 @@ def dump_memory_usage() -> None:
     ))
 
 
+def tail(f, lines=2):
+    total_lines_wanted = lines
+
+    block_size = 1024
+    f.seek(0, 2)
+    block_end_byte = f.tell()
+    lines_to_go = total_lines_wanted
+    block_number = -1
+    blocks = []
+    while lines_to_go > 0 and block_end_byte > 0:
+        if block_end_byte - block_size > 0:
+            f.seek(block_number * block_size, 2)
+            blocks.append(f.read(block_size))
+        else:
+            f.seek(0, 0)
+            blocks.append(f.read(block_end_byte))
+        lines_found = blocks[-1].count(b'\n')
+        lines_to_go -= lines_found
+        block_end_byte -= block_size
+        block_number -= 1
+    all_read_text = b''.join(reversed(blocks))
+    return b'\n'.join(all_read_text.splitlines()[-total_lines_wanted:])
+
+
 class EXLZooms:
     name: str = 'Eagle-XL Zooms'
     output_dir: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
@@ -187,6 +211,9 @@ class EXLZooms:
                     timesteps_file = os.path.join(run_directory, file)
 
                     with open(timesteps_file, 'r') as file_handle:
+
+                        print(tail(file_handle))
+
                         lastlast_line = file_handle.readlines()[-2].split()
                         last_line = file_handle.readlines()[-1].split()
 
