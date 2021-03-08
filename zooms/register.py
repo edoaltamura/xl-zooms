@@ -336,8 +336,9 @@ class EXLZooms:
         if stdout:
             print(f"\n{' Detailed search on incomplete runs ':-^40s}")
             print((
-                "\tLegend:"
+                "\tLegend:\n"
                 "`!` = Incomplete \n`SW` = SWIFT \n`VR` = Velociraptor \n"
+                "`z = 127.` = Simulation not started \n"
                 "`xxx` = Not on SLURM queue \n`que` = Pending in SLURM queue \n"
                 "`run` = Running on partition\n"
             ))
