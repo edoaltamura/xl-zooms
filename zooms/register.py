@@ -380,7 +380,7 @@ zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
 
 if __name__ == "__main__":
-    incomplete_runs = [run for run in calibration_zooms.run_directories if run not in completed_runs]
+    incomplete_runs = calibration_zooms.get_incomplete_catalogue()
     print((
         "\n"
         "The following simulations were found with directory set-up, "
