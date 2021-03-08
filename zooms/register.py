@@ -576,7 +576,7 @@ class Zoom(object):
         redshift_info['run_name'] = self.run_name
         redshift_info['scale_factor'] = self.scale_factors[self.index_snaps][index]
         redshift_info['redshift'] = redshift_select
-        redshift_info['snapshot_path'] = self.snapshot_paths[index]
+        redshift_info['snapshot_paths'] = self.snapshot_paths[index]
         redshift_info['catalogue_properties_paths'] = self.catalogue_properties_paths[index]
 
         return Redshift(redshift_info)
