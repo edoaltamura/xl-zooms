@@ -327,8 +327,8 @@ class EXLZooms:
             ]
 
         if stdout:
-            for i in range(len(incomplete_analysis)):
-                print(incomplete_analysis.iloc[[i]].values)
+            incomplete_analysis_listform = incomplete_analysis.values.tolist()
+            for i in range(len(incomplete_analysis_listform)):
                 (
                     run_name,
                     run_directory,
@@ -341,7 +341,7 @@ class EXLZooms:
                     number_catalogues,
                     slurm_swift_running,
                     slurm_swift_queuing
-                ) = incomplete_analysis.iloc[[i]].values
+                ) = incomplete_analysis_listform[i]
 
                 slurm_code = 'xxx'
                 if slurm_swift_running:
