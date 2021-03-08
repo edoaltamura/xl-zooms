@@ -230,7 +230,7 @@ class EXLZooms:
 
         incomplete_analysis = pd.DataFrame(columns=analysis_criteria)
 
-        for run_name, run_directory in zip(incomplete_name_list, incomplete_run_directories):
+        for i, (run_name, run_directory) in enumerate(zip(incomplete_name_list, incomplete_run_directories)):
 
             # Initialise default analysis values
             timesteps_file_found = False
