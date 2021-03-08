@@ -221,7 +221,7 @@ class EXLZooms:
 
                     with open(timesteps_file, 'r') as file_handle:
 
-                        print(tail(file_handle))
+                        print(tail(timesteps_file))
 
                         # lastlast_line = file_handle.readlines()[-2].split()
                         # last_line = file_handle.readlines()[-1].split()
