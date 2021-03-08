@@ -93,7 +93,6 @@ class EXLZooms:
         for repository in self.cosma_repositories:
             for run_basename in os.listdir(repository)[:15]:
                 run_abspath = os.path.join(repository, run_basename)
-                print(run_abspath)
                 if os.path.isdir(run_abspath) and run_basename.startswith('L0300N0564'):
                     self.run_directories.append(run_abspath)
                     self.name_list.append(run_basename)
@@ -128,7 +127,6 @@ class EXLZooms:
             print(f"Runs completed: {self.complete_runs.sum():d}")
             print(f"Runs not completed: {len(self.complete_runs) - self.complete_runs.sum():d}")
 
-        print(self.name_list, self.run_directories, self.complete_runs)
 
     @staticmethod
     def get_vr_number_from_name(basename: str) -> int:
