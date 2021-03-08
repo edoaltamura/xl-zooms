@@ -300,6 +300,7 @@ class EXLZooms:
             # slurp off header line
             _ = next(jobs)
             job_list = []
+            print(jobs.decode().strip().split())
             for line in jobs:
                 print(line.decode().strip().split())
                 job_list.append(line.decode().strip().split())
