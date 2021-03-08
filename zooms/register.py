@@ -299,7 +299,6 @@ class EXLZooms:
 
             for line in jobs:
                 job_name, job_status = line.strip().split()
-                print(job_name, job_status)
                 if job_name == run_name:
                     if slurm_status_descriptor[job_status] == 'pending':
                         slurm_swift_queuing = True
@@ -321,6 +320,8 @@ class EXLZooms:
                 slurm_swift_running,
                 slurm_swift_queuing
             ]
+
+        print(incomplete_analysis)
 
 
 
