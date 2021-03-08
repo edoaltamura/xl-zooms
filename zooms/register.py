@@ -339,7 +339,7 @@ class EXLZooms:
 
                 print((
                     f"[{'!' if last_redshift > 0. else ' '}SW] "
-                    f"[z = {last_redshift:.2f}] "
+                    f"[z = {last_redshift:3.2f}] "
                     f"[{'!' if number_catalogues < number_snapshots_target else ' '}VR] "
                     f"[SLURM {slurm_code:s}] "
                     f"{run_name}"
