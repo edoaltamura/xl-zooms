@@ -133,6 +133,8 @@ class EXLZooms:
         self.run_directories = run_directories
         self.complete_runs = complete_runs
 
+        print(self.name_list, self.run_directories, self.complete_runs)
+
     @staticmethod
     def get_vr_number_from_name(basename: str) -> int:
         """
