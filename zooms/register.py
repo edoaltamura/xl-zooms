@@ -606,7 +606,7 @@ if __name__ == "__main__":
         print(i)
 
     print(f"\n{' Test: redshift data ':-^40s}")
-    print(zooms_register[0].get_redshift(30))
+    print(zooms_register[0].get_redshift(33))
 
     advanced_search = input((
         "Press `y` to initialise the advanced search on incomplete runs. "
