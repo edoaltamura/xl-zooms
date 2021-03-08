@@ -400,14 +400,14 @@ class Zoom(object):
 
 
 calibration_zooms = EXLZooms()
-completed_runs = calibration_zooms.get_completed_catalogue()
+completed_runs = calibration_zooms.get_completed_run_directories()
 zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
 
 # Sort zooms by VR number
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
 
 if __name__ == "__main__":
-    incomplete_runs = calibration_zooms.get_incomplete_catalogue()
+    incomplete_runs = calibration_zooms.get_incomplete_run_directories()
     print((
         "\n"
         "The following simulations were found with directory set-up, "
