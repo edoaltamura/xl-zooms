@@ -301,6 +301,7 @@ class EXLZooms:
             _ = next(jobs)
 
             for line in jobs:
+                print(line.decode().strip().split())
                 job_name, job_status = line.decode().strip().split()
                 if job_name == run_name:
                     if slurm_status_descriptor[job_status] == 'pending':
