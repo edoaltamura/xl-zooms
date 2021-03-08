@@ -163,10 +163,12 @@ class EXLZooms:
         return list(vr_nums).sort()
 
     def get_completed_catalogue(self):
-        return [self.run_directories[i] for i in self.complete_runs if i]
+        directories = np.array(self.run_directories, dtype=np.str)
+        return directories[self.complete_runs].tolist()
 
     def get_incomplete_catalogue(self):
-        return [self.run_directories[i] for i in self.complete_runs if not i]
+        directories = np.array(self.run_directories, dtype=np.str)
+        return directories[~self.complete_runs].tolist()
 
     def analyse_incomplete_runs(self):
 
