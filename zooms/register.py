@@ -304,10 +304,13 @@ class EXLZooms:
 
                 job_name, job_status = line.decode().strip().split()
                 if job_name == run_name:
+
                     if slurm_status_descriptor[job_status] == 'pending':
                         slurm_swift_queuing = True
                     elif slurm_status_descriptor[job_status] == 'running':
                         slurm_swift_running = True
+
+                    break
 
             incomplete_analysis.loc[i] = [
                 run_name,
