@@ -334,6 +334,13 @@ class EXLZooms:
         )
 
         if stdout:
+            print(f"\n{' Detailed search on incomplete runs ':-^40s}")
+            print((
+                "\tLegend:"
+                "`!` = Incomplete \n`SW` = SWIFT \n`VR` = Velociraptor \n"
+                "`xxx` = Not on SLURM queue \n`que` = Pending in SLURM queue \n"
+                "`run` = Running on partition\n"
+            ))
             incomplete_analysis_listform = incomplete_analysis.values.tolist()
             for i in range(len(incomplete_analysis_listform)):
                 (
