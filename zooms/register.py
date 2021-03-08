@@ -78,9 +78,9 @@ class EXLZooms:
 
     # Zooms will be searched in this directories
     cosma_repositories: List[str] = [
-        "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
+        # "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
+        # "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
     name_list: List[str]
@@ -89,21 +89,18 @@ class EXLZooms:
 
     def __init__(self) -> None:
 
-        name_list = []
-        run_directories = []
-
         # Search for any run directories in repositories
         for repository in self.cosma_repositories:
             for run_basename in os.listdir(repository):
                 run_abspath = os.path.join(repository, run_basename)
                 if os.path.isdir(run_abspath) and run_basename.startswith('L0300N0564'):
-                    run_directories.append(run_abspath)
-                    name_list.append(run_basename)
+                    self.run_directories.append(run_abspath)
+                    self.name_list.append(run_basename)
 
         # Classify complete and incomplete runs
-        complete_runs = np.zeros(len(name_list), dtype=np.bool)
+        self.complete_runs = np.zeros(len(self.name_list), dtype=np.bool)
 
-        for i, run_directory in enumerate(run_directories):
+        for i, run_directory in enumerate(self.run_directories):
             snaps_path = os.path.join(run_directory, 'snapshots')
             catalogues_path = os.path.join(run_directory, 'stf')
 
@@ -122,16 +119,12 @@ class EXLZooms:
                     (number_catalogues > 0) and
                     (number_snapshots == number_catalogues)
             ):
-                complete_runs[i] = True
+                self.complete_runs[i] = True
 
         if __name__ == "__main__":
-            print(f"Found {len(name_list):d} zoom directories.")
-            print(f"Runs completed: {complete_runs.sum():d}")
-            print(f"Runs not completed: {len(complete_runs) - complete_runs.sum():d}")
-
-        self.name_list = name_list
-        self.run_directories = run_directories
-        self.complete_runs = complete_runs
+            print(f"Found {len(self.name_list):d} zoom directories.")
+            print(f"Runs completed: {self.complete_runs.sum():d}")
+            print(f"Runs not completed: {len(self.complete_runs) - self.complete_runs.sum():d}")
 
         print(self.name_list, self.run_directories, self.complete_runs)
 
