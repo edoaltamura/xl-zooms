@@ -247,12 +247,12 @@ class Zoom(object):
 
     run_name: str
     run_directory: str
-    redshifts: np.ndarray[np.float]
-    scale_factors: np.ndarray[np.float]
+    redshifts: np.ndarray
+    scale_factors: np.ndarray
     index_snaps: np.ndarray
     index_snips: np.ndarray
-    snapshot_paths: List[str]
-    catalogue_properties_paths: List[str]
+    snapshot_paths: List[str] = []
+    catalogue_properties_paths: List[str] = []
 
     def __init__(self, run_directory: str) -> None:
         self.run_name = os.path.basename(run_directory)
@@ -260,9 +260,6 @@ class Zoom(object):
         self.redshifts, self.scale_factors, self.index_snaps, self.index_snips = self.read_output_list()
 
         # Retrieve absolute data paths to files
-        self.snapshot_paths = []
-        self.catalogue_properties_paths = []
-
         snapshot_files = os.listdir(os.path.join(self.run_directory, 'snapshots'))
         snapshot_files = [file_name for file_name in snapshot_files if file_name.endswith('.hdf5')]
 
