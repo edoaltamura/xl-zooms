@@ -114,7 +114,7 @@ def tail(fname, window=2):
 
 class EXLZooms(object):
     name: str = 'Eagle-XL Zooms'
-    output_dir: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
+    output_directory: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
     # Zooms will be searched in this directories
     cosma_repositories: List[str] = [
