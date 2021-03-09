@@ -2,38 +2,45 @@
 import sys
 import os
 import unyt
-import numpy as np
-from typing import Tuple
+import argparse
 import h5py as h5
-import swiftsimio as sw
+import numpy as np
 import pandas as pd
+import swiftsimio as sw
+from typing import Tuple
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
-
-# Make the register backend visible to the script
-sys.path.append("../zooms")
-sys.path.append("../observational_data")
-
-from register import zooms_register, Zoom, Tcut_halogas, name_list
-import observational_data as obs
-import scaling_utils as utils
-import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
 
-# Make argument parser explicit
-KEYWORDS = sys.argv[1].split(',')
+# Make the register backend visible to the script
+sys.path.append("../zooms")
+sys.path.append("../observational_data")
 
-cosmology = obs.Observations().cosmo_model
-fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
+from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
+import observational_data as obs
+import scaling_utils as utils
+import scaling_style as style
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
+parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
+parser.add_argument('-r', '--redshift-index', type=int, default=37, required=False,
+                    choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
+parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
+                    choices=['crit', 'true', 'hse'])
+parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
+args = parser.parse_args()
 
 
 def process_single_halo(
         path_to_snap: str,
-        path_to_catalogue: str
+        path_to_catalogue: str,
+        hse_dataset: pd.Series = None,
 ) -> Tuple[unyt.unyt_quantity]:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
@@ -42,6 +49,13 @@ def process_single_halo(
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+
+        # If no custom aperture, select R500c as default
+        if hse_dataset is not None:
+            assert R500c.units == hse_dataset["R500hse"].units
+            assert M500c.units == hse_dataset["M500hse"].units
+            R500c = hse_dataset["R500hse"]
+            M500c = hse_dataset["M500hse"]
 
     # Read in gas particles to compute the core-excised temperature
     mask = sw.mask(f'{path_to_snap}', spatial_only=False)
@@ -92,7 +106,32 @@ def process_single_halo(
     'Etherm_500crit'
 ])
 def _process_single_halo(zoom: Zoom):
-    return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+
+    # Select redshift
+    snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
+    catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
+
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
+
+        return process_single_halo(snapshot_file, catalog_file)
+
+    elif args.mass_estimator == 'hse':
+        try:
+            hse_catalogue = pd.read_pickle(f'{calibration_zooms.output_directory}/hse_massbias.pkl')
+        except FileExistsError as error:
+            raise FileExistsError(
+                f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
+            )
+
+        hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
+        print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
+        if zoom.run_name in hse_catalogue_names:
+            i = hse_catalogue_names.index(zoom.run_name)
+            hse_entry = hse_catalogue.loc[i]
+        else:
+            raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
+
+        return process_single_halo(snapshot_file, catalog_file, hse_dataset=hse_entry)
 
 
 def relaxation(results: pd.DataFrame):
@@ -125,31 +164,33 @@ def relaxation(results: pd.DataFrame):
     # Display observational data
     handles = []
 
-    Barnes17 = obs.Barnes17().hdf5.z000p000.true
-    relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
-    ax.scatter(Barnes17.M500[relaxed < 0.1], relaxed[relaxed < 0.1],
-               marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
-    ax.scatter(Barnes17.M500[relaxed > 0.1], relaxed[relaxed > 0.1],
-               marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
-    handles.append(
-        Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=obs.Barnes17().citation + ' $z=0$')
-    )
-    del Barnes17
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
+        Barnes17 = obs.Barnes17().hdf5.z000p000.true
+        relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
+        ax.scatter(Barnes17.M500[relaxed < 0.1], relaxed[relaxed < 0.1],
+                   marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)
+        ax.scatter(Barnes17.M500[relaxed > 0.1], relaxed[relaxed > 0.1],
+                   marker='s', s=5, alpha=1, facecolors='w', edgecolors='k', linewidth=0.4, zorder=0)
+        handles.append(
+            Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=obs.Barnes17().citation + ' $z=0$')
+        )
+        del Barnes17
 
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
     ax.axhline(y=0.1, linestyle='--', linewidth=1, color='k')
-    ax.set_xlabel(r'$M_{500{\rm crit}}\ [{\rm M}_{\odot}]$')
+    ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_ylabel(r'$E_{\rm kin}\ /E_{\rm therm}\ (<R_{500{\rm crit}})$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_ylim([0.02, 1.5])
-    fig.savefig(f'{zooms_register[0].output_directory}/relaxation.png', dpi=300)
+    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
+    fig.savefig(f'{calibration_zooms.output_directoryy}/relaxation_{args.redshift_index:d}.png', dpi=300)
     plt.show()
     plt.close()
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword=KEYWORDS)
+    results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
     relaxation(results)

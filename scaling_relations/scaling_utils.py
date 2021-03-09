@@ -26,7 +26,7 @@ sys.path.append(
     )
 )
 
-from register import zooms_register, Zoom, Redshift
+from register import zooms_register, Zoom
 
 
 def set_output_names(dataset_names: List[str]):
