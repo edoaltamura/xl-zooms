@@ -43,7 +43,7 @@ def process_single_halo(
         hse_dataset: pd.Series = None,
 ) -> Tuple[unyt.unyt_quantity]:
     # Read in halo properties
-    with h5.File(f'{path_to_catalogue}', 'r') as h5file:
+    with h5.File(path_to_catalogue, 'r') as h5file:
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -58,7 +58,7 @@ def process_single_halo(
             M500c = hse_dataset["M500hse"]
 
     # Read in gas particles to compute the core-excised temperature
-    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    mask = sw.mask(path_to_snap, spatial_only=False)
     region = [[XPotMin - 1.1 * R500c, XPotMin + 1.1 * R500c],
               [YPotMin - 1.1 * R500c, YPotMin + 1.1 * R500c],
               [ZPotMin - 1.1 * R500c, ZPotMin + 1.1 * R500c]]
@@ -68,10 +68,11 @@ def process_single_halo(
         Tcut_halogas * mask.units.temperature,
         1.e12 * mask.units.temperature
     )
-    data = sw.load(f'{path_to_snap}', mask=mask)
+    data = sw.load(path_to_snap, mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
     velGas = data.gas.velocities.to_physical()
+    print(velGas.cosmo_factor, velGas)
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
     # Select hot gas within sphere and without core
