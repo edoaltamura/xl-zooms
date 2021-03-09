@@ -246,7 +246,7 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * obs.cosmic_fbary for lim in ax.get_xlim()], '--', color='k')
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
-    fig.savefig(f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas.png', dpi=300)
+    fig.savefig(f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas_{args.redshift_index:d}.png', dpi=300)
     if not args.quiet:
         plt.show()
     plt.close()
@@ -354,7 +354,7 @@ def f_500_hotgas(results: pd.DataFrame):
     ax.set_xlim([4e12, 6e15])
     ax.plot(ax.get_xlim(), [obs.cosmic_fbary for _ in ax.get_xlim()], '--', color='k')
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
-    fig.savefig(f'{calibration_zooms.output_directory}/f500{args.mass_estimator}_hotgas.png', dpi=300)
+    fig.savefig(f'{calibration_zooms.output_directory}/f500{args.mass_estimator}_hotgas_{args.redshift_index:d}.png', dpi=300)
     if not args.quiet:
         plt.show()
     plt.close()
