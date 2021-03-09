@@ -163,7 +163,7 @@ class Observations:
 
         for model_name in dir(cosmology):
             if cosmo_model.lower() == model_name.lower():
-                if self.verbose > 0:
+                if self.verbose > 1:
                     print(f"Using the {model_name} cosmology")
                 self.cosmo_model = getattr(cosmology, model_name)
 
