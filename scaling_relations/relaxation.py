@@ -57,7 +57,7 @@ def process_single_halo(
     data = sw.load(f'{path_to_snap}', mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
-    velGas = data.gas.velocities
+    velGas = data.gas.velocities.to_physical()
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
     # Select hot gas within sphere and without core

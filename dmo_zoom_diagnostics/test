@@ -723,3 +723,22 @@ do
     sed -i "s/_-8res/_+1res/" L0300N0564_VR"$t"_+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth/params.yml
     grep "/cosma" L0300N0564_VR"$t"_+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth/params.yml
 done
+
+for i in {24..36}
+do
+   python3 hotgasmass_halomass.py -r $i -m true -k dT8.5_ -q
+done
+
+ffmpeg \
+    -framerate 2 \
+    -start_number 24 \
+    -i f500true_hotgas_%02d.png \
+    -vf scale=-2:1080,format=yuv420p \
+    -c:v libx264 \
+    -profile:v high \
+    -c:a aac \
+    -strict experimental \
+    -b:a 192k \
+    -movflags faststart \
+    -crf 16 \
+    f500true_hotgas.mp4
