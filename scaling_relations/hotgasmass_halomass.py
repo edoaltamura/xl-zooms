@@ -2,7 +2,7 @@
 Plot scaling relations for EAGLE-XL tests
 
 Run using:
-    git pull; python3 hotgasmass_halomass.py -m true -k dT8_ dT8.5_
+    git pull; python3 hotgasmass_halomass.py -r 37 -m true -k dT8_ dT8.5_
 """
 import sys
 import os
@@ -38,6 +38,7 @@ from relaxation import process_single_halo as relaxation_index
 parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
 parser.add_argument('-e', '--observ-errorbars', type=bool, default=False, required=False)
+parser.add_argument('-r', '--redshift-index', type=int, default=-1, required=False)
 parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
                     choices=['crit', 'true', 'hse'])
 args = parser.parse_args()
@@ -116,8 +117,8 @@ def process_single_halo(
 def _process_single_halo(zoom: Zoom):
 
     # Select redshift
-    snapshot_file = zoom.get_redshift(-1).snapshot_path
-    catalog_file = zoom.get_redshift(-1).catalogue_properties_path
+    snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
+    catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
 
     if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
 
@@ -237,8 +238,8 @@ def m_500_hotgas(results: pd.DataFrame):
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas, {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500,{{\\rm gas, {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * obs.cosmic_fbary for lim in ax.get_xlim()], '--', color='k')
@@ -349,7 +350,7 @@ def f_500_hotgas(results: pd.DataFrame):
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
     ax.plot(ax.get_xlim(), [obs.cosmic_fbary for _ in ax.get_xlim()], '--', color='k')
-
+    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index)}$")
     fig.savefig(f'{calibration_zooms.output_directory}/f500{args.mass_estimator}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
