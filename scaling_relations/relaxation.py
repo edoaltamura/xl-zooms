@@ -186,7 +186,7 @@ def relaxation(results: pd.DataFrame):
     ax.set_yscale('log')
     ax.set_ylim([0.02, 1.5])
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
-    fig.savefig(f'{calibration_zooms.output_directoryy}/relaxation_{args.redshift_index:d}.png', dpi=300)
+    fig.savefig(f'{calibration_zooms.output_directory}/relaxation_{args.redshift_index:d}.png', dpi=300)
     plt.show()
     plt.close()
 
