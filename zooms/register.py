@@ -216,8 +216,12 @@ class EXLZooms(object):
         directories = np.array(self.name_list, dtype=np.str)
         return directories[~self.complete_runs].tolist()
 
-    def redshift_from_index(self, redshift_index: int):
-        run_directory = self.get_completed_run_directories()[0]
+    def get_snap_redshifts(self, directory: str = None):
+        if directory is None:
+            run_directory = self.get_completed_run_directories()[0]
+        else:
+            run_directory = directory
+
         output_list_file = os.path.join(run_directory, 'snap_redshifts.txt')
         output_list = pd.read_csv(output_list_file)
         redshifts = output_list["# Redshift"].values
@@ -231,8 +235,10 @@ class EXLZooms(object):
         else:
             index_snaps = np.arange(len(redshifts))
 
-        redshifts = redshifts[index_snaps]
+        return redshifts[index_snaps]
 
+    def redshift_from_index(self, redshift_index: int):
+        redshifts = self.get_snap_redshifts()
         return redshifts[redshift_index]
 
     @staticmethod
@@ -309,20 +315,8 @@ class EXLZooms(object):
             if stf_dir_found:
                 number_catalogues = len([subdir for subdir in os.listdir(catalogues_path)])
 
-            output_list_file = os.path.join(run_directory, 'snap_redshifts.txt')
-            output_list = pd.read_csv(output_list_file)
-            redshifts = output_list["# Redshift"].values
-
-            if " Select Output" in output_list.columns:
-                index_snaps = np.arange(len(output_list))[
-                    np.logical_or.reduce(
-                        [output_list[" Select Output"] == f" Snapshot"]
-                    )
-                ]
-            else:
-                index_snaps = np.arange(len(redshifts))
-
-            number_snapshots_target = len(index_snaps)
+            redshifts = self.get_snap_redshifts(directory=run_directory)
+            number_snapshots_target = len(redshifts)
 
             # Analyse queries from SLURM
             slurm_swift_running = False
