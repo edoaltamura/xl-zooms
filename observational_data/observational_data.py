@@ -1190,5 +1190,9 @@ class Mernier17(MetallicityScale):
         ]
 
 
+# Define constants
+cosmology = Observations().cosmo_model
+cosmic_fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
+
 if __name__ == '__main__':
     obs = Pratt10().quick_display()

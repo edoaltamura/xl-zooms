@@ -33,8 +33,15 @@ Attributes:
     long computations, or when running in the background with `nohup [cmd] &`,
     you may want to set this to `True` to avoid printing the progress-bar.
 
+    calibration_zooms (EXLZooms): class instance which can be used to retrieve
+    info directly from the base class or to call some useful static methods.
+
     zooms_register (List[Zoom]): specifies the zooms catalogues formed with
-    runs that have completed
+    runs that have completed. These are sorted by VR number.
+
+    name_list (List[str]): collects the names of the runs that have completed
+    and is specular to `zooms_register[:].run_name`. These are sorted by VR
+    number.
 
 Todo:
     * None
@@ -105,7 +112,7 @@ def tail(fname, window=2):
         return data.splitlines()[-window:]
 
 
-class EXLZooms:
+class EXLZooms(object):
     name: str = 'Eagle-XL Zooms'
     output_dir: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
@@ -388,8 +395,8 @@ class Redshift(object):
         'a',
         'redshift',
         'z',
-        'snapshot_paths',
-        'catalogue_properties_paths',
+        'snapshot_path',
+        'catalogue_properties_path',
     )
 
     run_name: str
@@ -397,8 +404,8 @@ class Redshift(object):
     a: float
     redshift: float
     z: float
-    snapshot_paths: str
-    catalogue_properties_paths: str
+    snapshot_path: str
+    catalogue_properties_path: str
 
     def __init__(self, info_dict: dict):
         for key in info_dict:
@@ -412,8 +419,8 @@ class Redshift(object):
             f"Run name:                 {self.run_name}\n"
             f"Scale factor (a):         {self.scale_factor}\n"
             f"Redshift (z):             {self.redshift}\n"
-            f"Snapshot file:            {self.snapshot_paths}\n"
-            f"Catalog properties file:  {self.catalogue_properties_paths}"
+            f"Snapshot file:            {self.snapshot_path}\n"
+            f"Catalog properties file:  {self.catalogue_properties_path}"
         )
 
 
@@ -577,8 +584,8 @@ class Zoom(object):
         redshift_info['run_name'] = self.run_name
         redshift_info['scale_factor'] = self.scale_factors[self.index_snaps][index]
         redshift_info['redshift'] = redshift_select
-        redshift_info['snapshot_paths'] = self.snapshot_paths[index]
-        redshift_info['catalogue_properties_paths'] = self.catalogue_properties_paths[index]
+        redshift_info['snapshot_path'] = self.snapshot_paths[index]
+        redshift_info['catalogue_properties_path'] = self.catalogue_properties_paths[index]
 
         return Redshift(redshift_info)
 
@@ -586,9 +593,11 @@ class Zoom(object):
 calibration_zooms = EXLZooms()
 completed_runs = calibration_zooms.get_completed_run_directories()
 zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
+name_list = calibration_zooms.get_completed_run_names()
 
 # Sort zooms by VR number
 zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
+name_list.sort(key=lambda x: int(x.split('_')[1][2:]))
 
 if __name__ == "__main__":
     incomplete_runs = calibration_zooms.get_incomplete_run_directories()

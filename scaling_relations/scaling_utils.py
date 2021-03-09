@@ -5,7 +5,6 @@ import pandas as pd
 from typing import Callable, List, Union
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
-import matplotlib.pyplot as plt
 
 # Make the register backend visible to the script
 sys.path.append(
@@ -27,12 +26,7 @@ sys.path.append(
     )
 )
 
-from register import zooms_register, Zoom, Tcut_halogas, name_list
-
-try:
-    plt.style.use("../mnras.mplstyle")
-except:
-    pass
+from register import zooms_register, Zoom, Redshift
 
 
 def set_output_names(dataset_names: List[str]):
@@ -152,6 +146,7 @@ def process_catalogue(_process_single_halo: Callable,
     if len(_zooms_register) == 1:
         print("Analysing one object only. Not using multiprocessing features.")
         results = [_process_single_halo(_zooms_register[0])]
+
     else:
 
         if no_multithreading:
@@ -162,6 +157,7 @@ def process_catalogue(_process_single_halo: Callable,
                 results.append(
                     _process_single_halo(zoom)
                 )
+
         else:
 
             print("Running with multithreading.")

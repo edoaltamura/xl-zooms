@@ -2,31 +2,32 @@
 Plot scaling relations for EAGLE-XL tests
 
 Run using:
-    git pull; python3 hotgasmass_halomass.py dT8_,dT8.5_,dT9_ crit
+    git pull; python3 hotgasmass_halomass.py -m true -k dT8_ dT8.5_
 """
 import sys
 import os
 import unyt
-import numpy as np
-from typing import Tuple
+import argparse
 import h5py as h5
+import numpy as np
 import pandas as pd
+from typing import Tuple
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 from collections import OrderedDict
-
-# Make the register backend visible to the script
-sys.path.append("../zooms")
-sys.path.append("../observational_data")
-sys.path.append("../hydrostatic_estimates")
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
 
+# Make the register backend visible to the script
+sys.path.append("../zooms")
+sys.path.append("../observational_data")
+sys.path.append("../hydrostatic_estimates")
+
 # Import backend utilities
-from register import zooms_register, Zoom, Tcut_halogas, name_list
+from register import zooms_register, Tcut_halogas, calibration_zooms, Zoom
 import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
@@ -34,14 +35,12 @@ import scaling_style as style
 # Import modules for calculating additional quantities
 from relaxation import process_single_halo as relaxation_index
 
-# Make argument parser explicit
-KEYWORDS = sys.argv[1].split(',')
-MASS_ESTIMATOR = sys.argv[2]
-
-# Define constants
-cosmology = obs.Observations().cosmo_model
-fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
-plot_observation_errorbars = False
+parser = argparse.ArgumentParser()
+parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
+parser.add_argument('-e', '--observ-errorbars', type=bool, default=False, required=False)
+parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
+                    choices=['crit', 'true', 'hse'])
+args = parser.parse_args()
 
 
 def process_single_halo(
@@ -49,7 +48,6 @@ def process_single_halo(
         path_to_catalogue: str,
         hse_dataset: pd.Series = None,
 ) -> Tuple[unyt.unyt_quantity]:
-
     _, kinetic_energy, thermal_energy = relaxation_index(
         path_to_snap,
         path_to_catalogue
@@ -117,13 +115,17 @@ def process_single_halo(
 ])
 def _process_single_halo(zoom: Zoom):
 
-    if MASS_ESTIMATOR == 'crit':
+    # Select redshift
+    snapshot_file = zoom.get_redshift(-1).snapshot_path
+    catalog_file = zoom.get_redshift(-1).catalogue_properties_path
 
-        return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
 
-    elif MASS_ESTIMATOR == 'hse':
+        return process_single_halo(snapshot_file, catalog_file)
+
+    elif args.mass_estimator == 'hse':
         try:
-            hse_catalogue = pd.read_pickle(f'{zooms_register[0].output_directory}/hse_massbias.pkl')
+            hse_catalogue = pd.read_pickle(f'{calibration_zooms.output_directory}/hse_massbias.pkl')
         except FileExistsError as error:
             raise FileExistsError(
                 f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
@@ -137,7 +139,7 @@ def _process_single_halo(zoom: Zoom):
         else:
             raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
 
-        return process_single_halo(zoom.snapshot_file, zoom.catalog_file, hse_dataset=hse_entry)
+        return process_single_halo(snapshot_file, catalog_file, hse_dataset=hse_entry)
 
 
 def m_500_hotgas(results: pd.DataFrame):
@@ -168,53 +170,55 @@ def m_500_hotgas(results: pd.DataFrame):
     observations_color = (0.65, 0.65, 0.65)
     handles = []
 
-    Sun09 = obs.Sun09()
-    ax.scatter(Sun09.M_500, Sun09.M_500gas,
-               marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    if plot_observation_errorbars:
-        ax.errorbar(Sun09.M_500, Sun09.M_500gas, yerr=Sun09.M_500gas_error, xerr=Sun09.M_500_error,
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Sun09.citation)
-    )
-    del Sun09
+    if args.mass_estimator == 'hse':
 
-    Lovisari15 = obs.Lovisari15()
-    ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='^', s=5, alpha=1,
-               color=observations_color, edgecolors='none', zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Lovisari15.citation)
-    )
-    del Lovisari15
+        Sun09 = obs.Sun09()
+        ax.scatter(Sun09.M_500, Sun09.M_500gas,
+                   marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+        if args.observ_errorbars:
+            ax.errorbar(Sun09.M_500, Sun09.M_500gas, yerr=Sun09.M_500gas_error, xerr=Sun09.M_500_error,
+                        ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Sun09.citation)
+        )
+        del Sun09
 
-    Lin12 = obs.Lin12()
-    ax.scatter(Lin12.M_500, Lin12.M_500gas,
-               marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    if plot_observation_errorbars:
-        ax.errorbar(Lin12.M_500, Lin12.M_500gas, yerr=Lin12.M_500gas_error, xerr=Lin12.M_500_error,
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Lin12.citation)
-    )
-    del Lin12
+        Lovisari15 = obs.Lovisari15()
+        ax.scatter(Lovisari15.M_500, Lovisari15.M_gas500, marker='^', s=5, alpha=1,
+                   color=observations_color, edgecolors='none', zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Lovisari15.citation)
+        )
+        del Lovisari15
 
-    Vikhlinin06 = obs.Vikhlinin06()
-    ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
-               marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    if plot_observation_errorbars:
-        ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.M_500gas, yerr=Vikhlinin06.error_M_500gas,
-                    xerr=Vikhlinin06.error_M_500,
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Vikhlinin06.citation)
-    )
-    del Vikhlinin06
+        Lin12 = obs.Lin12()
+        ax.scatter(Lin12.M_500, Lin12.M_500gas,
+                   marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+        if args.observ_errorbars:
+            ax.errorbar(Lin12.M_500, Lin12.M_500gas, yerr=Lin12.M_500gas_error, xerr=Lin12.M_500_error,
+                        ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Lin12.citation)
+        )
+        del Lin12
 
-    if MASS_ESTIMATOR.lower() == 'true' or MASS_ESTIMATOR.lower() == 'crit':
+        Vikhlinin06 = obs.Vikhlinin06()
+        ax.scatter(Vikhlinin06.M_500, Vikhlinin06.M_500gas,
+                   marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+        if args.observ_errorbars:
+            ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.M_500gas, yerr=Vikhlinin06.error_M_500gas,
+                        xerr=Vikhlinin06.error_M_500,
+                        ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Vikhlinin06.citation)
+        )
+        del Vikhlinin06
+
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
         Barnes17 = obs.Barnes17().hdf5.z000p101.true
         relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
         ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1],
@@ -228,18 +232,18 @@ def m_500_hotgas(results: pd.DataFrame):
         del Barnes17
 
     handles.append(
-        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
+        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${obs.cosmic_fbary:.3f}")
     )
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas, {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas, {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.plot(ax.get_xlim(), [lim * fbary for lim in ax.get_xlim()], '--', color='k')
+    ax.plot(ax.get_xlim(), [lim * obs.cosmic_fbary for lim in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/m500{MASS_ESTIMATOR}_hotgas.png', dpi=300)
+    fig.savefig(f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
@@ -272,52 +276,54 @@ def f_500_hotgas(results: pd.DataFrame):
     observations_color = (0.65, 0.65, 0.65)
     handles = []
 
-    Sun09 = obs.Sun09()
-    ax.scatter(Sun09.M_500, Sun09.fb_500,
-               marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    if plot_observation_errorbars:
-        ax.errorbar(Sun09.M_500, Sun09.fb_500, yerr=Sun09.fb_500_error, xerr=Sun09.M_500_error,
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Sun09.citation)
-    )
-    del Sun09
+    if args.mass_estimator == 'hse':
 
-    Lovisari15 = obs.Lovisari15()
-    ax.scatter(Lovisari15.M_500, Lovisari15.fb_500, marker='^', s=5, alpha=1,
-               color=observations_color, edgecolors='none', zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Lovisari15.citation)
-    )
-    del Lovisari15
+        Sun09 = obs.Sun09()
+        ax.scatter(Sun09.M_500, Sun09.fb_500,
+                   marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+        if args.observ_errorbars:
+            ax.errorbar(Sun09.M_500, Sun09.fb_500, yerr=Sun09.fb_500_error, xerr=Sun09.M_500_error,
+                        ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Sun09.citation)
+        )
+        del Sun09
 
-    Lin12 = obs.Lin12()
-    ax.scatter(Lin12.M_500, Lin12.fb_500,
-               marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    if plot_observation_errorbars:
-        ax.errorbar(Lin12.M_500, Lin12.fb_500, yerr=Lin12.fb_500_error, xerr=Lin12.M_500_error,
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Lin12.citation)
-    )
-    del Lin12
+        Lovisari15 = obs.Lovisari15()
+        ax.scatter(Lovisari15.M_500, Lovisari15.fb_500, marker='^', s=5, alpha=1,
+                   color=observations_color, edgecolors='none', zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='^', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Lovisari15.citation)
+        )
+        del Lovisari15
 
-    Vikhlinin06 = obs.Vikhlinin06()
-    ax.scatter(Vikhlinin06.M_500, Vikhlinin06.fb_500,
-               marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
-    if plot_observation_errorbars:
-        ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.fb_500, yerr=Vikhlinin06.error_fb_500, xerr=Vikhlinin06.error_M_500,
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
-    handles.append(
-        Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
-               label=Vikhlinin06.citation)
-    )
-    del Vikhlinin06
+        Lin12 = obs.Lin12()
+        ax.scatter(Lin12.M_500, Lin12.fb_500,
+                   marker='v', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+        if args.observ_errorbars:
+            ax.errorbar(Lin12.M_500, Lin12.fb_500, yerr=Lin12.fb_500_error, xerr=Lin12.M_500_error,
+                        ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='v', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Lin12.citation)
+        )
+        del Lin12
 
-    if MASS_ESTIMATOR.lower() == 'true' or MASS_ESTIMATOR.lower() == 'crit':
+        Vikhlinin06 = obs.Vikhlinin06()
+        ax.scatter(Vikhlinin06.M_500, Vikhlinin06.fb_500,
+                   marker='>', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
+        if args.observ_errorbars:
+            ax.errorbar(Vikhlinin06.M_500, Vikhlinin06.fb_500, yerr=Vikhlinin06.error_fb_500, xerr=Vikhlinin06.error_M_500,
+                        ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+        handles.append(
+            Line2D([], [], color=observations_color, marker='>', markeredgecolor='none', linestyle='None', markersize=4,
+                   label=Vikhlinin06.citation)
+        )
+        del Vikhlinin06
+
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
         Barnes17 = obs.Barnes17().hdf5.z000p101.true
         relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
         ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.Mgas_500[relaxed < 0.1] / Barnes17.M500[relaxed < 0.1],
@@ -331,25 +337,25 @@ def f_500_hotgas(results: pd.DataFrame):
         del Barnes17
 
     handles.append(
-        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${fbary:.3f}")
+        Line2D([], [], color='black', linestyle='--', markersize=0, label=f"Planck18 $f_{{bary}}=${obs.cosmic_fbary:.3f}")
     )
 
     legend_obs = plt.legend(handles=handles, loc=4, frameon=True, facecolor='w', edgecolor='none')
     ax.add_artist(legend_obs)
 
-    ax.set_xlabel(f'$M_{{500{{\\rm {MASS_ESTIMATOR}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500{{\\rm gas, {MASS_ESTIMATOR}}}}} / M_{{500{{\\rm {MASS_ESTIMATOR}}}}}$')
+    ax.set_xlabel(f'$M_{{500{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$M_{{500{{\\rm gas, {args.mass_estimator}}}}} / M_{{500{{\\rm {args.mass_estimator}}}}}$')
     ax.set_xscale('log')
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
-    ax.plot(ax.get_xlim(), [fbary for _ in ax.get_xlim()], '--', color='k')
+    ax.plot(ax.get_xlim(), [obs.cosmic_fbary for _ in ax.get_xlim()], '--', color='k')
 
-    fig.savefig(f'{zooms_register[0].output_directory}/f500{MASS_ESTIMATOR}_hotgas.png', dpi=300)
+    fig.savefig(f'{calibration_zooms.output_directory}/f500{args.mass_estimator}_hotgas.png', dpi=300)
     plt.show()
     plt.close()
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword=KEYWORDS)
+    results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
     # m_500_hotgas(results)
     f_500_hotgas(results)
