@@ -71,7 +71,7 @@ def process_single_halo(
     data = sw.load(path_to_snap, mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
-    velGas = data.gas.velocities.to_physical()
+    velGas = data.gas.velocities
     print(velGas.cosmo_factor, velGas)
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
