@@ -37,11 +37,12 @@ from relaxation import process_single_halo as relaxation_index
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
-parser.add_argument('-e', '--observ-errorbars', type=bool, default=False, required=False)
+parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
 parser.add_argument('-r', '--redshift-index', type=int, default=37, required=False,
                     choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
 parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
                     choices=['crit', 'true', 'hse'])
+parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
 args = parser.parse_args()
 
 
@@ -244,9 +245,10 @@ def m_500_hotgas(results: pd.DataFrame):
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.plot(ax.get_xlim(), [lim * obs.cosmic_fbary for lim in ax.get_xlim()], '--', color='k')
-
+    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
     fig.savefig(f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas.png', dpi=300)
-    plt.show()
+    if not args.quiet:
+        plt.show()
     plt.close()
 
 
@@ -351,9 +353,10 @@ def f_500_hotgas(results: pd.DataFrame):
     ax.set_ylim([-0.07, 0.27])
     ax.set_xlim([4e12, 6e15])
     ax.plot(ax.get_xlim(), [obs.cosmic_fbary for _ in ax.get_xlim()], '--', color='k')
-    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index)}$")
+    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
     fig.savefig(f'{calibration_zooms.output_directory}/f500{args.mass_estimator}_hotgas.png', dpi=300)
-    plt.show()
+    if not args.quiet:
+        plt.show()
     plt.close()
 
 
