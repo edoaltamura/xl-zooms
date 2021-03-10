@@ -56,7 +56,7 @@ mean_atomic_weight_per_free_electron = 1.14
 sampling_method = 'shell_density'
 # sampling_method = 'particle_density'
 
-field_name = 'pressure'
+field_name = 'entropy'
 
 
 def latex_float(f):
@@ -321,7 +321,7 @@ def profile_3d_single_halo(
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
     'bin_centre',
-    'profile_field',
+    field_name,
     'ylabel',
     'convergence_radius',
 ])
