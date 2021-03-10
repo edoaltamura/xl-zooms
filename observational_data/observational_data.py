@@ -659,7 +659,7 @@ class Pratt10(Observations):
             'R500 Rdet').split()
         data = []
 
-        with open('repository/pratt2010_properties.dat') as f:
+        with open(f'{repository_dir}/pratt2010_properties.dat') as f:
             lines = f.readlines()
             for line in lines:
                 if not line.startswith('#') and not line.isspace():
@@ -740,7 +740,7 @@ class Pratt10(Observations):
             'alpha Delta_alpha').split()
         data = []
 
-        with open('repository/pratt2010_profiles.dat') as f:
+        with open(f'{repository_dir}/pratt2010_profiles.dat') as f:
             lines = f.readlines()
             for line in lines:
                 if not line.startswith('#') and not line.isspace():

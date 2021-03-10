@@ -37,7 +37,7 @@ parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', re
 parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
 args = parser.parse_args()
 
-FIELD_NAME = 'entropy_physical'
+FIELD_NAME = 'entropy'
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
