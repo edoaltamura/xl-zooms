@@ -23,9 +23,6 @@ from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
-from convergence_radius import convergence_radius
-from radial_profiles import profile_3d_single_halo as profiles
-from mass_scaling_entropy import process_single_halo as entropy_scaling
 
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
