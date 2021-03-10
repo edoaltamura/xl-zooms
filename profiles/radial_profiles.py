@@ -7,10 +7,7 @@ import numpy as np
 import pandas as pd
 import swiftsimio as sw
 from typing import Tuple
-from multiprocessing import Pool, cpu_count
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -22,18 +19,11 @@ sys.path.append("../observational_data")
 sys.path.append("../scaling_relations")
 sys.path.append("../zooms")
 
-
-from register import (
-    zooms_register,
-    Zoom,
-    Tcut_halogas,
-    calibration_zooms
-)
-
-from convergence_radius import convergence_radius
+from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
+from convergence_radius import convergence_radius
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
@@ -45,17 +35,13 @@ parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', re
 parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
 args = parser.parse_args()
 
-
 # Constants
-bins = 40
-radius_bounds = [0.01, 6.]  # In units of R500crit
-fbary = 0.15741  # Cosmic baryon fraction
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
-
+bins = 40
+radius_bounds = [0.01, 2.5]  # In units of R500crit
 sampling_method = 'shell_density'
 # sampling_method = 'particle_density'
-
 field_name = 'entropy'
 
 
@@ -223,7 +209,7 @@ def profile_3d_single_halo(
 
             volume_shell = (4. * np.pi / 3.) * (R500c ** 3) * ((bin_edges[1:]) ** 3 - (bin_edges[:-1]) ** 3)
             density_gas = mass_weights / volume_shell
-            mean_density_R500c = (3 * M500c * fbary / (4 * np.pi * R500c ** 3)).to(density_gas.units)
+            mean_density_R500c = (3 * M500c * obs.cosmic_fbary / (4 * np.pi * R500c ** 3)).to(density_gas.units)
 
             kBT, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.mass_weighted_temperatures)
             kBT *= unyt.boltzmann_constant
@@ -238,7 +224,7 @@ def profile_3d_single_halo(
         elif sampling_method.lower() == 'particle_density':
 
             n_e = data.gas.densities
-            ne_500crit = 3 * M500c * fbary / (4 * np.pi * R500c ** 3)
+            ne_500crit = 3 * M500c * obs.cosmic_fbary / (4 * np.pi * R500c ** 3)
 
             kBT = unyt.boltzmann_constant * data.gas.mass_weighted_temperatures
             kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
@@ -306,7 +292,7 @@ def profile_3d_single_halo(
             hist /= mass_weights
 
         # Make dimensionless, divide by P_500crit
-        norm = 500 * fbary * rho_crit * unyt.G * M500c / 2 / R500c
+        norm = 500 * obs.cosmic_fbary * rho_crit * unyt.G * M500c / 2 / R500c
         hist /= norm.to(hist.units)
         hist *= bin_centre ** 3
 
@@ -326,7 +312,6 @@ def profile_3d_single_halo(
     'convergence_radius',
 ])
 def _process_single_halo(zoom: Zoom):
-
     # Select redshift
     snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
     catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
@@ -369,20 +354,21 @@ def plot_profiles(results: pd.DataFrame):
         ax.plot(
             results['bin_centre'][i][convergence_index],
             results[field_name][i][convergence_index],
-            linestyle=run_style['Line style'], linewidth=0.5, color=run_style['Color'], alpha=0.6,
-            # label=results.loc[i, "run_name"]
+            linestyle=run_style['Line style'],
+            color=run_style['Color'],
+            linewidth=0.5,
+            alpha=0.6,
         )
 
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(results['ylabel'][0])
-    plt.show()
+    if not args.quiet:
+        plt.show()
+    plt.close()
 
 
 if __name__ == "__main__":
-
     results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
     plot_profiles(results)
-
-

@@ -1,87 +1,90 @@
-import sys
 import os
+import sys
 import unyt
-from typing import Tuple
+import argparse
+import h5py as h5
 import numpy as np
-from multiprocessing import Pool, cpu_count
 import pandas as pd
+import swiftsimio as sw
+from typing import Tuple
 import matplotlib.pyplot as plt
-from matplotlib.patches import Patch
-from matplotlib.lines import Line2D
+
+try:
+    plt.style.use("../mnras.mplstyle")
+except:
+    pass
 
 # Make the register backend visible to the script
 sys.path.append("../observational_data")
 sys.path.append("../scaling_relations")
+sys.path.append("../zooms")
 
+from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
+import observational_data as obs
+import scaling_utils as utils
+import scaling_style as style
+from convergence_radius import convergence_radius
 from radial_profiles import profile_3d_single_halo as profiles
 from mass_scaling_entropy import process_single_halo as entropy_scaling
-from register import (
-    SILENT_PROGRESSBAR,
-    zooms_register,
-    Zoom,
-    Tcut_halogas,
-    name_list,
-    vr_numbers,
-    get_allpaths_from_last,
-    get_snip_handles,
-    dump_memory_usage,
-)
 
+parser = argparse.ArgumentParser()
+parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
+parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
+parser.add_argument('-r', '--redshift-index', type=int, default=37, required=False,
+                    choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
+parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
+                    choices=['crit', 'true', 'hse'])
+parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
+args = parser.parse_args()
 
 FIELD_NAME = 'entropy_physical'
 
 
-def _process_single_halo(zoom: Zoom) -> tuple:
-    scaling_database = entropy_scaling(zoom.snapshot_file, zoom.catalog_file)
-    profiles_database = profiles(zoom.snapshot_file, zoom.catalog_file, weights=FIELD_NAME)
-    return tuple(scaling_database + profiles_database)
+@utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
+@utils.set_output_names([
+    'M_500crit',
+    'M_hot (< R_500crit)',
+    'f_hot (< R_500crit)',
+    'entropy',
+    'kBT_500crit',
+    'bin_centre',
+    FIELD_NAME,
+    'ylabel',
+    'convergence_radius'
+])
+def _process_single_halo(zoom: Zoom):
+    # Select redshift
+    snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
+    catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
 
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
 
-def process_catalogue(find_keyword: str = '', savefile: bool = False) -> pd.DataFrame:
-    if find_keyword == '':
-        _zooms_register = zooms_register
-    else:
-        _zooms_register = [zoom for zoom in zooms_register if f"{find_keyword}" in zoom.run_name]
+        scaling_database = entropy_scaling(snapshot_file, catalog_file)
+        profiles_database = profiles(snapshot_file, catalog_file, weights=FIELD_NAME)
+        return tuple(scaling_database + profiles_database)
 
-    _name_list = [zoom.run_name for zoom in _zooms_register]
+    elif args.mass_estimator == 'hse':
+        try:
+            hse_catalogue = pd.read_pickle(f'{calibration_zooms.output_directory}/hse_massbias.pkl')
+        except FileExistsError as error:
+            raise FileExistsError(
+                f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
+            )
 
-    if len(_zooms_register) == 1:
-        print("Analysing one object only. Not using multiprocessing features.")
-        results = [_process_single_halo(_zooms_register[0])]
-    else:
-        num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
-        # The results of the multiprocessing Pool are returned in the same order as inputs
-        print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
-        with Pool(num_threads) as pool:
-            results = pool.map(_process_single_halo, iter(_zooms_register))
+        hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
+        print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
+        if zoom.run_name in hse_catalogue_names:
+            i = hse_catalogue_names.index(zoom.run_name)
+            hse_entry = hse_catalogue.loc[i]
+        else:
+            raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
 
-    # Recast output into a Pandas dataframe for further manipulation
-    columns = [
-        'M_500crit',
-        'M_hot (< R_500crit)',
-        'f_hot (< R_500crit)',
-        'entropy',
-        'kBT_500crit',
-        'bin_centre',
-        FIELD_NAME,
-        'ylabel',
-        'convergence_radius'
-    ]
-    results = pd.DataFrame(list(results), columns=columns)
-    results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
-    print(results.head())
-    dump_memory_usage()
-
-    if savefile:
-        file_name = f'{zooms_register[0].output_directory}/median_radial_profiles_catalogue.pkl'
-        results.to_pickle(file_name)
-        print(f"Catalogue file saved to {file_name}")
-
-    return results
+        scaling_database = entropy_scaling(snapshot_file, catalog_file)
+        profiles_database = profiles(snapshot_file, catalog_file, weights=FIELD_NAME, hse_dataset=hse_entry)
+        return tuple(scaling_database + profiles_database)
 
 
 def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame:
-
     if filename is None:
         file_path = f'{zooms_register[0].output_directory}/median_radial_profiles_catalogue.pkl'
     else:
@@ -99,7 +102,6 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
 
 
 def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tuple[pd.DataFrame, np.ndarray]:
-
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit']])
     bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
@@ -147,6 +149,23 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
             label=f"$10^{{{bin_edges[i]:.1f}}}<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_edges[i + 1]:.1f}}}$"
         )
 
+    # Observational data
+    pratt10 = obs.Pratt10()
+    bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
+        m500_limits=(
+            1e10 * unyt.Solar_Mass,
+            1e17 * unyt.Solar_Mass
+        ),
+        k500_rescale=True
+    )
+    plt.fill_between(
+        pratt10.radial_bins,
+        bin_perc16,
+        bin_perc84,
+        color='aqua', alpha=0.85, linewidth=0
+    )
+    plt.plot(pratt10.radial_bins, bin_median, c='k')
+
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(plot_database.iloc[0]['ylabel'])
     ax.set_ylim([70, 2000])
@@ -154,24 +173,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
-    plt.title(keyword)
-    fig.savefig(f'{zooms_register[0].output_directory}/median_radial_profiles_{keyword}.png', dpi=300)
-    plt.show()
+    plt.title(" ".join(args.keywords))
+    fig.savefig(f'{calibration_zooms.output_directory}/median_radial_profiles_{" ".join(args.keywords)}.png', dpi=300)
+    if not args.quiet:
+        plt.show()
     plt.close()
 
 
 if __name__ == "__main__":
-
-    dts = ['7.5', '8', '8.5', '9', '9.5']
-
-    for dt in dts:
-        keyword = f'fixedAGNdT{dt}_'
-
-        try:
-            results_database = load_catalogue(find_keyword=keyword)
-        except FileNotFoundError or FileExistsError as err:
-            print(err, "\nAnalysing catalogues from data...")
-            results_database = process_catalogue(find_keyword=keyword, savefile=False)
-
-        results_database, bin_edges = attach_mass_bin_index(results_database)
-        plot_radial_profiles_median(results_database, bin_edges)
+    results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
+    results_database, bin_edges = attach_mass_bin_index(results_database)
+    plot_radial_profiles_median(results_database, bin_edges)
