@@ -83,7 +83,7 @@ def process_single_halo(
             (ZPotMin - 3 * R500c < 0 * unyt.Mpc)
     ):
         print('Wrapping needed')
-        print(np.mean(posGas, axis=0), np.min(posGas[:, 1], np.max(posGas[:, 1]))
+        print(np.mean(posGas, axis=0), np.min(posGas[:, 1]), np.max(posGas[:, 1]))
 
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
