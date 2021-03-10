@@ -2,7 +2,7 @@
 Plot scaling relations for EAGLE-XL tests
 
 Run using:
-    git pull; python3 hotgasmass_halomass.py -r 37 -m true -k dT8_ dT8.5_
+    git pull; python3 hotgasmass_halomass.py -r 36 -m true -k dT8_ dT8.5_
 """
 import sys
 import os
@@ -38,7 +38,7 @@ from relaxation import process_single_halo as relaxation_index
 parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
 parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
-parser.add_argument('-r', '--redshift-index', type=int, default=37, required=False,
+parser.add_argument('-r', '--redshift-index', type=int, default=36, required=False,
                     choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
 parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
                     choices=['crit', 'true', 'hse'])
