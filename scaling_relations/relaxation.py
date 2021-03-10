@@ -44,11 +44,12 @@ def process_single_halo(
 ) -> Tuple[unyt.unyt_quantity]:
     # Read in halo properties
     with h5.File(path_to_catalogue, 'r') as h5file:
+        scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
+        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / scale_factor
+        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
+        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / scale_factor
 
         print(XPotMin, YPotMin, ZPotMin, R500c)
 
@@ -60,16 +61,16 @@ def process_single_halo(
             M500c = hse_dataset["M500hse"]
 
     # Read in gas particles to compute the core-excised temperature
-    mask = sw.mask(path_to_snap, spatial_only=True)
+    mask = sw.mask(path_to_snap, spatial_only=False)
     region = [[XPotMin - 1.1 * R500c, XPotMin + 1.1 * R500c],
               [YPotMin - 1.1 * R500c, YPotMin + 1.1 * R500c],
               [ZPotMin - 1.1 * R500c, ZPotMin + 1.1 * R500c]]
     mask.constrain_spatial(region)
-    # mask.constrain_mask(
-    #     "gas", "temperatures",
-    #     Tcut_halogas * mask.units.temperature,
-    #     1.e12 * mask.units.temperature
-    # )
+    mask.constrain_mask(
+        "gas", "temperatures",
+        Tcut_halogas * mask.units.temperature,
+        1.e12 * mask.units.temperature
+    )
     data = sw.load(path_to_snap, mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
