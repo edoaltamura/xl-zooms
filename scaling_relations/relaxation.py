@@ -213,5 +213,5 @@ def relaxation(results: pd.DataFrame):
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
+    results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords, no_multithreading=True)
     relaxation(results)
