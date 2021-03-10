@@ -68,10 +68,11 @@ def process_single_halo(
             Mhot500c = unyt.unyt_quantity(h5file[f'/{Mhot500c_key}'][0] * 1.e10, unyt.Solar_Mass)
 
         else:
-            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+            scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
+            R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
+            XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / scale_factor
+            YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
+            ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / scale_factor
 
             # If no custom aperture, select R500c as default
             if hse_dataset is not None:

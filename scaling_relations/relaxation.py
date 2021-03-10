@@ -73,20 +73,6 @@ def process_single_halo(
     posGas = data.gas.coordinates
     massGas = data.gas.masses
     velGas = data.gas.velocities
-
-    # Print if needs wrapping
-    if (
-            (XPotMin + 1.5 * R500c > 300 * unyt.Mpc) or
-            (YPotMin + 1.5 * R500c > 300 * unyt.Mpc) or
-            (ZPotMin + 1.5 * R500c > 300 * unyt.Mpc) or
-            (XPotMin - 1.5 * R500c < 0 * unyt.Mpc) or
-            (YPotMin - 1.5 * R500c < 0 * unyt.Mpc) or
-            (ZPotMin - 1.5 * R500c < 0 * unyt.Mpc)
-    ):
-        print('Wrapping needed')
-        print(np.mean(posGas, axis=0), len(posGas), np.min(posGas[:, 1]), np.max(posGas[:, 1]))
-
-
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
     # Select hot gas within sphere and without core
