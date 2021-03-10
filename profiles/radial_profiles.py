@@ -1,14 +1,21 @@
+import os
 import sys
 import unyt
+import argparse
+import h5py as h5
 import numpy as np
+import pandas as pd
+import swiftsimio as sw
 from typing import Tuple
 from multiprocessing import Pool, cpu_count
-import h5py as h5
-import swiftsimio as sw
-import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
+
+try:
+    plt.style.use("../mnras.mplstyle")
+except:
+    pass
 
 # Make the register backend visible to the script
 sys.path.append("../observational_data")
@@ -19,8 +26,7 @@ from register import (
     zooms_register,
     Zoom,
     Tcut_halogas,
-    name_list,
-    vr_numbers
+    calibration_zooms
 )
 
 from convergence_radius import convergence_radius
@@ -28,10 +34,16 @@ import observational_data as obs
 import scaling_utils as utils
 import scaling_style as style
 
-try:
-    plt.style.use("../mnras.mplstyle")
-except:
-    pass
+parser = argparse.ArgumentParser()
+parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
+parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
+parser.add_argument('-r', '--redshift-index', type=int, default=37, required=False,
+                    choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
+parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
+                    choices=['crit', 'true', 'hse'])
+parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
+args = parser.parse_args()
+
 
 # Constants
 bins = 40
@@ -42,6 +54,8 @@ mean_atomic_weight_per_free_electron = 1.14
 
 sampling_method = 'shell_density'
 # sampling_method = 'particle_density'
+
+field_name = 'pressure'
 
 
 def latex_float(f):
@@ -82,23 +96,36 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
     return res * data.units
 
 
-def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: str) -> tuple:
+def profile_3d_single_halo(
+        path_to_snap: str,
+        path_to_catalogue: str,
+        weights: str,
+        hse_dataset: pd.Series = None,
+) -> tuple:
     # Read in halo properties
-    with h5.File(f'{path_to_catalogue}', 'r') as h5file:
-        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+    with h5.File(path_to_catalogue, 'r') as h5file:
+        scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
+        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / scale_factor
+        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
+        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / scale_factor
+
+        # If no custom aperture, select R500c as default
+        if hse_dataset is not None:
+            assert R500c.units == hse_dataset["R500hse"].units
+            assert M500c.units == hse_dataset["M500hse"].units
+            R500c = hse_dataset["R500hse"]
+            M500c = hse_dataset["M500hse"]
 
     # Read in gas particles
-    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    mask = sw.mask(path_to_snap, spatial_only=False)
     region = [[XPotMin - radius_bounds[1] * R500c, XPotMin + radius_bounds[1] * R500c],
               [YPotMin - radius_bounds[1] * R500c, YPotMin + radius_bounds[1] * R500c],
               [ZPotMin - radius_bounds[1] * R500c, ZPotMin + radius_bounds[1] * R500c]]
     mask.constrain_spatial(region)
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
-    data = sw.load(f'{path_to_snap}', mask=mask)
+    data = sw.load(path_to_snap, mask=mask)
     posGas = data.gas.coordinates
 
     # Select hot gas within sphere
@@ -110,6 +137,7 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     # Calculate particle mass and rho_crit
     unitLength = data.metadata.units.length
     unitMass = data.metadata.units.mass
+
     rho_crit = unyt.unyt_quantity(
         data.metadata.cosmology_raw['Critical density [internal units]'],
         unitMass / unitLength ** 3
@@ -273,55 +301,53 @@ def profile_3d_single_halo(path_to_snap: str, path_to_catalogue: str, weights: s
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-    return bin_centre, hist, ylabel, conv_radius
+    return bin_centre.to_physical(), hist.to_physical(), ylabel, conv_radius.to_physical()
 
 
-if __name__ == "__main__":
+@utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
+@utils.set_output_names([
+    'bin_centre',
+    'profile_field',
+    'ylabel',
+    'convergence_radius',
+])
+def _process_single_halo(zoom: Zoom):
 
-    vr_num = 'Isotropic'
-    field_name = 'pressure'
+    # Select redshift
+    snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
+    catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
+
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
+
+        return profile_3d_single_halo(snapshot_file, catalog_file, weights=field_name)
+
+    elif args.mass_estimator == 'hse':
+        try:
+            hse_catalogue = pd.read_pickle(f'{calibration_zooms.output_directory}/hse_massbias.pkl')
+        except FileExistsError as error:
+            raise FileExistsError(
+                f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
+            )
+
+        hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
+        print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
+        if zoom.run_name in hse_catalogue_names:
+            i = hse_catalogue_names.index(zoom.run_name)
+            hse_entry = hse_catalogue.loc[i]
+        else:
+            raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
+
+        return profile_3d_single_halo(snapshot_file, catalog_file, weights=field_name, hse_dataset=hse_entry)
 
 
-    def _process_single_halo(zoom: Zoom):
-        return profile_3d_single_halo(zoom.snapshot_file, zoom.catalog_file, weights=field_name)
-
-
-    zooms_register = [zoom for zoom in zooms_register if f"{vr_num}" in zoom.run_name]
-    name_list = [zoom for zoom in name_list if f"{vr_num}" in zoom]
-
-    # The results of the multiprocessing Pool are returned in the same order as inputs
-    with Pool() as pool:
-        print(f"Analysis mapped onto {cpu_count():d} CPUs.")
-        results = pool.map(_process_single_halo, iter(zooms_register))
-
-        # Recast output into a Pandas dataframe for further manipulation
-        columns = [
-            'bin_centre',
-            field_name,
-            'ylabel',
-            'convergence_radius'
-        ]
-        results = pd.DataFrame(list(results), columns=columns)
-        results.insert(0, 'run_name', pd.Series(name_list, dtype=str))
-        print(results.head())
-
+def plot_profiles(results: pd.DataFrame):
     fig, ax = plt.subplots()
-
+    legend_handles = []
     for i in range(len(results)):
 
-        style = ''
-        if '-8res' in results.loc[i, "run_name"]:
-            style = ':'
-        elif '+1res' in results.loc[i, "run_name"]:
-            style = '-'
-
-        color = ''
-        if 'Ref' in results.loc[i, "run_name"]:
-            color = 'black'
-        elif 'MinimumDistance' in results.loc[i, "run_name"]:
-            color = 'orange'
-        elif 'Isotropic' in results.loc[i, "run_name"]:
-            color = 'lime'
+        run_style = style.get_style_for_object(results.loc[i, "Run name"])
+        if run_style['Legend handle'] not in legend_handles:
+            legend_handles.append(run_style['Legend handle'])
 
         # Plot only profiles outside convergence radius
         convergence_index = np.where(results['bin_centre'][i] > results['convergence_radius'][i])[0]
@@ -329,27 +355,20 @@ if __name__ == "__main__":
         ax.plot(
             results['bin_centre'][i][convergence_index],
             results[field_name][i][convergence_index],
-            linestyle=style, linewidth=0.5, color=color, alpha=0.6,
+            linestyle=run_style['Line style'], linewidth=0.5, color=run_style['Color'], alpha=0.6,
             # label=results.loc[i, "run_name"]
         )
-
-    # obs.Voit05().plot_on_axes(ax, linestyle='--', color='k', linewidth=0.5)
-    # obs.Pratt10().plot_on_axes(ax, linestyle='--', color='r', linewidth=0.5)
 
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(results['ylabel'][0])
-
-    handles = [
-        Line2D([], [], markersize=0, color='k', linestyle=':', label='-8 Res'),
-        Line2D([], [], markersize=0, color='k', linestyle='-', label='+1 Res'),
-        Patch(facecolor='black', edgecolor='None', label='Random (Ref)'),
-        Patch(facecolor='orange', edgecolor='None', label='Minimum distance'),
-        Patch(facecolor='lime', edgecolor='None', label='Isotropic'),
-    ]
-    legend_sims = plt.legend(handles=handles, loc=2)
-    ax.add_artist(legend_sims)
-
-    # plt.legend()
     plt.show()
+
+
+if __name__ == "__main__":
+
+    results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
+    plot_profiles(results)
+
+
