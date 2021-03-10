@@ -40,13 +40,14 @@ def process_single_halo(
 ) -> tuple:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
-        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+        scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
+        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / scale_factor
+        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
+        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / scale_factor
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R2500c = unyt.unyt_quantity(h5file['/SO_R_2500_rhocrit'][0], unyt.Mpc)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-        R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc)
+        R2500c = unyt.unyt_quantity(h5file['/SO_R_2500_rhocrit'][0], unyt.Mpc) / scale_factor
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
+        R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc) / scale_factor
 
     # print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
 
@@ -58,6 +59,20 @@ def process_single_halo(
     mask.constrain_spatial(region)
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(f'{path_to_snap}', mask=mask)
+
+    # Convert datasets to physical quantities
+    R500c *= scale_factor
+    XPotMin *= scale_factor
+    YPotMin *= scale_factor
+    ZPotMin *= scale_factor
+    data.gas.coordinates.convert_to_physical()
+    data.gas.masses.convert_to_physical()
+    data.gas.temperatures.convert_to_physical()
+    data.gas.densities.convert_to_physical()
+    data.gas.pressures.convert_to_physical()
+    data.gas.entropies.convert_to_physical()
+    data.dark_matter.masses.convert_to_physical()
+
     posGas = data.gas.coordinates
     massGas = data.gas.masses
     mass_weighted_tempGas = data.gas.temperatures * data.gas.masses
