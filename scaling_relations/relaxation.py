@@ -50,6 +50,8 @@ def process_single_halo(
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
 
+        print(XPotMin, YPotMin, ZPotMin, R500c)
+
         # If no custom aperture, select R500c as default
         if hse_dataset is not None:
             assert R500c.units == hse_dataset["R500hse"].units
@@ -73,15 +75,19 @@ def process_single_halo(
     massGas = data.gas.masses
     velGas = data.gas.velocities
 
+    print('len(posGas):', len(posGas))
+    print('len(massGas):', len(massGas))
+    print('len(velGas):', len(velGas))
+
     # Print if needs wrapping
     print(np.mean(posGas, axis=0), len(posGas), np.min(posGas[:, 1]), np.max(posGas[:, 1]))
     if (
-            (XPotMin + 3 * R500c > 300 * unyt.Mpc) or
-            (YPotMin + 3 * R500c > 300 * unyt.Mpc) or
-            (ZPotMin + 3 * R500c > 300 * unyt.Mpc) or
-            (XPotMin - 3 * R500c < 0 * unyt.Mpc) or
-            (YPotMin - 3 * R500c < 0 * unyt.Mpc) or
-            (ZPotMin - 3 * R500c < 0 * unyt.Mpc)
+            (XPotMin + 1.5 * R500c > 300 * unyt.Mpc) or
+            (YPotMin + 1.5 * R500c > 300 * unyt.Mpc) or
+            (ZPotMin + 1.5 * R500c > 300 * unyt.Mpc) or
+            (XPotMin - 1.5 * R500c < 0 * unyt.Mpc) or
+            (YPotMin - 1.5 * R500c < 0 * unyt.Mpc) or
+            (ZPotMin - 1.5 * R500c < 0 * unyt.Mpc)
     ):
         print('Wrapping needed')
 
