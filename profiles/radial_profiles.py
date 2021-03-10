@@ -127,9 +127,22 @@ def profile_3d_single_halo(
     mask.constrain_spatial(region)
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
     data = sw.load(path_to_snap, mask=mask)
-    posGas = data.gas.coordinates
+
+    # Convert datasets to physical quantities
+    R500c *= scale_factor
+    XPotMin *= scale_factor
+    YPotMin *= scale_factor
+    ZPotMin *= scale_factor
+    data.gas.coordinates.convert_to_physical()
+    data.gas.masses.convert_to_physical()
+    data.gas.temperatures.convert_to_physical()
+    data.gas.densities.convert_to_physical()
+    data.gas.pressures.convert_to_physical()
+    data.gas.entropies.convert_to_physical()
+    data.dark_matter.masses.convert_to_physical()
 
     # Select hot gas within sphere
+    posGas = data.gas.coordinates
     deltaX = posGas[:, 0] - XPotMin
     deltaY = posGas[:, 1] - YPotMin
     deltaZ = posGas[:, 2] - ZPotMin
@@ -140,7 +153,7 @@ def profile_3d_single_halo(
     unitMass = data.metadata.units.mass
 
     rho_crit = unyt.unyt_quantity(
-        data.metadata.cosmology_raw['Critical density [internal units]'],
+        data.metadata.cosmology_raw['Critical density [internal units]'] / scale_factor ** 3,
         unitMass / unitLength ** 3
     )
     dm_masses = data.dark_matter.masses.to('Msun')
@@ -302,7 +315,7 @@ def profile_3d_single_halo(
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-    return bin_centre.to_physical(), hist.to_physical(), ylabel, conv_radius.to_physical()
+    return bin_centre, hist, ylabel, conv_radius
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
