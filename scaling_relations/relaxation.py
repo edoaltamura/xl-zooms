@@ -72,7 +72,8 @@ def process_single_halo(
     posGas = data.gas.coordinates
     massGas = data.gas.masses
     velGas = data.gas.velocities
-    print(velGas.cosmo_factor, velGas)
+    print(XPotMin, YPotMin, ZPotMin)
+    print(np.mean(posGas, axis=0))
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
     # Select hot gas within sphere and without core
