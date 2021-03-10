@@ -1,36 +1,31 @@
-# Plot scaling relations for EAGLE-XL tests
-import sys
 import os
+import sys
 import unyt
-import numpy as np
+import argparse
 import h5py as h5
-import swiftsimio as sw
+import numpy as np
 import pandas as pd
+import swiftsimio as sw
+from typing import Tuple
 import matplotlib.pyplot as plt
-
-# Make the register backend visible to the script
-sys.path.append("../zooms")
-sys.path.append("../observational_data")
-
-from register import (
-    SILENT_PROGRESSBAR,
-    zooms_register,
-    Zoom,
-    Tcut_halogas,
-    name_list,
-    vr_numbers,
-    get_allpaths_from_last,
-    get_snip_handles,
-    dump_memory_usage,
-)
-import observational_data as obs
-import scaling_utils as utils
-import scaling_style as style
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
+
+# Make the register backend visible to the script
+sys.path.append("../observational_data")
+sys.path.append("../scaling_relations")
+sys.path.append("../zooms")
+
+from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
+import observational_data as obs
+import scaling_utils as utils
+import scaling_style as style
+from convergence_radius import convergence_radius
+from radial_profiles import profile_3d_single_halo as profiles
+from mass_scaling_entropy import process_single_halo as entropy_scaling
 
 cosmology = obs.Observations().cosmo_model
 fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
