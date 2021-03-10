@@ -70,7 +70,7 @@ def process_single_halo(
         Tcut_halogas * mask.units.temperature,
         1.e12 * mask.units.temperature
     )
-    data = sw.load(path_to_snap, mask=mask)
+    data = sw.load(path_to_snap)#, mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
     velGas = data.gas.velocities
