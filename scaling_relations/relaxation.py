@@ -74,6 +74,7 @@ def process_single_halo(
     velGas = data.gas.velocities
 
     # Print if needs wrapping
+    print(np.mean(posGas, axis=0), len(posGas), np.min(posGas[:, 1]), np.max(posGas[:, 1]))
     if (
             (XPotMin + 3 * R500c > 300 * unyt.Mpc) or
             (YPotMin + 3 * R500c > 300 * unyt.Mpc) or
@@ -83,7 +84,7 @@ def process_single_halo(
             (ZPotMin - 3 * R500c < 0 * unyt.Mpc)
     ):
         print('Wrapping needed')
-        print(np.mean(posGas, axis=0), len(posGas), np.min(posGas[:, 1]), np.max(posGas[:, 1]))
+
 
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
