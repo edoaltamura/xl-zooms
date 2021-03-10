@@ -83,7 +83,7 @@ def process_single_halo(
             (ZPotMin - 3 * R500c < 0 * unyt.Mpc)
     ):
         print('Wrapping needed')
-        print(np.mean(posGas, axis=0))
+        print(np.mean(posGas, axis=0), np.max(posGas[:, 1]))
 
     mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
 
@@ -200,7 +200,8 @@ def relaxation(results: pd.DataFrame):
     ax.set_ylim([0.02, 1.5])
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
     fig.savefig(f'{calibration_zooms.output_directory}/relaxation_{args.redshift_index:d}.png', dpi=300)
-    plt.show()
+    if not args.quiet:
+        plt.show()
     plt.close()
 
 
