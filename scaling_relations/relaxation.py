@@ -60,17 +60,17 @@ def process_single_halo(
             M500c = hse_dataset["M500hse"]
 
     # Read in gas particles to compute the core-excised temperature
-    mask = sw.mask(path_to_snap, spatial_only=False)
+    mask = sw.mask(path_to_snap, spatial_only=True)
     region = [[XPotMin - 1.1 * R500c, XPotMin + 1.1 * R500c],
               [YPotMin - 1.1 * R500c, YPotMin + 1.1 * R500c],
               [ZPotMin - 1.1 * R500c, ZPotMin + 1.1 * R500c]]
     mask.constrain_spatial(region)
-    mask.constrain_mask(
-        "gas", "temperatures",
-        Tcut_halogas * mask.units.temperature,
-        1.e12 * mask.units.temperature
-    )
-    data = sw.load(path_to_snap)#, mask=mask)
+    # mask.constrain_mask(
+    #     "gas", "temperatures",
+    #     Tcut_halogas * mask.units.temperature,
+    #     1.e12 * mask.units.temperature
+    # )
+    data = sw.load(path_to_snap, mask=mask)
     posGas = data.gas.coordinates
     massGas = data.gas.masses
     velGas = data.gas.velocities
