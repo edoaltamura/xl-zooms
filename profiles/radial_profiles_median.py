@@ -45,7 +45,7 @@ FIELD_NAME = 'entropy'
     'M_500crit',
     'M_hot (< R_500crit)',
     'f_hot (< R_500crit)',
-    'entropy',
+    'entropy (= R_500crit)',
     'kBT_500crit',
     'bin_centre',
     FIELD_NAME,
@@ -102,7 +102,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
 
 
 def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tuple[pd.DataFrame, np.ndarray]:
-    m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit']])
+    m500crit_log10 = np.log10(object_database['M_500crit'].values)
     bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
     object_database.insert(1, 'M_500crit bin_indices', pd.Series(bin_indices, dtype=int))
@@ -121,7 +121,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
     ax.set_prop_cycle(color=colors)
 
     # Display zoom data
-    for i, bin_edge in enumerate(bin_edges[:-1]):
+    for i in enumerate(bin_edges[:-1]):
         bin_select = object_database['M_500crit bin_indices'] == i + 1
         plot_database = object_database[bin_select]
         max_convergence_radius = plot_database['convergence_radius'].max()
