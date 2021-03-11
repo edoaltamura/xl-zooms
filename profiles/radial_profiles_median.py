@@ -158,7 +158,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, 
         pratt10.radial_bins,
         bin_perc16,
         bin_perc84,
-        color='aqua', alpha=0.85, linewidth=0
+        color='grey', alpha=0.15, linewidth=0
     )
     plt.plot(pratt10.radial_bins, bin_median, c='k')
 
