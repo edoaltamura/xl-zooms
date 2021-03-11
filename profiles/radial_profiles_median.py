@@ -122,6 +122,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
 
     # Display zoom data
     for i in enumerate(bin_edges[:-1]):
+        print(object_database['M_500crit bin_indices'] == i + 1)
         bin_select = object_database['M_500crit bin_indices'] == i + 1
         plot_database = object_database[bin_select]
         max_convergence_radius = plot_database['convergence_radius'].max()
