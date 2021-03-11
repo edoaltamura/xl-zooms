@@ -101,7 +101,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
     return catalogue
 
 
-def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) -> None:
+def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, highmass_only: bool = False) -> None:
     from matplotlib.cm import get_cmap
 
     name = "Set2"
@@ -117,8 +117,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
 
     # Display zoom data
-    for i in range(1, n_bins + 1):
-        print(np.where(bin_indices == i)[0])
+    for i in range(n_bins if highmass_only else 1, n_bins + 1):
+
         plot_database = object_database.iloc[np.where(bin_indices == i)[0]]
         max_convergence_radius = plot_database['convergence_radius'].max()
 
@@ -178,4 +178,4 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
 
 if __name__ == "__main__":
     results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
-    plot_radial_profiles_median(results_database, n_bins=3)
+    plot_radial_profiles_median(results_database, n_bins=3, highmass_only=True)
