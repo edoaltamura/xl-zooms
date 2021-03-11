@@ -119,7 +119,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
     # Display zoom data
     for i in range(1, n_bins + 1):
         print(np.where(bin_indices == i)[0])
-        plot_database = object_database.iloc[[np.where(bin_indices == i)[0]]]
+        plot_database = object_database.iloc[np.where(bin_indices == i)[0]]
         max_convergence_radius = plot_database['convergence_radius'].max()
 
         # Plot only profiles outside the *largest* convergence radius
