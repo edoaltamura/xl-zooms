@@ -117,9 +117,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
 
     # Display zoom data
-    for i in enumerate(bin_edges[:-1]):
-        print(np.where(bin_indices == (i + 1))[0])
-        plot_database = object_database.iloc[[np.where(bin_indices == (i + 1))[0]]]
+    for i in range(1, n_bins + 1):
+        print(np.where(bin_indices == i)[0])
+        plot_database = object_database.iloc[[np.where(bin_indices == i)[0]]]
         max_convergence_radius = plot_database['convergence_radius'].max()
 
         # Plot only profiles outside the *largest* convergence radius
@@ -137,12 +137,12 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
 
         ax.fill_between(
             bin_centres, percent84_profile, percent16_profile,
-            linewidth=0, alpha=0.5, color=colors[i],
+            linewidth=0, alpha=0.5, color=colors[i - 1],
         )
         ax.plot(
             bin_centres, median_profile,
-            linestyle='-', linewidth=1, alpha=1, color=colors[i],
-            label=f"$10^{{{bin_edges[i]:.1f}}}<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_edges[i + 1]:.1f}}}$"
+            linestyle='-', linewidth=1, alpha=1, color=colors[i - 1],
+            label=f"$10^{{{bin_log_edges[i-1]:.1f}}}<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$"
         )
 
     # Observational data
@@ -178,5 +178,4 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
 
 if __name__ == "__main__":
     results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
-    results_database, bin_edges = attach_mass_bin_index(results_database)
-    plot_radial_profiles_median(results_database, bin_edges)
+    plot_radial_profiles_median(results_database, n_bins=3)
