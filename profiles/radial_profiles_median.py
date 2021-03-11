@@ -149,8 +149,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) 
     pratt10 = obs.Pratt10()
     bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
         m500_limits=(
-            1e10 * unyt.Solar_Mass,
-            1e17 * unyt.Solar_Mass
+            10 ** bin_log_edges[-2] * unyt.Solar_Mass,
+            10 ** bin_log_edges[-1] * unyt.Solar_Mass,
         ),
         k500_rescale=True
     )
