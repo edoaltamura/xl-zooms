@@ -101,16 +101,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
     return catalogue
 
 
-def attach_mass_bin_index(object_database: pd.DataFrame, n_bins: int = 3) -> Tuple[pd.DataFrame, np.ndarray]:
-    m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit'].values])
-    bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
-    bin_indices = np.digitize(m500crit_log10, bin_log_edges)
-    object_database.insert(1, 'M_500crit bin_indices', pd.Series(bin_indices, dtype=int))
-
-    return object_database, bin_log_edges
-
-
-def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.ndarray) -> None:
+def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3) -> None:
     from matplotlib.cm import get_cmap
 
     name = "Set2"
@@ -120,10 +111,15 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
     fig, ax = plt.subplots()
     ax.set_prop_cycle(color=colors)
 
+    # Bin objects by mass
+    m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit'].values])
+    bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
+    bin_indices = np.digitize(m500crit_log10, bin_log_edges)
+
     # Display zoom data
     for i in enumerate(bin_edges[:-1]):
-        print(object_database['M_500crit bin_indices'].values)
-        plot_database = object_database[object_database['M_500crit bin_indices'].values == (i + 1)]
+        print(np.where(bin_indices == (i + 1))[0])
+        plot_database = object_database.iloc[[np.where(bin_indices == (i + 1))[0]]]
         max_convergence_radius = plot_database['convergence_radius'].max()
 
         # Plot only profiles outside the *largest* convergence radius
