@@ -126,9 +126,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, bin_edges: np.nda
         plot_database = object_database[bin_select]
         max_convergence_radius = plot_database['convergence_radius'].max()
 
-        print(plot_database['bin_centre'])
-        print(plot_database['bin_centre'].iloc[0])
-
         # Plot only profiles outside the *largest* convergence radius
         radial_profiles = []
         for j in range(len(plot_database)):
