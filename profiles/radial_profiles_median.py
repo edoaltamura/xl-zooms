@@ -149,10 +149,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         )
 
         # Display profiles individually
-        for j in range(n_bins if highmass_only else 1, n_bins + 1):
+        for single_profile in radial_profiles:
             ax.plot(
                 bin_centres,
-                radial_profiles[j],
+                single_profile,
                 linestyle='-', linewidth=0.5, alpha=1, color=colors[i - 1]
             )
 
