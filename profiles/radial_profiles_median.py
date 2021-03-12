@@ -103,7 +103,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
 def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
     from matplotlib.cm import get_cmap
 
-    name = "Set2_r"
+    name = "Set2"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
     colors = cmap.colors[1:]  # type: list
 
