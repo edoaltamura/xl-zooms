@@ -105,14 +105,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
     name = "Set2_r"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
-    colors = cmap.colors  # type: list
+    colors = cmap.colors[1:]  # type: list
 
     fig, ax = plt.subplots()
     ax.set_prop_cycle(color=colors)
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit'].values])
-    bin_log_edges = np.array([12.5, 13.5, 14., 14.6])
+    bin_log_edges = np.array([12.5, 13.4, 13.8, 14.6])
     n_bins = len(bin_log_edges) - 1
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
 
@@ -147,6 +147,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
                 f"/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$"
             )
         )
+
+        # Display profiles individually
+        for j in range(n_bins if highmass_only else 1, n_bins + 1):
+            ax.plot(
+                bin_centres,
+                radial_profiles[j],
+                linestyle='-', linewidth=0.5, alpha=1, color=colors[i - 1]
+            )
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
