@@ -40,31 +40,31 @@ def process_single_halo(
         hse_dataset: pd.Series = None,
 ) -> tuple:
     # Read in halo properties
-    with h5.File(f'{path_to_catalogue}', 'r') as h5file:
+    with h5.File(path_to_catalogue, 'r') as h5file:
         scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
+        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / scale_factor
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / scale_factor
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R2500c = unyt.unyt_quantity(h5file['/SO_R_2500_rhocrit'][0], unyt.Mpc) / scale_factor
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
         R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc) / scale_factor
 
-    # If no custom aperture, select R500c as default
-    if hse_dataset is not None:
-        assert R500c.units == hse_dataset["R500hse"].units
-        assert M500c.units == hse_dataset["M500hse"].units
-        R500c = hse_dataset["R500hse"]
-        M500c = hse_dataset["M500hse"]
+        # If no custom aperture, select R500c as default
+        if hse_dataset is not None:
+            assert R500c.units == hse_dataset["R500hse"].units
+            assert M500c.units == hse_dataset["M500hse"].units
+            R500c = hse_dataset["R500hse"]
+            M500c = hse_dataset["M500hse"]
 
     # Read in gas particles
-    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
+    mask = sw.mask(path_to_snap, spatial_only=False)
     region = [[XPotMin - R500c, XPotMin + R500c],
               [YPotMin - R500c, YPotMin + R500c],
               [ZPotMin - R500c, ZPotMin + R500c]]
     mask.constrain_spatial(region)
     mask.constrain_mask("gas", "temperatures", Tcut_halogas * mask.units.temperature, 1.e12 * mask.units.temperature)
-    data = sw.load(f'{path_to_snap}', mask=mask)
+    data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
     R500c *= scale_factor
