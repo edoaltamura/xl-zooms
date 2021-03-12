@@ -22,8 +22,7 @@ sys.path.append("../zooms")
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 import observational_data as obs
 import scaling_utils as utils
-import scaling_style as style
-from convergence_radius import convergence_radius
+
 from radial_profiles import profile_3d_single_halo as profiles
 from mass_scaling_entropy import process_single_halo as entropy_scaling
 
@@ -101,7 +100,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
     return catalogue
 
 
-def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, highmass_only: bool = False) -> None:
+def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
     from matplotlib.cm import get_cmap
 
     name = "Set2"
@@ -113,7 +112,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, 
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M_500crit'].values])
-    bin_log_edges = np.linspace(m500crit_log10.min(), m500crit_log10.max() * 1.01, n_bins + 1)
+    bin_log_edges = np.array([12.5, 13.5, 14., 14.6])
+    n_bins = len(bin_log_edges) - 1
     bin_indices = np.digitize(m500crit_log10, bin_log_edges)
 
     # Display zoom data
@@ -145,6 +145,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, 
             label=f"$10^{{{bin_log_edges[i-1]:.1f}}}<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$"
         )
 
+    # Display observational data
+    observations_color = (0.65, 0.65, 0.65)
+
     # Observational data
     pratt10 = obs.Pratt10()
     bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
@@ -158,14 +161,21 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, 
         pratt10.radial_bins,
         bin_perc16,
         bin_perc84,
-        color='grey', alpha=0.15, linewidth=0
+        color=observations_color,
+        alpha=0.8,
+        linewidth=0
     )
-    plt.plot(pratt10.radial_bins, bin_median, c='k')
+    plt.plot(
+        pratt10.radial_bins, bin_median, c='k',
+        label=(
+            f"{pratt10.citation:s} ($10^{{{bin_log_edges[i-1]:.1f}}}"
+            f"<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
+        )
+    )
+    del pratt10
 
     ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
     ax.set_ylabel(plot_database.iloc[0]['ylabel'])
-    # ax.set_ylim([70, 2000])
-    # ax.set_xlim([0.02, 5])
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
@@ -178,4 +188,4 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, n_bins: int = 3, 
 
 if __name__ == "__main__":
     results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
-    plot_radial_profiles_median(results_database, n_bins=3, highmass_only=True)
+    plot_radial_profiles_median(results_database, highmass_only=True)
