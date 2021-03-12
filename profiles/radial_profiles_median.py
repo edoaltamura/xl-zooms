@@ -179,7 +179,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
-    plt.title(" ".join(args.keywords))
+    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}")
     fig.savefig(f'{calibration_zooms.output_directory}/median_radial_profiles_{" ".join(args.keywords)}.png', dpi=300)
     if not args.quiet:
         plt.show()
