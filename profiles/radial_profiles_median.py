@@ -177,7 +177,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     )
     del pratt10
 
-    ax.set_xlabel(f'$R/R_{{500{{\\rm {args.mass_estimator}}}$')
+    ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
     ax.set_ylabel(plot_database.iloc[0]['ylabel'])
     ax.set_xscale('log')
     ax.set_yscale('log')
