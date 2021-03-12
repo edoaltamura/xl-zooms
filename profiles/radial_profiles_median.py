@@ -153,7 +153,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
             ax.plot(
                 bin_centres,
                 single_profile,
-                linestyle='-', linewidth=0.5, alpha=1, color=colors[i - 1]
+                linestyle='-', linewidth=0.3, alpha=0.5, color=colors[i - 1]
             )
 
     # Display observational data
