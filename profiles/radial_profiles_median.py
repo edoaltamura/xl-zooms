@@ -103,7 +103,7 @@ def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame
 def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
     from matplotlib.cm import get_cmap
 
-    name = "Set2"
+    name = "Set2_r"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
     colors = cmap.colors  # type: list
 
@@ -142,7 +142,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         ax.plot(
             bin_centres, median_profile,
             linestyle='-', linewidth=1, alpha=1, color=colors[i - 1],
-            label=f"$10^{{{bin_log_edges[i-1]:.1f}}}<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$"
+            label=(
+                f"$10^{{{bin_log_edges[i - 1]:.1f}}}<M_{{500,{args.mass_estimator}}}"
+                f"/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$"
+            )
         )
 
     # Display observational data
@@ -168,19 +171,19 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     plt.plot(
         pratt10.radial_bins, bin_median, c='k',
         label=(
-            f"{pratt10.citation:s} ($10^{{{bin_log_edges[i-1]:.1f}}}"
-            f"<M_{{500, crit}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
+            f"{pratt10.citation:s} ($10^{{{bin_log_edges[i - 1]:.1f}}}"
+            f"<M_{{500}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
         )
     )
     del pratt10
 
-    ax.set_xlabel(r'$R/R_{500{\rm crit}}$')
+    ax.set_xlabel(f'$R/R_{{500{{\\rm {args.mass_estimator}}}$')
     ax.set_ylabel(plot_database.iloc[0]['ylabel'])
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
-                 fontsize=7)
+                 fontsize=5)
     fig.savefig(f'{calibration_zooms.output_directory}/median_radial_profiles_{" ".join(args.keywords)}.png', dpi=300)
     if not args.quiet:
         plt.show()
