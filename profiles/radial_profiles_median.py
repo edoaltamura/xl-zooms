@@ -78,7 +78,7 @@ def _process_single_halo(zoom: Zoom):
         else:
             raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
 
-        scaling_database = entropy_scaling(snapshot_file, catalog_file)
+        scaling_database = entropy_scaling(snapshot_file, catalog_file, hse_dataset=hse_entry)
         profiles_database = profiles(snapshot_file, catalog_file, weights=FIELD_NAME, hse_dataset=hse_entry)
         return tuple(scaling_database + profiles_database)
 

@@ -36,7 +36,8 @@ entropy_shell_thickness = unyt.unyt_quantity(10, 'kpc')
 
 def process_single_halo(
         path_to_snap: str,
-        path_to_catalogue: str
+        path_to_catalogue: str,
+        hse_dataset: pd.Series = None,
 ) -> tuple:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
@@ -49,7 +50,12 @@ def process_single_halo(
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
         R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc) / scale_factor
 
-    # print(XPotMin, YPotMin, ZPotMin, M500c, R500c)
+    # If no custom aperture, select R500c as default
+    if hse_dataset is not None:
+        assert R500c.units == hse_dataset["R500hse"].units
+        assert M500c.units == hse_dataset["M500hse"].units
+        R500c = hse_dataset["R500hse"]
+        M500c = hse_dataset["M500hse"]
 
     # Read in gas particles
     mask = sw.mask(f'{path_to_snap}', spatial_only=False)
