@@ -787,7 +787,7 @@ class Pratt10(Observations):
             else:
                 ez = self.ez_function(redshift)
                 radius = np.logspace(np.log10(0.01 * R500.v), np.log10(R500.v), len(radial_range))
-                profiles[i] = K0 + K100 * (radius / 100 / h_conv) ** alpha
+                profiles[i] = K0 + K100 * (radius / 100 / 0.7) ** alpha
                 profiles[i] *= ez ** (4 / 3) * h_conv ** (-1 / 3)
 
         self.entropy_profiles = unyt.unyt_array(profiles, unyt.keV * unyt.cm ** 2)

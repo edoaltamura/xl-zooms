@@ -2,11 +2,8 @@ import os
 import sys
 import unyt
 import argparse
-import h5py as h5
 import numpy as np
 import pandas as pd
-import swiftsimio as sw
-from typing import Tuple
 import matplotlib.pyplot as plt
 
 try:
@@ -40,7 +37,7 @@ FIELD_NAME = 'entropy'
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
-    'bin_centre',
+    'radius',
     FIELD_NAME,
     'ylabel',
     'convergence_radius',
@@ -98,7 +95,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
     name = "Set2"
     cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
-    colors = cmap.colors[1:]  # type: list
+    colors = cmap.colors[3:]  # type: list
 
     fig, ax = plt.subplots()
     ax.set_prop_cycle(color=colors)
@@ -116,38 +113,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         max_convergence_radius = plot_database['convergence_radius'].max()
 
         # Plot only profiles outside the *largest* convergence radius
-        radial_profiles = []
+        radius = np.empty(0)
+        field = np.empty(0)
         for j in range(len(plot_database)):
-            convergence_index = np.where(plot_database['bin_centre'].iloc[j] > max_convergence_radius)[0]
-            radial_profiles.append(plot_database[FIELD_NAME].iloc[j][convergence_index])
+            convergence_index = np.where(plot_database['radius'].iloc[j] > max_convergence_radius)[0]
+            radius = np.append(radius, plot_database['radius'].iloc[j][convergence_index])
+            field = np.append(field, plot_database[FIELD_NAME].iloc[j][convergence_index])
 
-        radial_profiles = np.asarray(radial_profiles)
-        convergence_index = np.where(plot_database['bin_centre'].iloc[0] > max_convergence_radius)[0]
-        bin_centres = plot_database['bin_centre'].iloc[0][convergence_index]
-        median_profile = np.median(radial_profiles, axis=0)
-        percent16_profile = np.percentile(radial_profiles, 16, axis=0)
-        percent84_profile = np.percentile(radial_profiles, 84, axis=0)
-
-        ax.fill_between(
-            bin_centres, percent84_profile, percent16_profile,
-            linewidth=0, alpha=0.5, color=colors[i - 1],
-        )
-        ax.plot(
-            bin_centres, median_profile,
-            linestyle='-', linewidth=1, alpha=1, color=colors[i - 1],
-            label=(
-                f"$10^{{{bin_log_edges[i - 1]:.1f}}}<M_{{500,{args.mass_estimator}}}"
-                f"/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$"
-            )
-        )
-
-        # Display profiles individually
-        for single_profile in radial_profiles:
-            ax.plot(
-                bin_centres,
-                single_profile,
-                linestyle='-', linewidth=0.3, alpha=0.5, color=colors[i - 1]
-            )
+        ax.scatter(radius, field, marker=',', s=2, edgecolors='none', alpha=0.5, facecolors=colors[i - 1], linewidth=0)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
@@ -183,9 +156,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
-    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
-                 fontsize=5)
-    fig.savefig(f'{calibration_zooms.output_directory}/median_radial_profiles_{" ".join(args.redshift_index)}.png', dpi=300)
+    ax.set_title(
+        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
+        fontsize=5
+    )
+    fig.savefig(
+        f'{calibration_zooms.output_directory}/nobins_radial_profiles_{" ".join(args.redshift_index)}.png',
+        dpi=300
+    )
     if not args.quiet:
         plt.show()
     plt.close()

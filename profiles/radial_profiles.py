@@ -41,6 +41,7 @@ mean_atomic_weight_per_free_electron = 1.14
 bins = 40
 radius_bounds = [0.01, 2.5]  # In units of R500crit
 sampling_method = 'shell_density'
+sampling_method = 'no_binning'
 # sampling_method = 'particle_density'
 field_name = 'entropy'
 
@@ -233,6 +234,17 @@ def profile_3d_single_halo(
             hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
             hist /= mass_weights
 
+        elif sampling_method.lower() == 'no_binning':
+
+            n_e = data.gas.densities
+            ne_500crit = 3 * M500c * obs.cosmic_fbary / (4 * np.pi * R500c ** 3)
+            kBT = unyt.boltzmann_constant * data.gas.temperatures
+            kBT_500crit = unyt.G * mean_molecular_weight * M500c * unyt.mass_proton / 2 / R500c
+            weights_field = kBT / kBT_500crit * (ne_500crit / n_e) ** (2 / 3)
+
+            bin_centre = radial_distance
+            hist = weights_field
+
         ylabel = r'$K/K_{500{\rm crit}}$'
 
     elif weights.lower() == 'entropy_physical':
@@ -264,6 +276,16 @@ def profile_3d_single_halo(
             hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
             hist /= mass_weights
             hist = hist.to('keV*cm**2')
+
+        elif sampling_method.lower() == 'no_binning':
+
+            number_density_gas = data.gas.densities / (mean_molecular_weight * unyt.mass_proton)
+            number_density_gas = number_density_gas.to('1/cm**3')
+            kBT = unyt.boltzmann_constant * data.gas.temperatures
+            weights_field = kBT / number_density_gas ** (2 / 3)
+
+            bin_centre = radial_distance
+            hist = weights_field
 
         ylabel = r'$K$   [keV cm$^2$]'
 
@@ -301,7 +323,7 @@ def profile_3d_single_halo(
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-    return bin_centre, hist, ylabel, conv_radius
+    return bin_centre, hist, ylabel, conv_radius, M500c
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -310,6 +332,7 @@ def profile_3d_single_halo(
     field_name,
     'ylabel',
     'convergence_radius',
+    'M500'
 ])
 def _process_single_halo(zoom: Zoom):
     # Select redshift
