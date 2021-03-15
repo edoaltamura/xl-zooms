@@ -120,7 +120,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
             radius = np.append(radius, plot_database['radius'].iloc[j][convergence_index])
             field = np.append(field, plot_database[FIELD_NAME].iloc[j][convergence_index])
 
-        ax.plot(radius, field, marker=',', lw=0, linestyle="", c=colors[i - 1])
+        ax.plot(radius[::10], field[::10], marker=',', lw=0, linestyle="", c=colors[i - 1])
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
@@ -156,6 +156,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim([0.01, 2.5])
+    ax.set_ylim([0.01, 100])
     plt.legend()
     ax.set_title(
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
