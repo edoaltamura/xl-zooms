@@ -38,7 +38,7 @@ args = parser.parse_args()
 FIELD_NAME = 'entropy'
 
 
-def density_scatter(x, y, ax=None, sort=True, bins=20, **kwargs):
+def density_scatter(x, y, ax=None, sort=False, bins=20, **kwargs):
     """
     Scatter plot colored by 2d histogram
     """
@@ -153,7 +153,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
         # ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c=colors[i - 1], alpha=0.1)
 
-        density_scatter(radius, field, ax=ax, bins=50)
+        density_scatter(radius, field, ax=ax, bins=30)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
