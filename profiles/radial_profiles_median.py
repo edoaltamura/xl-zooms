@@ -183,9 +183,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_xscale('log')
     ax.set_yscale('log')
     plt.legend()
-    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
-                 fontsize=5)
-    fig.savefig(f'{calibration_zooms.output_directory}/median_radial_profiles_{" ".join(args.redshift_index)}.png', dpi=300)
+    ax.set_title(
+        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
+        fontsize=5
+    )
+    fig.savefig(
+        f'{calibration_zooms.output_directory}/median_radial_profiles_{args.redshift_index:04d}.png',
+        dpi=300
+    )
     if not args.quiet:
         plt.show()
     plt.close()

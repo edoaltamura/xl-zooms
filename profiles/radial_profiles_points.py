@@ -161,7 +161,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         fontsize=5
     )
     fig.savefig(
-        f'{calibration_zooms.output_directory}/nobins_radial_profiles_{" ".join(args.redshift_index)}.png',
+        f'{calibration_zooms.output_directory}/nobins_radial_profiles_{args.redshift_index:04d}.png',
         dpi=300
     )
     if not args.quiet:
