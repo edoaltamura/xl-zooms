@@ -25,7 +25,7 @@ from radial_profiles import profile_3d_single_halo as profiles
 parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
 parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
-parser.add_argument('-r', '--redshift-index', type=int, default=37, required=False,
+parser.add_argument('-r', '--redshift-index', type=int, default=36, required=False,
                     choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
 parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
                     choices=['crit', 'true', 'hse'])
