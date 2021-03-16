@@ -7,6 +7,7 @@ import os
 import sys
 import unyt
 import argparse
+import scipy
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -41,34 +42,6 @@ parser.add_argument('-q', '--quiet', default=False, required=False, action='stor
 args = parser.parse_args()
 
 FIELD_NAME = 'entropy'
-
-
-def density_scatter(x, y, ax=None, sort=True, bins=20, **kwargs):
-    """
-    Scatter plot colored by 2d histogram
-    """
-    if ax is None:
-        fig, ax = plt.subplots()
-    data, x_e, y_e = np.histogram2d(x, y, bins=bins, density=True)
-    z = interpn((0.5 * (x_e[1:] + x_e[:-1]), 0.5 * (y_e[1:] + y_e[:-1])), data, np.vstack([x, y]).T,
-                method="splinef2d",
-                bounds_error=False)
-
-    # To be sure to plot all data
-    z[np.where(np.isnan(z))] = 0.0
-
-    # Sort the points by density, so that the densest points are plotted last
-    if sort:
-        idx = z.argsort()
-        x, y, z = x[idx], y[idx], z[idx]
-
-    ax.scatter(x, y, c=z, **kwargs)
-
-    # norm = Normalize(vmin=np.min(z), vmax=np.max(z))
-    # cbar = plt.colorbar(cm.ScalarMappable(norm=norm), ax=ax)
-    # cbar.ax.set_ylabel('Density')
-
-    return ax
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -152,13 +125,15 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         radius = np.empty(0)
         field = np.empty(0)
         for j in range(len(plot_database)):
-            convergence_index = np.where(plot_database['radius'].iloc[j] > max_convergence_radius)[0]
-            radius = np.append(radius, plot_database['radius'].iloc[j][convergence_index])
-            field = np.append(field, plot_database[FIELD_NAME].iloc[j][convergence_index])
+            # convergence_index = np.where(plot_database['radius'].iloc[j] > max_convergence_radius)[0]
+            # radius = np.append(radius, plot_database['radius'].iloc[j][convergence_index])
+            # field = np.append(field, plot_database[FIELD_NAME].iloc[j][convergence_index])
 
-        # ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c=colors[i - 1], alpha=0.1)
+            radius = np.append(radius, plot_database['radius'].iloc[j])
+            field = np.append(field, plot_database[FIELD_NAME].iloc[j])
 
-        density_scatter(radius, field, ax=ax, bins=30)
+        ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c=colors[i - 1], alpha=0.9)
+
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
