@@ -93,7 +93,9 @@ def profile_3d_single_halo(
     # Read in halo properties
     with h5.File(path_to_catalogue, 'r') as h5file:
         scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
+        M200c = unyt.unyt_quantity(h5file['/Mass_200crit'][0] * 1.e10, unyt.Solar_Mass)
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
+        R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc) / scale_factor
         R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc) / scale_factor
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc) / scale_factor
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
@@ -188,6 +190,8 @@ def profile_3d_single_halo(
         weights_field = data.gas.mass_weighted_temperatures
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
         hist /= mass_weights
+
+        print('Virial temperature = ', (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV'))
 
         if sampling_method.lower() == 'no_binning':
 
