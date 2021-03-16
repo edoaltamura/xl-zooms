@@ -1,3 +1,8 @@
+"""
+Test as:
+    $ git pull; python3 radial_profiles_points.py -k _-8res_MinimumDistance_fixedAGNdT8.5_ -m true -r 36
+"""
+
 import os
 import sys
 import unyt
@@ -38,7 +43,7 @@ args = parser.parse_args()
 FIELD_NAME = 'entropy'
 
 
-def density_scatter(x, y, ax=None, sort=False, bins=20, **kwargs):
+def density_scatter(x, y, ax=None, sort=True, bins=20, **kwargs):
     """
     Scatter plot colored by 2d histogram
     """
@@ -59,9 +64,9 @@ def density_scatter(x, y, ax=None, sort=False, bins=20, **kwargs):
 
     ax.scatter(x, y, c=z, **kwargs)
 
-    norm = Normalize(vmin=np.min(z), vmax=np.max(z))
-    cbar = plt.colorbar(cm.ScalarMappable(norm=norm), ax=ax)
-    cbar.ax.set_ylabel('Density')
+    # norm = Normalize(vmin=np.min(z), vmax=np.max(z))
+    # cbar = plt.colorbar(cm.ScalarMappable(norm=norm), ax=ax)
+    # cbar.ax.set_ylabel('Density')
 
     return ax
 
