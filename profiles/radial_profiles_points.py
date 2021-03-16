@@ -50,7 +50,8 @@ FIELD_NAME = 'mass_weighted_temps'
     FIELD_NAME,
     'ylabel',
     'convergence_radius',
-    'M500'
+    'M500',
+    'R500'
 ])
 def _process_single_halo(zoom: Zoom):
     # Select redshift

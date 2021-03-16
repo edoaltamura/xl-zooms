@@ -329,7 +329,7 @@ def profile_3d_single_halo(
     else:
         raise ValueError(f"Unrecognized weighting field: {weights}.")
 
-    return bin_centre, hist, ylabel, conv_radius, M500c
+    return bin_centre, hist, ylabel, conv_radius, M500c, R500c
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -338,7 +338,8 @@ def profile_3d_single_halo(
     field_name,
     'ylabel',
     'convergence_radius',
-    'M500'
+    'M500',
+    'R500'
 ])
 def _process_single_halo(zoom: Zoom):
     # Select redshift
