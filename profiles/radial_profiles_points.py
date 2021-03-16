@@ -41,7 +41,7 @@ parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', re
 parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
 args = parser.parse_args()
 
-FIELD_NAME = 'entropy'
+FIELD_NAME = 'mass_weighted_temps'
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -139,37 +139,37 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     observations_color = (0.65, 0.65, 0.65)
 
     # Observational data
-    pratt10 = obs.Pratt10()
-    bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
-        m500_limits=(
-            10 ** bin_log_edges[-2] * unyt.Solar_Mass,
-            10 ** bin_log_edges[-1] * unyt.Solar_Mass,
-        ),
-        k500_rescale=True
-    )
-    plt.fill_between(
-        pratt10.radial_bins,
-        bin_perc16,
-        bin_perc84,
-        color=observations_color,
-        alpha=0.8,
-        linewidth=0
-    )
-    plt.plot(
-        pratt10.radial_bins, bin_median, c='k',
-        label=(
-            f"{pratt10.citation:s} ($10^{{{bin_log_edges[i - 1]:.1f}}}"
-            f"<M_{{500}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
-        )
-    )
-    del pratt10
+    # pratt10 = obs.Pratt10()
+    # bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
+    #     m500_limits=(
+    #         10 ** bin_log_edges[-2] * unyt.Solar_Mass,
+    #         10 ** bin_log_edges[-1] * unyt.Solar_Mass,
+    #     ),
+    #     k500_rescale=True
+    # )
+    # plt.fill_between(
+    #     pratt10.radial_bins,
+    #     bin_perc16,
+    #     bin_perc84,
+    #     color=observations_color,
+    #     alpha=0.8,
+    #     linewidth=0
+    # )
+    # plt.plot(
+    #     pratt10.radial_bins, bin_median, c='k',
+    #     label=(
+    #         f"{pratt10.citation:s} ($10^{{{bin_log_edges[i - 1]:.1f}}}"
+    #         f"<M_{{500}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
+    #     )
+    # )
+    # del pratt10
 
     ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
     ax.set_ylabel(plot_database.iloc[0]['ylabel'])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim([0.01, 2.5])
-    ax.set_ylim([0.01, 100])
+    ax.set_ylim([1e5, 1e10])
     plt.legend()
     ax.set_title(
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",

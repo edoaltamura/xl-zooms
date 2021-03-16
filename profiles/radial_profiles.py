@@ -184,9 +184,15 @@ def profile_3d_single_halo(
         ylabel = r'$(\rho_{\rm gas}/\rho_{\rm crit})\ (R/R_{500{\rm crit}})^3 $'
 
     elif weights.lower() == 'mass_weighted_temps':
+
         weights_field = data.gas.mass_weighted_temperatures
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
         hist /= mass_weights
+
+        if sampling_method.lower() == 'no_binning':
+
+            bin_centre = radial_distance
+            hist = data.gas.temperatures
 
         ylabel = r'$T$ [K]'
 
