@@ -170,8 +170,8 @@ def get_xray_luminosity(
     a = vr_catalogue_handle.a
     R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[1].to('Mpc')
     XPotMin = vr_catalogue_handle.positions.xcminpot[1].to('Mpc')
-    YPotMin = vr_catalogue_handle.positions.xcminpot[1].to('Mpc')
-    ZPotMin = vr_catalogue_handle.positions.xcminpot[1].to('Mpc')
+    YPotMin = vr_catalogue_handle.positions.ycminpot[1].to('Mpc')
+    ZPotMin = vr_catalogue_handle.positions.zcminpot[1].to('Mpc')
     print(R500c, XPotMin, YPotMin, ZPotMin)
 
     # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
