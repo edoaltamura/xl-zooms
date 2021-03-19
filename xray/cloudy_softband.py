@@ -182,6 +182,7 @@ def get_xray_luminosity(
         [(YPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (YPotMin + 0.5 * R500c) / vr_catalogue_handle.a],
         [(ZPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (ZPotMin + 0.5 * R500c) / vr_catalogue_handle.a]
     ]
+    print(region)
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
 
