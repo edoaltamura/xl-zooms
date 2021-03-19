@@ -189,7 +189,7 @@ def process_single_halo(
     index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c) & (tempGas > 1e5))[0]
 
     # Compute hydrogen number density
-    data_nH = np.log10((data.gas.element_mass_fractions.hydrogen * data.gas.densities / unyt.proton_mass).to('cm**-3').value)
+    data_nH = np.log10((data.gas.element_mass_fractions.hydrogen * data.gas.densities / unyt.pm).to('cm**-3').value)
 
     # get temperature
     data_T = np.log10(data.gas.temperatures.value)
@@ -203,8 +203,8 @@ def process_single_halo(
     emissivity = unyt.unyt_array(10 ** emissivity, 'erg*cm**3/s')
 
     # Compute X-ray luminosities
-    xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * \
-                        data.gas.masses / unyt.proton_mass / 0.6 * \
+    xray_luminosities = data.gas.densities / unyt.pm / 0.6 * \
+                        data.gas.masses / unyt.pm / 0.6 * \
                         emissivity
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
