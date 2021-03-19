@@ -188,10 +188,12 @@ def get_xray_luminosity(
 
     # Convert datasets to physical quantities
     # R500c is already in physical units
+    print(data.gas.densities)
     data.gas.coordinates.convert_to_physical()
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
+    print(data.gas.densities)
 
     # Select hot gas within sphere and without core
     tempGas = data.gas.temperatures
