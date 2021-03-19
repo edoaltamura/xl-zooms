@@ -3,6 +3,7 @@ import sys
 import h5py
 import numpy as np
 import swiftsimio as sw
+import velociraptor as vr
 from numba import jit
 import unyt
 
@@ -158,25 +159,38 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
     return emissivities
 
 
-def process_single_halo(
+def get_xray_luminosity(
         path_to_snap: str,
-        path_to_catalogue: str
-):
-    # Read in halo properties
-    with h5py.File(path_to_catalogue, 'r') as h5file:
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+        path_to_catalogue: str,
+        core_excised: bool = False
+) -> unyt.unyt_quantity:
 
-    # Read in gas particles to compute the core-excised temperature
+    # Read in halo properties
+    vr_catalogue_handle = vr.load(path_to_catalogue)
+    R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0]
+    XPotMin = vr_catalogue_handle.positions.xcminpot[0]
+    YPotMin = vr_catalogue_handle.positions.xcminpot[0]
+    ZPotMin = vr_catalogue_handle.positions.xcminpot[0]
+
+    # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
+    # to filter particle coordinates, while VR outputs are in physical units.
+    # Convert the region bounds to comoving, but keep the CoP and Rcrit in
+    # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
-    region = [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
-              [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
-              [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
+    region = np.array(
+        [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
+         [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
+         [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
+    ) / vr_catalogue_handle.a
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
+
+    # Convert datasets to physical quantities
+    # R500c is already in physical units
+    data.gas.coordinates.convert_to_physical()
+    data.gas.masses.convert_to_physical()
+    data.gas.temperatures.convert_to_physical()
+    data.gas.densities.convert_to_physical()
 
     # Select hot gas within sphere and without core
     tempGas = data.gas.temperatures
@@ -186,41 +200,40 @@ def process_single_halo(
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
     # Keep only particles inside R500crit
-    index = np.where((deltaR < 1) & (tempGas > 1e5))[0]
+    if core_excised:
+        index = np.where((deltaR > 0.15) & (deltaR < 1) & (tempGas > 1e5))[0]
+    else:
+        index = np.where((deltaR < 1) & (tempGas > 1e5))[0]
 
-    # Compute hydrogen number density
+    del tempGas, deltaX, deltaY, deltaZ, deltaR
+
+    # Compute hydrogen number density and the log10
+    # of the temperature to provide to the xray interpolator.
     data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
-
-    # get temperature
     data_T = np.log10(data.gas.temperatures.value)
 
-    # interpolate
-    emissivity = interpolate_X_Ray(
+    # Interpolate the Cloudy table to get emissivities
+    emissivities = interpolate_X_Ray(
         data_nH,
         data_T,
         data.gas.element_mass_fractions
     )
-    print(emissivity)
-
-    emissivity = unyt.unyt_array(10 ** emissivity, 'erg/s/cm**3')
-    emissivity = emissivity.to('erg/s/Mpc**3')
-    print(emissivity)
-    print(emissivity * data.gas.masses / data.gas.densities)
+    emissivities = unyt.unyt_array(10 ** emissivities, 'erg/s/cm**3')
+    emissivities = emissivities.to('erg/s/Mpc**3')
 
     # Compute X-ray luminosities
-    xray_luminosities = emissivity * data.gas.masses / data.gas.densities
+    # LX = emissivity * gas_mass / gas_density
+    xray_luminosities = emissivities * data.gas.masses / data.gas.densities
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
-    print(f"M_500_crit: {M500c:.3E}")
-    print(f"X-luminosity: {np.sum(xray_luminosities[index]):.3E}")
-
-    return np.sum(xray_luminosities)
+    return np.sum(xray_luminosities[index])
 
 
 if __name__ == '__main__':
     zoom = zooms_register[0]
     print(zoom.run_name)
-    process_single_halo(
+    LX = get_xray_luminosity(
         path_to_snap=zoom.get_redshift().snapshot_path,
         path_to_catalogue=zoom.get_redshift().catalogue_properties_path
     )
+    print(f"X-ray Luminosity: {LX:.3E}")
