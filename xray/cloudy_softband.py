@@ -5,7 +5,6 @@ import numpy as np
 import swiftsimio as sw
 from numba import jit
 import unyt
-from unyt import g, cm, mp
 
 sys.path.append("../zooms")
 
@@ -31,7 +30,7 @@ class Interpolate(object):
         self.solar_metallicity = self.table['/Bins/Solar_metallicities/'][()]
 
 
-@jit(nopython=True, parallel=True, fastmath=True)
+@jit(nopython=True)
 def find_dx(subdata, bins, idx_0):
     dx_p = np.zeros(len(subdata))
     for i in range(len(subdata)):
@@ -40,7 +39,7 @@ def find_dx(subdata, bins, idx_0):
     return dx_p
 
 
-@jit(nopython=True, parallel=True, fastmath=True)
+@jit(nopython=True)
 def find_idx(subdata, bins, dbins):
     idx_p = np.zeros((len(subdata), 2))
     for i in range(len(subdata)):
@@ -51,7 +50,7 @@ def find_idx(subdata, bins, dbins):
     return idx_p
 
 
-@jit(nopython=True, parallel=True, fastmath=True)
+@jit(nopython=True)
 def find_idx_he(subdata, bins):
     idx_p = np.zeros((len(subdata), 2))
     for i in range(len(subdata)):
@@ -60,7 +59,7 @@ def find_idx_he(subdata, bins):
     return idx_p
 
 
-@jit(nopython=True, parallel=True, fastmath=True)
+@jit(nopython=True)
 def find_dx_he(subdata, bins, idx_0):
     dx_p = np.zeros(len(subdata))
     for i in range(len(subdata)):
@@ -70,7 +69,7 @@ def find_dx_he(subdata, bins, idx_0):
     return dx_p
 
 
-@jit(nopython=True, parallel=True, fastmath=True)
+@jit(nopython=True)
 def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abundance_to_solar):
     f_n_T_Z = np.zeros(len(idx_n[:, 0]))
     for i in range(len(idx_n[:, 0])):
@@ -190,7 +189,7 @@ def process_single_halo(
     index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c) & (tempGas > 1e5))[0]
 
     # Compute hydrogen number density
-    data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / mp)
+    data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
 
     # get temperature
     data_T = np.log10(data.gas.temperatures.value)
