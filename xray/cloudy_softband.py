@@ -177,12 +177,12 @@ def get_xray_luminosity(
     # Convert the region bounds to comoving, but keep the CoP and Rcrit in
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
-    region = unyt.unyt_array(
-        [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
-         [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
-         [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
-    ) / vr_catalogue_handle.a
-    mask.constrain_spatial(region.tolist())
+    region = [
+        [(XPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (XPotMin + 0.5 * R500c) / vr_catalogue_handle.a],
+        [(YPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (YPotMin + 0.5 * R500c) / vr_catalogue_handle.a],
+        [(ZPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (ZPotMin + 0.5 * R500c) / vr_catalogue_handle.a]
+    ]
+    mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
