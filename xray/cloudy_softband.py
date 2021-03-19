@@ -167,11 +167,11 @@ def get_xray_luminosity(
 
     # Read in halo properties
     vr_catalogue_handle = vr.load(path_to_catalogue)
+    a = vr_catalogue_handle.a
     R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
     XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
     YPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
     ZPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
-    print(vr_catalogue_handle.a)
 
     # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
     # to filter particle coordinates, while VR outputs are in physical units.
@@ -179,9 +179,9 @@ def get_xray_luminosity(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [(XPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (XPotMin + 0.5 * R500c) / vr_catalogue_handle.a],
-        [(YPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (YPotMin + 0.5 * R500c) / vr_catalogue_handle.a],
-        [(ZPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (ZPotMin + 0.5 * R500c) / vr_catalogue_handle.a]
+        [XPotMin / a - 0.5 * R500c / a, XPotMin / a + 0.5 * R500c / a],
+        [YPotMin / a - 0.5 * R500c / a, YPotMin / a + 0.5 * R500c / a],
+        [ZPotMin / a - 0.5 * R500c / a, ZPotMin / a + 0.5 * R500c / a]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
