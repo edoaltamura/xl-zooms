@@ -189,7 +189,7 @@ def process_single_halo(
     index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c) & (tempGas > 1e5))[0]
 
     # Compute hydrogen number density
-    data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
+    data_nH = np.log10((data.gas.element_mass_fractions.hydrogen * data.gas.densities / unyt.proton_mass).to('cm**-3').value)
 
     # get temperature
     data_T = np.log10(data.gas.temperatures.value)
