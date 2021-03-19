@@ -232,10 +232,11 @@ def get_xray_luminosity(
 
 
 if __name__ == '__main__':
-    zoom = zooms_register[0]
-    print(zoom.run_name)
-    LX = get_xray_luminosity(
-        path_to_snap=zoom.get_redshift().snapshot_path,
-        path_to_catalogue=zoom.get_redshift().catalogue_properties_path
-    )
-    print(f"X-ray Luminosity: {LX:.3E}")
+    for i in [0, 10, 50, 100, 200, 250]:
+        zoom = zooms_register[i]
+        print(zoom.run_name)
+        LX = get_xray_luminosity(
+            path_to_snap=zoom.get_redshift().snapshot_path,
+            path_to_catalogue=zoom.get_redshift().catalogue_properties_path
+        )
+        print(f"X-ray Luminosity: {LX:.3E}")
