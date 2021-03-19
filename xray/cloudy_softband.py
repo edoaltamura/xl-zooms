@@ -183,13 +183,13 @@ def process_single_halo(
     deltaX = data.gas.coordinates[:, 0] - XPotMin
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
-    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
     # Keep only particles inside R500crit
-    index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c) & (tempGas > 1e5))[0]
+    index = np.where((deltaR > 0.15) & (deltaR < 1) & (tempGas > 1e5))[0]
 
     # Compute hydrogen number density
-    data_nH = np.log10((data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp).to('cm**-3').value)
+    data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
 
     # get temperature
     data_T = np.log10(data.gas.temperatures.value)
@@ -201,16 +201,14 @@ def process_single_halo(
         data.gas.element_mass_fractions
     )
     emissivity = unyt.unyt_array(10 ** emissivity, 'erg*cm**-3/s')
-    volume = (4/3*np.pi*R500c**3).to('cm**3')
 
     # Compute X-ray luminosities
-    xray_luminosities = data.gas.densities / unyt.mp / 0.6 * \
-                        data.gas.masses / unyt.mp / 0.6 * \
+    xray_luminosities = data.gas.masses / unyt.mp / 0.6 * \
                         emissivity
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     print(f"M_500_crit: {M500c:.3E}")
-    print(f"X-luminosity: {np.sum(emissivity[index]) * volume:.3E}")
+    print(f"X-luminosity: {np.sum(xray_luminosities[index]):.3E}")
 
     return np.sum(xray_luminosities)
 
