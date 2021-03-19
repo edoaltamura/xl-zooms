@@ -179,9 +179,9 @@ def get_xray_luminosity(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [XPotMin / a - 0.5 * R500c / a, XPotMin / a + 0.5 * R500c / a],
-        [YPotMin / a - 0.5 * R500c / a, YPotMin / a + 0.5 * R500c / a],
-        [ZPotMin / a - 0.5 * R500c / a, ZPotMin / a + 0.5 * R500c / a]
+        [XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
+        [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
+        [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
