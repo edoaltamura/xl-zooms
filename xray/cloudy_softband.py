@@ -152,7 +152,7 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
     idx_he = find_idx_he(np.log10(abundances[:, 1]), interp.He_bins)
     dx_he = find_dx_he(np.log10(abundances[:, 1]), interp.He_bins, idx_he[:, 0].astype(int))
 
-    print('Start interpolation')
+    print(f'Start interpolation on {data_n:d} particles.')
     emissivities = get_table_interp(interp.dn, interp.dT, dx_T, dx_n, idx_T.astype(int), idx_n.astype(int),
                                     idx_he.astype(int), dx_he, interp.X_Ray, abundance_to_solar[:, 2:])
 
@@ -188,12 +188,10 @@ def get_xray_luminosity(
 
     # Convert datasets to physical quantities
     # R500c is already in physical units
-    print(data.gas.densities)
     data.gas.coordinates.convert_to_physical()
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
-    print(data.gas.densities)
 
     # Select hot gas within sphere and without core
     tempGas = data.gas.temperatures
@@ -227,7 +225,7 @@ def get_xray_luminosity(
 
     # Compute X-ray luminosities
     # LX = emissivity * gas_mass / gas_density
-    xray_luminosities = emissivities[index] * data.gas.masses[index] / data.gas.densities[index]
+    xray_luminosities = emissivities[index] * (data.gas.masses[index] / data.gas.densities[index]).to('Mpc**3')
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
     print(xray_luminosities)
     return xray_luminosities.sum()
