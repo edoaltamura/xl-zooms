@@ -191,8 +191,6 @@ def profile_3d_single_halo(
         hist, _ = histogram_unyt(radial_distance, bins=lbins, weights=weights_field)
         hist /= mass_weights
 
-        print('Virial temperature = ', (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV'))
-
         if sampling_method.lower() == 'no_binning':
 
             bin_centre = radial_distance
