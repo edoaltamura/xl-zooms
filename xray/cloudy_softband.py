@@ -196,7 +196,7 @@ def process_single_halo(
     data_T = np.log10(data.gas.temperatures.value)
 
     # interpolate
-    emissivity = interpolate_X_Ray.interpolate_X_Ray(
+    emissivity = interpolate.interpolate_X_Ray(
         data_nH,
         data_T,
         data.gas.element_mass_fractions
