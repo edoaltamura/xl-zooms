@@ -13,7 +13,8 @@ sys.path.append("../zooms")
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 
 
-class interpolate:
+class Interpolate(object):
+
     def init(self):
         pass
 
@@ -30,7 +31,6 @@ class interpolate:
 
         self.solar_metallicity = self.table['/Bins/Solar_metallicities/'][()]
 
-
 @jit(nopython=True)
 def find_dx(subdata, bins, idx_0):
     dx_p = np.zeros(len(subdata))
@@ -38,7 +38,6 @@ def find_dx(subdata, bins, idx_0):
         dx_p[i] = np.abs(bins[idx_0[i]] - subdata[i])
 
     return dx_p
-
 
 # @jit(nopython = True)
 def find_idx(subdata, bins, dbins):
@@ -50,7 +49,6 @@ def find_idx(subdata, bins, dbins):
 
     return idx_p
 
-
 @jit(nopython=True)
 def find_idx_he(subdata, bins):
     idx_p = np.zeros((len(subdata), 2))
@@ -58,7 +56,6 @@ def find_idx_he(subdata, bins):
         idx_p[i, :] = np.sort(np.argsort(np.abs(bins - subdata[i]))[:2])
 
     return idx_p
-
 
 @jit(nopython=True)
 def find_dx_he(subdata, bins, idx_0):
@@ -68,7 +65,6 @@ def find_dx_he(subdata, bins, idx_0):
     # dx_p1[i] = np.abs(bins[idx_0[i+1]] - subdata[i])
 
     return dx_p
-
 
 @jit(nopython=True)
 def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abundance_to_solar):
@@ -106,7 +102,6 @@ def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abu
 
     return f_n_T_Z
 
-
 def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
     mass_fraction = np.zeros((len(data_n), 9))
 
@@ -121,7 +116,7 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
     mass_fraction[:, 7] = element_mass_fractions.silicon
     mass_fraction[:, 8] = element_mass_fractions.iron
 
-    interp = interpolate()
+    interp = Interpolate()
     interp.load_table()
 
     # Find density offsets
@@ -196,7 +191,7 @@ def process_single_halo(
     data_T = np.log10(data.gas.temperatures.value)
 
     # interpolate
-    emissivity = interpolate().interpolate_X_Ray(
+    emissivity = interpolate_X_Ray(
         data_nH,
         data_T,
         data.gas.element_mass_fractions
