@@ -167,10 +167,10 @@ def get_xray_luminosity(
 
     # Read in halo properties
     vr_catalogue_handle = vr.load(path_to_catalogue)
-    R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0]
-    XPotMin = vr_catalogue_handle.positions.xcminpot[0]
-    YPotMin = vr_catalogue_handle.positions.xcminpot[0]
-    ZPotMin = vr_catalogue_handle.positions.xcminpot[0]
+    R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+    XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+    YPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+    ZPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
 
     # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
     # to filter particle coordinates, while VR outputs are in physical units.
