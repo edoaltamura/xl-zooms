@@ -205,8 +205,7 @@ def process_single_halo(
     emissivity = unyt.unyt_array(10 ** emissivity, 'erg/s/cm**3')
     emissivity = emissivity.to('erg/s/Mpc**3')
     print(emissivity)
-    print(data.gas.masses / data.gas.densities)
-    print(data.gas.densities.to('g*cm**-3'))
+    print(emissivity * data.gas.masses / data.gas.densities)
 
     # Compute X-ray luminosities
     xray_luminosities = emissivity * (data.gas.masses / data.gas.densities).to('cm**3')
