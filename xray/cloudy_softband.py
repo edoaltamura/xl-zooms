@@ -177,7 +177,7 @@ def get_xray_luminosity(
     # Convert the region bounds to comoving, but keep the CoP and Rcrit in
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
-    region = np.array(
+    region = unyt.unyt_array(
         [[XPotMin - 0.5 * R500c, XPotMin + 0.5 * R500c],
          [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
          [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
