@@ -221,6 +221,7 @@ def get_xray_luminosity(
     )
     emissivities = unyt.unyt_array(10 ** emissivities, 'erg/s/cm**3')
     emissivities = emissivities.to('erg/s/Mpc**3')
+    print(emissivities)
 
     # Compute X-ray luminosities
     # LX = emissivity * gas_mass / gas_density
