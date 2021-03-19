@@ -192,7 +192,7 @@ def get_xray_luminosity(
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
-
+    print(data.gas.coordinates)
     # Select hot gas within sphere and without core
     tempGas = data.gas.temperatures
     deltaX = data.gas.coordinates[:, 0] - XPotMin
@@ -229,7 +229,7 @@ def get_xray_luminosity(
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
     print(xray_luminosities)
 
-    return np.sum(xray_luminosities[index])
+    return xray_luminosities[index].sum()
 
 
 if __name__ == '__main__':
