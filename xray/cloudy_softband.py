@@ -172,7 +172,6 @@ def get_xray_luminosity(
     XPotMin = vr_catalogue_handle.positions.xcminpot[1].to('Mpc')
     YPotMin = vr_catalogue_handle.positions.ycminpot[1].to('Mpc')
     ZPotMin = vr_catalogue_handle.positions.zcminpot[1].to('Mpc')
-    print(R500c, XPotMin, YPotMin, ZPotMin)
 
     # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
     # to filter particle coordinates, while VR outputs are in physical units.
@@ -193,7 +192,7 @@ def get_xray_luminosity(
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
-    print(data.gas.coordinates)
+
     # Select hot gas within sphere and without core
     tempGas = data.gas.temperatures
     deltaX = data.gas.coordinates[:, 0] - XPotMin
@@ -222,13 +221,11 @@ def get_xray_luminosity(
     )
     emissivities = unyt.unyt_array(10 ** emissivities, 'erg/s/cm**3')
     emissivities = emissivities.to('erg/s/Mpc**3')
-    print(emissivities)
 
     # Compute X-ray luminosities
     # LX = emissivity * gas_mass / gas_density
     xray_luminosities = emissivities * data.gas.masses / data.gas.densities
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
-    print(xray_luminosities)
 
     return xray_luminosities[index].sum()
 
