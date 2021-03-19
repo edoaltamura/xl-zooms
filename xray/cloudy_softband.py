@@ -226,8 +226,8 @@ def get_xray_luminosity(
     # Compute X-ray luminosities
     # LX = emissivity * gas_mass / gas_density
     xray_luminosities = emissivities[index] * data.gas.masses[index] / data.gas.densities[index]
-    # xray_luminosities[~np.isfinite(xray_luminosities)] = 0
-
+    xray_luminosities[~np.isfinite(xray_luminosities)] = 0
+    print(xray_luminosities)
     return xray_luminosities.sum()
 
 
