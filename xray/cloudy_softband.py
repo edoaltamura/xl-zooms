@@ -162,7 +162,7 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
 def get_xray_luminosity(
         path_to_snap: str,
         path_to_catalogue: str,
-        core_excised: bool = False
+        core_excised: bool = True
 ) -> unyt.unyt_quantity:
 
     # Read in halo properties
