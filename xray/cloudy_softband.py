@@ -9,7 +9,6 @@ from unyt import g, cm, mp
 
 sys.path.append("../zooms")
 
-
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 
 
@@ -31,7 +30,8 @@ class Interpolate(object):
 
         self.solar_metallicity = self.table['/Bins/Solar_metallicities/'][()]
 
-@jit(nopython=True)
+
+@jit(nopython=True, parallel=True, fastmath=True)
 def find_dx(subdata, bins, idx_0):
     dx_p = np.zeros(len(subdata))
     for i in range(len(subdata)):
@@ -39,7 +39,8 @@ def find_dx(subdata, bins, idx_0):
 
     return dx_p
 
-# @jit(nopython = True)
+
+@jit(nopython=True, parallel=True, fastmath=True)
 def find_idx(subdata, bins, dbins):
     idx_p = np.zeros((len(subdata), 2))
     for i in range(len(subdata)):
@@ -49,7 +50,8 @@ def find_idx(subdata, bins, dbins):
 
     return idx_p
 
-@jit(nopython=True)
+
+@jit(nopython=True, parallel=True, fastmath=True)
 def find_idx_he(subdata, bins):
     idx_p = np.zeros((len(subdata), 2))
     for i in range(len(subdata)):
@@ -57,7 +59,8 @@ def find_idx_he(subdata, bins):
 
     return idx_p
 
-@jit(nopython=True)
+
+@jit(nopython=True, parallel=True, fastmath=True)
 def find_dx_he(subdata, bins, idx_0):
     dx_p = np.zeros(len(subdata))
     for i in range(len(subdata)):
@@ -66,7 +69,8 @@ def find_dx_he(subdata, bins, idx_0):
 
     return dx_p
 
-@jit(nopython=True)
+
+@jit(nopython=True, parallel=True, fastmath=True)
 def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abundance_to_solar):
     f_n_T_Z = np.zeros(len(idx_n[:, 0]))
     for i in range(len(idx_n[:, 0])):
@@ -101,6 +105,7 @@ def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abu
         f_n_T_Z[i] = f_n_T_Z_temp
 
     return f_n_T_Z
+
 
 def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
     mass_fraction = np.zeros((len(data_n), 9))
@@ -205,7 +210,7 @@ def process_single_halo(
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     print(f"M_500_crit: {M500c:.3E}")
-    print(f"X-luminosity: {np.sum(emissivity[index]):.3E}")
+    print(f"X-luminosity: {np.sum(emissivity[index]) * 4 / 3 * np.pi * R500c.to('cm') ** 3 * (1 - 0.15 ** 3):.3E}")
 
     return np.sum(xray_luminosities)
 
