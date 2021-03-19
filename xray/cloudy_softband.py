@@ -207,7 +207,7 @@ def process_single_halo(
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     print(f"M_500_crit: {M500c:.3E}")
-    print(f"X-luminosity: {np.sum(10 ** xray_luminosities[index]):.3E}")
+    print(f"X-luminosity: {np.sum(xray_luminosities[index]):.3E}")
 
     return np.sum(xray_luminosities)
 
