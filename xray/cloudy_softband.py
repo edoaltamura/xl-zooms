@@ -203,10 +203,9 @@ def process_single_halo(
     emissivity = unyt.unyt_array(10 ** emissivity, 'erg*cm**3/s')
 
     # Compute X-ray luminosities
-    # xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * \
-    #                     data.gas.masses / unyt.proton_mass / 0.6 * \
-    #                     emissivity
-    xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * emissivity
+    xray_luminosities = data.gas.densities / unyt.proton_mass / 0.6 * \
+                        data.gas.masses / unyt.proton_mass / 0.6 * \
+                        emissivity
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     print(f"M_500_crit: {M500c:.3E}")
@@ -216,7 +215,7 @@ def process_single_halo(
 
 
 if __name__ == '__main__':
-    zoom = zooms_register[10]
+    zoom = zooms_register[100]
     process_single_halo(
         path_to_snap=zoom.get_redshift().snapshot_path,
         path_to_catalogue=zoom.get_redshift().catalogue_properties_path
