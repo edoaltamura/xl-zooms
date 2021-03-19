@@ -182,7 +182,7 @@ def get_xray_luminosity(
          [YPotMin - 0.5 * R500c, YPotMin + 0.5 * R500c],
          [ZPotMin - 0.5 * R500c, ZPotMin + 0.5 * R500c]]
     ) / vr_catalogue_handle.a
-    mask.constrain_spatial(region)
+    mask.constrain_spatial(region.tolist())
     data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
