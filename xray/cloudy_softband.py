@@ -186,7 +186,7 @@ def process_single_halo(
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
 
     # Keep only particles inside R500crit
-    index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c) & (tempGas > 1e5))[0]
+    index = np.where((deltaR < R500c) & (tempGas > 1e5))[0]
 
     # Compute hydrogen number density
     data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
@@ -209,7 +209,7 @@ def process_single_halo(
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     print(f"M_500_crit: {M500c:.3E}")
-    print(f"X-luminosity: {np.sum(emissivity[index]) * 4 / 3 * np.pi * R500c.to('cm') ** 3 * (1 - 0.15 ** 3):.3E}")
+    print(f"X-luminosity: {np.sum(xray_luminosities[index]):.3E}")
 
     return np.sum(xray_luminosities)
 
