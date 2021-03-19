@@ -218,7 +218,7 @@ def process_single_halo(
 
 
 if __name__ == '__main__':
-    zoom = zooms_register[200]
+    zoom = zooms_register[0]
     print(zoom.run_name)
     process_single_halo(
         path_to_snap=zoom.get_redshift().snapshot_path,
