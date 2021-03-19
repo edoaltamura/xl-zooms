@@ -186,7 +186,7 @@ def process_single_halo(
     deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
 
     # Keep only particles inside R500crit
-    index = np.where((deltaR > 0.15) & (deltaR < 1) & (tempGas > 1e5))[0]
+    index = np.where((deltaR < 1) & (tempGas > 1e5))[0]
 
     # Compute hydrogen number density
     data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
