@@ -182,7 +182,6 @@ def get_xray_luminosity(
         [(YPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (YPotMin + 0.5 * R500c) / vr_catalogue_handle.a],
         [(ZPotMin - 0.5 * R500c) / vr_catalogue_handle.a, (ZPotMin + 0.5 * R500c) / vr_catalogue_handle.a]
     ]
-    print(region)
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
 
@@ -221,11 +220,13 @@ def get_xray_luminosity(
     )
     emissivities = unyt.unyt_array(10 ** emissivities, 'erg/s/cm**3')
     emissivities = emissivities.to('erg/s/Mpc**3')
+    print(emissivities)
 
     # Compute X-ray luminosities
     # LX = emissivity * gas_mass / gas_density
     xray_luminosities = emissivities * data.gas.masses / data.gas.densities
     xray_luminosities[~np.isfinite(xray_luminosities)] = 0
+    print(xray_luminosities)
 
     return np.sum(xray_luminosities[index])
 
