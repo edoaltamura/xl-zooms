@@ -245,3 +245,8 @@ def mass_xray_luminosity(results: pd.DataFrame):
     if not args.quiet:
         plt.show()
     plt.close()
+
+
+if __name__ == "__main__":
+    results = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
+    mass_xray_luminosity(results)
