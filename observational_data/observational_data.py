@@ -674,7 +674,7 @@ class Pratt10(Observations):
 
         data = list(map(list, itertools.zip_longest(*data, fillvalue=None)))
         for i, field in enumerate(data):
-            data[i] = np.array(field, dtype=np.float64)
+            data[i] = np.array(field)
 
         conversion_factors = [
             None,
