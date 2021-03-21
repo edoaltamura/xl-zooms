@@ -245,7 +245,7 @@ def mass_xray_luminosity(results: pd.DataFrame):
     del Bohringer2007
 
     ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$L_{{X,500,{{\\rm gas, {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\keV}}$ [erg/s]')
+    ax.set_ylabel(f'$L_{{X,500,{{\\rm gas, {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\ keV}}$ [erg/s]')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
