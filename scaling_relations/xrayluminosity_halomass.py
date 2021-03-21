@@ -12,6 +12,7 @@ import pandas as pd
 from typing import Tuple
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 from collections import OrderedDict
 import swiftsimio as sw
 import velociraptor as vr
@@ -239,9 +240,9 @@ def mass_xray_luminosity(results: pd.DataFrame):
     Bohringer2007 = obs.Bohringer2007()
     Bohringer2007.draw_LX_bounds(ax)
     handles.append(
-        Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
-               label=obs.Barnes17().citation + ' $z=0.1$')
+        Patch(facecolor='lime', edgecolor='none', label=Bohringer2007.citation)
     )
+    del Bohringer2007
 
     ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_ylabel(f'$L_{{X,500,{{\\rm gas, {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\keV}}$ [erg/s]')
