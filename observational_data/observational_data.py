@@ -585,9 +585,6 @@ class Barnes17(Observations):
         self.Z_Fe = data[15] * Solar_Metallicity
         self.ekin_ethrm = data[16] * Dimensionless
 
-        # Convert self.LX to Solar luminosities
-        self.LX = self.LX.to(Solar_Luminosity)
-
     def get_from_hdf5(self):
         data = load_dict_from_hdf5(f'{repository_dir}/barnes2017_ceagle.hdf5')
         data = dict2obj(data)
@@ -629,7 +626,7 @@ class Voit05(Observations):
 
 class Pratt10(Observations):
     citation = "Pratt et al. (2010)"
-    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..85P/abstract'
+    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..8510 ** 44 * P/abstract'
     notes = (
         "REXCESS sample."
     )
@@ -699,15 +696,15 @@ class Pratt10(Observations):
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            unyt.erg / unyt.s,
-            unyt.erg / unyt.s,
-            unyt.erg / unyt.s,
+            10 ** 44 * unyt.erg / unyt.s,
+            10 ** 44 * unyt.erg / unyt.s,
+            10 ** 44 * unyt.erg / unyt.s,
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            unyt.erg / unyt.s,
-            unyt.erg / unyt.s,
-            unyt.erg / unyt.s,
+            10 ** 44 * unyt.erg / unyt.s,
+            10 ** 44 * unyt.erg / unyt.s,
+            10 ** 44 * unyt.erg / unyt.s,
             unyt.keV,
             unyt.keV,
             unyt.keV,

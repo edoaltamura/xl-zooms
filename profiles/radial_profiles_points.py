@@ -11,6 +11,7 @@ import h5py as h5
 import numpy as np
 import pandas as pd
 import swiftsimio as sw
+import velociraptor as vr
 import matplotlib.pyplot as plt
 
 try:
@@ -50,7 +51,7 @@ def profile_3d_single_halo(
 ) -> tuple:
     # Read in halo properties
     with h5.File(path_to_catalogue, 'r') as h5file:
-        scale_factor = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
+        a = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
         M200c = unyt.unyt_quantity(h5file['/Mass_200crit'][0] * 1.e10, unyt.Solar_Mass)
         M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
         R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc)
@@ -71,11 +72,11 @@ def profile_3d_single_halo(
     # Convert the region bounds to comoving, but keep the CoP and Rcrit in
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
-    region = np.array(
-        [[XPotMin - 3 * R500c, XPotMin + 3 * R500c],
-         [YPotMin - 3 * R500c, YPotMin + 3 * R500c],
-         [ZPotMin - 3 * R500c, ZPotMin + 3 * R500c]]
-    ) / scale_factor
+    region = [
+        [XPotMin / a - 3 * R500c / a, XPotMin / a + 3 * R500c / a],
+        [YPotMin / a - 3 * R500c / a, YPotMin / a + 3 * R500c / a],
+        [ZPotMin / a - 3 * R500c / a, ZPotMin / a + 3 * R500c / a]
+    ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
 
@@ -87,39 +88,29 @@ def profile_3d_single_halo(
     data.gas.densities.convert_to_physical()
 
     # Select hot gas within sphere
+    tempGas = data.gas.temperatures
     deltaX = data.gas.coordinates[:, 0] - XPotMin
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
-    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+    radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
+    index = np.where((radial_distance < 3) & (tempGas > 1e5))[0]
+    del tempGas, deltaX, deltaY, deltaZ
 
     # Calculate particle mass and rho_crit
-    unitLength = data.metadata.units.length
-    unitMass = data.metadata.units.mass
-    rho_crit = unyt.unyt_quantity(
-        data.metadata.cosmology_raw['Critical density [internal units]'] / scale_factor ** 3,
-        unitMass / unitLength ** 3
-    )
-    # dm_masses = data.dark_matter.masses.to('Msun')
-    # zoom_mass_resolution = dm_masses[0]
+    rho_crit = data.metadata.cosmology.critical_density(data.metadata.z)
 
     # Since useful for different applications, attach datasets
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
 
-    # Rescale profiles to R500c
-    radial_distance = deltaR / R500c
-
     # Compute convergence radius
-    conv_radius = convergence_radius(deltaR, data.gas.masses.to('Msun'), rho_crit.to('Msun/Mpc**3')) / R500c
+    conv_radius = convergence_radius(
+        radial_distance,
+        data.gas.masses.to('Msun'),
+        rho_crit.to('Msun/Mpc**3')
+    ) / R500c
 
-    kBT200 = (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV')
-    K200 = (kBT200 / (3 * M200c * obs.cosmic_fbary / (4 * np.pi * R200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
-        'keV*cm**2')
-    print('Virial temperature = ', kBT200)
-
-    number_density_gas = data.gas.densities / (mean_molecular_weight * unyt.mass_proton)
-    number_density_gas = number_density_gas.to('1/cm**3')
-
-    field_value = data.gas.temperatures
+    radial_distance = radial_distance[index]
+    field_value = data.gas.temperatures[index]
     field_label = r'$T [K]$'
 
     return radial_distance, field_value, field_label, conv_radius, M500c, R500c, M200c, R200c
@@ -166,24 +157,18 @@ def _process_single_halo(zoom: Zoom):
         return profiles_database
 
 
-def load_catalogue(find_keyword: str = '', filename: str = None) -> pd.DataFrame:
-    if filename is None:
-        file_path = f'{zooms_register[0].output_directory}/median_radial_profiles_catalogue.pkl'
-    else:
-        file_path = filename
-
-    print(f"Retrieving catalogue file {file_path}")
-    catalogue = pd.read_pickle(file_path)
-
-    if find_keyword != '':
-        match_filter = catalogue['Run name'].str.contains(r'{0}'.format(find_keyword), na=False)
-        catalogue = catalogue[match_filter]
-
-    print(f"Loaded {len(catalogue):d} objects.")
-    return catalogue
-
-
 def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
+
+
+    # kBT200 = (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV')
+    # K200 = (kBT200 / (3 * M200c * obs.cosmic_fbary / (4 * np.pi * R200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+    #     'keV*cm**2')
+    # print('Virial temperature = ', kBT200)
+    #
+    # number_density_gas = data.gas.densities / (mean_molecular_weight * unyt.mass_proton)
+    # number_density_gas = number_density_gas.to('1/cm**3')
+    #
+
     from matplotlib.cm import get_cmap
 
     name = "Set2"
@@ -209,12 +194,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         radius = np.empty(0)
         field = np.empty(0)
         for j in range(len(plot_database)):
-            # convergence_index = np.where(plot_database['radius'].iloc[j] > max_convergence_radius)[0]
-            # radius = np.append(radius, plot_database['radius'].iloc[j][convergence_index])
-            # field = np.append(field, plot_database[FIELD_NAME].iloc[j][convergence_index])
-
-            radius = np.append(radius, plot_database['radius'].iloc[j])
-            field = np.append(field, plot_database[FIELD_NAME].iloc[j])
+            radius = np.append(radius, plot_database['radial_distance'].iloc[j])
+            field = np.append(field, plot_database['field_value'].iloc[j])
 
         ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c=colors[i - 1], alpha=0.9)
 
@@ -248,7 +229,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # del pratt10
 
     ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
-    ax.set_ylabel(plot_database.iloc[0]['ylabel'])
+    ax.set_ylabel(plot_database.iloc[0]['field_label'])
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim([0.01, 2.5])
