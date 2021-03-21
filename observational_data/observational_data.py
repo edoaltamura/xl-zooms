@@ -674,7 +674,7 @@ class Pratt10(Observations):
 
         data = list(map(list, itertools.zip_longest(*data, fillvalue=None)))
         for i, field in enumerate(data):
-            data[i] = np.array(field)
+            data[i] = np.array(field, dtype=np.float64)
 
         conversion_factors = [
             None,
@@ -696,21 +696,21 @@ class Pratt10(Observations):
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            10 ** 44 * unyt.erg / unyt.s,
-            10 ** 44 * unyt.erg / unyt.s,
-            10 ** 44 * unyt.erg / unyt.s,
+            1e44 * unyt.erg / unyt.s,
+            1e44 * unyt.erg / unyt.s,
+            1e44 * unyt.erg / unyt.s,
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            10 ** 44 * unyt.erg / unyt.s,
-            10 ** 44 * unyt.erg / unyt.s,
-            10 ** 44 * unyt.erg / unyt.s,
+            1e44 * unyt.erg / unyt.s,
+            1e44 * unyt.erg / unyt.s,
+            1e44 * unyt.erg / unyt.s,
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            10 ** 13 * Solar_Mass * unyt.keV,
-            10 ** 13 * Solar_Mass * unyt.keV,
-            10 ** 13 * Solar_Mass * unyt.keV,
+            1e13 * Solar_Mass * unyt.keV,
+            1e13 * Solar_Mass * unyt.keV,
+            1e13 * Solar_Mass * unyt.keV,
             unyt.kpc,
             unyt.dimensionless
         ]
