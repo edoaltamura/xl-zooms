@@ -7,7 +7,6 @@ Run using:
 import sys
 import os
 import unyt
-import argparse
 import numpy as np
 import pandas as pd
 from typing import Tuple
@@ -30,23 +29,15 @@ sys.path.append("../xray")
 
 # Import backend utilities
 from register import zooms_register, Tcut_halogas, calibration_zooms, Zoom
-import observational_data as obs
+from auto_parser import args
 import scaling_utils as utils
 import scaling_style as style
 
 # Import modules for calculating additional quantities
 from relaxation import process_single_halo as relaxation_index
 from cloudy_softband import interpolate_X_Ray, logsumexp
+import observational_data as obs
 
-parser = argparse.ArgumentParser()
-parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
-parser.add_argument('-e', '--observ-errorbars', default=True, required=False, action='store_true')
-parser.add_argument('-r', '--redshift-index', type=int, default=36, required=False,
-                    choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
-parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
-                    choices=['crit', 'true', 'hse'])
-parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
-args = parser.parse_args()
 
 core_excised: bool = False
 
@@ -131,16 +122,19 @@ def process_single_halo(
         data_T,
         data.gas.element_mass_fractions
     )
-    # emissivities = unyt.unyt_array((10 ** emissivities.astype(np.float32)).astype(np.float64), 'erg/s/cm**3')
-    # emissivities = emissivities.to('erg/s/Mpc**3')
-
-    # Compute X-ray luminosities
-    # LX = emissivity * gas_mass / gas_density
-    # xray_luminosities = emissivities[index] * (data.gas.masses[index] / data.gas.densities[index]).to('Mpc**3')
-    # xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
     log10_Mpc3_to_cm3 = np.log10(unyt.Mpc.get_conversion_factor(unyt.cm)[0] ** 3)
 
+    # The `data.gas.masses` and `data.gas.densities` datasets are formatted as
+    # `numpy.float32` and are not well-behaved when trying to convert their ratio
+    # from `unyt.Mpc ** 3` to `unyt.cm ** 3`, giving overflows and inf returns.
+    # The `logsumexp` function offers a workaround to solve the problem when large
+    # or small exponentiated numbers need to be summed (and logged) again.
+    # See https://en.wikipedia.org/wiki/LogSumExp for details.
+    # The conversion from `unyt.Mpc ** 3` to `unyt.cm ** 3` is also obtained by
+    # adding the log10 of the conversion factor (2.9379989445851786e+73) to the
+    # result of the `logsumexp` function.
+    # $L_X = 10^{\log_{10} (\sum_i \epsilon_i) + log10_Mpc3_to_cm3}$
     LX = unyt.unyt_quantity(
         10 ** (
                 logsumexp(
@@ -150,8 +144,6 @@ def process_single_halo(
                 ) + log10_Mpc3_to_cm3
         ), 'erg/s'
     )
-
-    assert LX.units == unyt.erg / unyt.s
 
     return M500, LX, relaxed
 
@@ -247,7 +239,7 @@ def mass_xray_luminosity(results: pd.DataFrame):
     ax.axhspan(0.407e44, 20e44, facecolor='lime', alpha=0.2)
 
     ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
-    ax.set_ylabel(f'$M_{{500,{{\\rm gas, {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
+    ax.set_ylabel(f'$L_{{X,500,{{\\rm gas, {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\keV}}$ [erg/s]')
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
