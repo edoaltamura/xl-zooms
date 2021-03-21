@@ -626,7 +626,7 @@ class Voit05(Observations):
 
 class Pratt10(Observations):
     citation = "Pratt et al. (2010)"
-    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..8510 ** 44 * P/abstract'
+    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..8510/abstract'
     notes = (
         "REXCESS sample."
     )
@@ -841,6 +841,43 @@ class Pratt10(Observations):
         plt.yscale('log')
         plt.show()
         plt.close()
+
+
+class Bohringer2007(Observations):
+    citation = "Böhringer et al. (2007)"
+    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2007A%26A...469..363B/abstract'
+    notes = (
+        "REXCESS sample."
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(Bohringer2007, self).__init__(*args, **kwargs)
+
+        self.bins = [(0.407, 0.55, 0.0555, 0.06215),
+                     (0.55, 0.78, 0.0794, 0.0877),
+                     (0.78, 1.13, 0.0920, 0.1037),
+                     (1.13, 1.71, 0.1077, 0.12105),
+                     (1.71, 2.88, 0.1122, 0.1248),
+                     (2.88, 4.10, 0.1224, 0.15215),
+                     (4.10, 5.90, 0.1337, 0.16875),
+                     (5.90, 11.9, 0.1423, 0.1719),
+                     (11.9, 20.0, 0.1623, 0.19925)]
+
+    def draw_LX_bounds(self, ax: plt.Axes):
+        h_conv = 0.7 / self.cosmo_model.h
+        for (luminosity_min, luminosity_max, redshift_min, redshift_max) in self.bins:
+            ax.axhspan(
+                luminosity_min * 1e44 * h_conv ** 2,
+                luminosity_max * 1e44 * h_conv ** 2,
+                facecolor='lime',
+                alpha=0.2
+            )
+
+            ax.text(
+                ax.get_xlim()[0],
+                10 ** (0.5 * np.log10(luminosity_min * luminosity_max)) * 1e44 * h_conv ** 2,
+                f"$z$ = {redshift_min:.3f} - {redshift_max:.3f}",
+            )
 
 
 class PlanckSZ2015(Observations):

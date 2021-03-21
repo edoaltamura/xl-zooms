@@ -236,7 +236,12 @@ def mass_xray_luminosity(results: pd.DataFrame):
     )
     del Barnes17
 
-    ax.axhspan(0.407e44, 20e44, facecolor='lime', alpha=0.2)
+    Bohringer2007 = obs.Bohringer2007()
+    Bohringer2007.draw_LX_bounds(ax)
+    handles.append(
+        Line2D([], [], color='k', marker='s', markeredgecolor='none', linestyle='None', markersize=4,
+               label=obs.Barnes17().citation + ' $z=0.1$')
+    )
 
     ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_ylabel(f'$L_{{X,500,{{\\rm gas, {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\keV}}$ [erg/s]')
