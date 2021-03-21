@@ -865,7 +865,13 @@ class Bohringer2007(Observations):
 
     def draw_LX_bounds(self, ax: plt.Axes):
         h_conv = 0.7 / self.cosmo_model.h
-        for (luminosity_min, luminosity_max, redshift_min, redshift_max) in self.bins:
+        for i, (
+                luminosity_min,
+                luminosity_max,
+                redshift_min,
+                redshift_max
+        ) in enumerate(self.bins):
+
             ax.axhspan(
                 luminosity_min * 1e44 * h_conv ** 2,
                 luminosity_max * 1e44 * h_conv ** 2,
@@ -873,11 +879,13 @@ class Bohringer2007(Observations):
                 alpha=0.2
             )
 
-            ax.text(
-                ax.get_xlim()[0],
-                10 ** (0.5 * np.log10(luminosity_min * luminosity_max)) * 1e44 * h_conv ** 2,
-                f"$z$ = {redshift_min:.3f} - {redshift_max:.3f}",
-            )
+            # Print redshift bounds once every 2 bins to avoid clutter.
+            if i % 2 == 0:
+                ax.text(
+                    ax.get_xlim()[0],
+                    10 ** (0.5 * np.log10(luminosity_min * luminosity_max)) * 1e44 * h_conv ** 2,
+                    f"$z$ = {redshift_min:.3f} - {redshift_max:.3f}",
+                )
 
 
 class PlanckSZ2015(Observations):

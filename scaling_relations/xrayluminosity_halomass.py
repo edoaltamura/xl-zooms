@@ -160,7 +160,7 @@ def _process_single_halo(zoom: Zoom):
     snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
     catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
 
-    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
+    if args.mass_estimator == 'true':
 
         return process_single_halo(snapshot_file, catalog_file)
 
@@ -248,6 +248,8 @@ def mass_xray_luminosity(results: pd.DataFrame):
     ax.set_ylabel(f'$L_{{X,500,{{\\rm gas, {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\ keV}}$ [erg/s]')
     ax.set_xscale('log')
     ax.set_yscale('log')
+    ax.set_xlim([5e12, 2e15])
+    ax.set_ylim([1e40, 1e46])
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
     fig.savefig(f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas_{args.redshift_index:d}.png',
                 dpi=300)
