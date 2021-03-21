@@ -221,7 +221,7 @@ def mass_xray_luminosity(results: pd.DataFrame):
     )
     del Pratt10
 
-    Barnes17 = obs.Barnes17().hdf5.z000p101.true
+    Barnes17 = obs.Barnes17().hdf5.z000p101.spec
     relaxed = Barnes17.Ekin_500 / Barnes17.Ethm_500
     ax.scatter(Barnes17.M500[relaxed < 0.1], Barnes17.LXbol_500[relaxed < 0.1],
                marker='s', s=6, alpha=1, color='k', edgecolors='none', zorder=0)

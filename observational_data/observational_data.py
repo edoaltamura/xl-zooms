@@ -577,7 +577,7 @@ class Barnes17(Observations):
         self.z_ics = data[7] * h_conv_Barn * Mpc / unyt.hubble_parameter
         self.extent_ics = data[8] * h_conv_Barn * Mpc / unyt.hubble_parameter
         self.kb_TX = data[9] * keV
-        self.LX = np.power(10, data[10]) * erg / second
+        self.LX = np.power(10, data[10]) * erg / second * h_conv_Barn ** 2
         self.m_gas = np.power(10, data[11]) * Solar_Mass
         self.m_star = np.power(10, data[12]) * Solar_Mass
         self.Y_X = np.power(10, data[13]) * Solar_Mass * keV
@@ -696,15 +696,15 @@ class Pratt10(Observations):
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            1e44 * unyt.erg / unyt.s,
-            1e44 * unyt.erg / unyt.s,
-            1e44 * unyt.erg / unyt.s,
+            1e44 * h_conv ** 2 * unyt.erg / unyt.s,
+            1e44 * h_conv ** 2 * unyt.erg / unyt.s,
+            1e44 * h_conv ** 2 * unyt.erg / unyt.s,
             unyt.keV,
             unyt.keV,
             unyt.keV,
-            1e44 * unyt.erg / unyt.s,
-            1e44 * unyt.erg / unyt.s,
-            1e44 * unyt.erg / unyt.s,
+            1e44 * h_conv ** 2 * unyt.erg / unyt.s,
+            1e44 * h_conv ** 2 * unyt.erg / unyt.s,
+            1e44 * h_conv ** 2 * unyt.erg / unyt.s,
             unyt.keV,
             unyt.keV,
             unyt.keV,
