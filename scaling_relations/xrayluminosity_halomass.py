@@ -51,7 +51,14 @@ args = parser.parse_args()
 core_excised: bool = True
 
 
-def logsumexp(a, axis=None, b=None, keepdims: bool = False, return_sign: bool = False, base: float = 10.):
+def logsumexp(
+        a: np.ndarray,
+        axis: int = None,
+        b: np.ndarray = None,
+        keepdims: bool = False,
+        return_sign: bool = False,
+        base: float = 10.
+) -> float:
     """
     Compute the log of the sum of exponentials of input elements.
     Parameters
@@ -236,11 +243,15 @@ def process_single_halo(
     # xray_luminosities = emissivities[index] * (data.gas.masses[index] / data.gas.densities[index]).to('Mpc**3')
     # xray_luminosities[~np.isfinite(xray_luminosities)] = 0
 
+    log10_Mpc3_to_cm3 = np.log10(unyt.Mpc.get_conversion_factor(unyt.cm)[0] ** 3)
+
     LX = unyt.unyt_quantity(
-        10 ** logsumexp(
-            emissivities[index],
-            b=(data.gas.masses[index] / data.gas.densities[index]).to('cm**3').v,
-            base=10.
+        10 ** (
+                logsumexp(
+                    emissivities[index],
+                    b=(data.gas.masses[index] / data.gas.densities[index]).value,
+                    base=10.
+                ) + log10_Mpc3_to_cm3
         ), 'erg/s'
     )
 
