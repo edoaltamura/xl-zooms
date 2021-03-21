@@ -150,7 +150,7 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
 
     return emissivities
 
-@jit(nopython=True)
+
 def logsumexp(
         a: np.ndarray,
         axis: int = None,
