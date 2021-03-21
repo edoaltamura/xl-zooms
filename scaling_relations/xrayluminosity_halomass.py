@@ -36,11 +36,11 @@ import scaling_style as style
 
 # Import modules for calculating additional quantities
 from relaxation import process_single_halo as relaxation_index
-from cloudy_softband import interpolate_X_Ray
+from cloudy_softband import interpolate_X_Ray, logsumexp
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
-parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
+parser.add_argument('-e', '--observ-errorbars', default=True, required=False, action='store_true')
 parser.add_argument('-r', '--redshift-index', type=int, default=36, required=False,
                     choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
 parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
@@ -48,111 +48,7 @@ parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', re
 parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
 args = parser.parse_args()
 
-core_excised: bool = True
-
-
-def logsumexp(
-        a: np.ndarray,
-        axis: int = None,
-        b: np.ndarray = None,
-        keepdims: bool = False,
-        return_sign: bool = False,
-        base: float = 10.
-) -> float:
-    """
-    Compute the log of the sum of exponentials of input elements.
-    Parameters
-    ----------
-    a : array_like
-        Input array.
-    axis : None or int or tuple of ints, optional
-        Axis or axes over which the sum is taken. By default `axis` is None,
-        and all elements are summed.
-
-    keepdims : bool, optional
-        If this is set to True, the axes which are reduced are left in the
-        result as dimensions with size one. With this option, the result
-        will broadcast correctly against the original array.
-
-    base : float, optional
-        This base is used in the exponentiation and the logarithm.
-        $\log_{base} \sum (base)^{array}$
-
-    b : array-like, optional
-        Scaling factor for exp(`a`) must be of the same shape as `a` or
-        broadcastable to `a`. These values may be negative in order to
-        implement subtraction.
-
-    return_sign : bool, optional
-        If this is set to True, the result will be a pair containing sign
-        information; if False, results that are negative will be returned
-        as NaN. Default is False (no sign information).
-
-    Returns
-    -------
-    res : ndarray
-        The result, ``np.log(np.sum(np.exp(a)))`` calculated in a numerically
-        more stable way. If `b` is given then ``np.log(np.sum(b*np.exp(a)))``
-        is returned.
-
-    sgn : ndarray
-        If return_sign is True, this will be an array of floating-point
-        numbers matching res and +1, 0, or -1 depending on the sign
-        of the result. If False, only one result is returned.
-
-    See Also
-    --------
-    numpy.logaddexp, numpy.logaddexp2
-
-    Notes
-    -----
-    NumPy has a logaddexp function which is very similar to `logsumexp`, but
-    only handles two arguments. `logaddexp.reduce` is similar to this
-    function, but may be less stable.
-    """
-    if b is not None:
-        a, b = np.broadcast_arrays(a, b)
-        if np.any(b == 0):
-            a = a + 0.  # promote to at least float
-            a[b == 0] = -np.inf
-
-    a_max = np.amax(a, axis=axis, keepdims=True)
-
-    if a_max.ndim > 0:
-        a_max[~np.isfinite(a_max)] = 0
-    elif not np.isfinite(a_max):
-        a_max = 0
-
-    if b is not None:
-        b = np.asarray(b)
-        if base is None or base == np.e:
-            tmp = b * np.exp(a - a_max)
-        else:
-            tmp = b * base ** (a - a_max)
-    else:
-        if base is None or base == np.e:
-            tmp = np.exp(a - a_max)
-        else:
-            tmp = base ** (a - a_max)
-
-    # suppress warnings about log of zero
-    with np.errstate(divide='ignore'):
-        s = np.sum(tmp, axis=axis, keepdims=keepdims)
-        if return_sign:
-            sgn = np.sign(s)
-            s *= sgn  # /= makes more sense but we need zero -> zero
-
-        log_base_conversion = 1 / np.log(base)
-        out = np.log(s) * log_base_conversion
-
-    if not keepdims:
-        a_max = np.squeeze(a_max, axis=axis)
-    out += a_max
-
-    if return_sign:
-        return out, sgn
-    else:
-        return out
+core_excised: bool = False
 
 
 def process_single_halo(
@@ -323,11 +219,11 @@ def mass_xray_luminosity(results: pd.DataFrame):
     handles = []
 
     Pratt10 = obs.Pratt10()
-    ax.scatter(Pratt10.M500, Pratt10.LX_0p15_1R500,
+    ax.scatter(Pratt10.M500, Pratt10.LX_R500,
                marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     if args.observ_errorbars:
-        ax.errorbar(Pratt10.M500, Pratt10.LX_0p15_1R500,
-                    yerr=(Pratt10.Delta_lo_LX_0p15_1R500, Pratt10.Delta_hi_LX_0p15_1R500),
+        ax.errorbar(Pratt10.M500, Pratt10.LX_R500,
+                    yerr=(Pratt10.Delta_lo_LX_R500, Pratt10.Delta_hi_LX_R500),
                     xerr=(Pratt10.Delta_lo_M500, Pratt10.Delta_hi_M500),
                     ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
