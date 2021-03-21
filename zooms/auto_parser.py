@@ -1,6 +1,6 @@
 import argparse
-from .register import calibration_zooms
-
+import matplotlib.pyplot as plt
+from register import calibration_zooms
 
 parser = argparse.ArgumentParser()
 
@@ -51,3 +51,9 @@ parser.add_argument(
 )
 
 args = parser.parse_args()
+
+
+try:
+    plt.style.use("../mnras.mplstyle")
+except:
+    pass
