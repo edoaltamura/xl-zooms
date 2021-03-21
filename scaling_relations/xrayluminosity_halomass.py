@@ -239,7 +239,7 @@ def process_single_halo(
     LX = unyt.unyt_quantity(
         10 ** logsumexp(
             emissivities[index],
-            b=(data.gas.masses[index] / data.gas.densities[index]).to('cm**3').values,
+            b=(data.gas.masses[index] / data.gas.densities[index]).to('cm**3').v,
             base=10.
         ), 'erg/s'
     )
