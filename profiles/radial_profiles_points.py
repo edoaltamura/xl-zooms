@@ -166,11 +166,11 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     xyrange = [[0.01, 2], [10, 2000]]  # data range
     bins = [100, 100]  # number of bins
     thresh = 3  # density threshold
-    import scipy
+
     # histogram the data
     xbins = np.logspace(np.log10(0.01), np.log10(2), bins[0] + 1)
     ybins = np.logspace(np.log10(10), np.log10(2000), bins[1] + 1)
-    hh, locx, locy = scipy.histogram2d(radius, field, range=xyrange, bins=(xbins, ybins))
+    hh, locx, locy = np.histogram2d(radius, field, bins=(xbins, ybins))
     posx = np.digitize(radius, locx)
     posy = np.digitize(field, locy)
 
@@ -182,7 +182,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
 
     im = ax.imshow(np.flipud(hh.T), cmap='copper', extent=np.array(xyrange).flatten(), interpolation='none', origin='upper')
-    cax = fig.add_axes([1, 0, 0.5, 0.05])
+    cax = fig.add_axes([1, 0.5, 1., 0.05])
     fig.colorbar(im, cax=cax, orientation='vertical')
     ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
 
