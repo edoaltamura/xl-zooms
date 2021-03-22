@@ -232,7 +232,7 @@ def mass_xray_luminosity(results: pd.DataFrame):
         ax.errorbar(Pratt10.M500, Pratt10.LX_0p15_1R500,
                     yerr=(Pratt10.Delta_lo_LX_0p15_1R500, Pratt10.Delta_hi_LX_0p15_1R500),
                     xerr=(Pratt10.Delta_lo_M500, Pratt10.Delta_hi_M500),
-                    ls='-', elinewidth=0.5, color=observations_color, zorder=0)
+                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
                label=Pratt10.citation)
@@ -274,10 +274,11 @@ def mass_xray_luminosity(results: pd.DataFrame):
     ax.set_xscale('log')
     ax.set_yscale('log')
     ax.set_xlim([2e12, 2e15])
-    ax.set_ylim([1e40, 1e50])
+    ax.set_ylim([1e40, 1e48])
     ax.set_title((
-        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$ "
-        f"Core-excised: {xray_tables}, X-ray table: {xray_tables}"
+        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$ | "
+        f"Core-excised: {core_excised} | "
+        f"X-ray table: {xray_tables}"
     ))
     fig.savefig(
         f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas_{args.redshift_index:d}.png',
