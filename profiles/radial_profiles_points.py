@@ -6,7 +6,6 @@ Test as:
 import os
 import sys
 import unyt
-import argparse
 import h5py as h5
 import numpy as np
 import pandas as pd
@@ -25,19 +24,10 @@ sys.path.append("../scaling_relations")
 sys.path.append("../zooms")
 
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
+from auto_parser import args
 import observational_data as obs
 import scaling_utils as utils
 from convergence_radius import convergence_radius
-
-parser = argparse.ArgumentParser()
-parser.add_argument('-k', '--keywords', type=str, nargs='+', required=True)
-parser.add_argument('-e', '--observ-errorbars', default=False, required=False, action='store_true')
-parser.add_argument('-r', '--redshift-index', type=int, default=36, required=False,
-                    choices=list(range(len(calibration_zooms.get_snap_redshifts()))))
-parser.add_argument('-m', '--mass-estimator', type=str.lower, default='crit', required=True,
-                    choices=['crit', 'true', 'hse'])
-parser.add_argument('-q', '--quiet', default=False, required=False, action='store_true')
-args = parser.parse_args()
 
 # Constants
 mean_molecular_weight = 0.59
@@ -236,8 +226,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_ylabel(plot_database.iloc[0]['field_label'])
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_xlim([0.01, 2.5])
-    ax.set_ylim([1e5, 1e10])
+    # ax.set_xlim([0.01, 2.5])
+    # ax.set_ylim([1e5, 1e10])
     plt.legend()
     ax.set_title(
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
