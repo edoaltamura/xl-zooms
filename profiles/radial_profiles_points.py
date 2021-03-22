@@ -110,8 +110,12 @@ def profile_3d_single_halo(
     ) / R500c
 
     radial_distance = radial_distance[index]
-    field_value = data.gas.temperatures[index]
-    field_label = r'$T [K]$'
+    data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures * unyt.boltzmann_constant
+    mean_molecular_weight = 0.59
+    data.gas.number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
+    field_value = data.gas.mass_weighted_temperatures / data.gas.number_densities ** (2 / 3)
+    field_value = field_value.to('keV*cm**2')
+    field_label = r'$K$ [keV cm$^2$]'
 
     return radial_distance, field_value, field_label, conv_radius, M500c, R500c, M200c, R200c
 
@@ -203,30 +207,30 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     observations_color = (0.65, 0.65, 0.65)
 
     # Observational data
-    # pratt10 = obs.Pratt10()
-    # bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
-    #     m500_limits=(
-    #         10 ** bin_log_edges[-2] * unyt.Solar_Mass,
-    #         10 ** bin_log_edges[-1] * unyt.Solar_Mass,
-    #     ),
-    #     k500_rescale=True
-    # )
-    # plt.fill_between(
-    #     pratt10.radial_bins,
-    #     bin_perc16,
-    #     bin_perc84,
-    #     color=observations_color,
-    #     alpha=0.8,
-    #     linewidth=0
-    # )
-    # plt.plot(
-    #     pratt10.radial_bins, bin_median, c='k',
-    #     label=(
-    #         f"{pratt10.citation:s} ($10^{{{bin_log_edges[i - 1]:.1f}}}"
-    #         f"<M_{{500}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
-    #     )
-    # )
-    # del pratt10
+    pratt10 = obs.Pratt10()
+    bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
+        m500_limits=(
+            10 ** bin_log_edges[-2] * unyt.Solar_Mass,
+            10 ** bin_log_edges[-1] * unyt.Solar_Mass,
+        ),
+        k500_rescale=True
+    )
+    plt.fill_between(
+        pratt10.radial_bins,
+        bin_perc16,
+        bin_perc84,
+        color=observations_color,
+        alpha=0.8,
+        linewidth=0
+    )
+    plt.plot(
+        pratt10.radial_bins, bin_median, c='k',
+        label=(
+            f"{pratt10.citation:s} ($10^{{{bin_log_edges[i - 1]:.1f}}}"
+            f"<M_{{500}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
+        )
+    )
+    del pratt10
 
     ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
     ax.set_ylabel(plot_database.iloc[0]['field_label'])

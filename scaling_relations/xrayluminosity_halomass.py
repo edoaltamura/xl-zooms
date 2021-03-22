@@ -36,7 +36,8 @@ import scaling_style as style
 
 # Import modules for calculating additional quantities
 from relaxation import process_single_halo as relaxation_index
-from cloudy_softband import interpolate_X_Ray, logsumexp
+import cloudy_softband as cloudy
+import apec_softband as apec
 import observational_data as obs
 
 
@@ -112,39 +113,42 @@ def process_single_halo(
 
     del tempGas, deltaX, deltaY, deltaZ, deltaR, a
 
-    # Compute hydrogen number density and the log10
-    # of the temperature to provide to the xray interpolator.
-    data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
-    data_T = np.log10(data.gas.temperatures.value)
+    # # Compute hydrogen number density and the log10
+    # # of the temperature to provide to the xray interpolator.
+    # data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
+    # data_T = np.log10(data.gas.temperatures.value)
+    #
+    # # Interpolate the Cloudy table to get emissivities
+    # emissivities = cloudy.interpolate_xray(
+    #     data_nH,
+    #     data_T,
+    #     data.gas.element_mass_fractions
+    # )
+    #
+    # log10_Mpc3_to_cm3 = np.log10(unyt.Mpc.get_conversion_factor(unyt.cm)[0] ** 3)
+    #
+    # # The `data.gas.masses` and `data.gas.densities` datasets are formatted as
+    # # `numpy.float32` and are not well-behaved when trying to convert their ratio
+    # # from `unyt.Mpc ** 3` to `unyt.cm ** 3`, giving overflows and inf returns.
+    # # The `logsumexp` function offers a workaround to solve the problem when large
+    # # or small exponentiated numbers need to be summed (and logged) again.
+    # # See https://en.wikipedia.org/wiki/LogSumExp for details.
+    # # The conversion from `unyt.Mpc ** 3` to `unyt.cm ** 3` is also obtained by
+    # # adding the log10 of the conversion factor (2.9379989445851786e+73) to the
+    # # result of the `logsumexp` function.
+    # # $L_X = 10^{\log_{10} (\sum_i \epsilon_i) + log10_Mpc3_to_cm3}$
+    # LX = unyt.unyt_quantity(
+    #     10 ** (
+    #             cloudy.logsumexp(
+    #                 emissivities[index],
+    #                 b=(data.gas.masses[index] / data.gas.densities[index]).value,
+    #                 base=10.
+    #             ) + log10_Mpc3_to_cm3
+    #     ), 'erg/s'
+    # )
 
-    # Interpolate the Cloudy table to get emissivities
-    emissivities = interpolate_X_Ray(
-        data_nH,
-        data_T,
-        data.gas.element_mass_fractions
-    )
-
-    log10_Mpc3_to_cm3 = np.log10(unyt.Mpc.get_conversion_factor(unyt.cm)[0] ** 3)
-
-    # The `data.gas.masses` and `data.gas.densities` datasets are formatted as
-    # `numpy.float32` and are not well-behaved when trying to convert their ratio
-    # from `unyt.Mpc ** 3` to `unyt.cm ** 3`, giving overflows and inf returns.
-    # The `logsumexp` function offers a workaround to solve the problem when large
-    # or small exponentiated numbers need to be summed (and logged) again.
-    # See https://en.wikipedia.org/wiki/LogSumExp for details.
-    # The conversion from `unyt.Mpc ** 3` to `unyt.cm ** 3` is also obtained by
-    # adding the log10 of the conversion factor (2.9379989445851786e+73) to the
-    # result of the `logsumexp` function.
-    # $L_X = 10^{\log_{10} (\sum_i \epsilon_i) + log10_Mpc3_to_cm3}$
-    LX = unyt.unyt_quantity(
-        10 ** (
-                logsumexp(
-                    emissivities[index],
-                    b=(data.gas.masses[index] / data.gas.densities[index]).value,
-                    base=10.
-                ) + log10_Mpc3_to_cm3
-        ), 'erg/s'
-    )
+    luminosities = apec.interpolate_xray(data)
+    LX = np.sum(luminosities[index])
 
     return M500, LX, relaxed
 
@@ -204,7 +208,15 @@ def mass_xray_luminosity(results: pd.DataFrame):
         )
 
     # Build legends
-    legend_sims = plt.legend(handles=legend_handles, loc=2, frameon=True, facecolor='w', edgecolor='none')
+    legend_sims = plt.legend(
+        handles=legend_handles,
+        frameon=True,
+        facecolor='w',
+        edgecolor='grey',
+        title='Zooms-EXL',
+        bbox_to_anchor=(1.05, 1),
+        loc='upper left'
+    )
     ax.add_artist(legend_sims)
 
     # Display observational data
@@ -243,6 +255,17 @@ def mass_xray_luminosity(results: pd.DataFrame):
         Patch(facecolor='lime', edgecolor='none', label=Bohringer2007.citation)
     )
     del Bohringer2007
+
+    legend_obs = plt.legend(
+        handles=handles,
+        frameon=True,
+        facecolor='w',
+        edgecolor='grey',
+        title='Literature',
+        bbox_to_anchor=(1.05, 1),
+        loc='lower left'
+    )
+    ax.add_artist(legend_obs)
 
     ax.set_xlabel(f'$M_{{500,{{\\rm {args.mass_estimator}}}}}\\ [{{\\rm M}}_{{\\odot}}]$')
     ax.set_ylabel(f'$L_{{X,500,{{\\rm {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\ keV}}$ [erg/s]')

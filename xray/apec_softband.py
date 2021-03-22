@@ -23,7 +23,7 @@ def locate(A, x):
     return fdx
 
 
-def soft_band(data, pix):
+def interpolate_xray(data):
     APEC = readsav('/cosma/home/dp004/dc-alta2/xl-zooms/xray/APEC_0.5_2.0keV_interp.idl')
 
     inde = 0  # 0 - erg/s, 1 - photons
@@ -132,6 +132,7 @@ def soft_band(data, pix):
     erg2keV = 1.60215e-9  # erg --> keV conversion factor
 
     # --- Calculate observables
+    pix = 1
     Lx = Lambda * (data.gas.densities * (ne_nH / ((ne_nH + ni_nH) * mu * unyt.mp)) ** 2.0) * data.gas.masses / ne_nH
     Sx = Lx / (4.0 * np.pi * pix * pix) / ((180.0 * 60.0 / np.pi) ** 2)
     Ypix = (unyt.thompson_cross_section_cgs.v / (511.0 * erg2keV)) * unyt.kb_cgs * data.gas.temperatures * (
@@ -189,11 +190,7 @@ def process_single_halo(
     data.gas.element_mass_fractions.silicon = data.gas.element_mass_fractions.silicon[index]
     data.gas.element_mass_fractions.iron = data.gas.element_mass_fractions.iron[index]
 
-    redshift = data.metadata.z
-    if redshift > 1e-4:
-        Lx, Sx, Ypix = soft_band(data, data.metadata.cosmology.luminosity_distance(redshift).to('cm'))
-    else:
-        Lx, Sx, Ypix = soft_band(data, 1)
+    Lx, Sx, Ypix = interpolate_xray(data)
 
     print(f"M_500_crit = {M500c:.3E}")
     print(f'LX = {np.sum(Lx):.3E}')
@@ -202,7 +199,6 @@ def process_single_halo(
 
 
 if __name__ == '__main__':
-
     process_single_halo(
         path_to_snap=zooms_register[0].snapshot_file,
         path_to_catalogue=zooms_register[0].catalog_file

@@ -99,7 +99,7 @@ def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abu
     return f_n_T_Z
 
 
-def interpolate_X_Ray(data_n, data_T, element_mass_fractions):
+def interpolate_xray(data_n, data_T, element_mass_fractions):
     mass_fraction = np.zeros((len(data_n), 9))
 
     # get individual mass fraction
