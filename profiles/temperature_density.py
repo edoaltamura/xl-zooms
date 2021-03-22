@@ -113,7 +113,7 @@ def make_single_image(
         axis.text(0.025, 0.975, name, ha="left", va="top", transform=axis.transAxes)
 
     fig.colorbar(mappable, ax=ax.ravel().tolist(), label="Number of particles")
-
+    plt.show()
     fig.savefig(f"{output_path}/subgrid_density_temperature.png")
 
     return
