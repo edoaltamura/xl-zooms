@@ -863,8 +863,23 @@ class Bohringer2007(Observations):
                      (5.90, 11.9, 0.1423, 0.1719),
                      (11.9, 20.0, 0.1623, 0.19925)]
 
-    def draw_LX_bounds(self, ax: plt.Axes):
+    def draw_LX_bounds(self, ax: plt.Axes, redshifts_on: bool = True):
         h_conv = 0.7 / self.cosmo_model.h
+
+        ax.axhspan(
+            self.bins[0][0] * 1e44 * h_conv ** 2,
+            self.bins[-1][1] * 1e44 * h_conv ** 2,
+            facecolor='lime',
+            linewidth=0,
+            alpha=0.2
+        )
+        ax.axhline(
+            self.bins[0][0] * 1e44 * h_conv ** 2,
+            color='lime',
+            linewidth=1,
+            alpha=0.1
+        )
+
         for i, (
                 luminosity_min,
                 luminosity_max,
@@ -872,20 +887,33 @@ class Bohringer2007(Observations):
                 redshift_max
         ) in enumerate(self.bins):
 
-            ax.axhspan(
-                luminosity_min * 1e44 * h_conv ** 2,
+            ax.axhline(
                 luminosity_max * 1e44 * h_conv ** 2,
-                facecolor='lime',
-                alpha=0.2
+                color='lime',
+                linewidth=1,
+                alpha=0.1
             )
 
             # Print redshift bounds once every 2 bins to avoid clutter.
-            if i % 2 == 0:
+            if i % 2 == 0 and redshifts_on:
                 ax.text(
-                    ax.get_xlim()[0],
+                    10 ** ax.get_xlim()[0],
                     10 ** (0.5 * np.log10(luminosity_min * luminosity_max)) * 1e44 * h_conv ** 2,
                     f"$z$ = {redshift_min:.3f} - {redshift_max:.3f}",
+                    horizontalalignment='left',
+                    verticalalignment='center',
+                    color='k',
+                    alpha=0.3
                 )
+
+    def quick_display(self):
+        fig, ax = plt.subplots()
+        self.draw_LX_bounds(ax)
+        plt.title(f"REXCESS sample - {self.citation}")
+        ax.set_xscale('log')
+        ax.set_yscale('log')
+        plt.show()
+        plt.close()
 
 
 class PlanckSZ2015(Observations):
@@ -1237,4 +1265,4 @@ class Mernier17(MetallicityScale):
 cosmic_fbary = Observations().cosmo_model.Ob0 / Observations().cosmo_model.Om0
 
 if __name__ == '__main__':
-    obs = Pratt10().quick_display()
+    obs = Bohringer2007().quick_display()

@@ -40,7 +40,6 @@ import cloudy_softband as cloudy
 import apec_softband as apec
 import observational_data as obs
 
-
 core_excised: bool = False
 
 
@@ -188,7 +187,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 def mass_xray_luminosity(results: pd.DataFrame):
-    fig, ax = plt.subplots(figsize=(7,4))
+    fig, ax = plt.subplots(figsize=(7, 4))
     legend_handles = []
     for i in range(len(results)):
 
