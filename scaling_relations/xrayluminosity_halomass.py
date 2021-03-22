@@ -40,7 +40,8 @@ import cloudy_softband as cloudy
 import apec_softband as apec
 import observational_data as obs
 
-core_excised: bool = False
+core_excised: bool = True
+xray_tables: str = 'apec'
 
 
 def process_single_halo(
@@ -112,42 +113,44 @@ def process_single_halo(
 
     del tempGas, deltaX, deltaY, deltaZ, deltaR, a
 
-    # # Compute hydrogen number density and the log10
-    # # of the temperature to provide to the xray interpolator.
-    # data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
-    # data_T = np.log10(data.gas.temperatures.value)
-    #
-    # # Interpolate the Cloudy table to get emissivities
-    # emissivities = cloudy.interpolate_xray(
-    #     data_nH,
-    #     data_T,
-    #     data.gas.element_mass_fractions
-    # )
-    #
-    # log10_Mpc3_to_cm3 = np.log10(unyt.Mpc.get_conversion_factor(unyt.cm)[0] ** 3)
-    #
-    # # The `data.gas.masses` and `data.gas.densities` datasets are formatted as
-    # # `numpy.float32` and are not well-behaved when trying to convert their ratio
-    # # from `unyt.Mpc ** 3` to `unyt.cm ** 3`, giving overflows and inf returns.
-    # # The `logsumexp` function offers a workaround to solve the problem when large
-    # # or small exponentiated numbers need to be summed (and logged) again.
-    # # See https://en.wikipedia.org/wiki/LogSumExp for details.
-    # # The conversion from `unyt.Mpc ** 3` to `unyt.cm ** 3` is also obtained by
-    # # adding the log10 of the conversion factor (2.9379989445851786e+73) to the
-    # # result of the `logsumexp` function.
-    # # $L_X = 10^{\log_{10} (\sum_i \epsilon_i) + log10_Mpc3_to_cm3}$
-    # LX = unyt.unyt_quantity(
-    #     10 ** (
-    #             cloudy.logsumexp(
-    #                 emissivities[index],
-    #                 b=(data.gas.masses[index] / data.gas.densities[index]).value,
-    #                 base=10.
-    #             ) + log10_Mpc3_to_cm3
-    #     ), 'erg/s'
-    # )
+    if xray_tables == 'cloudy':
+        # Compute hydrogen number density and the log10
+        # of the temperature to provide to the xray interpolator.
+        data_nH = np.log10(data.gas.element_mass_fractions.hydrogen * data.gas.densities.to('g*cm**-3') / unyt.mp)
+        data_T = np.log10(data.gas.temperatures.value)
 
-    luminosities = apec.interpolate_xray(data)[0]
-    LX = np.sum(luminosities[index])
+        # Interpolate the Cloudy table to get emissivities
+        emissivities = cloudy.interpolate_xray(
+            data_nH,
+            data_T,
+            data.gas.element_mass_fractions
+        )
+
+        log10_Mpc3_to_cm3 = np.log10(unyt.Mpc.get_conversion_factor(unyt.cm)[0] ** 3)
+
+        # The `data.gas.masses` and `data.gas.densities` datasets are formatted as
+        # `numpy.float32` and are not well-behaved when trying to convert their ratio
+        # from `unyt.Mpc ** 3` to `unyt.cm ** 3`, giving overflows and inf returns.
+        # The `logsumexp` function offers a workaround to solve the problem when large
+        # or small exponentiated numbers need to be summed (and logged) again.
+        # See https://en.wikipedia.org/wiki/LogSumExp for details.
+        # The conversion from `unyt.Mpc ** 3` to `unyt.cm ** 3` is also obtained by
+        # adding the log10 of the conversion factor (2.9379989445851786e+73) to the
+        # result of the `logsumexp` function.
+        # $L_X = 10^{\log_{10} (\sum_i \epsilon_i) + log10_Mpc3_to_cm3}$
+        LX = unyt.unyt_quantity(
+            10 ** (
+                    cloudy.logsumexp(
+                        emissivities[index],
+                        b=(data.gas.masses[index] / data.gas.densities[index]).value,
+                        base=10.
+                    ) + log10_Mpc3_to_cm3
+            ), 'erg/s'
+        )
+
+    elif xray_tables == 'apec':
+        luminosities = apec.interpolate_xray(data)[0]
+        LX = np.sum(luminosities[index])
 
     return M500, LX, relaxed
 
@@ -223,13 +226,13 @@ def mass_xray_luminosity(results: pd.DataFrame):
     handles = []
 
     Pratt10 = obs.Pratt10()
-    ax.scatter(Pratt10.M500, Pratt10.LX_R500,
+    ax.scatter(Pratt10.M500, Pratt10.LX_0p15_1R500,
                marker='D', s=5, alpha=1, color=observations_color, edgecolors='none', zorder=0)
     if args.observ_errorbars:
-        ax.errorbar(Pratt10.M500, Pratt10.LX_R500,
-                    yerr=(Pratt10.Delta_lo_LX_R500, Pratt10.Delta_hi_LX_R500),
+        ax.errorbar(Pratt10.M500, Pratt10.LX_0p15_1R500,
+                    yerr=(Pratt10.Delta_lo_LX_0p15_1R500, Pratt10.Delta_hi_LX_0p15_1R500),
                     xerr=(Pratt10.Delta_lo_M500, Pratt10.Delta_hi_M500),
-                    ls='none', elinewidth=0.5, color=observations_color, zorder=0)
+                    ls='-', elinewidth=0.5, color=observations_color, zorder=0)
     handles.append(
         Line2D([], [], color=observations_color, marker='D', markeredgecolor='none', linestyle='None', markersize=4,
                label=Pratt10.citation)
@@ -270,9 +273,12 @@ def mass_xray_luminosity(results: pd.DataFrame):
     ax.set_ylabel(f'$L_{{X,500,{{\\rm {args.mass_estimator}}}}}^{{\\rm 0.5-2.0\\ keV}}$ [erg/s]')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    # ax.set_xlim([5e12, 2e15])
-    # ax.set_ylim([1e40, 1e46])
-    ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
+    ax.set_xlim([2e12, 2e15])
+    ax.set_ylim([1e40, 1e50])
+    ax.set_title((
+        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$ "
+        f"Core-excised: {xray_tables}, X-ray table: {xray_tables}"
+    ))
     fig.savefig(
         f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas_{args.redshift_index:d}.png',
         dpi=300

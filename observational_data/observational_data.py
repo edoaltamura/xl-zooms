@@ -625,8 +625,11 @@ class Voit05(Observations):
 
 
 class Pratt10(Observations):
-    citation = "Pratt et al. (2010)"
-    hyperlink = 'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..8510/abstract'
+    citation = "Pratt et al. (2009, 2010)"
+    hyperlink = [
+        'https://ui.adsabs.harvard.edu/abs/2009A%26A...498..361P/abstract',
+        'https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..8510/abstract'
+    ]
     notes = (
         "REXCESS sample."
     )
