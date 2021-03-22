@@ -87,7 +87,10 @@ def profile_3d_single_halo(
     del tempGas, deltaX, deltaY, deltaZ
 
     # Calculate particle mass and rho_crit
-    rho_crit = data.metadata.cosmology.critical_density(data.metadata.z)
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology.critical_density(data.metadata.z).value,
+        'g/cm**3'
+    )
 
     # Since useful for different applications, attach datasets
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
