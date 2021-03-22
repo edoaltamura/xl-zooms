@@ -107,9 +107,9 @@ def process_single_halo(
 
     # Keep only particles inside R500crit
     if core_excised:
-        index = np.where((deltaR > 0.15) & (deltaR < 1) & (tempGas > 1e5))[0]
+        index = np.where((deltaR > 0.15) & (deltaR < 1) & (tempGas > 1e5) & (tempGas < 5e8))[0]
     else:
-        index = np.where((deltaR < 1) & (tempGas > 1e5))[0]
+        index = np.where((deltaR < 1) & (tempGas > 1e5) & (tempGas < 5e8))[0]
 
     del tempGas, deltaX, deltaY, deltaZ, deltaR, a
 
