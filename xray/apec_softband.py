@@ -35,6 +35,7 @@ def interpolate_xray(data):
     mu = np.zeros(len(data.gas.masses.value))
     Lambda = np.zeros(len(data.gas.masses.value), dtype=np.float64)
 
+    print(f'Start interpolation on {len(data.gas.masses.value):d} particles.')
     # --- Sum element contributions
     # Hydrogen
     H = data.gas.element_mass_fractions.hydrogen.value
