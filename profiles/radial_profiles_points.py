@@ -152,6 +152,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     #
 
     fig, ax = plt.subplots()
+    ax.flat[0].loglog()
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
@@ -165,7 +166,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # histogram definition
     xyrange = [[0.01, 2], [10, 2000]]  # data range
     bins = [100, 100]  # number of bins
-    thresh = 3  # density threshold
+    thresh = 6  # density threshold
 
     # histogram the data
     xbins = np.logspace(np.log10(0.1), np.log10(2), bins[0] + 1)
@@ -210,8 +211,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
     ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
     ax.set_ylabel(plot_database.iloc[0]['field_label'])
-    ax.set_xscale('log')
-    ax.set_yscale('log')
     ax.set_xlim([0.05, 2])
     ax.set_ylim([100, 2000])
     plt.legend()
