@@ -188,7 +188,7 @@ def _process_single_halo(zoom: Zoom):
 
 
 def mass_xray_luminosity(results: pd.DataFrame):
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(figsize=(7,4))
     legend_handles = []
     for i in range(len(results)):
 
@@ -276,7 +276,6 @@ def mass_xray_luminosity(results: pd.DataFrame):
     ax.set_title(f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$")
     fig.savefig(
         f'{calibration_zooms.output_directory}/m500{args.mass_estimator}_hotgas_{args.redshift_index:d}.png',
-        bbox_inches="tight",
         dpi=300
     )
     if not args.quiet:
