@@ -92,9 +92,9 @@ def profile_3d_single_halo(
     )
 
     radial_distance = radial_distance[index]
+    data.gas.densities = data.gas.densities[index]
     data.gas.masses = data.gas.masses[index]
     data.gas.temperatures = data.gas.temperatures[index]
-    data.gas.number_densities = data.gas.number_densities[index]
 
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures * unyt.boltzmann_constant
     data.gas.number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
