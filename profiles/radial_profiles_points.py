@@ -39,7 +39,7 @@ def profile_3d_single_halo(
         path_to_catalogue: str,
         hse_dataset: pd.Series = None,
 ) -> tuple:
-    print(1)
+
     # Read in halo properties
     vr_catalogue_handle = vr.load(path_to_catalogue)
     a = vr_catalogue_handle.a
@@ -84,6 +84,8 @@ def profile_3d_single_halo(
     radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
     index = np.where((radial_distance < 3) & (tempGas > 1e5))[0]
     del tempGas, deltaX, deltaY, deltaZ
+
+    print(1)
 
     # Calculate particle mass and rho_crit
     rho_crit = unyt.unyt_quantity(
