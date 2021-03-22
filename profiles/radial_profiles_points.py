@@ -164,8 +164,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
     # histogram definition
     xyrange = [[0.01, 2], [10, 2000]]  # data range
-    bins = [50, 50]  # number of bins
-    thresh = 4  # density threshold
+    bins = [100, 100]  # number of bins
+    thresh = 3  # density threshold
     import scipy
     # histogram the data
     xbins = np.logspace(np.log10(0.01), np.log10(2), bins[0] + 1)
