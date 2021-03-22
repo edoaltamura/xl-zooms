@@ -201,10 +201,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     )
     plt.plot(
         pratt10.radial_bins, bin_median, c='k',
-        label=(
-            f"{pratt10.citation:s} ($10^{{{bin_log_edges[i - 1]:.1f}}}"
-            f"<M_{{500}}/M_{{\odot}}<10^{{{bin_log_edges[i]:.1f}}}$)"
-        )
+        label=f"{pratt10.citation:s}"
     )
     del pratt10
 
