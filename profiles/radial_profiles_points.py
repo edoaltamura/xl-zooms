@@ -212,8 +212,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_ylabel(plot_database.iloc[0]['field_label'])
     ax.set_xscale('log')
     ax.set_yscale('log')
-    ax.set_xlim([0.01, 2.5])
-    ax.set_ylim([10, 2000])
+    ax.set_xlim([0.05, 2])
+    ax.set_ylim([100, 2000])
     plt.legend()
     ax.set_title(
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
