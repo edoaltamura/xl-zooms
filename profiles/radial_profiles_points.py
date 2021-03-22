@@ -96,9 +96,9 @@ def profile_3d_single_halo(
     data.gas.masses = data.gas.masses[index]
     data.gas.temperatures = data.gas.temperatures[index]
 
-    data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures * unyt.boltzmann_constant
-    data.gas.number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
-    field_value = data.gas.mass_weighted_temperatures / data.gas.number_densities ** (2 / 3)
+    mass_weighted_temperatures = data.gas.temperatures * unyt.boltzmann_constant
+    number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
+    field_value = mass_weighted_temperatures / number_densities ** (2 / 3)
     field_value = field_value.to('keV*cm**2')
     field_label = r'$K$ [keV cm$^2$]'
 
