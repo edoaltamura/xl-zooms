@@ -247,4 +247,4 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
 if __name__ == "__main__":
     results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
-    plot_radial_profiles_median(results_database, highmass_only=True)
+    # plot_radial_profiles_median(results_database, highmass_only=True)
