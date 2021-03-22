@@ -109,6 +109,7 @@ def profile_3d_single_halo(
     field_value = data.gas.mass_weighted_temperatures / data.gas.number_densities ** (2 / 3)
     field_value = field_value.to('keV*cm**2')
     field_label = r'$K$ [keV cm$^2$]'
+    print(radial_distance, field_value, field_label, conv_radius, M500c, R500c, M200c, R200c)
 
     return radial_distance, field_value, field_label, conv_radius, M500c, R500c, M200c, R200c
 
@@ -166,14 +167,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # number_density_gas = number_density_gas.to('1/cm**3')
     #
 
-    from matplotlib.cm import get_cmap
-
-    name = "Set2"
-    cmap = get_cmap(name)  # type: matplotlib.colors.ListedColormap
-    colors = cmap.colors[3:]  # type: list
-
     fig, ax = plt.subplots()
-    ax.set_prop_cycle(color=colors)
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
@@ -194,7 +188,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
             radius = np.append(radius, plot_database['radial_distance'].iloc[j])
             field = np.append(field, plot_database['field_value'].iloc[j])
 
-        ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c=colors[i - 1], alpha=0.9)
+        ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c='orange', alpha=0.9)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
@@ -247,4 +241,4 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
 if __name__ == "__main__":
     results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
-    # plot_radial_profiles_median(results_database, highmass_only=True)
+    plot_radial_profiles_median(results_database, highmass_only=True)
