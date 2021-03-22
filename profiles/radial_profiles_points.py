@@ -40,22 +40,20 @@ def profile_3d_single_halo(
         hse_dataset: pd.Series = None,
 ) -> tuple:
     # Read in halo properties
-    with h5.File(path_to_catalogue, 'r') as h5file:
-        a = float(h5file['/SimulationInfo'].attrs['ScaleFactor'])
-        M200c = unyt.unyt_quantity(h5file['/Mass_200crit'][0] * 1.e10, unyt.Solar_Mass)
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-        XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
-        YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
-        ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+    vr_catalogue_handle = vr.load(path_to_catalogue)
+    a = vr_catalogue_handle.a
+    M500 = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
+    R500 = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+    XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+    YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
+    ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
-        # If no custom aperture, select R500c as default
-        if hse_dataset is not None:
-            assert R500c.units == hse_dataset["R500hse"].units
-            assert M500c.units == hse_dataset["M500hse"].units
-            R500c = hse_dataset["R500hse"]
-            M500c = hse_dataset["M500hse"]
+    # If no custom aperture, select R500c as default
+    if hse_dataset is not None:
+        assert R500.units == hse_dataset["R500hse"].units
+        assert M500.units == hse_dataset["M500hse"].units
+        R500 = hse_dataset["R500hse"]
+        M500 = hse_dataset["M500hse"]
 
     # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
     # to filter particle coordinates, while VR outputs are in physical units.
@@ -63,9 +61,9 @@ def profile_3d_single_halo(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [XPotMin / a - 3 * R500c / a, XPotMin / a + 3 * R500c / a],
-        [YPotMin / a - 3 * R500c / a, YPotMin / a + 3 * R500c / a],
-        [ZPotMin / a - 3 * R500c / a, ZPotMin / a + 3 * R500c / a]
+        [(XPotMin - 0.5 * R500) * a, (XPotMin + 0.5 * R500) * a],
+        [(YPotMin - 0.5 * R500) * a, (YPotMin + 0.5 * R500) * a],
+        [(ZPotMin - 0.5 * R500) * a, (ZPotMin + 0.5 * R500) * a]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
@@ -82,7 +80,7 @@ def profile_3d_single_halo(
     deltaX = data.gas.coordinates[:, 0] - XPotMin
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
-    radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500c
+    radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
     index = np.where((radial_distance < 3) & (tempGas > 1e5))[0]
     del tempGas, deltaX, deltaY, deltaZ
 
@@ -92,26 +90,15 @@ def profile_3d_single_halo(
         'g/cm**3'
     )
 
-    # Since useful for different applications, attach datasets
-    data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
-
-    # Compute convergence radius
-    conv_radius = convergence_radius(
-        radial_distance * R500c,
-        data.gas.masses.to('Msun'),
-        rho_crit.to('Msun/Mpc**3')
-    ) / R500c
-
     radial_distance = radial_distance[index]
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures * unyt.boltzmann_constant
-    mean_molecular_weight = 0.59
+
     data.gas.number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
     field_value = data.gas.mass_weighted_temperatures / data.gas.number_densities ** (2 / 3)
     field_value = field_value.to('keV*cm**2')
     field_label = r'$K$ [keV cm$^2$]'
-    print(radial_distance, field_value, field_label, conv_radius, M500c, R500c, M200c, R200c)
 
-    return radial_distance, field_value, field_label, conv_radius, M500c, R500c, M200c, R200c
+    return radial_distance, field_value, field_label, M500, R500
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -119,11 +106,8 @@ def profile_3d_single_halo(
     'radial_distance',
     'field_value',
     'field_label',
-    'convergence_radius',
     'M500',
-    'R500',
-    'M200',
-    'R200'
+    'R500'
 ])
 def _process_single_halo(zoom: Zoom):
     # Select redshift
@@ -156,8 +140,6 @@ def _process_single_halo(zoom: Zoom):
 
 
 def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
-
-
     # kBT200 = (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV')
     # K200 = (kBT200 / (3 * M200c * obs.cosmic_fbary / (4 * np.pi * R200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
     #     'keV*cm**2')
