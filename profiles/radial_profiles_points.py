@@ -97,14 +97,16 @@ def profile_3d_single_halo(
     field_label = r'$K$ [keV cm$^2$]'
     radial_distance = radial_distance[index]
     field_value = field_value[index]
+    field_masses = data.gas.masses[index]
 
-    return radial_distance, field_value, field_label, M500, R500
+    return radial_distance, field_value, field_masses, field_label, M500, R500
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
     'radial_distance',
     'field_value',
+    'field_masses',
     'field_label',
     'M500',
     'R500'
@@ -153,24 +155,33 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
-    bin_log_edges = np.array([12.5, 13.4, 13.8, 14.6])
-    n_bins = len(bin_log_edges) - 1
-    bin_indices = np.digitize(m500crit_log10, bin_log_edges)
+    plot_database = object_database.iloc[np.where(m500crit_log10 > 14)[0]]
+    radius = np.empty(0)
+    field = np.empty(0)
+    for j in range(len(plot_database)):
+        radius = np.append(radius, plot_database['radial_distance'].iloc[j])
+        field = np.append(field, plot_database['field_value'].iloc[j])
 
-    # Display zoom data
-    for i in range(n_bins if highmass_only else 1, n_bins + 1):
+    # histogram definition
+    xyrange = [[radius.min(), radius.max()], [field.min(), field.max()]]  # data range
+    bins = [100, 100]  # number of bins
+    thresh = 3  # density threshold
+    import scipy
+    # histogram the data
+    hh, locx, locy = scipy.histogram2d(radius, field, range=xyrange, bins=bins)
+    posx = np.digitize(radius, locx)
+    posy = np.digitize(field, locy)
 
-        plot_database = object_database.iloc[np.where(bin_indices == i)[0]]
-        max_convergence_radius = plot_database['convergence_radius'].max()
+    # select points within the histogram
+    ind = (posx > 0) & (posx <= bins[0]) & (posy > 0) & (posy <= bins[1])
+    hhsub = hh[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
+    xdat1 = radius[ind][hhsub < thresh]  # low density points
+    ydat1 = field[ind][hhsub < thresh]
+    hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
 
-        # Plot only profiles outside the *largest* convergence radius
-        radius = np.empty(0)
-        field = np.empty(0)
-        for j in range(len(plot_database)):
-            radius = np.append(radius, plot_database['radial_distance'].iloc[j])
-            field = np.append(field, plot_database['field_value'].iloc[j])
-
-        ax.plot(radius[::2], field[::2], marker=',', lw=0, linestyle="", c='orange', alpha=0.9)
+    ax.imshow(np.flipud(hh.T), cmap='jet', extent=np.array(xyrange).flatten(), interpolation='none', origin='upper')
+    ax.colorbar()
+    ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
@@ -178,10 +189,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # Observational data
     pratt10 = obs.Pratt10()
     bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
-        m500_limits=(
-            10 ** bin_log_edges[-2] * unyt.Solar_Mass,
-            10 ** bin_log_edges[-1] * unyt.Solar_Mass,
-        ),
         k500_rescale=True
     )
     plt.fill_between(
