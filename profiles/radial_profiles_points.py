@@ -62,9 +62,9 @@ def profile_3d_single_halo(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [(XPotMin - 0.5 * R500) * a, (XPotMin + 0.5 * R500) * a],
-        [(YPotMin - 0.5 * R500) * a, (YPotMin + 0.5 * R500) * a],
-        [(ZPotMin - 0.5 * R500) * a, (ZPotMin + 0.5 * R500) * a]
+        [(XPotMin - R500) * a, (XPotMin + R500) * a],
+        [(YPotMin - R500) * a, (YPotMin + R500) * a],
+        [(ZPotMin - R500) * a, (ZPotMin + R500) * a]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
@@ -82,10 +82,8 @@ def profile_3d_single_halo(
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
     radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
-    index = np.where((radial_distance < 3) & (tempGas > 1e5))[0]
+    index = np.where((radial_distance < 2) & (tempGas > 1e5))[0]
     del tempGas, deltaX, deltaY, deltaZ
-
-    print(1)
 
     # Calculate particle mass and rho_crit
     rho_crit = unyt.unyt_quantity(
@@ -94,6 +92,10 @@ def profile_3d_single_halo(
     )
 
     radial_distance = radial_distance[index]
+    data.gas.masses = data.gas.masses[index]
+    data.gas.temperatures = data.gas.temperatures[index]
+    data.gas.number_densities = data.gas.number_densities[index]
+
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures * unyt.boltzmann_constant
     data.gas.number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
     field_value = data.gas.mass_weighted_temperatures / data.gas.number_densities ** (2 / 3)
