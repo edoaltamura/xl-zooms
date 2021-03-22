@@ -163,13 +163,13 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         field = np.append(field, plot_database['field_value'].iloc[j])
 
     # histogram definition
-    xyrange = [[radius.min(), radius.max()], [field.min(), field.max()]]  # data range
+    xyrange = [[0.01, 2], [10, 2000]]  # data range
     bins = [50, 50]  # number of bins
-    thresh = 2  # density threshold
+    thresh = 4  # density threshold
     import scipy
     # histogram the data
-    xbins = np.logspace(np.log10(0.01), np.log10(3), bins[0] + 1)
-    ybins = np.logspace(np.log10(5), np.log10(2000), bins[1] + 1)
+    xbins = np.logspace(np.log10(0.01), np.log10(2), bins[0] + 1)
+    ybins = np.logspace(np.log10(10), np.log10(2000), bins[1] + 1)
     hh, locx, locy = scipy.histogram2d(radius, field, range=xyrange, bins=(xbins, ybins))
     posx = np.digitize(radius, locx)
     posy = np.digitize(field, locy)
@@ -212,8 +212,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.set_ylabel(plot_database.iloc[0]['field_label'])
     ax.set_xscale('log')
     ax.set_yscale('log')
-    # ax.set_xlim([0.01, 2.5])
-    # ax.set_ylim([1e5, 1e10])
+    ax.set_xlim([0.01, 2.5])
+    ax.set_ylim([10, 2000])
     plt.legend()
     ax.set_title(
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
