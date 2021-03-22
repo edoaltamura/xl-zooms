@@ -39,7 +39,6 @@ def profile_3d_single_halo(
         path_to_catalogue: str,
         hse_dataset: pd.Series = None,
 ) -> tuple:
-
     # Read in halo properties
     vr_catalogue_handle = vr.load(path_to_catalogue)
     a = vr_catalogue_handle.a
@@ -91,16 +90,13 @@ def profile_3d_single_halo(
         'g/cm**3'
     )
 
-    radial_distance = radial_distance[index]
-    data.gas.densities = data.gas.densities[index]
-    data.gas.masses = data.gas.masses[index]
-    data.gas.temperatures = data.gas.temperatures[index]
-
-    mass_weighted_temperatures = data.gas.temperatures * unyt.boltzmann_constant
+    mass_weighted_temperatures = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
     number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
     field_value = mass_weighted_temperatures / number_densities ** (2 / 3)
-    field_value = field_value.to('keV*cm**2')
+
     field_label = r'$K$ [keV cm$^2$]'
+    radial_distance = radial_distance[index]
+    field_value = field_value[index]
 
     return radial_distance, field_value, field_label, M500, R500
 
