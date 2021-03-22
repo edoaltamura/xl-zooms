@@ -152,7 +152,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     #
 
     fig, ax = plt.subplots()
-    ax.flat[0].loglog()
+    ax.loglog()
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
@@ -193,6 +193,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # Observational data
     pratt10 = obs.Pratt10()
     bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
+        m500_limits=(
+            1e14 * unyt.Solar_Mass,
+            1e15 * unyt.Solar_Mass,
+        ),
         k500_rescale=True
     )
     plt.fill_between(
