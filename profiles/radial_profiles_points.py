@@ -94,7 +94,7 @@ def profile_3d_single_halo(
 
     # Compute convergence radius
     conv_radius = convergence_radius(
-        radial_distance,
+        radial_distance * R500c,
         data.gas.masses.to('Msun'),
         rho_crit.to('Msun/Mpc**3')
     ) / R500c
