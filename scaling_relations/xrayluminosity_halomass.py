@@ -147,7 +147,7 @@ def process_single_halo(
     #     ), 'erg/s'
     # )
 
-    luminosities = apec.interpolate_xray(data)
+    luminosities = apec.interpolate_xray(data)[0]
     LX = np.sum(luminosities[index])
 
     return M500, LX, relaxed
