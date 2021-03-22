@@ -41,7 +41,7 @@ import apec_softband as apec
 import observational_data as obs
 
 core_excised: bool = True
-xray_tables: str = 'apec'
+xray_tables: str = 'cloudy'
 
 
 def process_single_halo(
