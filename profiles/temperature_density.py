@@ -157,7 +157,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     density_bounds = [x.min(), x.max()]  # in nh/cm^3
     temperature_bounds = [y.min(), y.max()]  # in K
-    bins = 512
+    bins = 256
 
     # Make the norm object to define the image stretch
     density_bins = np.logspace(
@@ -180,14 +180,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
     vmax = np.max(H)
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.4)
-    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+    fig.colorbar(mappable, ax=ax, label="SNe")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.4)
-    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+    fig.colorbar(mappable, ax=ax, label="AGN")
 
 
 
