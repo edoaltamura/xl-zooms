@@ -189,9 +189,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     x_scatter = x[snii_flag][ind][hhsub < 5]  # low density points
     y_scatter = y[snii_flag][ind][hhsub < 5]
     H[H < 5] = np.nan  # fill the areas with low density by NaNs
-    ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
+    ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.5)
     ax.contour(H.T, extent=[density_bounds[0], density_bounds[1], temperature_bounds[0], temperature_bounds[1]],
-               linewidths=1, levels=[20, 200, 500])
+               linewidths=3, levels=[5, 10, 200, 500])
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
@@ -204,10 +204,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     x_scatter = x[agn_flag][ind][hhsub < 5]  # low density points
     y_scatter = y[agn_flag][ind][hhsub < 5]
     H[H < 5] = np.nan  # fill the areas with low density by NaNs
-
-    ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='red', alpha=0.1)
+    ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='red', alpha=0.5)
     ax.contour(H.T, extent=[density_bounds[0], density_bounds[1], temperature_bounds[0], temperature_bounds[1]],
-               linewidths=1, levels=[20, 200, 500])
+               linewidths=1, levels=[5, 10, 200, 500])
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Temperature [K]")
