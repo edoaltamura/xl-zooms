@@ -158,8 +158,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
 
     # Set the limits of the figure.
-    density_bounds = [10 ** (-7.), 1e6]  # in nh/cm^3
-    temperature_bounds = [10 ** (0.3), 10 ** (9.5)]  # in K
+    density_bounds = [10 ** (-5.), 1e6]  # in nh/cm^3
+    temperature_bounds = [10 ** (3), 10 ** (9.5)]  # in K
     bins = 512
 
     # Make the norm object to define the image stretch
