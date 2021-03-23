@@ -141,7 +141,7 @@ def latex_float(f):
 
 
 def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
-    fig = plt.figure()
+    fig = plt.figure(figsize=(7, 3))
     ax = fig.add_subplot(1, 1, 1)
     ax.loglog()
 
@@ -224,7 +224,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
             label_pos.append(10 ** logvert[min_ind, :])
 
     # Draw contour labels
-    plt.clabel(CS, inline=True, inline_spacing=3, rightside_up=True, colors='k', fontsize=8, fmt=fmt, manual=label_pos)
+    plt.clabel(CS, inline=True, inline_spacing=3, rightside_up=True, colors='k', fontsize=5, fmt=fmt, manual=label_pos)
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Temperature [K]")
