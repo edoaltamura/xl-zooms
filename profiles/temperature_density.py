@@ -183,22 +183,33 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     H, density_edges, temperature_edges = np.histogram2d(
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
     )
-
     posx = np.digitize(x[snii_flag], density_edges)
     posy = np.digitize(y[snii_flag], temperature_edges)
-
     # select points within the histogram
     ind = (posx > 0) & (posx <= bins) & (posy > 0) & (posy <= bins)
     hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
-    x_scatter = x[snii_flag][ind][hhsub < 30]  # low density points
-    y_scatter = y[snii_flag][ind][hhsub < 30]
+    x_scatter = x[snii_flag][ind][hhsub < 5]  # low density points
+    y_scatter = y[snii_flag][ind][hhsub < 5]
     H[H < 30] = np.nan  # fill the areas with low density by NaNs
-
     ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
     plt.contour(H.T, extent=[*density_bounds, *temperature_bounds],
                 linewidths=1, color='lime', levels=[20, 200, 500])
 
-    ax.plot(x[agn_flag], y[agn_flag], marker=',', lw=0, linestyle="", c='r', alpha=1)
+    H, density_edges, temperature_edges = np.histogram2d(
+        x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
+    )
+    posx = np.digitize(x[agn_flag], density_edges)
+    posy = np.digitize(y[agn_flag], temperature_edges)
+    # select points within the histogram
+    ind = (posx > 0) & (posx <= bins) & (posy > 0) & (posy <= bins)
+    hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
+    x_scatter = x[agn_flag][ind][hhsub < 5]  # low density points
+    y_scatter = y[agn_flag][ind][hhsub < 5]
+    H[H < 30] = np.nan  # fill the areas with low density by NaNs
+
+    ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='red', alpha=0.1)
+    plt.contour(H.T, extent=[*density_bounds, *temperature_bounds],
+                linewidths=1, color='red', levels=[20, 200, 500])
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Temperature [K]")
