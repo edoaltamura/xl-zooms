@@ -216,12 +216,13 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
         fontsize=5
     )
+    if not args.quiet:
+        plt.show()
     fig.savefig(
         f'{calibration_zooms.output_directory}/subgrid_density_temperature_{args.redshift_index:04d}.png',
         dpi=300
     )
-    if not args.quiet:
-        plt.show()
+
     plt.close()
 
 
