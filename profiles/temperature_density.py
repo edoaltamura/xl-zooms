@@ -133,6 +133,8 @@ def _process_single_halo(zoom: Zoom):
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
+    if f < 1e-2:
+        float_str = "{0:.0e}".format(f)
     if "e" in float_str:
         base, exponent = float_str.split("e")
         return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
@@ -204,7 +206,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
-    levels = [10 ** k for k in range(-4, 4)]
+    levels = [10 ** k for k in range(-4, 5)]
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
     CS = plt.contour(
         density_interps,
