@@ -92,11 +92,11 @@ def profile_3d_single_halo(
 
     try:
         number_density = (data.gas.subgrid_physical_densities / unyt.mh).to('cm**-3')
-        temperature = (data.gas.subgrid_temperatures * unyt.boltzmann_constant).to('keV')
+        temperature = (data.gas.subgrid_temperatures).to('K')
     except:
         # No sub-grid quantities present. Still make the figure, but use non-subgrid.
         number_density = (data.gas.densities / unyt.mh).to('cm**-3')
-        temperature = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
+        temperature = (data.gas.temperatures).to('K')
 
     agn_flag = data.gas.heated_by_agnfeedback[index]
     snii_flag = data.gas.heated_by_sniifeedback[index]
@@ -186,10 +186,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax))
     fig.colorbar(mappable, ax=ax, label="Number of particles")
     ax.plot(x[agn_flag], y[agn_flag], marker=',', lw=0, linestyle="", c='r', alpha=1)
-    ax.plot(x[snii_flag], y[snii_flag], marker=',', lw=0, linestyle="", c='lime', alpha=1)
+    ax.plot(x[snii_flag], y[snii_flag], marker=',', lw=0, linestyle="", c='lime', alpha=0.2)
 
     ax.set_xlabel(r"Subgrid Density [$n_H$ cm$^{-3}$]")
-    ax.set_ylabel(r"Subgrid Temperature [keV]")
+    ax.set_ylabel(r"Subgrid Temperature [K]")
 
     plt.legend()
     ax.set_title(
