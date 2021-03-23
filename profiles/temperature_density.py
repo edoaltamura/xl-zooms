@@ -164,6 +164,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         agn_flag = np.append(agn_flag, plot_database['agn_flag'].iloc[j])
         snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
 
+    print(snii_flag)
     # Set the limits of the figure.
     density_bounds = [10 ** (-9.5), 1e6]  # in nh/cm^3
     temperature_bounds = [10 ** (0.5), 10 ** (9.5)]  # in K
