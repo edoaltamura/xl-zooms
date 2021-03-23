@@ -163,10 +163,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         agn_flag = np.append(agn_flag, plot_database['agn_flag'].iloc[j])
         snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
 
-    print(snii_flag)
     # Set the limits of the figure.
-    density_bounds = [10 ** (-9.5), 1e6]  # in nh/cm^3
-    temperature_bounds = [10 ** (0.5), 10 ** (9.5)]  # in K
+    density_bounds = [10 ** (-7.), 1e6]  # in nh/cm^3
+    temperature_bounds = [10 ** (0.3), 10 ** (9.5)]  # in K
     bins = 512
 
     # Make the norm object to define the image stretch
@@ -184,7 +183,25 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     vmax = np.max(H)
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='inferno')
     fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
-    ax.plot(x[snii_flag], y[snii_flag], marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
+
+    # perform kernel density estimate
+    threshold = 0.1
+    from scipy.stats import gaussian_kde
+    points = np.vstack([x[snii_flag], y[snii_flag]])
+    kde = gaussian_kde(points)
+    z = kde(points)
+    # mask points above density threshold
+    x_scatter = np.ma.masked_where(z > threshold, x[snii_flag])
+    y_scatter = np.ma.masked_where(z > threshold, y[snii_flag])
+    ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
+
+    xx, yy = np.meshgrid(density_edges, temperature_edges)
+    gridpoints = np.array([xx.ravel(), yy.ravel()])
+
+    # compute density map
+    zz = np.reshape(kde(gridpoints), xx.shape)
+    cs = ax.contour(xx, yy, zz, levels=[threshold], colors='lime')
+
     ax.plot(x[agn_flag], y[agn_flag], marker=',', lw=0, linestyle="", c='r', alpha=1)
 
     ax.set_xlabel(r"Subgrid Density [$n_H$ cm$^{-3}$]")
