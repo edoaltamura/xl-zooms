@@ -138,7 +138,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
-    plot_database = object_database.iloc[np.where(m500crit_log10 > 14)[0]]
+    plot_database = object_database.iloc[np.where(m500crit_log10 > 12)[0]]
     x = np.empty(0)
     y = np.empty(0)
     agn_flag = np.empty(0, dtype=np.bool)
