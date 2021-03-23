@@ -191,7 +191,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # Draw equi-entropy lines
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps * unyt.cm ** 3) ** (2 / 3)
+    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps / unyt.cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
     CS = plt.contour(density_interps, entropy_interps, entropy_interps, 6, colors='k')
     plt.clabel(CS, fontsize=9, inline=1)
