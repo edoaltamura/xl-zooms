@@ -171,10 +171,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     fig.colorbar(density, label='Number of particles per pixel')
     # ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.1)
 
-    ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
-    ax.set_ylabel(plot_database.iloc[0]['field_label'])
-    ax.set_xlim([0.05, 2])
-    ax.set_ylim([100, 2000])
+    ax.set_xlabel('$n_{\rm H}$ [cm$^{-3}$]')
+    ax.set_xlabel('Temperature [K]')
+
     plt.legend()
     ax.set_title(
         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
