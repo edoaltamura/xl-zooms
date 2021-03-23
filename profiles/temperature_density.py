@@ -172,38 +172,24 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
 
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='inferno')
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r')
     fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
     )
-    posx = np.digitize(x[snii_flag], density_edges)
-    posy = np.digitize(y[snii_flag], temperature_edges)
-    # select points within the histogram
-    ind = (posx > 0) & (posx <= bins) & (posy > 0) & (posy <= bins)
-    hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
-    x_scatter = x[snii_flag][ind][hhsub < 5]  # low density points
-    y_scatter = y[snii_flag][ind][hhsub < 5]
-    H[H < 5] = np.nan  # fill the areas with low density by NaNs
-    # ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.5)
-    # ax.contour(H.T, extent=[density_bounds[0], density_bounds[1], temperature_bounds[0], temperature_bounds[1]],
-    #            linewidths=3, levels=[5, 10, 200, 500])
+    vmax = np.max(H)
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.4)
+    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
     )
-    posx = np.digitize(x[agn_flag], density_edges)
-    posy = np.digitize(y[agn_flag], temperature_edges)
-    # select points within the histogram
-    ind = (posx > 0) & (posx <= bins) & (posy > 0) & (posy <= bins)
-    hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
-    x_scatter = x[agn_flag][ind][hhsub < 5]  # low density points
-    y_scatter = y[agn_flag][ind][hhsub < 5]
-    H[H < 5] = np.nan  # fill the areas with low density by NaNs
-    # ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='red', alpha=0.5)
-    # ax.contour(H.T, extent=[density_bounds[0], density_bounds[1], temperature_bounds[0], temperature_bounds[1]],
-    #            linewidths=1, levels=[5, 10, 200, 500])
+    vmax = np.max(H)
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.4)
+    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+
+
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Temperature [K]")
