@@ -162,8 +162,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
     assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
-    density_bounds = [x.min(), x.max()]  # in nh/cm^3
-    temperature_bounds = [y.min(), y.max()]  # in K
+    density_bounds = [10 ** (-9.5), 1e6]  # in nh/cm^3
+    temperature_bounds = [10 ** (0.5), 10 ** (9.5)]  # in K
     bins = 256
 
     # Make the norm object to define the image stretch
@@ -211,7 +211,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         temperature_interps,
         entropy_interps,
         levels,
-        colors='blue',
+        colors='aqua',
         linewidths=0.5
     )
 
@@ -235,7 +235,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         inline=True,
         inline_spacing=3,
         rightside_up=True,
-        colors='blue',
+        colors='aqua',
         fontsize=5,
         fmt=fmt,
         manual=label_pos
