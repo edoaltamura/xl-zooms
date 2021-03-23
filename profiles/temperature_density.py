@@ -1,127 +1,194 @@
-import matplotlib.pyplot as plt
+"""
+Test as:
+    $ git pull; python3 radial_profiles_points.py -k _-8res_MinimumDistance_fixedAGNdT8.5_ -m true -r 36
+"""
+
+import os
+import sys
+import unyt
+import mpl_scatter_density
 import numpy as np
+import pandas as pd
+import swiftsimio as sw
+import velociraptor as vr
+import matplotlib.pyplot as plt
 
-from swiftsimio import load
+try:
+    plt.style.use("../mnras.mplstyle")
+except:
+    pass
 
-from unyt import mh, cm, Gyr, unyt_array
-from matplotlib.colors import LogNorm
-from matplotlib.animation import FuncAnimation
+# Make the register backend visible to the script
+sys.path.append("../observational_data")
+sys.path.append("../scaling_relations")
+sys.path.append("../zooms")
 
-# Set the limits of the figure.
-density_bounds = [10 ** (-9.5), 1e6]  # in nh/cm^3
-temperature_bounds = [10 ** (0.5), 10 ** (9.5)]  # in K
-bins = 256
+from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
+from auto_parser import args
+import observational_data as obs
+import scaling_utils as utils
 
-
-def get_data(filename):
-    """
-    Grabs the data (T in Kelvin and density in mh / cm^3).
-    """
-
-    data = load(filename)
-
-    try:
-        number_density = (data.gas.subgrid_physical_densities / mh).to(cm ** -3)
-        temperature = data.gas.subgrid_temperatures.to_physical().to("K")
-    except:
-        # No sub-grid quantities present. Still make the figure, but use non-subgrid.
-        number_density = (data.gas.densities.to_physical() / mh).to(cm ** -3)
-        temperature = data.gas.temperatures.to_physical().to("K")
-
-    return number_density.value, temperature.value
+# Constants
+mean_molecular_weight = 0.59
+mean_atomic_weight_per_free_electron = 1.14
 
 
-def make_hist(filename, density_bounds, temperature_bounds, bins):
-    """
-    Makes the histogram for filename with bounds as lower, higher
-    for the bins and "bins" the number of bins along each dimension.
-    Also returns the edges for pcolormesh to use.
-    """
+def profile_3d_single_halo(
+        path_to_snap: str,
+        path_to_catalogue: str,
+        hse_dataset: pd.Series = None,
+) -> tuple:
+    # Read in halo properties
+    vr_catalogue_handle = vr.load(path_to_catalogue)
+    a = vr_catalogue_handle.a
+    M500 = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
+    R500 = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+    XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+    YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
+    ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
-    density_bins = np.logspace(
-        np.log10(density_bounds[0]), np.log10(density_bounds[1]), bins
+    # If no custom aperture, select R500c as default
+    if hse_dataset is not None:
+        assert R500.units == hse_dataset["R500hse"].units
+        assert M500.units == hse_dataset["M500hse"].units
+        R500 = hse_dataset["R500hse"]
+        M500 = hse_dataset["M500hse"]
+
+    # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
+    # to filter particle coordinates, while VR outputs are in physical units.
+    # Convert the region bounds to comoving, but keep the CoP and Rcrit in
+    # physical units for later use.
+    mask = sw.mask(path_to_snap, spatial_only=True)
+    region = [
+        [(XPotMin - R500) * a, (XPotMin + R500) * a],
+        [(YPotMin - R500) * a, (YPotMin + R500) * a],
+        [(ZPotMin - R500) * a, (ZPotMin + R500) * a]
+    ]
+    mask.constrain_spatial(region)
+    data = sw.load(path_to_snap, mask=mask)
+
+    # Convert datasets to physical quantities
+    # R500c is already in physical units
+    data.gas.coordinates.convert_to_physical()
+    data.gas.masses.convert_to_physical()
+    data.gas.temperatures.convert_to_physical()
+    data.gas.densities.convert_to_physical()
+
+    # Select hot gas within sphere
+    tempGas = data.gas.temperatures
+    deltaX = data.gas.coordinates[:, 0] - XPotMin
+    deltaY = data.gas.coordinates[:, 1] - YPotMin
+    deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+    radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
+    index = np.where((radial_distance < 2) & (tempGas > 1e5))[0]
+    del tempGas, deltaX, deltaY, deltaZ
+
+    # Calculate particle mass and rho_crit
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology.critical_density(data.metadata.z).value,
+        'g/cm**3'
     )
-    temperature_bins = np.logspace(
-        np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
+
+    mass_weighted_temperatures = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
+    number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
+    entropies = mass_weighted_temperatures / number_densities ** (2 / 3)
+
+    x = number_densities[index]
+    y = data.gas.temperature[index]
+    weights = entropies[index]
+
+    return x, y, weights, M500, R500
+
+
+@utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
+@utils.set_output_names([
+    'x',
+    'y',
+    'weights',
+    'M500',
+    'R500'
+])
+def _process_single_halo(zoom: Zoom):
+    # Select redshift
+    snapshot_file = zoom.get_redshift(args.redshift_index).snapshot_path
+    catalog_file = zoom.get_redshift(args.redshift_index).catalogue_properties_path
+
+    if args.mass_estimator == 'crit' or args.mass_estimator == 'true':
+
+        profiles_database = profile_3d_single_halo(snapshot_file, catalog_file)
+        return profiles_database
+
+    elif args.mass_estimator == 'hse':
+        try:
+            hse_catalogue = pd.read_pickle(f'{calibration_zooms.output_directory}/hse_massbias.pkl')
+        except FileExistsError as error:
+            raise FileExistsError(
+                f"{error}\nPlease, consider first generating the HSE catalogue for better performance."
+            )
+
+        hse_catalogue_names = hse_catalogue['Run name'].values.tolist()
+        print(f"Looking for HSE results in the catalogue - zoom: {zoom.run_name}")
+        if zoom.run_name in hse_catalogue_names:
+            i = hse_catalogue_names.index(zoom.run_name)
+            hse_entry = hse_catalogue.loc[i]
+        else:
+            raise ValueError(f"{zoom.run_name} not found in HSE catalogue. Please, regenerate the catalogue.")
+
+        profiles_database = profile_3d_single_halo(snapshot_file, catalog_file, hse_dataset=hse_entry)
+        return profiles_database
+
+
+def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
+    # kBT200 = (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV')
+    # K200 = (kBT200 / (3 * M200c * obs.cosmic_fbary / (4 * np.pi * R200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+    #     'keV*cm**2')
+    # print('Virial temperature = ', kBT200)
+    #
+    # number_density_gas = data.gas.densities / (mean_molecular_weight * unyt.mass_proton)
+    # number_density_gas = number_density_gas.to('1/cm**3')
+    #
+
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection='scatter_density')
+    ax.loglog()
+
+    # Bin objects by mass
+    m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
+    plot_database = object_database.iloc[np.where(m500crit_log10 > 14)[0]]
+    x = np.empty(0)
+    y = np.empty(0)
+    weights = np.empty(0)
+    for j in range(len(plot_database)):
+        x = np.append(x, plot_database['x'].iloc[j])
+        y = np.append(y, plot_database['y'].iloc[j])
+        weights = np.append(weights, plot_database['weights'].iloc[j])
+
+    # Make the norm object to define the image stretch
+    from astropy.visualization import LogStretch
+    from astropy.visualization.mpl_normalize import ImageNormalize
+    norm = ImageNormalize(vmin=1., vmax=1000, stretch=LogStretch())
+    density = ax.scatter_density(x[x > 0], y[y > 0], c=weights)
+    fig.colorbar(density, label='Number of particles per pixel')
+    # ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.1)
+
+    ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
+    ax.set_ylabel(plot_database.iloc[0]['field_label'])
+    ax.set_xlim([0.05, 2])
+    ax.set_ylim([100, 2000])
+    plt.legend()
+    ax.set_title(
+        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
+        fontsize=5
     )
-
-    H, density_edges, temperature_edges = np.histogram2d(
-        *get_data(filename), bins=[density_bins, temperature_bins]
+    fig.savefig(
+        f'{calibration_zooms.output_directory}/nobins_radial_profiles_{args.redshift_index:04d}.png',
+        dpi=300
     )
-
-    return H.T, density_edges, temperature_edges
-
-
-def setup_axes(number_of_simulations: int):
-    """
-    Creates the figure and axis object. Creates a grid of a x b subplots
-    that add up to at least number_of_simulations.
-    """
-
-    sqrt_number_of_simulations = np.sqrt(number_of_simulations)
-    horizontal_number = int(np.ceil(sqrt_number_of_simulations))
-    # Ensure >= number_of_simulations plots in a grid
-    vertical_number = int(np.ceil(number_of_simulations / horizontal_number))
-
-    fig, ax = plt.subplots(
-        vertical_number, horizontal_number, squeeze=True, sharex=True, sharey=True,
-    )
-
-    ax = np.array([ax]) if number_of_simulations == 1 else ax
-
-    if horizontal_number * vertical_number > number_of_simulations:
-        for axis in ax.flat[number_of_simulations:]:
-            axis.axis("off")
-
-    # Set all valid on bottom row to have the horizontal axis label.
-    for axis in np.atleast_2d(ax)[:][-1]:
-        axis.set_xlabel("Subgrid Density [$n_H$ cm$^{-3}$]")
-
-    for axis in np.atleast_2d(ax).T[:][0]:
-        axis.set_ylabel("Subgrid Temperature [K]")
-
-    ax.flat[0].loglog()
-
-    return fig, ax
-
-
-def make_single_image(
-        filenames,
-        names='',
-        number_of_simulations=1,
-        density_bounds=density_bounds,
-        temperature_bounds=temperature_bounds,
-        bins=bins,
-        output_path='.',
-):
-    """
-    Makes a single plot of rho-T
-    """
-
-    fig, ax = setup_axes(number_of_simulations=number_of_simulations)
-
-    hists = []
-
-    for filename in filenames:
-        hist, d, T = make_hist(filename, density_bounds, temperature_bounds, bins)
-        hists.append(hist)
-
-    vmax = np.max([np.max(hist) for hist in hists])
-
-    for hist, name, axis in zip(hists, names, ax.flat):
-        mappable = axis.pcolormesh(d, T, hist, norm=LogNorm(vmin=1, vmax=vmax))
-        axis.text(0.025, 0.975, name, ha="left", va="top", transform=axis.transAxes)
-
-    fig.colorbar(mappable, ax=ax.ravel().tolist(), label="Number of particles")
-    plt.show()
-    fig.savefig(f"{output_path}/subgrid_density_temperature.png")
-
-    return
+    if not args.quiet:
+        plt.show()
+    plt.close()
 
 
 if __name__ == "__main__":
-    snap_filepath_zoom = "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro/L0300N0564_VR2414_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR2414_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036.hdf5"
-
-    make_single_image(
-        filenames=snap_filepath_zoom
-    )
+    results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
+    plot_radial_profiles_median(results_database, highmass_only=True)
