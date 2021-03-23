@@ -148,7 +148,7 @@ def _process_single_halo(zoom: Zoom):
 def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     fig = plt.figure()
-    ax = fig.add_subplot(1, 1, 1, projection='scatter_density')
+    ax = fig.add_subplot(1, 1, 1)
     ax.loglog()
 
     # Bin objects by mass
