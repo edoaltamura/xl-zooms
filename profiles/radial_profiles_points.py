@@ -172,7 +172,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     norm = ImageNormalize(vmin=1., vmax=1000, stretch=LogStretch())
     density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='inferno')
     fig.colorbar(density, label='Number of particles per pixel')
-    ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.3)
+    ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.1)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
