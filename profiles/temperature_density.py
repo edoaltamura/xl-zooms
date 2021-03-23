@@ -176,7 +176,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     vmax = np.max(H)
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='inferno')
-    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+    # fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
