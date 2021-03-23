@@ -59,9 +59,9 @@ def profile_3d_single_halo(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [(XPotMin - R500) / a, (XPotMin + R500) / a],
-        [(YPotMin - R500) / a, (YPotMin + R500) / a],
-        [(ZPotMin - R500) / a, (ZPotMin + R500) / a]
+        [(XPotMin - R500) * a, (XPotMin + R500) * a],
+        [(YPotMin - R500) * a, (YPotMin + R500) * a],
+        [(ZPotMin - R500) * a, (ZPotMin + R500) * a]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
@@ -72,8 +72,6 @@ def profile_3d_single_halo(
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
-    data.gas.subgrid_physical_densities.convert_to_physical()
-    data.gas.subgrid_temperatures.convert_to_physical()
 
     # Select gas within sphere
     deltaX = data.gas.coordinates[:, 0] - XPotMin
@@ -83,21 +81,15 @@ def profile_3d_single_halo(
     index = np.where(radial_distance < 1)[0]
     del deltaX, deltaY, deltaZ
 
-    # Calculate particle mass and rho_crit
-    rho_crit = unyt.unyt_quantity(
-        data.metadata.cosmology.critical_density(data.metadata.z).value,
-        'g/cm**3'
-    )
-
-    number_density = (data.gas.densities / unyt.mh).to('cm**-3')
-    temperature = (data.gas.temperatures).to('K')
+    number_density = (data.gas.densities[index] / unyt.mh).to('cm**-3')
+    temperature = (data.gas.temperatures[index]).to('K')
 
     agn_flag = data.gas.heated_by_agnfeedback[index]
     snii_flag = data.gas.heated_by_sniifeedback[index]
     agn_flag = agn_flag > 0
     snii_flag = snii_flag > 0
 
-    return number_density[index].value, temperature[index].value, agn_flag, snii_flag, M500, R500
+    return number_density, temperature, agn_flag, snii_flag, M500, R500
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -158,8 +150,11 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
 
     # Set the limits of the figure.
-    density_bounds = [10 ** (-5.), 1e6]  # in nh/cm^3
-    temperature_bounds = [10 ** (3), 10 ** (9.5)]  # in K
+    assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
+    assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
+
+    density_bounds = [x.min(), x.max()]  # in nh/cm^3
+    temperature_bounds = [y.min(), y.max()]  # in K
     bins = 512
 
     # Make the norm object to define the image stretch
@@ -176,7 +171,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     vmax = np.max(H)
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='inferno')
-    # fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
