@@ -6,7 +6,7 @@ Test as:
 import os
 import sys
 import unyt
-import mpl_scatter_density
+from matplotlib.colors import LogNorm
 import numpy as np
 import pandas as pd
 import swiftsimio as sw
@@ -73,15 +73,16 @@ def profile_3d_single_halo(
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
+    data.gas.subgrid_physical_densities.convert_to_physical()
+    data.gas.subgrid_temperatures.convert_to_physical()
 
-    # Select hot gas within sphere
-    tempGas = data.gas.temperatures
+    # Select gas within sphere
     deltaX = data.gas.coordinates[:, 0] - XPotMin
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
     radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
-    index = np.where((radial_distance < 2) & (tempGas > 1e5))[0]
-    del tempGas, deltaX, deltaY, deltaZ
+    index = np.where(radial_distance < 1)[0]
+    del deltaX, deltaY, deltaZ
 
     # Calculate particle mass and rho_crit
     rho_crit = unyt.unyt_quantity(
@@ -89,22 +90,28 @@ def profile_3d_single_halo(
         'g/cm**3'
     )
 
-    mass_weighted_temperatures = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
-    number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
-    entropies = mass_weighted_temperatures / number_densities ** (2 / 3)
+    try:
+        number_density = (data.gas.subgrid_physical_densities / unyt.mh).to('cm**-3')
+        temperature = (data.gas.subgrid_temperatures * unyt.boltzmann_constant).to('keV')
+    except:
+        # No sub-grid quantities present. Still make the figure, but use non-subgrid.
+        number_density = (data.gas.densities / unyt.mh).to('cm**-3')
+        temperature = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
 
-    x = number_densities[index]
-    y = mass_weighted_temperatures[index]
-    weights = entropies[index]
+    agn_flag = data.gas.heated_by_agn_feedback[index]
+    snii_flag = data.gas.heated_by_snii_feedback[index]
+    agn_flag = agn_flag > 0
+    snii_flag = snii_flag > 0
 
-    return x, y, weights, M500, R500
+    return number_density[index].value, temperature[index].value, agn_flag, snii_flag, M500, R500
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
     'x',
     'y',
-    'weights',
+    'agn_flag',
+    'snii_flag',
     'M500',
     'R500'
 ])
@@ -138,15 +145,7 @@ def _process_single_halo(zoom: Zoom):
         return profiles_database
 
 
-def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
-    # kBT200 = (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV')
-    # K200 = (kBT200 / (3 * M200c * obs.cosmic_fbary / (4 * np.pi * R200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
-    #     'keV*cm**2')
-    # print('Virial temperature = ', kBT200)
-    #
-    # number_density_gas = data.gas.densities / (mean_molecular_weight * unyt.mass_proton)
-    # number_density_gas = number_density_gas.to('1/cm**3')
-    #
+def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     fig = plt.figure()
     ax = fig.add_subplot(1, 1, 1, projection='scatter_density')
@@ -157,22 +156,39 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     plot_database = object_database.iloc[np.where(m500crit_log10 > 14)[0]]
     x = np.empty(0)
     y = np.empty(0)
-    weights = np.empty(0)
+    agn_flag = np.empty(0)
+    snii_flag = np.empty(0)
     for j in range(len(plot_database)):
         x = np.append(x, plot_database['x'].iloc[j])
         y = np.append(y, plot_database['y'].iloc[j])
-        weights = np.append(weights, plot_database['weights'].iloc[j])
+        agn_flag = np.append(agn_flag, plot_database['agn_flag'].iloc[j])
+        snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
+
+    # Set the limits of the figure.
+    density_bounds = [10 ** (-9.5), 1e6]  # in nh/cm^3
+    temperature_bounds = [10 ** (0.5), 10 ** (9.5)]  # in K
+    bins = 256
 
     # Make the norm object to define the image stretch
-    from astropy.visualization import LogStretch
-    from astropy.visualization.mpl_normalize import ImageNormalize
-    norm = ImageNormalize(vmin=1., vmax=1000, stretch=LogStretch())
-    density = ax.scatter_density(x[x > 0], y[y > 0], cmap='inferno')
-    fig.colorbar(density, label='Number of particles per pixel')
-    # ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.1)
+    density_bins = np.logspace(
+        np.log10(density_bounds[0]), np.log10(density_bounds[1]), bins
+    )
+    temperature_bins = np.logspace(
+        np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
+    )
 
-    ax.set_xlabel(r'$n_{\rm H}$ [cm$^{-3}$]')
-    ax.set_ylabel('Temperature [KeV]')
+    H, density_edges, temperature_edges = np.histogram2d(
+        x, y, bins=[density_bins, temperature_bins]
+    )
+
+    vmax = np.max(H)
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax))
+    fig.colorbar(mappable, ax=ax, label="Number of particles")
+    ax.plot(x[agn_flag], y[agn_flag], marker=',', lw=0, linestyle="", c='r', alpha=1)
+    ax.plot(x[snii_flag], y[snii_flag], marker=',', lw=0, linestyle="", c='lime', alpha=1)
+
+    ax.set_xlabel(r"Subgrid Density [$n_H$ cm$^{-3}$]")
+    ax.set_ylabel(r"Subgrid Temperature [keV]")
 
     plt.legend()
     ax.set_title(
@@ -180,7 +196,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         fontsize=5
     )
     fig.savefig(
-        f'{calibration_zooms.output_directory}/nobins_radial_profiles_{args.redshift_index:04d}.png',
+        f'{calibration_zooms.output_directory}/subgrid_density_temperature_{args.redshift_index:04d}.png',
         dpi=300
     )
     if not args.quiet:
@@ -190,4 +206,4 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
 
 if __name__ == "__main__":
     results_database = utils.process_catalogue(_process_single_halo, find_keyword=args.keywords)
-    plot_radial_profiles_median(results_database, highmass_only=True)
+    plot_radial_profiles_median(results_database)
