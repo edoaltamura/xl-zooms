@@ -156,8 +156,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     plot_database = object_database.iloc[np.where(m500crit_log10 > 14)[0]]
     x = np.empty(0)
     y = np.empty(0)
-    agn_flag = np.empty(0)
-    snii_flag = np.empty(0)
+    agn_flag = np.empty(0, dtype=np.bool)
+    snii_flag = np.empty(0, dtype=np.bool)
     for j in range(len(plot_database)):
         x = np.append(x, plot_database['x'].iloc[j])
         y = np.append(y, plot_database['y'].iloc[j])
