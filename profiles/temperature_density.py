@@ -81,8 +81,8 @@ def profile_3d_single_halo(
     index = np.where(radial_distance < 1)[0]
     del deltaX, deltaY, deltaZ
 
-    number_density = (data.gas.densities / unyt.mh).to('cm**-3')[index]
-    temperature = (data.gas.temperatures).to('K')[index]
+    number_density = (data.gas.densities / unyt.mh).to('cm**-3').value[index]
+    temperature = (data.gas.temperatures).to('K').value[index]
 
     agn_flag = data.gas.heated_by_agnfeedback[index]
     snii_flag = data.gas.heated_by_sniifeedback[index]
