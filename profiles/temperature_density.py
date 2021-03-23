@@ -221,9 +221,16 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
     label_pos = []
+    log_rho = 5
+    i = 0
     for line in CS.collections:
         for path in line.get_paths():
             logvert = np.log10(path.vertices)
+
+            # Align with same x-value
+            logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+            i += 1
+
             # find closest point
             logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
             min_ind = np.argmin(logdist)
@@ -238,7 +245,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         colors='aqua',
         fontsize=5,
         fmt=fmt,
-        # manual=label_pos
+        manual=label_pos
     )
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
