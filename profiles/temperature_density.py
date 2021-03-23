@@ -204,9 +204,16 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
-    levels = [10 ** k for k in range(-3, 4)]
+    levels = [10 ** k for k in range(-4, 4)]
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
-    CS = plt.contour(density_interps, temperature_interps, entropy_interps, levels, colors='grey', linewidths=1)
+    CS = plt.contour(
+        density_interps,
+        temperature_interps,
+        entropy_interps,
+        levels,
+        colors='blue',
+        linewidths=0.5
+    )
 
     # work with logarithms for loglog scale
     # middle of the figure:
@@ -217,14 +224,22 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     for line in CS.collections:
         for path in line.get_paths():
             logvert = np.log10(path.vertices)
-
             # find closest point
             logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
             min_ind = np.argmin(logdist)
             label_pos.append(10 ** logvert[min_ind, :])
 
     # Draw contour labels
-    plt.clabel(CS, inline=True, inline_spacing=3, rightside_up=True, colors='grey', fontsize=5, fmt=fmt, manual=label_pos)
+    plt.clabel(
+        CS,
+        inline=True,
+        inline_spacing=3,
+        rightside_up=True,
+        colors='blue',
+        fontsize=5,
+        fmt=fmt,
+        manual=label_pos
+    )
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Temperature [K]")
