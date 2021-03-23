@@ -182,9 +182,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ydat1 = field[ind][hhsub < thresh]
     hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
 
-    im = ax.imshow(np.flipud(hh.T), cmap='copper', interpolation='none', origin='upper')
-    cax = fig.add_axes([0.9, 0.5, 1., 0.05])
-    fig.colorbar(im, cax=cax, orientation='vertical')
+    ax.imshow(hh.T, cmap='copper', interpolation='none', origin='lower')
+    plt.colorbar()
     ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
 
     # Display observational data
