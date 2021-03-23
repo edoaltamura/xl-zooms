@@ -25,7 +25,6 @@ sys.path.append("../zooms")
 
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 from auto_parser import args
-import observational_data as obs
 import scaling_utils as utils
 
 # Constants
@@ -168,7 +167,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     # Set the limits of the figure.
     density_bounds = [10 ** (-9.5), 1e6]  # in nh/cm^3
     temperature_bounds = [10 ** (0.5), 10 ** (9.5)]  # in K
-    bins = 256
+    bins = 512
 
     # Make the norm object to define the image stretch
     density_bins = np.logspace(
@@ -183,10 +182,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
 
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax))
-    fig.colorbar(mappable, ax=ax, label="Number of particles")
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='inferno')
+    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+    ax.plot(x[snii_flag], y[snii_flag], marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
     ax.plot(x[agn_flag], y[agn_flag], marker=',', lw=0, linestyle="", c='r', alpha=1)
-    ax.plot(x[snii_flag], y[snii_flag], marker=',', lw=0, linestyle="", c='lime', alpha=0.2)
 
     ax.set_xlabel(r"Subgrid Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Subgrid Temperature [K]")
