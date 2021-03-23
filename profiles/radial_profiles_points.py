@@ -153,7 +153,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # number_density_gas = number_density_gas.to('1/cm**3')
     #
 
-    fig, ax = plt.subplots(projection='scatter_density')
+    fig = plt.figure()
+    ax = fig.add_subplot(1, 1, 1, projection='scatter_density')
     ax.loglog()
 
     # Bin objects by mass
