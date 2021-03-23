@@ -6,7 +6,7 @@ Test as:
 import os
 import sys
 import unyt
-import h5py as h5
+import mpl_scatter_density
 import numpy as np
 import pandas as pd
 import swiftsimio as sw
@@ -23,13 +23,10 @@ sys.path.append("../observational_data")
 sys.path.append("../scaling_relations")
 sys.path.append("../zooms")
 
-import mpl_scatter_density
-
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 from auto_parser import args
 import observational_data as obs
 import scaling_utils as utils
-from convergence_radius import convergence_radius
 
 # Constants
 mean_molecular_weight = 0.59
@@ -99,16 +96,18 @@ def profile_3d_single_halo(
     field_label = r'$K$ [keV cm$^2$]'
     radial_distance = radial_distance[index]
     field_value = field_value[index]
-    field_masses = data.gas.masses[index]
+    field_weight1 = data.gas.temperatures[index]
+    field_weight2 = number_densities[index]
 
-    return radial_distance, field_value, field_masses, field_label, M500, R500
+    return radial_distance, field_value, field_weight1, field_weight2, field_label, M500, R500
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
     'radial_distance',
     'field_value',
-    'field_masses',
+    'field_weight1',
+    'field_weight2',
     'field_label',
     'M500',
     'R500'
@@ -163,8 +162,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     radius = np.empty(0)
     field = np.empty(0)
     for j in range(len(plot_database)):
-        radius = np.append(radius, plot_database['radial_distance'].iloc[j])
-        field = np.append(field, plot_database['field_value'].iloc[j])
+        radius = np.append(radius, plot_database['field_weight1'].iloc[j])
+        field = np.append(field, plot_database['field_weight2'].iloc[j])
 
     # Make the norm object to define the image stretch
     from astropy.visualization import LogStretch
@@ -175,30 +174,30 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.1)
 
     # Display observational data
-    observations_color = (0.65, 0.65, 0.65)
-
-    # Observational data
-    pratt10 = obs.Pratt10()
-    bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
-        m500_limits=(
-            1e14 * unyt.Solar_Mass,
-            1e15 * unyt.Solar_Mass,
-        ),
-        k500_rescale=False
-    )
-    plt.fill_between(
-        pratt10.radial_bins,
-        bin_perc16,
-        bin_perc84,
-        color=observations_color,
-        alpha=0.8,
-        linewidth=0
-    )
-    plt.plot(
-        pratt10.radial_bins, bin_median, c='k',
-        label=f"{pratt10.citation:s}"
-    )
-    del pratt10
+    # observations_color = (0.65, 0.65, 0.65)
+    #
+    # # Observational data
+    # pratt10 = obs.Pratt10()
+    # bin_median, bin_perc16, bin_perc84 = pratt10.combine_entropy_profiles(
+    #     m500_limits=(
+    #         1e14 * unyt.Solar_Mass,
+    #         1e15 * unyt.Solar_Mass,
+    #     ),
+    #     k500_rescale=False
+    # )
+    # plt.fill_between(
+    #     pratt10.radial_bins,
+    #     bin_perc16,
+    #     bin_perc84,
+    #     color=observations_color,
+    #     alpha=0.8,
+    #     linewidth=0
+    # )
+    # plt.plot(
+    #     pratt10.radial_bins, bin_median, c='k',
+    #     label=f"{pratt10.citation:s}"
+    # )
+    # del pratt10
 
     ax.set_xlabel(f'$R/R_{{500,{args.mass_estimator}}}$')
     ax.set_ylabel(plot_database.iloc[0]['field_label'])
