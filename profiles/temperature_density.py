@@ -190,7 +190,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
     x_scatter = x[snii_flag][ind][hhsub < 5]  # low density points
     y_scatter = y[snii_flag][ind][hhsub < 5]
-    H[H < 30] = np.nan  # fill the areas with low density by NaNs
+    H[H < 5] = np.nan  # fill the areas with low density by NaNs
     ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
     plt.contour(H.T, extent=[*density_bounds, *temperature_bounds],
                 linewidths=1, color='lime', levels=[20, 200, 500])
@@ -205,7 +205,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
     x_scatter = x[agn_flag][ind][hhsub < 5]  # low density points
     y_scatter = y[agn_flag][ind][hhsub < 5]
-    H[H < 30] = np.nan  # fill the areas with low density by NaNs
+    H[H < 5] = np.nan  # fill the areas with low density by NaNs
 
     ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='red', alpha=0.1)
     plt.contour(H.T, extent=[*density_bounds, *temperature_bounds],
