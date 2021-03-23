@@ -59,9 +59,9 @@ def profile_3d_single_halo(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [(XPotMin - R500), (XPotMin + R500)],
-        [(YPotMin - R500), (YPotMin + R500)],
-        [(ZPotMin - R500), (ZPotMin + R500)]
+        [(XPotMin - R500) / a, (XPotMin + R500) / a],
+        [(YPotMin - R500) / a, (YPotMin + R500) / a],
+        [(ZPotMin - R500) / a, (ZPotMin + R500) / a]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
