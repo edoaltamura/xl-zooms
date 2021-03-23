@@ -166,7 +166,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         radius = np.append(radius, plot_database['radial_distance'].iloc[j])
         field = np.append(field, plot_database['field_value'].iloc[j])
     from matplotlib.colors import LogNorm
-    density = ax.scatter_density(radius, field, cmap='Greys_r', norm=LogNorm())
+    density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='Greys_r', norm=LogNorm(vmin=1))
     fig.colorbar(density, label='Number of points per pixel')
 
     # # histogram definition
