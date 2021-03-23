@@ -94,7 +94,7 @@ def profile_3d_single_halo(
     entropies = mass_weighted_temperatures / number_densities ** (2 / 3)
 
     x = number_densities[index]
-    y = data.gas.temperature[index]
+    y = mass_weighted_temperatures[index]
     weights = entropies[index]
 
     return x, y, weights, M500, R500
@@ -172,7 +172,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.1)
 
     ax.set_xlabel('$n_{\rm H}$ [cm$^{-3}$]')
-    ax.set_xlabel('Temperature [K]')
+    ax.set_xlabel('Temperature [KeV]')
 
     plt.legend()
     ax.set_title(
