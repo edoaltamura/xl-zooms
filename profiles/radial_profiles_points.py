@@ -165,8 +165,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     for j in range(len(plot_database)):
         radius = np.append(radius, plot_database['radial_distance'].iloc[j])
         field = np.append(field, plot_database['field_value'].iloc[j])
-
-    density = ax.scatter_density(radius, field)
+    from matplotlib.colors import LogNorm
+    density = ax.scatter_density(radius, field, cmap='Greys_r', norm=LogNorm(vmin=1))
     fig.colorbar(density, label='Number of points per pixel')
 
     # # histogram definition
@@ -187,7 +187,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # xdat1 = radius[ind][hhsub < thresh]  # low density points
     # ydat1 = field[ind][hhsub < thresh]
     # hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
-    # from matplotlib.colors import LogNorm
+    #
     # im = ax.imshow(hh.T, cmap='cividis', interpolation='none', origin='lower', extent=[0.01, 2, 10, 2000], norm=LogNorm())
     # fig.colorbar(im)
     # ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
