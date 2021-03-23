@@ -165,9 +165,15 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     for j in range(len(plot_database)):
         radius = np.append(radius, plot_database['radial_distance'].iloc[j])
         field = np.append(field, plot_database['field_value'].iloc[j])
-    from matplotlib.colors import LogNorm
-    density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='Greys_r')
+
+    # Make the norm object to define the image stretch
+    from astropy.visualization import LogStretch
+    from astropy.visualization.mpl_normalize import ImageNormalize
+    norm = ImageNormalize(vmin=1., vmax=1000, stretch=LogStretch())
+    density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='Greys_r', norm=norm)
     fig.colorbar(density, label='Number of points per pixel')
+
+    ax.plot(radius[::50], field[::50], marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
 
     # # histogram definition
     # xyrange = [[0.01, 2], [10, 2000]]  # data range
@@ -190,7 +196,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     #
     # im = ax.imshow(hh.T, cmap='cividis', interpolation='none', origin='lower', extent=[0.01, 2, 10, 2000], norm=LogNorm())
     # fig.colorbar(im)
-    # ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
+    #
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
