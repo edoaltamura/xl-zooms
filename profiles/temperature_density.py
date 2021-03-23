@@ -98,8 +98,8 @@ def profile_3d_single_halo(
         number_density = (data.gas.densities / unyt.mh).to('cm**-3')
         temperature = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
 
-    agn_flag = data.gas.heated_by_agn_feedback[index]
-    snii_flag = data.gas.heated_by_snii_feedback[index]
+    agn_flag = data.gas.heated_by_agnfeedback[index]
+    snii_flag = data.gas.heated_by_sniifeedback[index]
     agn_flag = agn_flag > 0
     snii_flag = snii_flag > 0
 
