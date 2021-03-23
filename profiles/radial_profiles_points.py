@@ -170,9 +170,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     from astropy.visualization import LogStretch
     from astropy.visualization.mpl_normalize import ImageNormalize
     norm = ImageNormalize(vmin=1., vmax=1000, stretch=LogStretch())
-    density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='Greys_r', norm=norm)
-    fig.colorbar(density, label='Number of points per pixel')
-
+    density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='inferno')
+    fig.colorbar(density, label='Number of particles per pixel')
     ax.plot(radius[::50], field[::50], marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
 
     # # histogram definition
