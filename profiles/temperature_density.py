@@ -188,7 +188,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     posy = np.digitize(y[snii_flag], temperature_edges)
 
     # select points within the histogram
-    ind = (posx > 0) & (posx <= bins[0]) & (posy > 0) & (posy <= bins[1])
+    ind = (posx > 0) & (posx <= bins) & (posy > 0) & (posy <= bins)
     hhsub = H[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
     x_scatter = x[snii_flag][ind][hhsub < 30]  # low density points
     y_scatter = y[snii_flag][ind][hhsub < 30]
