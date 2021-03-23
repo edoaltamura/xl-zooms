@@ -1,6 +1,8 @@
 import argparse
 import matplotlib.pyplot as plt
 from register import calibration_zooms
+import matplotlib
+matplotlib.use('TKAgg')
 
 parser = argparse.ArgumentParser()
 
