@@ -172,30 +172,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     norm = ImageNormalize(vmin=1., vmax=1000, stretch=LogStretch())
     density = ax.scatter_density(radius[radius > 0], field[field > 0], cmap='inferno')
     fig.colorbar(density, label='Number of particles per pixel')
-    ax.plot(radius[::50], field[::50], marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
-
-    # # histogram definition
-    # xyrange = [[0.01, 2], [10, 2000]]  # data range
-    # bins = [100, 100]  # number of bins
-    # thresh = 50  # density threshold
-    #
-    # # histogram the data
-    # xbins = np.logspace(np.log10(0.1), np.log10(2), bins[0] + 1)
-    # ybins = np.logspace(np.log10(10), np.log10(2000), bins[1] + 1)
-    # hh, locx, locy = np.histogram2d(radius, field, bins=(xbins, ybins))
-    # posx = np.digitize(radius, locx)
-    # posy = np.digitize(field, locy)
-    #
-    # # select points within the histogram
-    # ind = (posx > 0) & (posx <= bins[0]) & (posy > 0) & (posy <= bins[1])
-    # hhsub = hh[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
-    # xdat1 = radius[ind][hhsub < thresh]  # low density points
-    # ydat1 = field[ind][hhsub < thresh]
-    # hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
-    #
-    # im = ax.imshow(hh.T, cmap='cividis', interpolation='none', origin='lower', extent=[0.01, 2, 10, 2000], norm=LogNorm())
-    # fig.colorbar(im)
-    #
+    ax.plot(radius[::20], field[::20], marker=',', lw=0, linestyle="", c='w', alpha=0.3)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
