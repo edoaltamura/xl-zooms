@@ -89,13 +89,9 @@ def profile_3d_single_halo(
         'g/cm**3'
     )
 
-    try:
-        number_density = (data.gas.subgrid_physical_densities / unyt.mh).to('cm**-3')
-        temperature = (data.gas.subgrid_temperatures).to('K')
-    except:
-        # No sub-grid quantities present. Still make the figure, but use non-subgrid.
-        number_density = (data.gas.densities / unyt.mh).to('cm**-3')
-        temperature = (data.gas.temperatures).to('K')
+
+    number_density = (data.gas.densities / unyt.mh).to('cm**-3')
+    temperature = (data.gas.temperatures).to('K')
 
     agn_flag = data.gas.heated_by_agnfeedback[index]
     snii_flag = data.gas.heated_by_sniifeedback[index]
@@ -184,28 +180,20 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='inferno')
     fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
 
-    # perform kernel density estimate
-    threshold = 0.1
-    from scipy.stats import gaussian_kde
-    points = np.vstack([x[snii_flag], y[snii_flag]])
-    kde = gaussian_kde(points)
-    z = kde(points)
+    H, density_edges, temperature_edges = np.histogram2d(
+        x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
+    )
     # mask points above density threshold
-    x_scatter = np.ma.masked_where(z > threshold, x[snii_flag])
-    y_scatter = np.ma.masked_where(z > threshold, y[snii_flag])
+    x_scatter = np.ma.masked_where(H.T > 20, x[snii_flag])
+    y_scatter = np.ma.masked_where(H.T > 20, y[snii_flag])
     ax.plot(x_scatter, y_scatter, marker=',', lw=0, linestyle="", c='lime', alpha=0.1)
-
-    xx, yy = np.meshgrid(density_edges, temperature_edges)
-    gridpoints = np.array([xx.ravel(), yy.ravel()])
-
-    # compute density map
-    zz = np.reshape(kde(gridpoints), xx.shape)
-    cs = ax.contour(xx, yy, zz, levels=[threshold], colors='lime')
+    plt.contour(H.T, extent=[*density_bounds, *temperature_bounds],
+                linewidths=1, color='lime', levels=[20, 200, 500])
 
     ax.plot(x[agn_flag], y[agn_flag], marker=',', lw=0, linestyle="", c='r', alpha=1)
 
-    ax.set_xlabel(r"Subgrid Density [$n_H$ cm$^{-3}$]")
-    ax.set_ylabel(r"Subgrid Temperature [K]")
+    ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
+    ax.set_ylabel(r"Temperature [K]")
 
     plt.legend()
     ax.set_title(
