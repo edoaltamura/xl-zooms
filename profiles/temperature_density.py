@@ -203,14 +203,15 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     density_interps /= unyt.cm ** 3
     temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = (temperature_interps / density_interps ** (2 / 3)).to('keV*cm**2').value
-    levels = [0.5 * 10 ** k for k in range(0, 6)]
+
+    # Define entropy levels to plot
+    levels = [10 ** k for k in range(0, 6)]
     fmt = {value: f'$10^{{{latex_float(value)}}}$ keV cm$^2$' for value in levels}
     CS = plt.contour(density_interps, temperature_interps, entropy_interps, levels, colors='k')
 
-    # get limits if they're automatic
-    xmin, xmax, ymin, ymax = plt.axis()
     # work with logarithms for loglog scale
     # middle of the figure:
+    xmin, xmax, ymin, ymax = plt.axis()
     logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
     label_pos = []
@@ -223,7 +224,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
             min_ind = np.argmin(logdist)
             label_pos.append(10 ** logvert[min_ind, :])
 
-    # draw labels, hope for the best
+    # Draw contour labels
     plt.clabel(CS, inline=True, inline_spacing=3, rightside_up=True, colors='k', fontsize=8, fmt=fmt, manual=label_pos)
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
