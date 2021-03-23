@@ -221,13 +221,17 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
     label_pos = []
-    log_rho = 5
     i = 0
     for line in CS.collections:
         for path in line.get_paths():
             logvert = np.log10(path.vertices)
 
             # Align with same x-value
+            if levels[i] > 1:
+                log_rho = -4
+            else:
+                log_rho = 16
+
             logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
             i += 1
 
