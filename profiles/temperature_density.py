@@ -200,13 +200,12 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # Draw equi-entropy lines
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    density_interps /= unyt.cm ** 3
-    temperature_interps *= unyt.K * unyt.boltzmann_constant
-    entropy_interps = (temperature_interps / density_interps ** (2 / 3)).to('keV*cm**2').value
+    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps / unyt.cm ** 3) ** (2 / 3)
+    entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
-    levels = [10 ** k for k in range(0, 6)]
-    fmt = {value: f'$10^{{{latex_float(value)}}}$ keV cm$^2$' for value in levels}
+    levels = [10 ** k for k in range(-3, 4)]
+    fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
     CS = plt.contour(density_interps, temperature_interps, entropy_interps, levels, colors='k')
 
     # work with logarithms for loglog scale
