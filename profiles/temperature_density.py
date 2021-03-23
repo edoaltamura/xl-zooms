@@ -149,8 +149,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         agn_flag = np.append(agn_flag, plot_database['agn_flag'].iloc[j])
         snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
 
-    print(x, y)
-
     # Set the limits of the figure.
     assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
     assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
@@ -179,23 +177,24 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.4)
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r',
+                             alpha=0.4)
     fig.colorbar(mappable, ax=ax, label="SNe")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.4)
+    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r',
+                             alpha=0.4)
     fig.colorbar(mappable, ax=ax, label="AGN")
 
     # Draw equi-entropy lines
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps * unyt.cm) ** (2 / 3)
+    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps * unyt.cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
     CS = plt.contour(density_interps, entropy_interps, entropy_interps, 6, colors='k')
     plt.clabel(CS, fontsize=9, inline=1)
-
 
     ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
     ax.set_ylabel(r"Temperature [K]")
