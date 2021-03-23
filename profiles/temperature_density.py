@@ -81,8 +81,8 @@ def profile_3d_single_halo(
     index = np.where(radial_distance < 1)[0]
     del deltaX, deltaY, deltaZ
 
-    number_density = (data.gas.densities / unyt.mh).to('cm**-3').value[index]
-    temperature = (data.gas.temperatures).to('K').value[index]
+    number_density = (data.gas.densities / unyt.mh).to('cm**-3')[index]
+    temperature = (data.gas.temperatures).to('K')[index]
 
     agn_flag = data.gas.heated_by_agnfeedback[index]
     snii_flag = data.gas.heated_by_sniifeedback[index]
@@ -148,6 +148,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         y = np.append(y, plot_database['y'].iloc[j])
         agn_flag = np.append(agn_flag, plot_database['agn_flag'].iloc[j])
         snii_flag = np.append(snii_flag, plot_database['snii_flag'].iloc[j])
+
+    print(x, y)
 
     # Set the limits of the figure.
     assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
