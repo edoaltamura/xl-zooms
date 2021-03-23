@@ -22,6 +22,9 @@ except:
 sys.path.append("../observational_data")
 sys.path.append("../scaling_relations")
 sys.path.append("../zooms")
+sys.path.append("~/mpl-scatter-density")
+
+import mpl_scatter_density
 
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 from auto_parser import args
@@ -151,7 +154,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
     # number_density_gas = number_density_gas.to('1/cm**3')
     #
 
-    fig, ax = plt.subplots()
+    fig, ax = plt.subplots(projection='scatter_density')
     ax.loglog()
 
     # Bin objects by mass
@@ -163,28 +166,31 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
         radius = np.append(radius, plot_database['radial_distance'].iloc[j])
         field = np.append(field, plot_database['field_value'].iloc[j])
 
-    # histogram definition
-    xyrange = [[0.01, 2], [10, 2000]]  # data range
-    bins = [100, 100]  # number of bins
-    thresh = 50  # density threshold
+    density = ax.scatter_density(radius, field)
+    fig.colorbar(density, label='Number of points per pixel')
 
-    # histogram the data
-    xbins = np.logspace(np.log10(0.1), np.log10(2), bins[0] + 1)
-    ybins = np.logspace(np.log10(10), np.log10(2000), bins[1] + 1)
-    hh, locx, locy = np.histogram2d(radius, field, bins=(xbins, ybins))
-    posx = np.digitize(radius, locx)
-    posy = np.digitize(field, locy)
-
-    # select points within the histogram
-    ind = (posx > 0) & (posx <= bins[0]) & (posy > 0) & (posy <= bins[1])
-    hhsub = hh[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
-    xdat1 = radius[ind][hhsub < thresh]  # low density points
-    ydat1 = field[ind][hhsub < thresh]
-    hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
-    from matplotlib.colors import LogNorm
-    im = ax.imshow(hh.T, cmap='cividis', interpolation='none', origin='lower', extent=[0.01, 2, 10, 2000], norm=LogNorm())
-    fig.colorbar(im)
-    ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
+    # # histogram definition
+    # xyrange = [[0.01, 2], [10, 2000]]  # data range
+    # bins = [100, 100]  # number of bins
+    # thresh = 50  # density threshold
+    #
+    # # histogram the data
+    # xbins = np.logspace(np.log10(0.1), np.log10(2), bins[0] + 1)
+    # ybins = np.logspace(np.log10(10), np.log10(2000), bins[1] + 1)
+    # hh, locx, locy = np.histogram2d(radius, field, bins=(xbins, ybins))
+    # posx = np.digitize(radius, locx)
+    # posy = np.digitize(field, locy)
+    #
+    # # select points within the histogram
+    # ind = (posx > 0) & (posx <= bins[0]) & (posy > 0) & (posy <= bins[1])
+    # hhsub = hh[posx[ind] - 1, posy[ind] - 1]  # values of the histogram where the points are
+    # xdat1 = radius[ind][hhsub < thresh]  # low density points
+    # ydat1 = field[ind][hhsub < thresh]
+    # hh[hh < thresh] = np.nan  # fill the areas with low density by NaNs
+    # from matplotlib.colors import LogNorm
+    # im = ax.imshow(hh.T, cmap='cividis', interpolation='none', origin='lower', extent=[0.01, 2, 10, 2000], norm=LogNorm())
+    # fig.colorbar(im)
+    # ax.plot(xdat1, ydat1, marker=',', lw=0, linestyle="", c='darkblue', alpha=0.9)
 
     # Display observational data
     observations_color = (0.65, 0.65, 0.65)
@@ -196,7 +202,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bo
             1e14 * unyt.Solar_Mass,
             1e15 * unyt.Solar_Mass,
         ),
-        k500_rescale=True
+        k500_rescale=False
     )
     plt.fill_between(
         pratt10.radial_bins,
