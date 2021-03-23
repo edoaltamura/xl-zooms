@@ -22,7 +22,7 @@ except:
 sys.path.append("../observational_data")
 sys.path.append("../scaling_relations")
 sys.path.append("../zooms")
-sys.path.append("~/mpl-scatter-density")
+sys.path.append("~/mpl-scatter-density/mpl-scatter-density")
 
 import mpl_scatter_density
 
