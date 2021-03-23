@@ -2,7 +2,7 @@ import argparse
 import matplotlib.pyplot as plt
 from register import calibration_zooms
 import matplotlib
-matplotlib.use('TKAgg')
+matplotlib.use('Qt5Agg')
 
 parser = argparse.ArgumentParser()
 
