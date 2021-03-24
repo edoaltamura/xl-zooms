@@ -24,10 +24,21 @@ sys.path.append("../scaling_relations")
 sys.path.append("../zooms")
 
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
-from auto_parser import args
+from auto_parser import args, parser
 import scaling_utils as utils
 
+parser.add_argument(
+    '-a',
+    '--aperture-percent',
+    type=int,
+    default=100,
+    required=False,
+    choices=list(range(5, 300))
+)
+args = parser.parse_args()
+
 # Constants
+aperture_fraction = args.aperture_percent / 100
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
@@ -59,9 +70,9 @@ def profile_3d_single_halo(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [(XPotMin - R500) / a, (XPotMin + R500) / a],
-        [(YPotMin - R500) / a, (YPotMin + R500) / a],
-        [(ZPotMin - R500) / a, (ZPotMin + R500) / a]
+        [(XPotMin - aperture_fraction * R500) / a, (XPotMin + aperture_fraction * R500) / a],
+        [(YPotMin - aperture_fraction * R500) / a, (YPotMin + aperture_fraction * R500) / a],
+        [(ZPotMin - aperture_fraction * R500) / a, (ZPotMin + aperture_fraction * R500) / a]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
@@ -78,7 +89,7 @@ def profile_3d_single_halo(
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
     radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
-    index = np.where(radial_distance < 1)[0]
+    index = np.where(radial_distance < aperture_fraction)[0]
     del deltaX, deltaY, deltaZ
 
     number_density = (data.gas.densities / unyt.mh).to('cm**-3').value[index]
@@ -202,7 +213,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # Draw equi-entropy lines
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps / unyt.cm ** 3) ** (2 / 3)
+    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps / unyt.cm ** 3) ** (
+                2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
@@ -219,8 +231,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # work with logarithms for loglog scale
     # middle of the figure:
-    xmin, xmax, ymin, ymax = plt.axis()
-    logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+    # xmin, xmax, ymin, ymax = plt.axis()
+    # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
     label_pos = []
     i = 0
@@ -259,7 +271,11 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     plt.legend()
     ax.set_title(
-        f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\t{''.join(args.keywords)}",
+        (
+            f"Aperture = {aperture_fraction:.2f} $R_{{500}}$ |"
+            f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
+            f"{''.join(args.keywords)}"
+        ),
         fontsize=5
     )
     if not args.quiet:
