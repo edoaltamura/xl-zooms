@@ -176,7 +176,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
     density_bounds = [1e-6, 1e4]  # in nh/cm^3
-    temperature_bounds = [1e3, 10 ** (9.5)]  # in K
+    temperature_bounds = [1e3, 1e10]  # in K
     bins = 256
 
     # Make the norm object to define the image stretch
@@ -192,24 +192,31 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
 
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r')
+    mappable = ax.pcolormesh(
+        density_edges, temperature_edges, H.T,
+        norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
+    )
     fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r',
-                             alpha=0.4)
-    fig.colorbar(mappable, ax=ax, label="SNe")
+    mappable = ax.pcolormesh(
+        density_edges, temperature_edges, H.T,
+        norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
+    )
+    fig.colorbar(mappable, ax=ax, label="Number of SNe heated particles")
 
     H, density_edges, temperature_edges = np.histogram2d(
         x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax.pcolormesh(density_edges, temperature_edges, H.T, norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r',
-                             alpha=0.4)
-    fig.colorbar(mappable, ax=ax, label="AGN")
+    mappable = ax.pcolormesh(
+        density_edges, temperature_edges, H.T,
+        norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
+    )
+    fig.colorbar(mappable, ax=ax, label="Number of AGN heated particles")
 
     # Draw equi-entropy lines
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
@@ -272,7 +279,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     plt.legend()
     ax.set_title(
         (
-            f"Aperture = {aperture_fraction:.2f} $R_{{500}}$ |"
+            f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
             f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
             f"{''.join(args.keywords)}"
         ),
