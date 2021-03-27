@@ -726,13 +726,13 @@ done
 
 for i in {15..36}
 do
-   python3 temperature_density.py -k VR18_-8res_MinimumDistance_fixedAGNdT8.5_ -m true -r $i
+   python3 temperature_density.py -k VR18_-8res_MinimumDistance_fixedAGNdT8.5_ -m true -r $i -a 100 -q
 done
 
 ffmpeg \
     -framerate 2 \
     -start_number 20 \
-    -i f500true_hotgas_%02d.png \
+    -i subgrid_density_temperature_%04d.png \
     -vf scale=-2:1080,format=yuv420p \
     -c:v libx264 \
     -profile:v high \
@@ -741,10 +741,15 @@ ffmpeg \
     -b:a 192k \
     -movflags faststart \
     -crf 16 \
-    f500true_hotgas.mp4
+    density_temperature_VR18_-8res_MinimumDistance_fixedAGNdT8p5.mp4
 
 
-
+ffmpeg \
+    -framerate 2 \
+    -start_number 15 \
+    -i subgrid_density_temperature_%04d.png \
+    -vf scale=-2:1080,format=yuv420p \
+    density_temperature_VR18_-8res_MinimumDistance_fixedAGNdT8p5.mp4
 
 
 
