@@ -68,10 +68,17 @@ out_name = out_name[sort_key]
 out_redshift[-1] = 0.
 
 # Write to file
-with open("output_list.txt", "w") as text_file:
-    print("# Redshift, Select Output", file=text_file)
-    for z, name in zip(out_redshift, out_name):
-        print(f"{z:.8f}, {name:s}", file=text_file)
-        print(f"{z:.8f}, {name:s}")
+if all_snapshots:
+    with open("output_list.txt", "w") as text_file:
+        print("# Redshift", file=text_file)
+        for z, name in zip(out_redshift, out_name):
+            print(f"{z:.8f}", file=text_file)
+            print(f"{z:.8f}")
+else:
+    with open("output_list.txt", "w") as text_file:
+        print("# Redshift, Select Output", file=text_file)
+        for z, name in zip(out_redshift, out_name):
+            print(f"{z:.8f}, {name:s}", file=text_file)
+            print(f"{z:.8f}, {name:s}")
 
 print(len(out_name))
