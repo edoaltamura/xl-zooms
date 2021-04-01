@@ -163,7 +163,6 @@ def latex_float(f):
 
 
 def draw_adiabats(axes, density_bins, temperature_bins):
-    plt.sca(axes)
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
     temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = temperature_interps / (density_interps / unyt.cm ** 3) ** (2 / 3)
@@ -337,8 +336,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         plt.show()
     fig.savefig(
         f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
-        dpi=300,
-        tight_layout=True
+        dpi=300
     )
 
     plt.close()
