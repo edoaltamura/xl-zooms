@@ -190,7 +190,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
     )
 
-    fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(5, 13))
+    fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(13, 5))
     ax0.loglog()
     ax1.loglog()
     ax2.loglog()
@@ -291,8 +291,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         R500 = object_database['R500'].mean()
         nH_500 = object_database['nH_500'].mean().value
         T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to('K').value
-        ax.hlines(y=T500, xmin=nH_500/5, xmax=nH_500+5, colors='k', linestyles='-', lw=2)
-        ax.vlines(x=nH_500, ymin=T500/10, ymax=T500*10, colors='k', linestyles='-', lw=2)
+        ax.hlines(y=T500, xmin=nH_500/5, xmax=nH_500*5, colors='k', linestyles='-', lw=1)
+        ax.vlines(x=nH_500, ymin=T500/10, ymax=T500*10, colors='k', linestyles='-', lw=1)
 
     ax1.set_ylabel(r"Temperature [K]")
     ax2.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
