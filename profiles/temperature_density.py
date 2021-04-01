@@ -308,7 +308,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     for ax in [ax0, ax1, ax2]:
         # Draw adiabats in all panels
-        draw_adiabats(ax, density_edges, temperature_edges)
+        draw_adiabats(ax0, density_edges, temperature_edges)
 
         # Draw cross-hair marker
         M500 = object_database['M500'].mean()
