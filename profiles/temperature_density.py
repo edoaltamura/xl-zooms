@@ -247,8 +247,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # Draw equi-entropy lines in all panels
     for ax in [ax0, ax1, ax2]:
-        ax.set_aspect(1)
-        plt.sca(ax)
+        # plt.sca(ax)
 
         density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
         temperature_interps *= unyt.K * unyt.boltzmann_constant
