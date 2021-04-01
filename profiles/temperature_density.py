@@ -250,7 +250,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
 
     fig, (ax0, ax1, ax2) = plt.subplots(
-        nrows=3, ncols=1, sharex=True, sharey=True, figsize=(4.2, 9)
+        nrows=3, ncols=1, sharex=True, sharey=True, figsize=(4, 8)
     )
     fig.tight_layout(pad=0.)
 
