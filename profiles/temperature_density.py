@@ -12,6 +12,7 @@ import pandas as pd
 import swiftsimio as sw
 import velociraptor as vr
 import matplotlib.pyplot as plt
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -206,7 +207,11 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
     )
-    fig.colorbar(mappable, ax=ax0, label="Number of particles per pixel")
+    # create an axes on the right side of ax. The width of cax will be 5%
+    # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+    divider = make_axes_locatable(ax0)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mappable, ax=cax, label="Number of particles per pixel", fontsize=5)
 
     # PLOT SN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -217,7 +222,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
     )
-    fig.colorbar(mappable, ax=ax1, label="Number of SNe heated particles")
+    divider = make_axes_locatable(ax1)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mappable, ax=cax, label="Number of SNe heated particles", fontsize=5)
 
     # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -228,10 +235,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
     )
-    fig.colorbar(mappable, ax=ax2, label="Number of AGN heated particles")
+    divider = make_axes_locatable(ax2)
+    cax = divider.append_axes("right", size="5%", pad=0.05)
+    fig.colorbar(mappable, ax=cax, label="Number of AGN heated particles", fontsize=5)
 
     # Draw equi-entropy lines in all panels
     for ax in fig.axes:
+        plt.sca(ax)
+        plt.subplots_adjust(wspace=0., hspace=0.)
 
         density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
         temperature_interps *= unyt.K * unyt.boltzmann_constant
@@ -241,13 +252,14 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         # Define entropy levels to plot
         levels = [10 ** k for k in range(-4, 5)]
         fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
-        CS = ax.contour(
+        CS = plt.contour(
             density_interps,
             temperature_interps,
             entropy_interps,
             levels,
             colors='aqua',
-            linewidths=0.5
+            linewidths=0.5,
+            alpha=0.5
         )
 
         # work with logarithms for loglog scale
@@ -276,7 +288,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
                 label_pos.append(10 ** logvert[min_ind, :])
 
         # Draw contour labels
-        ax.clabel(
+        plt.clabel(
             CS,
             inline=True,
             inline_spacing=3,
@@ -284,7 +296,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
             colors='aqua',
             fontsize=5,
             fmt=fmt,
-            manual=label_pos
+            manual=label_pos,
+            alpha=0.5
         )
 
         # Draw cross-hair marker
