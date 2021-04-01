@@ -299,8 +299,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         ax.axvline(0.1, color='k', linestyles=':', lw=1)
 
     # Heating temperatures
-    ax1.axhline(10 ** 7.5, color='k', linestyles='--', lw=1)
-    ax2.axhline(10 ** 8.5, color='k', linestyles='--', lw=1)
+    ax1.axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
+    ax2.axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
 
     ax1.set_ylabel(r"Temperature [K]")
     ax2.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
