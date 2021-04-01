@@ -13,6 +13,8 @@ import swiftsimio as sw
 import velociraptor as vr
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.offsetbox import AnchoredText
+
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -281,8 +283,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     divider = make_axes_locatable(axes[0, 0])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-    cb.set_label(label="All particles")
+    plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+    txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+    axes[0, 0].add_artist(txt)
 
     # PLOT SN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -297,10 +300,11 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
     divider = make_axes_locatable(axes[0, 1])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-    cb.set_label(label="SNe heated only")
+    plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
     # Heating temperatures
     axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
+    txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+    axes[0, 1].add_artist(txt)
 
     # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -315,8 +319,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
     divider = make_axes_locatable(axes[1, 1])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-    cb.set_label(label="AGN heated only")
+    plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+    txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+    axes[1, 1].add_artist(txt)
     # Heating temperatures
     axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
 
@@ -333,8 +338,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
     divider = make_axes_locatable(axes[1, 0])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-    cb.set_label(label="AGN and SN heated")
+    plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+    txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+    axes[1, 0].add_artist(txt)
     # Heating temperatures
     axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
     axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
