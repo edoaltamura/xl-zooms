@@ -354,7 +354,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
             f"{''.join(args.keywords)}\n"
             f"Central FoF group only"
         ),
-        fontsize=10
+        fontsize=7
     )
 
     if not args.quiet:
