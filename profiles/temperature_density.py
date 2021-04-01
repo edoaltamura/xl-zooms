@@ -162,6 +162,62 @@ def latex_float(f):
         return float_str
 
 
+def draw_adiabats(axes, density_bins, temperature_bins):
+    density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
+    temperature_interps *= unyt.K * unyt.boltzmann_constant
+    entropy_interps = temperature_interps / (density_interps / unyt.cm ** 3) ** (2 / 3)
+    entropy_interps = entropy_interps.to('keV*cm**2').value
+
+    # Define entropy levels to plot
+    levels = [10 ** k for k in range(-4, 5)]
+    fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
+    contours = axes.contour(
+        density_interps,
+        temperature_interps,
+        entropy_interps,
+        levels,
+        colors='aqua',
+        linewidths=0.3
+    )
+
+    # work with logarithms for loglog scale
+    # middle of the figure:
+    # xmin, xmax, ymin, ymax = plt.axis()
+    # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+
+    label_pos = []
+    i = 0
+    for line in contours.collections:
+        for path in line.get_paths():
+            logvert = np.log10(path.vertices)
+
+            # Align with same x-value
+            if levels[i] > 1:
+                log_rho = -4.5
+            else:
+                log_rho = 16
+
+            logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+            i += 1
+
+            # find closest point
+            logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
+            min_ind = np.argmin(logdist)
+            label_pos.append(10 ** logvert[min_ind, :])
+
+    # Draw contour labels
+    axes.clabel(
+        contours,
+        inline=True,
+        inline_spacing=3,
+        rightside_up=True,
+        colors='aqua',
+        fontsize=5,
+        fmt=fmt,
+        manual=label_pos
+    )
+
+
 def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
@@ -193,7 +249,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
 
     fig, (ax0, ax1, ax2) = plt.subplots(
-        nrows=3, ncols=1, sharex=True, sharey=True, figsize=(5, 13), constrained_layout=True
+        nrows=3, ncols=1, sharex=True, sharey=True, figsize=(5, 15)
     )
     plt.subplots_adjust(wspace=0., hspace=0.)
     ax0.loglog()
@@ -245,70 +301,18 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     cb = plt.colorbar(mappable, ax=ax2, cax=cax)
     cb.set_label(label="AGN heated", size=5)
 
-    # Draw equi-entropy lines in all panels
     for ax in [ax0, ax1, ax2]:
-
-        density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-        temperature_interps *= unyt.K * unyt.boltzmann_constant
-        entropy_interps = temperature_interps / (density_interps / unyt.cm ** 3) ** (2 / 3)
-        entropy_interps = entropy_interps.to('keV*cm**2').value
-
-        # Define entropy levels to plot
-        levels = [10 ** k for k in range(-4, 5)]
-        fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
-        CS = ax.contour(
-            density_interps,
-            temperature_interps,
-            entropy_interps,
-            levels,
-            colors='aqua',
-            linewidths=0.3
-        )
-
-        # work with logarithms for loglog scale
-        # middle of the figure:
-        # xmin, xmax, ymin, ymax = plt.axis()
-        # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
-
-        label_pos = []
-        i = 0
-        for line in CS.collections:
-            for path in line.get_paths():
-                logvert = np.log10(path.vertices)
-
-                # Align with same x-value
-                if levels[i] > 1:
-                    log_rho = -4.5
-                else:
-                    log_rho = 16
-
-                logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
-                i += 1
-
-                # find closest point
-                logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
-                min_ind = np.argmin(logdist)
-                label_pos.append(10 ** logvert[min_ind, :])
-
-        # Draw contour labels
-        ax.clabel(
-            CS,
-            inline=True,
-            inline_spacing=3,
-            rightside_up=True,
-            colors='aqua',
-            fontsize=5,
-            fmt=fmt,
-            manual=label_pos
-        )
+        # Draw adiabats in all panels
+        draw_adiabats(ax, density_edges, temperature_edges)
 
         # Draw cross-hair marker
         M500 = object_database['M500'].mean()
         R500 = object_database['R500'].mean()
         nH_500 = object_database['nH_500'].mean().value
-        T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to('K').value
-        ax.hlines(y=T500, xmin=nH_500/5, xmax=nH_500*5, colors='k', linestyles='-', lw=1)
-        ax.vlines(x=nH_500, ymin=T500/10, ymax=T500*10, colors='k', linestyles='-', lw=1)
+        T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to(
+            'K').value
+        ax.hlines(y=T500, xmin=nH_500 / 5, xmax=nH_500 * 5, colors='k', linestyles='-', lw=1)
+        ax.vlines(x=nH_500, ymin=T500 / 10, ymax=T500 * 10, colors='k', linestyles='-', lw=1)
 
         # Star formation threshold
         ax.axvline(0.1, color='k', linestyle=':', lw=1)
