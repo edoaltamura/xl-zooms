@@ -248,10 +248,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
     )
 
-    fig, axes = plt.subplots(
-        nrows=2, ncols=2, sharex=True, sharey=True, figsize=(5, 5)
-    )
-    fig.tight_layout(pad=0.)
+    fig = plt.figure(figsize=(5, 5))
+    gs = fig.add_gridspec(2, 2, hspace=0, wspace=0)
+    axes = gs.subplots(sharex='col', sharey='row')
 
     for ax in axes.flat:
         ax.loglog()
@@ -340,8 +339,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
     axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
 
-    fig.text(0.5, -0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
-    fig.text(-0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
+    fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
+    fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
     fig.suptitle(
         (
             f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
