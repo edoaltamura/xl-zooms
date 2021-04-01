@@ -248,12 +248,12 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
     )
 
-    fig, (ax0, ax1, ax2) = plt.subplots(
-        nrows=3, ncols=1, sharex=True, sharey=True, figsize=(4, 7)
+    fig, axes = plt.subplots(
+        nrows=2, ncols=2, sharex=True, sharey=True, figsize=(4, 7)
     )
     fig.tight_layout(pad=0.)
 
-    for ax in [ax0, ax1, ax2]:
+    for ax in axes.flat:
         ax.loglog()
 
         # Draw cross-hair marker
@@ -274,15 +274,15 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
 
     vmax = np.max(H)
-    mappable = ax0.pcolormesh(
+    mappable = axes[0, 0].pcolormesh(
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
     )
     # create an axes on the right side of ax. The width of cax will be 5%
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-    divider = make_axes_locatable(ax0)
+    divider = make_axes_locatable(axes[0, 0])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=ax0, cax=cax)
+    cb = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
     cb.set_label(label="All particles", size=5)
 
     # PLOT SN HEATED PARTICLES ===============================================
@@ -292,14 +292,16 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax1.pcolormesh(
+    mappable = axes[0, 1].pcolormesh(
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
     )
-    divider = make_axes_locatable(ax1)
+    divider = make_axes_locatable(axes[0, 1])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=ax1, cax=cax)
+    cb = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
     cb.set_label(label="SNe heated only")
+    # Heating temperatures
+    axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
 
     # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -308,22 +310,39 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax2.pcolormesh(
+    mappable = axes[1, 1].pcolormesh(
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
     )
-    divider = make_axes_locatable(ax2)
+    divider = make_axes_locatable(axes[1, 1])
     cax = divider.append_axes("right", size="3%", pad=0.)
-    cb = plt.colorbar(mappable, ax=ax2, cax=cax)
+    cb = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
     cb.set_label(label="AGN heated only")
-
     # Heating temperatures
-    ax1.axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
-    ax2.axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
+    axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
 
-    ax1.set_ylabel(r"Temperature [K]")
-    ax2.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
-    ax0.set_title(
+    # PLOT AGN+SN HEATED PARTICLES ===============================================
+    H, density_edges, temperature_edges = np.histogram2d(
+        x[(agn_flag & snii_flag)],
+        y[(agn_flag & snii_flag)],
+        bins=[density_bins, temperature_bins]
+    )
+    vmax = np.max(H)
+    mappable = axes[1, 0].pcolormesh(
+        density_edges, temperature_edges, H.T,
+        norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
+    )
+    divider = make_axes_locatable(axes[1, 0])
+    cax = divider.append_axes("right", size="3%", pad=0.)
+    cb = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+    cb.set_label(label="AGN heated only")
+    # Heating temperatures
+    axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
+    axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
+
+    fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
+    fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
+    fig.title(
         (
             f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
             f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
