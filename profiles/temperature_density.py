@@ -247,7 +247,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # Draw equi-entropy lines in all panels
     for ax in [ax0, ax1, ax2]:
-        # plt.sca(ax)
 
         density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
         temperature_interps *= unyt.K * unyt.boltzmann_constant
@@ -257,7 +256,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         # Define entropy levels to plot
         levels = [10 ** k for k in range(-4, 5)]
         fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
-        CS = plt.contour(
+        CS = ax.contour(
             density_interps,
             temperature_interps,
             entropy_interps,
@@ -292,7 +291,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
                 label_pos.append(10 ** logvert[min_ind, :])
 
         # Draw contour labels
-        plt.clabel(
+        ax.clabel(
             CS,
             inline=True,
             inline_spacing=3,
