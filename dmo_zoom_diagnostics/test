@@ -758,7 +758,8 @@ ffmpeg \
 
 
 declare -a arr=(
-"L0300N0564_VR680_+1res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth"
+"L0300N0564_VR813_+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth"
+"L0300N0564_VR485_+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth"
 )
 
 for i in "${arr[@]}"

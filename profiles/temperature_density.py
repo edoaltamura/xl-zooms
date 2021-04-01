@@ -100,7 +100,13 @@ def profile_3d_single_halo(
     agn_flag = agn_flag > 0
     snii_flag = snii_flag > 0
 
-    return number_density, temperature, agn_flag, snii_flag, M500, R500
+    # Calculate the critical density for the cross-hair marker
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology.critical_density(data.metadata.z).value, 'g/cm**3'
+    ).to('Msun/Mpc**3')
+    nH_500 = (rho_crit * 500 / unyt.mh).to('cm**-3')
+
+    return number_density, temperature, agn_flag, snii_flag, M500, R500, nH_500
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
@@ -110,7 +116,8 @@ def profile_3d_single_halo(
     'agn_flag',
     'snii_flag',
     'M500',
-    'R500'
+    'R500',
+    'nH_500'
 ])
 def _process_single_halo(zoom: Zoom):
     # Select redshift
@@ -154,10 +161,6 @@ def latex_float(f):
 
 
 def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
-    fig = plt.figure(figsize=(7, 3))
-    ax = fig.add_subplot(1, 1, 1)
-    ax.loglog()
-
     # Bin objects by mass
     m500crit_log10 = np.array([np.log10(m.value) for m in object_database['M500'].values])
     plot_database = object_database.iloc[np.where(m500crit_log10 > 12)[0]]
@@ -187,97 +190,113 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
     )
 
+    fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(5, 13))
+    ax0.loglog()
+    ax1.loglog()
+    ax2.loglog()
+
+    # PLOT ALL PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
         x, y, bins=[density_bins, temperature_bins]
     )
 
     vmax = np.max(H)
-    mappable = ax.pcolormesh(
+    mappable = ax0.pcolormesh(
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
     )
-    fig.colorbar(mappable, ax=ax, label="Number of particles per pixel")
+    fig.colorbar(mappable, ax=ax0, label="Number of particles per pixel")
 
+    # PLOT SN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
         x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax.pcolormesh(
+    mappable = ax1.pcolormesh(
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
     )
-    fig.colorbar(mappable, ax=ax, label="Number of SNe heated particles")
+    fig.colorbar(mappable, ax=ax1, label="Number of SNe heated particles")
 
+    # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
         x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
-    mappable = ax.pcolormesh(
+    mappable = ax2.pcolormesh(
         density_edges, temperature_edges, H.T,
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
     )
-    fig.colorbar(mappable, ax=ax, label="Number of AGN heated particles")
+    fig.colorbar(mappable, ax=ax2, label="Number of AGN heated particles")
 
-    # Draw equi-entropy lines
-    density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    entropy_interps = (temperature_interps * unyt.K * unyt.boltzmann_constant) / (density_interps / unyt.cm ** 3) ** (
-                2 / 3)
-    entropy_interps = entropy_interps.to('keV*cm**2').value
+    # Draw equi-entropy lines in all panels
+    for ax in fig.axes:
 
-    # Define entropy levels to plot
-    levels = [10 ** k for k in range(-4, 5)]
-    fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
-    CS = plt.contour(
-        density_interps,
-        temperature_interps,
-        entropy_interps,
-        levels,
-        colors='aqua',
-        linewidths=0.5
-    )
+        density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
+        temperature_interps *= unyt.K * unyt.boltzmann_constant
+        entropy_interps = temperature_interps / (density_interps / unyt.cm ** 3) ** (2 / 3)
+        entropy_interps = entropy_interps.to('keV*cm**2').value
 
-    # work with logarithms for loglog scale
-    # middle of the figure:
-    # xmin, xmax, ymin, ymax = plt.axis()
-    # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+        # Define entropy levels to plot
+        levels = [10 ** k for k in range(-4, 5)]
+        fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
+        CS = ax.contour(
+            density_interps,
+            temperature_interps,
+            entropy_interps,
+            levels,
+            colors='aqua',
+            linewidths=0.5
+        )
 
-    label_pos = []
-    i = 0
-    for line in CS.collections:
-        for path in line.get_paths():
-            logvert = np.log10(path.vertices)
+        # work with logarithms for loglog scale
+        # middle of the figure:
+        # xmin, xmax, ymin, ymax = plt.axis()
+        # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
-            # Align with same x-value
-            if levels[i] > 1:
-                log_rho = -4.5
-            else:
-                log_rho = 16
+        label_pos = []
+        i = 0
+        for line in CS.collections:
+            for path in line.get_paths():
+                logvert = np.log10(path.vertices)
 
-            logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
-            i += 1
+                # Align with same x-value
+                if levels[i] > 1:
+                    log_rho = -4.5
+                else:
+                    log_rho = 16
 
-            # find closest point
-            logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
-            min_ind = np.argmin(logdist)
-            label_pos.append(10 ** logvert[min_ind, :])
+                logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+                i += 1
 
-    # Draw contour labels
-    plt.clabel(
-        CS,
-        inline=True,
-        inline_spacing=3,
-        rightside_up=True,
-        colors='aqua',
-        fontsize=5,
-        fmt=fmt,
-        manual=label_pos
-    )
+                # find closest point
+                logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
+                min_ind = np.argmin(logdist)
+                label_pos.append(10 ** logvert[min_ind, :])
 
-    ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
-    ax.set_ylabel(r"Temperature [K]")
+        # Draw contour labels
+        ax.clabel(
+            CS,
+            inline=True,
+            inline_spacing=3,
+            rightside_up=True,
+            colors='aqua',
+            fontsize=5,
+            fmt=fmt,
+            manual=label_pos
+        )
 
-    plt.legend()
-    ax.set_title(
+        # Draw cross-hair marker
+        M500 = object_database['M500'].mean()
+        R500 = object_database['R500'].mean()
+        nH_500 = object_database['nH_500'].mean().values
+        T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to('K')
+        ax.hlines(y=T500, xmin=nH_500/5, xmax=nH_500+5, colors='k', linestyles='-', lw=2)
+        ax.vlines(x=nH_500, ymin=T500/10, ymax=T500*10, colors='k', linestyles='-', lw=2)
+
+    ax1.set_ylabel(r"Temperature [K]")
+    ax2.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
+    ax0.set_title(
         (
             f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
             f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
