@@ -351,9 +351,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         (
             f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
             f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-            f"{''.join(args.keywords)}"
+            f"{''.join(args.keywords)}\n"
+            f"Central FoF group only"
         ),
-        fontsize=5
+        fontsize=10
     )
 
     if not args.quiet:
