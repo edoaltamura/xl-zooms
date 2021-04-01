@@ -68,14 +68,13 @@ def profile_3d_single_halo(
     # to filter particle coordinates, while VR outputs are in physical units.
     # Convert the region bounds to comoving, but keep the CoP and Rcrit in
     # physical units for later use.
-    mask = sw.mask(path_to_snap, spatial_only=False)
+    mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
         [(XPotMin - aperture_fraction * R500) / a, (XPotMin + aperture_fraction * R500) / a],
         [(YPotMin - aperture_fraction * R500) / a, (YPotMin + aperture_fraction * R500) / a],
         [(ZPotMin - aperture_fraction * R500) / a, (ZPotMin + aperture_fraction * R500) / a]
     ]
     mask.constrain_spatial(region)
-    mask.constrain_mask("gas", "fofgroup_ids", 1, 1)
     data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
@@ -85,12 +84,13 @@ def profile_3d_single_halo(
     data.gas.temperatures.convert_to_physical()
     data.gas.densities.convert_to_physical()
 
-    # Select gas within sphere
+    # Select gas within sphere and main FOF halo
+    fof_id = data.gas.fofgroup_ids
     deltaX = data.gas.coordinates[:, 0] - XPotMin
     deltaY = data.gas.coordinates[:, 1] - YPotMin
     deltaZ = data.gas.coordinates[:, 2] - ZPotMin
     radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
-    index = np.where(radial_distance < aperture_fraction)[0]
+    index = np.where((radial_distance < aperture_fraction) & (fof_id == 1))[0]
     del deltaX, deltaY, deltaZ
 
     number_density = (data.gas.densities / unyt.mh).to('cm**-3').value[index]
