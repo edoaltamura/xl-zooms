@@ -342,7 +342,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
     fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
-    fig.title(
+    plt.title(
         (
             f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
             f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
