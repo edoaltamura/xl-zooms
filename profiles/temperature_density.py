@@ -335,7 +335,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     # create an axes on the right side of ax. The width of cax will be 5%
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     divider = make_axes_locatable(ax0)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cax = divider.append_axes("right", size="3%", pad=0.)
     cb = plt.colorbar(mappable, ax=ax0, cax=cax)
     cb.set_label(label="All particles", size=5)
 
@@ -351,9 +351,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
     )
     divider = make_axes_locatable(ax1)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cax = divider.append_axes("right", size="3%", pad=0.)
     cb = plt.colorbar(mappable, ax=ax1, cax=cax)
-    cb.set_label(label="SNe heated", size=5)
+    cb.set_label(label="SNe heated only")
 
     # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -367,9 +367,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
     )
     divider = make_axes_locatable(ax2)
-    cax = divider.append_axes("right", size="5%", pad=0.05)
+    cax = divider.append_axes("right", size="3%", pad=0.)
     cb = plt.colorbar(mappable, ax=ax2, cax=cax)
-    cb.set_label(label="AGN heated", size=5)
+    cb.set_label(label="AGN heated only")
 
     # Heating temperatures
     ax1.axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
