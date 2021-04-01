@@ -192,7 +192,10 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
     )
 
-    fig, (ax0, ax1, ax2) = plt.subplots(nrows=3, ncols=1, sharex=True, sharey=True, figsize=(5, 13))
+    fig, (ax0, ax1, ax2) = plt.subplots(
+        nrows=3, ncols=1, sharex=True, sharey=True, figsize=(5, 13), constrained_layout=True
+    )
+    plt.subplots_adjust(wspace=0., hspace=0.)
     ax0.loglog()
     ax1.loglog()
     ax2.loglog()
@@ -245,7 +248,6 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     # Draw equi-entropy lines in all panels
     for ax in [ax0, ax1, ax2]:
         plt.sca(ax)
-        plt.subplots_adjust(wspace=0., hspace=0.)
 
         density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
         temperature_interps *= unyt.K * unyt.boltzmann_constant
@@ -326,11 +328,13 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         ),
         fontsize=5
     )
+
     if not args.quiet:
         plt.show()
     fig.savefig(
         f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
-        dpi=300
+        dpi=300,
+        tight_layout=True
     )
 
     plt.close()
