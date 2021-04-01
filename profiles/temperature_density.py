@@ -164,8 +164,8 @@ def latex_float(f):
 
 def draw_adiabats(axes, density_bins, temperature_bins):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    temperature_interps *= unyt.K * unyt.boltzmann_constant
-    entropy_interps = temperature_interps / (density_interps / unyt.cm ** 3) ** (2 / 3)
+    # temperature_interps *= unyt.K * unyt.boltzmann_constant
+    entropy_interps = temperature_interps * unyt.K * unyt.boltzmann_constant / (density_interps / unyt.cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
