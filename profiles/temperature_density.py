@@ -296,7 +296,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         ax.vlines(x=nH_500, ymin=T500/10, ymax=T500*10, colors='k', linestyles='-', lw=1)
 
         # Star formation threshold
-        ax.axvline(0.1, color='k', linestyles=':', lw=1)
+        ax.axvline(0.1, color='k', linestyle=':', lw=1)
 
     # Heating temperatures
     ax1.axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
