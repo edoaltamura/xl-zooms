@@ -175,7 +175,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
         density_interps,
         temperature_interps,
         entropy_interps,
-        levels,
+        levels[::2],
         colors='aqua',
         linewidths=0.3
     )
@@ -282,7 +282,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     divider = make_axes_locatable(axes[0, 0])
     cax = divider.append_axes("right", size="3%", pad=0.)
     cb = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-    cb.set_label(label="All particles", size=5)
+    cb.set_label(label="All particles")
 
     # PLOT SN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -329,12 +329,12 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     vmax = np.max(H)
     mappable = axes[1, 0].pcolormesh(
         density_edges, temperature_edges, H.T,
-        norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
+        norm=LogNorm(vmin=1, vmax=vmax), cmap='Purples_r', alpha=0.6
     )
     divider = make_axes_locatable(axes[1, 0])
     cax = divider.append_axes("right", size="3%", pad=0.)
     cb = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-    cb.set_label(label="AGN heated only")
+    cb.set_label(label="AGN and SN heated")
     # Heating temperatures
     axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
     axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
