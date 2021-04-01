@@ -68,13 +68,14 @@ def profile_3d_single_halo(
     # to filter particle coordinates, while VR outputs are in physical units.
     # Convert the region bounds to comoving, but keep the CoP and Rcrit in
     # physical units for later use.
-    mask = sw.mask(path_to_snap, spatial_only=True)
+    mask = sw.mask(path_to_snap, spatial_only=False)
     region = [
         [(XPotMin - aperture_fraction * R500) / a, (XPotMin + aperture_fraction * R500) / a],
         [(YPotMin - aperture_fraction * R500) / a, (YPotMin + aperture_fraction * R500) / a],
         [(ZPotMin - aperture_fraction * R500) / a, (ZPotMin + aperture_fraction * R500) / a]
     ]
     mask.constrain_spatial(region)
+    mask.constrain_mask("gas", "fofgroup_ids", 1, 1)
     data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
