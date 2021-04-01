@@ -163,6 +163,7 @@ def latex_float(f):
 
 
 def draw_adiabats(axes, density_bins, temperature_bins):
+    plt.sca(axes)
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
     temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = temperature_interps / (density_interps / unyt.cm ** 3) ** (2 / 3)
@@ -171,7 +172,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
     # Define entropy levels to plot
     levels = [10 ** k for k in range(-4, 5)]
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
-    contours = axes.contour(
+    contours = plt.contour(
         density_interps,
         temperature_interps,
         entropy_interps,
@@ -206,7 +207,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
             label_pos.append(10 ** logvert[min_ind, :])
 
     # Draw contour labels
-    axes.clabel(
+    plt.clabel(
         contours,
         inline=True,
         inline_spacing=3,
@@ -275,7 +276,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # PLOT SN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
-        x[snii_flag], y[snii_flag], bins=[density_bins, temperature_bins]
+        x[(snii_flag & ~agn_flag)],
+        y[(snii_flag & ~agn_flag)],
+        bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
     mappable = ax1.pcolormesh(
@@ -289,7 +292,9 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
 
     # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
-        x[agn_flag], y[agn_flag], bins=[density_bins, temperature_bins]
+        x[(agn_flag & ~snii_flag)],
+        y[(agn_flag & ~snii_flag)],
+        bins=[density_bins, temperature_bins]
     )
     vmax = np.max(H)
     mappable = ax2.pcolormesh(
