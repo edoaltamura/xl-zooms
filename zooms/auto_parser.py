@@ -65,6 +65,7 @@ matplotlib.use(mpl_backend)
 
 # Apply the matplotlib stylesheet
 import matplotlib.pyplot as plt
+plt.ion()
 try:
     plt.style.use("../mnras.mplstyle")
 except:
