@@ -261,8 +261,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
             entropy_interps,
             levels,
             colors='aqua',
-            linewidths=0.5,
-            alpha=0.5
+            linewidths=0.3
         )
 
         # work with logarithms for loglog scale
@@ -299,8 +298,7 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
             colors='aqua',
             fontsize=5,
             fmt=fmt,
-            manual=label_pos,
-            alpha=0.5
+            manual=label_pos
         )
 
         # Draw cross-hair marker
