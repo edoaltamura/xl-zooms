@@ -289,8 +289,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
         # Draw cross-hair marker
         M500 = object_database['M500'].mean()
         R500 = object_database['R500'].mean()
-        nH_500 = object_database['nH_500'].mean()
-        T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to('K')
+        nH_500 = object_database['nH_500'].mean().value
+        T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to('K').value
         ax.hlines(y=T500, xmin=nH_500/5, xmax=nH_500+5, colors='k', linestyles='-', lw=2)
         ax.vlines(x=nH_500, ymin=T500/10, ymax=T500*10, colors='k', linestyles='-', lw=2)
 
