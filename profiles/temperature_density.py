@@ -211,8 +211,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
     divider = make_axes_locatable(ax0)
     cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(mappable, ax=cax)
-    cb.set_label(label="Number of particles per pixel", size=5)
+    cb = plt.colorbar(mappable, ax=ax0, cax=cax)
+    cb.set_label(label="All particles", size=5)
 
     # PLOT SN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -225,8 +225,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
     divider = make_axes_locatable(ax1)
     cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(mappable, ax=cax)
-    cb.set_label(label="Number of SNe heated particles", size=5)
+    cb = plt.colorbar(mappable, ax=ax1, cax=cax)
+    cb.set_label(label="SNe heated", size=5)
 
     # PLOT AGN HEATED PARTICLES ===============================================
     H, density_edges, temperature_edges = np.histogram2d(
@@ -239,8 +239,8 @@ def plot_radial_profiles_median(object_database: pd.DataFrame) -> None:
     )
     divider = make_axes_locatable(ax2)
     cax = divider.append_axes("right", size="5%", pad=0.05)
-    cb = plt.colorbar(mappable, ax=cax)
-    cb.set_label(label="Number of AGN heated particles", size=5)
+    cb = plt.colorbar(mappable, ax=ax2, cax=cax)
+    cb.set_label(label="AGN heated", size=5)
 
     # Draw equi-entropy lines in all panels
     for ax in [ax0, ax1, ax2]:
