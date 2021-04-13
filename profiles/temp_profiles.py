@@ -1,21 +1,57 @@
 from matplotlib import pyplot as plt
 from matplotlib.cm import get_cmap
+from matplotlib.legend_handler import HandlerLine2D
 import unyt
 import numpy as np
 import swiftsimio as sw
 import velociraptor as vr
+from typing import Tuple
 
 try:
     plt.style.use("../mnras.mplstyle")
 except:
     pass
 
+import sys
+
+# Make the register backend visible to the script
+sys.path.append("../observational_data")
+import observational_data as obs
+
 # Constants
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 
 
-def profile_3d_single_halo(
+def update_prop(handle, orig):
+    handle.update_from(orig)
+    handle.set_marker("o")
+
+
+def histogram_unyt(
+        data: unyt.unyt_array,
+        bins: unyt.unyt_array = None,
+        weights: unyt.unyt_array = None,
+        **kwargs,
+) -> Tuple[unyt.unyt_array]:
+    assert data.shape == weights.shape, (
+        "Data and weights arrays must have the same shape. "
+        f"Detected data {data.shape}, weights {weights.shape}."
+    )
+
+    assert data.units == bins.units, (
+        "Data and bins must have the same units. "
+        f"Detected data {data.units}, bins {bins.units}."
+    )
+
+    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value, **kwargs)
+    hist *= weights.units
+    bin_edges *= data.units
+
+    return hist, bin_edges
+
+
+def profile_3d_particles(
         path_to_snap: str,
         path_to_catalogue: str,
 ) -> tuple:
@@ -53,12 +89,78 @@ def profile_3d_single_halo(
     number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
     field_value = mass_weighted_temperatures / number_densities ** (2 / 3)
 
-    field_label = r'$K$ [keV cm$^2$]'
     radial_distance = radial_distance[index]
-    field_value = field_value[index]
-    field_masses = data.gas.temperatures[index]
+    entropies = field_value[index]
+    temperatures = mass_weighted_temperatures[index]
 
-    return radial_distance, field_value, field_masses, field_label, M500, R500
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology.critical_density(data.metadata.z).value, 'g/cm**3'
+    ).to('Msun/Mpc**3')
+    densities = data.gas.densities[index] / rho_crit
+
+    return radial_distance, densities, temperatures, entropies, M500, R500
+
+
+def profile_3d_shells(
+        path_to_snap: str,
+        path_to_catalogue: str,
+) -> tuple:
+    # Read in halo properties
+    vr_catalogue_handle = vr.load(path_to_catalogue)
+    M500 = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
+    R500 = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+    XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+    YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
+    ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
+
+    # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
+    # to filter particle coordinates, while VR outputs are in physical units.
+    # Convert the region bounds to comoving, but keep the CoP and Rcrit in
+    # physical units for later use.
+    mask = sw.mask(path_to_snap, spatial_only=True)
+    region = [
+        [(XPotMin - R500), (XPotMin + R500)],
+        [(YPotMin - R500), (YPotMin + R500)],
+        [(ZPotMin - R500), (ZPotMin + R500)]
+    ]
+    mask.constrain_spatial(region)
+    data = sw.load(path_to_snap, mask=mask)
+
+    # Select gas within sphere and main FOF halo
+    fof_id = data.gas.fofgroup_ids
+    tempGas = data.gas.temperatures
+    deltaX = data.gas.coordinates[:, 0] - XPotMin
+    deltaY = data.gas.coordinates[:, 1] - YPotMin
+    deltaZ = data.gas.coordinates[:, 2] - ZPotMin
+    radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
+    index = np.where((radial_distance < 2) & (fof_id == 1) & (tempGas > 1e5))[0]
+    del deltaX, deltaY, deltaZ, fof_id, tempGas
+
+    radial_distance = radial_distance[index]
+    data.gas.masses = data.gas.masses[index]
+    data.gas.temperatures = data.gas.temperatures[index]
+
+    # Define radial bins and shell volumes
+    lbins = np.logspace(-3, 2, 40) * radial_distance.units
+    radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
+    volume_shell = (4. * np.pi / 3.) * (R500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
+
+    mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.masses)
+    density_profile = mass_weights / volume_shell
+    number_density_profile = (density_profile.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
+
+    mass_weighted_temperatures = (data.gas.temperatures * unyt.boltzmann_constant).to('keV') * data.gas.masses
+    temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+    temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+
+    entropy_profile = mass_weighted_temperatures / number_density_profile ** (2 / 3)
+
+    rho_crit = unyt.unyt_quantity(
+        data.metadata.cosmology.critical_density(data.metadata.z).value, 'g/cm**3'
+    ).to('Msun/Mpc**3')
+    temperature_profile /= rho_crit
+
+    return radial_bin_centres, density_profile, temperature_profile, entropy_profile, M500, R500
 
 
 cwd = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/'
@@ -87,38 +189,215 @@ paths = {
     ),
 }
 
+alpha_list = ['0.', '1.']
+
 name = "Spectral"
 cmap = get_cmap(name)
 
-fig, ax = plt.subplots()
-ax.loglog()
+fig = plt.figure(figsize=(6, 9))
+gs = fig.add_gridspec(2, 3, hspace=0.1, wspace=0.2)
+axes = gs.subplots(sharex=True, sharey='col')
 
-for alpha_key in ['0.', '1.']:
+for ax in axes.flat:
+    ax.loglog()
+    ax.axvline(x=1, color='k', linestyle='--')
+    ax.set_xlabel(f'$r/r_{{500,true}}$')
+    ax.set_xlim([1e-3, 2])
+
+print("Entropy - shell average")
+ax = axes[0, 0]
+for alpha_key in alpha_list:
     print(alpha_key)
     cat, snap = paths[alpha_key]
 
-    output = profile_3d_single_halo(
+    radial_bin_centres, _, _, entropy_profile, M500, R500 = profile_3d_shells(
         path_to_snap=snap,
         path_to_catalogue=cat,
     )
-    print(output)
-    radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
-    ax.plot(radial_distance[::10], field_value[::10], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
+    ax.plot(
+        radial_bin_centres,
+        entropy_profile,
+        linestyle='-',
+        color=cmap(float(alpha_key)),
+        linewidth=1,
+        alpha=1,
+    )
+
+    kBT500 = (
+            unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
+    ).to('keV')
+    K500 = (
+            kBT500 / (3 * M500 * obs.cosmic_fbary / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
+    ).to('keV*cm**2')
+
+    ax.axhline(x=K500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.text(
+        ax.get_xlim()[0], K500, r'$K_{500}$',
+        horizontalalignment='left',
+        verticalalignment='bottom',
+        color='k',
+        bbox=dict(
+            boxstyle='square,pad=1',
+            fc='none',
+            ec='none'
+        )
+    )
+
+    ax.set_ylabel(r'$K$ [keV cm$^2$]')
+    ax.set_ylim([30, 1e4])
+
+print("Entropy - dot particles")
+ax = axes[1, 0]
+for alpha_key in alpha_list:
+    print(alpha_key)
+    cat, snap = paths[alpha_key]
+
+    radial_distance, _, _, entropies, M500, R500 = profile_3d_particles(
+        path_to_snap=snap,
+        path_to_catalogue=cat,
+    )
+
+    ax.plot(radial_distance[::10], entropies[::10], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
             alpha=0.5, label=f"Alpha_max = {alpha_key}")
 
-ax.set_xlabel(f'$r/r_{{500,true}}$')
-ax.set_ylabel(field_label)
-ax.set_xlim([0.05, 2])
-ax.set_ylim([30, 1e4])
+    kBT500 = (
+            unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
+    ).to('keV')
+    K500 = (
+            kBT500 / (3 * M500 * obs.cosmic_fbary / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
+    ).to('keV*cm**2')
 
-from matplotlib.legend_handler import HandlerLine2D
+    ax.axhline(x=K500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.text(
+        ax.get_xlim()[0], K500, r'$K_{500}$',
+        horizontalalignment='left',
+        verticalalignment='bottom',
+        color='k',
+        bbox=dict(
+            boxstyle='square,pad=1',
+            fc='none',
+            ec='none'
+        )
+    )
 
+    ax.set_ylabel(r'$K$ [keV cm$^2$]')
+    ax.set_ylim([30, 1e4])
 
-def update_prop(handle, orig):
-    handle.update_from(orig)
-    handle.set_marker("o")
+print("Temperatures - shell average")
+ax = axes[0, 1]
+for alpha_key in alpha_list:
+    print(alpha_key)
+    cat, snap = paths[alpha_key]
 
+    radial_bin_centres, _, temperature_profile, _, M500, R500 = profile_3d_shells(
+        path_to_snap=snap,
+        path_to_catalogue=cat,
+    )
+
+    ax.plot(
+        radial_bin_centres,
+        temperature_profile,
+        linestyle='-',
+        color=cmap(float(alpha_key)),
+        linewidth=1,
+        alpha=1,
+    )
+
+    kBT500 = (
+            unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
+    ).to('keV')
+
+    ax.axhline(x=kBT500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.text(
+        ax.get_xlim()[0], kBT500, r'$k_BT_{500}$',
+        horizontalalignment='left',
+        verticalalignment='bottom',
+        color='k',
+        bbox=dict(
+            boxstyle='square,pad=1',
+            fc='none',
+            ec='none'
+        )
+    )
+
+    ax.set_ylabel(r'$T$ [keV]')
+
+print("Temperatures - dot particles")
+ax = axes[1, 1]
+for alpha_key in alpha_list:
+    print(alpha_key)
+    cat, snap = paths[alpha_key]
+
+    radial_distance, _, temperatures, _, M500, R500 = profile_3d_particles(
+        path_to_snap=snap,
+        path_to_catalogue=cat,
+    )
+
+    ax.plot(radial_distance[::10], temperatures[::10], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
+            alpha=0.5, label=f"Alpha_max = {alpha_key}")
+
+    kBT500 = (
+            unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
+    ).to('keV')
+
+    ax.axhline(x=kBT500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.text(
+        ax.get_xlim()[0], kBT500, r'$k_BT_{500}$',
+        horizontalalignment='left',
+        verticalalignment='bottom',
+        color='k',
+        bbox=dict(
+            boxstyle='square,pad=1',
+            fc='none',
+            ec='none'
+        )
+    )
+
+    ax.set_ylabel(r'$T$ [keV]')
+
+print("Density - shell average")
+ax = axes[0, 2]
+for alpha_key in alpha_list:
+    print(alpha_key)
+    cat, snap = paths[alpha_key]
+
+    radial_bin_centres, density_profile, _, _, M500, R500 = profile_3d_shells(
+        path_to_snap=snap,
+        path_to_catalogue=cat,
+    )
+
+    ax.plot(
+        radial_bin_centres,
+        density_profile * (radial_bin_centres / R500) ** 2,
+        linestyle='-',
+        color=cmap(float(alpha_key)),
+        linewidth=1,
+        alpha=1,
+    )
+
+    ax.set_ylabel(r'$(\rho / \rho_{crit})(r/r_{500})^2$')
+
+print("Density - dot particles")
+ax = axes[1, 2]
+for alpha_key in alpha_list:
+    print(alpha_key)
+    cat, snap = paths[alpha_key]
+
+    radial_distance, densities, _, _, M500, R500 = profile_3d_particles(
+        path_to_snap=snap,
+        path_to_catalogue=cat,
+    )
+
+    ax.plot(
+        radial_distance[::10],
+        densities[::10] * (radial_distance[::10] / R500) ** 2,
+        marker=',',
+        lw=0, linestyle="", c=cmap(float(alpha_key)),
+        alpha=0.5, label=f"Alpha_max = {alpha_key}"
+    )
+
+    ax.set_ylabel(r'$(\rho / \rho_{crit})(r/r_{500})^2$')
 
 plt.legend(handler_map={plt.Line2D: HandlerLine2D(update_func=update_prop)})
 plt.show()
