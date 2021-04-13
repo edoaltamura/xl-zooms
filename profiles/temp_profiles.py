@@ -86,6 +86,7 @@ name = "Spectral"
 cmap = get_cmap(name)
 
 fig, ax = plt.subplots()
+ax.loglog()
 
 for alpha_key in paths:
     print(alpha_key)
@@ -98,7 +99,7 @@ for alpha_key in paths:
     print(output)
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
-    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c='k',
+    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
             alpha=0.1)
 
 plt.show()
