@@ -5,6 +5,11 @@ import numpy as np
 import swiftsimio as sw
 import velociraptor as vr
 
+try:
+    plt.style.use("../mnras.mplstyle")
+except:
+    pass
+
 # Constants
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
@@ -99,8 +104,8 @@ for alpha_key in paths:
     print(output)
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
-    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
-            alpha=0.1, label=alpha_key)
+    ax.plot(radial_distance[::100], field_value[::100], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
+            alpha=0.7, label=alpha_key)
 
 ax.set_xlabel(f'$r/r_{{500,true}}$')
 ax.set_ylabel(field_label)
