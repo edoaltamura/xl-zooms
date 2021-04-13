@@ -236,16 +236,16 @@ for alpha_key in alpha_list:
     ax.set_ylabel(r'$K$ [keV cm$^2$]')
     ax.set_ylim([30, 1e4])
 ax.text(
-        ax.get_xlim()[0], K500, r'$K_{500}$',
-        horizontalalignment='left',
-        verticalalignment='bottom',
-        color='k',
-        bbox=dict(
-            boxstyle='square,pad=10',
-            fc='none',
-            ec='none'
-        )
+    ax.get_xlim()[0], K500, r'$K_{500}$',
+    horizontalalignment='left',
+    verticalalignment='bottom',
+    color='k',
+    bbox=dict(
+        boxstyle='square,pad=10',
+        fc='none',
+        ec='none'
     )
+)
 
 print("Entropy - dot particles")
 ax = axes[1, 0]
@@ -283,8 +283,6 @@ ax.text(
     )
 )
 
-
-
 print("Temperatures - shell average")
 ax = axes[0, 1]
 for alpha_key in alpha_list:
@@ -310,7 +308,7 @@ for alpha_key in alpha_list:
     ).to('keV')
 
     ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
-    ax.set_ylabel(r'$T$ [keV]')
+    ax.set_ylabel(r'$k_BT$ [keV]')
     ax.set_ylim([0.1, 10])
 ax.text(
     ax.get_xlim()[0], kBT500, r'$k_BT_{500}$',
@@ -323,8 +321,6 @@ ax.text(
         ec='none'
     )
 )
-
-
 
 print("Temperatures - dot particles")
 ax = axes[1, 1]
@@ -345,7 +341,7 @@ for alpha_key in alpha_list:
     ).to('keV')
 
     ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
-    ax.set_ylabel(r'$T$ [keV]')
+    ax.set_ylabel(r'$k_BT$ [keV]')
     ax.set_ylim([0.1, 10])
     ax.set_xlabel(f'$r/r_{{500,true}}$')
 ax.text(
@@ -359,8 +355,6 @@ ax.text(
         ec='none'
     )
 )
-
-
 
 print("Density - shell average")
 ax = axes[0, 2]
@@ -408,13 +402,13 @@ for alpha_key in alpha_list:
 axes[0, 0].legend(handler_map={plt.Line2D: HandlerLine2D(update_func=update_prop)})
 
 fig.suptitle(
-        (
-            f"Aperture = 2 $r_{{500}}$\t\t"
-            f"$z = 0$\n"
-            f"VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha*_no_adiabatic\n"
-            f"Central FoF group only"
-        ),
-        fontsize=7
-    )
+    (
+        f"Aperture = 2 $r_{{500}}$\t\t"
+        f"$z = 0$\n"
+        f"VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha*_no_adiabatic\n"
+        f"Central FoF group only"
+    ),
+    fontsize=7
+)
 
 plt.show()
