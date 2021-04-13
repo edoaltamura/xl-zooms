@@ -106,10 +106,6 @@ for alpha_key in paths:
     print(alpha_key)
     vr, sw = paths[alpha_key]
 
-    if ~isfile(vr) or ~isfile(sw):
-        print('not found', vr, sw, sep='\n')
-        continue
-
     output = profile_3d_single_halo(
         path_to_snap=sw,
         path_to_catalogue=vr,
