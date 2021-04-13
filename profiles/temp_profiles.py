@@ -93,7 +93,7 @@ cmap = get_cmap(name)
 fig, ax = plt.subplots()
 ax.loglog()
 
-for alpha_key in paths:
+for alpha_key in ['0.', '1.']:
     print(alpha_key)
     cat, snap = paths[alpha_key]
 
