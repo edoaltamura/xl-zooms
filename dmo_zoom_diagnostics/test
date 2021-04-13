@@ -751,15 +751,12 @@ ffmpeg \
     -vf scale=-2:1080,format=yuv420p \
     density_temperature_VR18_-8res_MinimumDistance_fixedAGNdT8p5.mp4
 
-
-
-
-
-
-
 declare -a arr=(
-"L0300N0564_VR813_+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth"
-"L0300N0564_VR485_+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth"
+"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p5"
+"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0"
+"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0"
+"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p7"
+"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p9"
 )
 
 for i in "${arr[@]}"
@@ -771,3 +768,5 @@ do
     sbatch run_vr.slurm
     cd ..
 done
+
+3142263 3142264 3142265 3142266 3142267

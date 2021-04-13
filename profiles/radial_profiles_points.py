@@ -6,7 +6,6 @@ Test as:
 import os
 import sys
 import unyt
-import mpl_scatter_density
 import numpy as np
 import pandas as pd
 import swiftsimio as sw
