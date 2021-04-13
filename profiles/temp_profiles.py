@@ -153,12 +153,12 @@ def profile_3d_shells(
     temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
     temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
 
-    entropy_profile = mass_weighted_temperatures / number_density_profile ** (2 / 3)
+    entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
 
     rho_crit = unyt.unyt_quantity(
         data.metadata.cosmology.critical_density(data.metadata.z).value, 'g/cm**3'
     ).to('Msun/Mpc**3')
-    temperature_profile /= rho_crit
+    density_profile /= rho_crit
 
     return radial_bin_centres, density_profile, temperature_profile, entropy_profile, M500, R500
 
