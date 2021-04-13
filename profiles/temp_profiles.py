@@ -193,7 +193,7 @@ paths = {
 
 alpha_list = ['0.', '0.5', '0.7', '0.9', '1.']
 
-name = "Spectral_r"
+name = "rainbow"
 cmap = get_cmap(name)
 
 fig = plt.figure(figsize=(9, 5))
