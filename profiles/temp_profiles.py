@@ -106,5 +106,14 @@ ax.set_xlabel(f'$r/r_{{500,true}}$')
 ax.set_ylabel(field_label)
 ax.set_xlim([0.05, 2])
 ax.set_ylim([30, 1e4])
-plt.legend()
+
+from matplotlib.legend_handler import HandlerLine2D
+
+
+def update_prop(handle, orig):
+    handle.update_from(orig)
+    handle.set_marker("o")
+
+
+plt.legend(handler_map={plt.Line2D: HandlerLine2D(update_func=update_prop)})
 plt.show()
