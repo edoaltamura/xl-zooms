@@ -1,4 +1,3 @@
-from os.path import isfile
 from matplotlib import pyplot as plt
 from matplotlib.cm import get_cmap
 import unyt
@@ -17,7 +16,6 @@ def profile_3d_single_halo(
 ) -> tuple:
     # Read in halo properties
     vr_catalogue_handle = vr.load(path_to_catalogue)
-    a = vr_catalogue_handle.a
     M500 = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
     R500 = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
     XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
@@ -30,19 +28,12 @@ def profile_3d_single_halo(
     # physical units for later use.
     mask = sw.mask(path_to_snap, spatial_only=True)
     region = [
-        [(XPotMin - R500) * a, (XPotMin + R500) * a],
-        [(YPotMin - R500) * a, (YPotMin + R500) * a],
-        [(ZPotMin - R500) * a, (ZPotMin + R500) * a]
+        [(XPotMin - R500), (XPotMin + R500)],
+        [(YPotMin - R500), (YPotMin + R500)],
+        [(ZPotMin - R500), (ZPotMin + R500)]
     ]
     mask.constrain_spatial(region)
     data = sw.load(path_to_snap, mask=mask)
-
-    # Convert datasets to physical quantities
-    # R500c is already in physical units
-    data.gas.coordinates.convert_to_physical()
-    data.gas.masses.convert_to_physical()
-    data.gas.temperatures.convert_to_physical()
-    data.gas.densities.convert_to_physical()
 
     # Select hot gas within sphere
     tempGas = data.gas.temperatures
@@ -52,12 +43,6 @@ def profile_3d_single_halo(
     radial_distance = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2) / R500
     index = np.where((radial_distance < 2) & (tempGas > 1e5))[0]
     del tempGas, deltaX, deltaY, deltaZ
-
-    # Calculate particle mass and rho_crit
-    rho_crit = unyt.unyt_quantity(
-        data.metadata.cosmology.critical_density(data.metadata.z).value,
-        'g/cm**3'
-    )
 
     mass_weighted_temperatures = (data.gas.temperatures * unyt.boltzmann_constant).to('keV')
     number_densities = (data.gas.densities.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
