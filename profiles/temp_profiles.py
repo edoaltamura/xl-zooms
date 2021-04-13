@@ -146,11 +146,13 @@ def profile_3d_shells(
     volume_shell = (4. * np.pi / 3.) * (R500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
     mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=data.gas.masses)
+    mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
     density_profile = mass_weights / volume_shell
     number_density_profile = (density_profile.to('g/cm**3') / (unyt.mp * mean_molecular_weight)).to('cm**-3')
 
     mass_weighted_temperatures = (data.gas.temperatures * unyt.boltzmann_constant).to('keV') * data.gas.masses
     temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+    temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
     temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
 
     entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
@@ -194,14 +196,13 @@ alpha_list = ['0.', '1.']
 name = "Spectral"
 cmap = get_cmap(name)
 
-fig = plt.figure(figsize=(6, 9))
-gs = fig.add_gridspec(2, 3, hspace=0.1, wspace=0.2)
+fig = plt.figure(figsize=(9, 6))
+gs = fig.add_gridspec(2, 3, hspace=0.05, wspace=0.3)
 axes = gs.subplots(sharex=True, sharey='col')
 
 for ax in axes.flat:
     ax.loglog()
     ax.axvline(x=1, color='k', linestyle='--')
-    ax.set_xlabel(f'$r/r_{{500,true}}$')
     ax.set_xlim([1e-3, 2])
 
 print("Entropy - shell average")
@@ -322,6 +323,7 @@ for alpha_key in alpha_list:
     )
 
     ax.set_ylabel(r'$T$ [keV]')
+    ax.set_ylim([0.1, 10])
 
 print("Temperatures - dot particles")
 ax = axes[1, 1]
@@ -355,6 +357,8 @@ for alpha_key in alpha_list:
     )
 
     ax.set_ylabel(r'$T$ [keV]')
+    ax.set_ylim([0.1, 10])
+    ax.set_xlabel(f'$r/r_{{500,true}}$')
 
 print("Density - shell average")
 ax = axes[0, 2]
@@ -369,14 +373,14 @@ for alpha_key in alpha_list:
 
     ax.plot(
         radial_bin_centres,
-        density_profile * (radial_bin_centres / R500) ** 2,
+        density_profile,
         linestyle='-',
         color=cmap(float(alpha_key)),
         linewidth=1,
         alpha=1,
     )
 
-    ax.set_ylabel(r'$(\rho / \rho_{crit})(r/r_{500})^2$')
+    ax.set_ylabel(r'$(\rho / \rho_{crit})$')
 
 print("Density - dot particles")
 ax = axes[1, 2]
@@ -391,13 +395,13 @@ for alpha_key in alpha_list:
 
     ax.plot(
         radial_distance[::10],
-        densities[::10] * (radial_distance[::10] / R500) ** 2,
+        densities[::10],
         marker=',',
         lw=0, linestyle="", c=cmap(float(alpha_key)),
         alpha=0.5, label=f"Alpha_max = {alpha_key}"
     )
 
-    ax.set_ylabel(r'$(\rho / \rho_{crit})(r/r_{500})^2$')
+    ax.set_ylabel(r'$(\rho / \rho_{crit})$')
 
 plt.legend(handler_map={plt.Line2D: HandlerLine2D(update_func=update_prop)})
 plt.show()
