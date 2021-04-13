@@ -77,23 +77,23 @@ runname = 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1'
 paths = {
     '0.': (
         cwd + 'vr_partial_outputs/alpha0p0.properties',
-        cwd + runname + '_alpha0p0/snapshots/' + runname + '_2252.hdf5'
+        cwd + runname + '_alpha0p0/snapshots/' + runname + '_SNnobirth_2252.hdf5'
     ),
     '0.5': (
         cwd + 'vr_partial_outputs/alpha0p5.properties',
-        cwd + runname + '_alpha0p5/snapshots/' + runname + '_2252.hdf5'
+        cwd + runname + '_alpha0p5/snapshots/' + runname + '_SNnobirth_2252.hdf5'
     ),
     '0.7': (
         cwd + 'vr_partial_outputs/alpha0p7.properties',
-        cwd + runname + '_alpha0p7/snapshots/' + runname + '_2252.hdf5'
+        cwd + runname + '_alpha0p7/snapshots/' + runname + '_SNnobirth_2252.hdf5'
     ),
     '0.9': (
         cwd + 'vr_partial_outputs/alpha0p9.properties',
-        cwd + runname + '_alpha0p9/snapshots/' + runname + '_2252.hdf5'
+        cwd + runname + '_alpha0p9/snapshots/' + runname + '_SNnobirth_2252.hdf5'
     ),
     '1.': (
         cwd + 'vr_partial_outputs/alpha1p0.properties',
-        cwd + runname + '_alpha1p0/snapshots/' + runname + '_2252.hdf5'
+        cwd + runname + '_alpha1p0/snapshots/' + runname + '_SNnobirth_2252.hdf5'
     ),
 }
 
