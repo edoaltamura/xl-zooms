@@ -104,11 +104,11 @@ fig, ax = plt.subplots()
 
 for alpha_key in paths:
     print(alpha_key)
-    vr, sw = paths[alpha_key]
+    cat, snap = paths[alpha_key]
 
     output = profile_3d_single_halo(
-        path_to_snap=sw,
-        path_to_catalogue=vr,
+        path_to_snap=snap,
+        path_to_catalogue=cat,
     )
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
