@@ -105,7 +105,7 @@ for alpha_key in ['0.', '1.']:
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
     ax.plot(radial_distance[::10], field_value[::10], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
-            alpha=0.7, label=f"Alpha_max = {alpha_key}")
+            alpha=0.5, label=f"Alpha_max = {alpha_key}")
 
 ax.set_xlabel(f'$r/r_{{500,true}}$')
 ax.set_ylabel(field_label)
