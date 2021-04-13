@@ -97,8 +97,7 @@ paths = {
     ),
 }
 
-fig, ax = plt.subplots()
-name = "coolwarm"
+name = "Spectral"
 cmap = get_cmap(name)
 
 fig, ax = plt.subplots()
@@ -108,6 +107,7 @@ for alpha_key in paths:
     vr, sw = paths[alpha_key]
 
     if ~isfile(vr) or ~isfile(sw):
+        print('not found', vr, sw, sep='\n')
         continue
 
     output = profile_3d_single_halo(
