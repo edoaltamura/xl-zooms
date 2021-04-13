@@ -193,12 +193,12 @@ paths = {
 
 alpha_list = ['0.', '0.5', '0.7', '0.9', '1.']
 
-name = "Spectral"
+name = "Spectral_r"
 cmap = get_cmap(name)
 
 fig = plt.figure(figsize=(9, 5))
 gs = fig.add_gridspec(2, 3, hspace=0.05, wspace=0.3)
-axes = gs.subplots(sharex=True, sharey='col')
+axes = gs.subplots(sharex=True, sharey=False)
 
 for ax in axes.flat:
     ax.loglog()
@@ -309,7 +309,7 @@ for alpha_key in alpha_list:
 
     ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
     ax.set_ylabel(r'$k_BT$ [keV]')
-    ax.set_ylim([0.1, 10])
+    ax.set_ylim([1, 6])
 ax.text(
     ax.get_xlim()[0], kBT500, r'$k_BT_{500}$',
     horizontalalignment='left',
@@ -377,6 +377,7 @@ for alpha_key in alpha_list:
     )
 
     ax.set_ylabel(r'$\rho_{gas} / \rho_{crit}$')
+    ax.set_ylim([1, 1e3])
 
 print("Density - dot particles")
 ax = axes[1, 2]
@@ -398,15 +399,17 @@ for alpha_key in alpha_list:
     )
 
     ax.set_ylabel(r'$\rho_{gas} / \rho_{crit}$')
+    ax.set_ylim([1, 1e3])
 
-axes[0, 0].legend(handler_map={plt.Line2D: HandlerLine2D(update_func=update_prop)})
+plt.legend(handler_map={plt.Line2D: HandlerLine2D(update_func=update_prop)})
 
 fig.suptitle(
     (
         f"Aperture = 2 $r_{{500}}$\t\t"
         f"$z = 0$\n"
         f"VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha*_no_adiabatic\n"
-        f"Central FoF group only"
+        f"Central FoF group only\n"
+        f"Top row: shell-averaged, bottom row: particle-dots ([::20])"
     ),
     fontsize=7
 )
