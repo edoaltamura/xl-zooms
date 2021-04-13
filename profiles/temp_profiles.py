@@ -231,7 +231,7 @@ for alpha_key in alpha_list:
             kBT500 / (3 * M500 * obs.cosmic_fbary / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
-    ax.axhline(x=K500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
     ax.text(
         ax.get_xlim()[0], K500, r'$K_{500}$',
         horizontalalignment='left',
@@ -268,7 +268,7 @@ for alpha_key in alpha_list:
             kBT500 / (3 * M500 * obs.cosmic_fbary / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
-    ax.axhline(x=K500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
     ax.text(
         ax.get_xlim()[0], K500, r'$K_{500}$',
         horizontalalignment='left',
@@ -308,7 +308,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
 
-    ax.axhline(x=kBT500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
     ax.text(
         ax.get_xlim()[0], kBT500, r'$k_BT_{500}$',
         horizontalalignment='left',
@@ -341,7 +341,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
 
-    ax.axhline(x=kBT500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
     ax.text(
         ax.get_xlim()[0], kBT500, r'$k_BT_{500}$',
         horizontalalignment='left',
