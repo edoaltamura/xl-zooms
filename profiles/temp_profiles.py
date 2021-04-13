@@ -74,23 +74,23 @@ def profile_3d_single_halo(
 cwd = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/'
 
 paths = {
-    0.: (
+    '0.': (
         cwd + 'vr_partial_outputs/alpha0p0.properties',
         cwd + 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2252.hdf5'
     ),
-    0.5: (
+    '0.5': (
         cwd + 'vr_partial_outputs/alpha0p5.properties',
         cwd + 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p5/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2252.hdf5'
     ),
-    0.7: (
+    '0.7': (
         cwd + 'vr_partial_outputs/alpha0p7.properties',
         cwd + 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p7/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2252.hdf5'
     ),
-    0.9: (
+    '0.9': (
         cwd + 'vr_partial_outputs/alpha0p9.properties',
         cwd + 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p9/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2252.hdf5'
     ),
-    1.: (
+    '1.': (
         cwd + 'vr_partial_outputs/alpha1p0.properties',
         cwd + 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2252.hdf5'
     ),
@@ -115,6 +115,6 @@ for alpha_key in paths:
     )
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
-    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c=cmap(alpha_key), alpha=0.1)
+    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)), alpha=0.1)
 
 plt.show()
