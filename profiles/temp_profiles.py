@@ -100,10 +100,11 @@ for alpha_key in paths:
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
     ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
-            alpha=0.1)
+            alpha=0.1, label=alpha_key)
 
 ax.set_xlabel(f'$r/r_{{500,true}}$')
 ax.set_ylabel(field_label)
 ax.set_xlim([0.05, 2])
 ax.set_ylim([30, 1e4])
+plt.legend()
 plt.show()
