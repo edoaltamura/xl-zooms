@@ -110,9 +110,10 @@ for alpha_key in paths:
         path_to_snap=snap,
         path_to_catalogue=cat,
     )
+    print(output)
     radial_distance, field_value, field_masses, field_label, M500, R500 = output
 
-    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c=cmap(float(alpha_key)),
+    ax.plot(radial_distance[::20], field_value[::20], marker=',', lw=0, linestyle="", c='k',
             alpha=0.1)
 
 plt.show()
