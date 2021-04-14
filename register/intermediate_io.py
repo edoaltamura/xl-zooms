@@ -26,7 +26,7 @@ except ModuleNotFoundError:
     import pickle
 
 from .auto_parser import args
-from register.static_parameters import default_output_directory
+from .static_parameters import default_output_directory
 
 # Make sure the `intermediate` directory exists in the output directory
 if not os.path.isdir(os.path.join(default_output_directory, 'intermediate')):
