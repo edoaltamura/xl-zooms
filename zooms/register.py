@@ -625,11 +625,11 @@ def dump_exlzooms() -> None:
     )
 
 
-def load_exlzooms() -> tuple:
+def load_exlzooms() -> list:
     pickler = MultiObjPickler('zooms_register.pkl', relative_path=True)
     try:
         data_pkl = pickler.load_from_pickle()
-        return tuple(data_pkl)
+        return data_pkl
     except FileNotFoundError as e:
         print(
             "The EXL Zoom management data couldn't be found.",
@@ -641,6 +641,5 @@ def load_exlzooms() -> tuple:
 if args.refresh_catalogue:
     dump_exlzooms()
 
-print(*load_exlzooms())
-
-(calibration_zooms, completed_runs, zooms_register, name_list) = load_exlzooms()
+print([hex(id(x)) for x in load_exlzooms()])
+calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
