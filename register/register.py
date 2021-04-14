@@ -65,7 +65,7 @@ from typing import List
 import subprocess as sp
 
 from .auto_parser import args
-from register.static_parameters import *
+from .static_parameters import *
 from .intermediate_io import MultiObjPickler
 
 
