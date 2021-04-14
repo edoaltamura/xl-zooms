@@ -641,4 +641,6 @@ def load_exlzooms() -> tuple:
 if args.refresh_catalogue:
     dump_exlzooms()
 
+print(load_exlzooms())
+
 calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
