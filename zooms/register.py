@@ -124,8 +124,8 @@ class EXLZooms(object):
         "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
-    name_list: List[str] = []
-    run_directories: List[str] = []
+    name_list: List[str]
+    run_directories: List[str]
     complete_runs: np.ndarray
 
     def __init__(self) -> None:
@@ -207,7 +207,6 @@ class EXLZooms(object):
 
     def get_incomplete_run_directories(self) -> List[str]:
         directories = np.array(self.run_directories, dtype=np.str)
-        print(self.run_directories, len(directories))
         return directories[~self.complete_runs].tolist()
 
     def get_completed_run_names(self) -> List[str]:
