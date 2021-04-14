@@ -1,5 +1,12 @@
+# -*- coding: utf-8 -*-
+"""Argument parser and CLI
+
+This file defines the `ArgumentParser` instance for the command-line interface
+of the analysis pipeline.
+"""
+
 import argparse
-from register import calibration_zooms
+from .register import calibration_zooms
 
 parser = argparse.ArgumentParser(add_help=False)
 
@@ -37,13 +44,21 @@ parser.add_argument(
     '--mass-estimator',
     type=str.lower,
     default='true',
-    required=True,
+    required=False,
     choices=['true', 'hse', 'spec']
 )
 
 parser.add_argument(
     '-q',
     '--quiet',
+    default=False,
+    required=False,
+    action='store_true'
+)
+
+parser.add_argument(
+    '--refresh',
+    '--refresh-catalogue',
     default=False,
     required=False,
     action='store_true'
@@ -57,16 +72,13 @@ args = parser.parse_known_args()[0]
 # Set matplotlib backend depending on use
 import matplotlib
 
-if args.quiet:
-    mpl_backend = 'Agg'
-else:
-    mpl_backend = 'TkAgg'
+mpl_backend = 'Agg' if args.quiet else 'TkAgg'
 matplotlib.use(mpl_backend)
 
 # Apply the matplotlib stylesheet
 import matplotlib.pyplot as plt
-try:
-    plt.style.use("../mnras.mplstyle")
-except:
-    pass
 
+try:
+    plt.style.use("./mnras.mplstyle")
+except (FileNotFoundError, OSError):
+    pass

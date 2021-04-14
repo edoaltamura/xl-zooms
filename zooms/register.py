@@ -65,8 +65,9 @@ from tqdm import tqdm
 from typing import List
 import subprocess as sp
 
-Tcut_halogas = 1.e5
-SILENT_PROGRESSBAR = False
+from .auto_parser import args
+from .static_parameters import *
+from .intermediate_io import MultiObjPickler
 
 
 def dump_memory_usage() -> None:
@@ -114,7 +115,7 @@ def tail(fname, window=2):
 
 class EXLZooms(object):
     name: str = 'Eagle-XL Zooms'
-    output_directory: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
+    output_directory: str = default_output_directory
 
     # Zooms will be searched in this directories
     cosma_repositories: List[str] = [
@@ -603,16 +604,43 @@ class Zoom(object):
         return Redshift(redshift_info)
 
 
-calibration_zooms = EXLZooms()
-completed_runs = calibration_zooms.get_completed_run_directories()
-zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
-name_list = calibration_zooms.get_completed_run_names()
+def dump_exlzooms() -> None:
+    calibration_zooms = EXLZooms()
+    completed_runs = calibration_zooms.get_completed_run_directories()
+    zooms_register = [Zoom(run_directory) for run_directory in completed_runs]
+    name_list = calibration_zooms.get_completed_run_names()
 
-# Sort zooms by VR number
-zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
-name_list.sort(key=lambda x: int(x.split('_')[1][2:]))
+    # Sort zooms by VR number
+    zooms_register.sort(key=lambda x: int(x.run_name.split('_')[1][2:]))
+    name_list.sort(key=lambda x: int(x.split('_')[1][2:]))
 
-if __name__ == "__main__":
+    pickler = MultiObjPickler('zooms_register.pkl', relative_path=True)
+    pickler.dump_to_pickle(
+        [
+            calibration_zooms,
+            completed_runs,
+            zooms_register,
+            name_list
+        ]
+    )
+
+
+def load_exlzooms() -> tuple:
+    pickler = MultiObjPickler('zooms_register.pkl', relative_path=True)
+    try:
+        data_pkl = pickler.load_from_pickle()
+        return tuple(data_pkl)
+    except FileNotFoundError as e:
+        print(
+            "The EXL Zoom management data couldn't be found.",
+            "Run the pipeline with the --refresh or --refresh-catalogue options.",
+            e
+        )
+
+
+def query_exlzooms() -> None:
+    calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
+
     incomplete_runs = calibration_zooms.get_incomplete_run_directories()
     print((
         "\n"
@@ -640,3 +668,12 @@ if __name__ == "__main__":
     ))
     if advanced_search == 'y':
         calibration_zooms.analyse_incomplete_runs()
+
+
+if args.refresh_catalogue:
+    dump_exlzooms()
+
+calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
+
+if __name__ == "__main__":
+    query_exlzooms()
