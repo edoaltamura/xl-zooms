@@ -124,11 +124,11 @@ class EXLZooms(object):
         "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
-    name_list: List[str]
-    run_directories: List[str]
-    complete_runs: np.ndarray
-
     def __init__(self) -> None:
+
+        self.name_list: List[str] = []
+        self.run_directories: List[str] = []
+        self.complete_runs: np.ndarray
 
         # Search for any run directories in repositories
         for repository in self.cosma_repositories:
@@ -413,15 +413,15 @@ class Redshift(object):
         'catalogue_properties_path',
     )
 
-    run_name: str
-    scale_factor: float
-    a: float
-    redshift: float
-    z: float
-    snapshot_path: str
-    catalogue_properties_path: str
-
     def __init__(self, info_dict: dict):
+        self.run_name: str
+        self.scale_factor: float
+        self.a: float
+        self.redshift: float
+        self.z: float
+        self.snapshot_path: str
+        self.catalogue_properties_path: str
+
         for key in info_dict:
             setattr(self, key, info_dict[key])
 
@@ -450,16 +450,17 @@ class Zoom(object):
         'catalogue_properties_paths',
     )
 
-    run_name: str
-    run_directory: str
-    redshifts: np.ndarray
-    scale_factors: np.ndarray
-    index_snaps: np.ndarray
-    index_snips: np.ndarray
-    snapshot_paths: List[str]
-    catalogue_properties_paths: List[str]
-
     def __init__(self, run_directory: str) -> None:
+
+        self.run_name: str
+        self.run_directory: str
+        self.redshifts: np.ndarray
+        self.scale_factors: np.ndarray
+        self.index_snaps: np.ndarray
+        self.index_snips: np.ndarray
+        self.snapshot_paths: List[str]
+        self.catalogue_properties_paths: List[str]
+
         self.run_name = os.path.basename(run_directory)
         self.run_directory = run_directory
         self.redshifts, self.scale_factors, self.index_snaps, self.index_snips = self.read_output_list()

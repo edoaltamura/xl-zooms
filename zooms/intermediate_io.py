@@ -1,3 +1,9 @@
+"""
+
+When you pickled the instance you haven't pickled the class attributes,
+just the instance attributes. So when you unpickle it you get just the
+instance attributes back.
+"""
 import os
 from warnings import warn
 
