@@ -76,4 +76,4 @@ import matplotlib.pyplot as plt
 try:
     plt.style.use("./mnras.mplstyle")
 except (FileNotFoundError, OSError):
-    pass
+    print('Could not find the mnras.mplstyle style-sheet.')
