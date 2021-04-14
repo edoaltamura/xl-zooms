@@ -65,19 +65,9 @@ from tqdm import tqdm
 from typing import List
 import subprocess as sp
 
-
-if __name__ == "__main__":
-    # If running the file in stand-alone mode, importing the submodules
-    # with the leading `.` will result in a ModuleNotFoundError, so create
-    # separate set of relative imports.
-    from auto_parser import args
-    from static_parameters import *
-    from intermediate_io import MultiObjPickler
-
-else:
-    from .auto_parser import args
-    from .static_parameters import *
-    from .intermediate_io import MultiObjPickler
+from .auto_parser import args
+from .static_parameters import *
+from .intermediate_io import MultiObjPickler
 
 
 def dump_memory_usage() -> None:
@@ -648,42 +638,7 @@ def load_exlzooms() -> tuple:
         )
 
 
-def query_exlzooms() -> None:
-    calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
-
-    incomplete_runs = calibration_zooms.get_incomplete_run_directories()
-    print((
-        "\n"
-        "The following simulations were found with directory set-up, "
-        "but missing snapshots or stf sub-directories. They are "
-        "likely not yet launched or incomplete and were not appended "
-        "to the master register."
-    ))
-    for i in incomplete_runs:
-        print(f"[!] -> {i:s}")
-
-    print(f"\n{' Zoom register ':-^40s}")
-    for i in completed_runs:
-        print(i)
-
-    print(f"\n{' Test: redshift data (z = 0) ':-^40s}")
-    print(zooms_register[0].get_redshift())
-
-    print(f"\n{' Test: redshift data (z = 0.1) ':-^40s}")
-    print(zooms_register[0].get_redshift(-3))
-
-    advanced_search = input((
-        "Press `y` to initialise the advanced search on incomplete runs. "
-        "Press any other key to quit.\t--> "
-    ))
-    if advanced_search == 'y':
-        calibration_zooms.analyse_incomplete_runs()
-
-
 if args.refresh_catalogue:
     dump_exlzooms()
 
 calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
-
-if __name__ == "__main__":
-    query_exlzooms()
