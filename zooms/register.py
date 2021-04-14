@@ -65,9 +65,19 @@ from tqdm import tqdm
 from typing import List
 import subprocess as sp
 
-from .auto_parser import args
-from .static_parameters import *
-from .intermediate_io import MultiObjPickler
+
+if __name__ == "__main__":
+    # If running the file in stand-alone mode, importing the submodules
+    # with the leading `.` will result in a ModuleNotFoundError, so create
+    # separate set of relative imports.
+    from auto_parser import args
+    from static_parameters import *
+    from intermediate_io import MultiObjPickler
+
+else:
+    from .auto_parser import args
+    from .static_parameters import *
+    from .intermediate_io import MultiObjPickler
 
 
 def dump_memory_usage() -> None:
