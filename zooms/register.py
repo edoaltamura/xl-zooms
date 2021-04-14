@@ -633,7 +633,7 @@ def load_exlzooms() -> tuple:
     except FileNotFoundError as e:
         print(
             "The EXL Zoom management data couldn't be found.",
-            "Run the pipeline with the --refresh or --refresh-catalogue options.",
+            "Run the pipeline with the -refresh or --refresh-catalogue options.",
             e
         )
 
