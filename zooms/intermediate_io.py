@@ -26,7 +26,7 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-class MultiObjPickler:
+class CustomPickler:
     def __init__(self, filename: str, relative_path: bool = False):
 
         if relative_path:
@@ -38,9 +38,52 @@ class MultiObjPickler:
         else:
             self.filename = filename
 
+    def large_file_warning(self) -> None:
+        file_size_b = os.path.getsize(self.filename)
+        if not args.quiet and file_size_b > 524288000:
+            warn(
+                (
+                    '[io] Detected file larger than 500 MB! '
+                    'Trying to import all contents of pkl to memory at once. '
+                    'If the file is large, you may run out of memory or degrade the '
+                    'performance. You can use the `MultiObjPickler.get_pickle_generator` '
+                    'to access a generator, which returns only one pickled object at a '
+                    'time.'
+                ),
+                category=ResourceWarning
+            )
+
+
+class SingleObjPickler(CustomPickler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
     def dump_to_pickle(self, obj):
         with open(self.filename, 'wb') as output:  # Overwrites any existing file.
             pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+
+        if not args.quiet:
+            file_size = sizeof_fmt(
+                os.path.getsize(
+                    self.filename
+                )
+            )
+            print(f"[io] Object saved to pkl [{file_size:s}]: {self.filename:s}")
+
+    def load_from_pickle(self):
+        self.large_file_warning()
+
+        return pickle.load(self.filename)
+
+
+class MultiObjPickler(CustomPickler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def dump_to_pickle(self, obj_collection):
+        with open(self.filename, 'wb') as output:  # Overwrites any existing file.
+            for obj in obj_collection:
+                pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
         if not args.quiet:
             file_size = sizeof_fmt(
@@ -71,23 +114,8 @@ class MultiObjPickler:
                     break
 
     def load_from_pickle(self):
-
-        file_size_b = os.path.getsize(self.filename)
-        if not args.quiet and file_size_b > 52428800:
-            warn(
-                (
-                    '[io] Detected file larger than 50 MB! '
-                    'Trying to import all contents of pkl to memory at once. '
-                    'If the file is large, you may run out of memory or degrade the '
-                    'performance. You can use the `MultiObjPickler.get_pickle_generator` '
-                    'to access a generator, which returns only one pickled object at a '
-                    'time.'
-                ),
-                category=ResourceWarning
-            )
-
-        retrieve_pickled = []
+        self.large_file_warning()
+        collection_pkl = []
         for obj in self.get_pickle_generator():
-            retrieve_pickled.append(obj)
-
-        return retrieve_pickled
+            collection_pkl.append(obj)
+        return collection_pkl
