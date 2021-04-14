@@ -114,9 +114,6 @@ def tail(fname, window=2):
 
 
 class EXLZooms(object):
-    name: str = 'Eagle-XL Zooms'
-    output_directory: str = default_output_directory
-
     # Zooms will be searched in this directories
     cosma_repositories: List[str] = [
         "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
@@ -126,6 +123,9 @@ class EXLZooms(object):
 
     def __init__(self) -> None:
 
+        # Initialise variables as instance attributes, not as class attributes
+        self.name: str = 'Eagle-XL Zooms'
+        self.output_directory: str = default_output_directory
         self.name_list: List[str] = []
         self.run_directories: List[str] = []
         self.complete_runs: np.ndarray
@@ -414,6 +414,7 @@ class Redshift(object):
     )
 
     def __init__(self, info_dict: dict):
+        # Initialise variables as instance attributes, not as class attributes
         self.run_name: str
         self.scale_factor: float
         self.a: float
@@ -452,6 +453,7 @@ class Zoom(object):
 
     def __init__(self, run_directory: str) -> None:
 
+        # Initialise variables as instance attributes, not as class attributes
         self.run_name: str
         self.run_directory: str
         self.redshifts: np.ndarray

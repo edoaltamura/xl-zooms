@@ -37,4 +37,3 @@ def query_exlzooms() -> None:
 
 if __name__ == '__main__':
     query_exlzooms()
-    # print(completed_runs)
