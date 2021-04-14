@@ -3,6 +3,10 @@ from warnings import warn
 
 try:
     import _pickle as pickle
+
+    # `HIGHEST_PROTOCOL` attribute not defined in `_pickle`
+    pickle.HIGHEST_PROTOCOL = -1
+
 except ModuleNotFoundError:
     import pickle
 
