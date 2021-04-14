@@ -52,7 +52,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '--refresh',
+    '-refresh',
     '--refresh-catalogue',
     default=False,
     required=False,
