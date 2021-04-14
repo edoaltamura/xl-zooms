@@ -1,5 +1,14 @@
-"""
+# -*- coding: utf-8 -*-
+"""Tools for handling intermediate analysis products
 
+This package contains classes that use the `pickle` library to dump
+and read back into memory intermediate products of the analysis.
+
+Generally, quantities which take a long time to compute and do not
+need to be freshly calculated every time should be dumped to disk and
+read back when requires.
+
+IMPORTANT - (abstract) Class attributes are lost in pickling
 When you pickled the instance you haven't pickled the class attributes,
 just the instance attributes. So when you unpickle it you get just the
 instance attributes back.
@@ -17,7 +26,7 @@ except ModuleNotFoundError:
     import pickle
 
 from .auto_parser import args
-from .static_parameters import default_output_directory
+from register.static_parameters import default_output_directory
 
 # Make sure the `intermediate` directory exists in the output directory
 if not os.path.isdir(os.path.join(default_output_directory, 'intermediate')):

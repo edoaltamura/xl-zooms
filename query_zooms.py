@@ -1,4 +1,4 @@
-from zooms import (
+from register import (
     calibration_zooms,
     completed_runs,
     zooms_register,
