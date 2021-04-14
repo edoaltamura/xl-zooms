@@ -6,7 +6,6 @@ of the analysis pipeline.
 """
 
 import argparse
-from .register import calibration_zooms
 
 parser = argparse.ArgumentParser(add_help=False)
 
@@ -32,11 +31,7 @@ parser.add_argument(
     type=int,
     default=36,
     required=False,
-    choices=list(
-        range(
-            len(calibration_zooms.get_snap_redshifts())
-        )
-    )
+    choices=list(range(37))
 )
 
 parser.add_argument(
