@@ -34,5 +34,7 @@ def query_exlzooms() -> None:
     if advanced_search == 'y':
         calibration_zooms.analyse_incomplete_runs()
 
+
 if __name__ == '__main__':
-    query_exlzooms()
+    # query_exlzooms()
+    print(completed_runs)

@@ -641,5 +641,4 @@ def load_exlzooms() -> list:
 if args.refresh_catalogue:
     dump_exlzooms()
 
-print([hex(id(x)) for x in load_exlzooms()])
 calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
