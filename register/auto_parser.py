@@ -6,6 +6,7 @@ of the analysis pipeline.
 """
 
 import argparse
+import os.path
 
 parser = argparse.ArgumentParser(add_help=False)
 
@@ -72,8 +73,11 @@ matplotlib.use(mpl_backend)
 
 # Apply the matplotlib stylesheet
 import matplotlib.pyplot as plt
-
+matplotlib_stylesheet = os.path.join(
+    os.path.dirname(__file__),
+    'mnras.mplstyle'
+)
 try:
-    plt.style.use("./mnras.mplstyle")
+    plt.style.use(matplotlib_stylesheet)
 except (FileNotFoundError, OSError):
     print('Could not find the mnras.mplstyle style-sheet.')
