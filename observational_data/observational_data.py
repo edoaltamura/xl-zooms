@@ -233,6 +233,13 @@ class Sun09(Observations):
     plot_as = "points"
     redshift = 0.1
 
+    data_files: List[str] = [
+        os.path.join(repository_dir, 'Sun2009.dat'),
+        os.path.join(repository_dir, 'Sun2009_table1.dat'),
+        os.path.join(repository_dir, 'Sun2009_table3.dat'),
+        os.path.join(repository_dir, 'Sun2009_table4.dat'),
+    ]
+
     def __init__(self, *args, **kwargs):
         super(Sun09, self).__init__(*args, **kwargs)
 
@@ -259,6 +266,28 @@ class Sun09(Observations):
             self.M_500gas * (error_M_500_m / M_500 + error_fb_500_m / fb_500),
             self.M_500gas * (error_M_500_p / M_500 + error_fb_500_p / fb_500)
         ))
+
+    def test(self):
+        data = self.load_table(self.data_files[1])
+
+        l = [len(x) for x in data]
+        print(l)
+
+    def load_table(self, file: str):
+
+        data = []
+        with open(file) as f:
+            lines = f.readlines()
+        for line in lines:
+            if not (
+                    line.startswith('#') or
+                    line.startswith('\t') or
+                    line.isspace()
+            ):
+                line_data = line.strip().split('\t')
+                data.append(line_data)
+        return data
+
 
 
 class Lovisari15(Observations):
@@ -1268,4 +1297,4 @@ class Mernier17(MetallicityScale):
 cosmic_fbary = Observations().cosmo_model.Ob0 / Observations().cosmo_model.Om0
 
 if __name__ == '__main__':
-    obs = Bohringer2007().quick_display()
+    obs = Sun09().test()

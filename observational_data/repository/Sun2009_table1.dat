@@ -1,0 +1,76 @@
+# Table 1
+# The Group Sample and the Chandra Observations
+# https://iopscience.iop.org/article/10.1088/0004-637X/693/2/1142#apj299958t1
+
+
+# Group	z^a	D^b	ObsID^c	Date	Exposure^d	PSPC^e	L_Ks^f	L_1.4GHz^g
+NGC 1550	0.0124	51.4	3186	2002 Jan 8	9.7		11.29	21.72
+			3187	2002 Jan 8	9.5
+			5800	2005 Oct 22	43.0 (44.0)
+			5801	2005 Oct 24	44.0 (44.3)
+NGC 3402	0.0153	63.5	3243	2002 Nov 05	22.9 (29.5)		11.40	22.18
+A262	0.0163	67.8	2215	2001 Aug 3	28.7 (28.7)	7.6	11.60	22.56
+			7921	2006 Nov 20	110.5 (110.5)
+NGC 383 (3C 31)	0.0170	70.8	2147	2000 Nov 6	41.0 (44.3)	24.0	11.67	24.46
+3C 449	0.0171	71.2	4057	2003 Sep 18	14.3 (26.4)	8.9	11.13	24.36
+NGC 533	0.0185	77.1	2880	2002 July 28	29.7 (37.1)	11.5	11.76	22.31
+NGC 741	0.0185	77.3	2223	2001 Jan 28	28.7 (30.2)	12.4	11.82	23.85
+MKW4	0.0200	83.4	3234	2002 Nov 24	27.6 (29.7)	9.4	11.81	22.15
+A3581	0.0230	96.2	1650	2001 June 07	7.2 (7.2)		11.51	23.85
+NGC 5129	0.0230	96.2	6944	2006 April 13	20.5 (20.5)	5.5	11.63	21.90
+			7325	2006 May 14	25.6 (25.6)
+NGC 1132	0.0233	97.5	3576	2003 Nov 16	20.5 (37.1)		11.64	21.79
+UGC 2755	0.0245	102	2189	2001 Feb 7	7.2 (15.6)	16.4	11.49	24.26
+NGC 4325	0.0257	108	3232	2003 Feb 4	25.6 (29.9)	4.8	11.31	<21.32
+HCG 51	0.0258	108	4989	2004 Feb 15	18.4 (18.9)		11.47	<21.32
+			5304	2004 Feb 16	12.2 (12.7)
+3C 442A	0.0263	110	5635	2005 July 27	26.6		11.51, 11.40	24.70
+			6353	2005 July 28	13.6
+			6359	2005 Oct 7	19.4
+			6392	2006 Jan 12	31.7
+UGC 5088	0.0274	115	3227	2002 March 10	33.8		11.26	21.04
+NGC 6338	0.0274	115	4194	2003 Sep 17	39.9	3.5	11.73	22.95
+NGC 4104	0.0282	118	6939	2006 Feb 16	35.8 (35.8)	13.6	11.85	21.60
+RBS 461	0.0296	124	4182	2003 March 11	22.0		11.41	22.57
+ESO 552-020	0.0314	132	3206	2002 Oct 14	18.7		11.92	<21.72
+A1177	0.0316	133	6940	2006 Dec 27	32.8 (33.5)		11.73	<21.50
+IC 1262	0.0326	138	2018	2001 Aug 23	25.6 (30.5)		11.49	23.22
+			6949	2006 April 17	38.1
+			7321	2006 April 19	36.8
+			7322	2006 April 22	37.4
+NGC 6269	0.0348	147	4972	2003 Dec 29	38.6	10.1	11.94	23.11
+ESO 306-017	0.0358	151	3188	2002 March 8	13.6		11.91	22.58
+			3189	2002 March 9	13.8
+			914*	2000 July 26	50.4
+NGC 5098	0.0368	156	2231	2001 Aug 4	10.0		11.44, 11.36	23.38
+			6941	2005 Nov 1	37.9 (38.6)
+A1139	0.0398	169	9387	2008 March 28	10.0		11.50	23.16
+A160	0.0447	190	3219	2002 Oct 18	54.5		11.69	24.65
+UGC 842	0.0452	192	4963	2005 Feb 13	38.9 (39.2)		11.77	22.24
+A2717	0.0498	213	6973	2006 Aug 17	46.1	8.5	11.82	24.52
+			6974	2006 April 10	18.9
+RXJ 1022+3830	0.0543	233	6942	2006 Oct 14	40.9 (41.4)	10.3	11.69, -	<21.98
+AS1101	0.0564	242	1668	2001 Aug 13	9.2 (9.4)	11.9	11.89	24.27
+ESO 351-021	0.0571	245	5784	2005 April 24	34.8 (35.1)		11.95	22.71
+A3880	0.0581	250	5798	2004 Dec 23	19.7		11.93	24.22
+A1991	0.0587	253	3193	2002 Dec 16	36.8 (36.3)	20.0	11.86	23.47
+A1275	0.0637	275	6945	2006 Feb 5	49.1 (48.4)		11.31	<22.13
+A2092	0.0669	290	9384	2007 Nov 13	9.7		11.44	<22.17
+RXJ 1206-0744	0.0680	295	9388	2007 Nov 15	10.0		11.75	<22.19
+A1238	0.0720	313	4991	2004 March 28	18.2		11.70	24.44
+A744	0.0729	317	6947	2006 Oct 22	36.3		11.80	22.24
+A2462	0.0733	319	4159	2002 Nov 19	37.9 (38.6)	3.4	11.82	25.36
+RXJ 1159+5531	0.0808	354	4964	2004 Feb 11	69.6 (74.2)		11.97	<22.34
+A1692	0.0848	372	4990	2004 Aug 12	21.5		11.88	22.33
+			6930*	2006 March 6	76.0
+			7289*	2006 March 9	75.0
+A2550	0.122	550	2225	2001 Sep 3	57.3 (58.8)		11.62	23.18
+
+# Notes.
+# a The group redshift is extracted from NASA/IPAC Extragalactic Database (NED)
+# b The luminosity distance of the group derived from its redshift
+# c The ObsIDs with * are observations that happened to be close to the interested groups. We used these observations to constrain the local soft CXB.
+# d Effective exposure after excluding time intervals of background flares. For observations with ACIS-S3 at the optical axis, two exposure values are listed, with the one in the brackets as the exposure for the FI chips.
+# e ROSAT PSPC clean exposure time (in ksec) if the pointed PSPC observations exist.
+# f 2MASS K_s band luminosity of the cD galaxy as shown as log(L_Ks/L_sun), M_Ksun = 3.39 mag. There are three groups (3C 442A, NGC 5098 and RXJ 1022+3830) with two BCGs at the center. The K_s band magnitude of one central galaxy in RXJ 1022+3830 is unknown.
+# g 1.4 GHz luminosity of the cD galaxy as shown as log(L_1.4GHz/W Hz^-1) from the NRAO VLA Sky Survey (NVSS) or the Sydney University Molonglo Sky Survey (SUMSS), assuming a spectral index of -0.8, unless it can be derived from NED.
