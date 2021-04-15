@@ -247,33 +247,32 @@ class Sun09(Observations):
         Omega_b = self.cosmo_model.Ob0
         Omega_m = self.cosmo_model.Om0
 
-        raw = np.loadtxt(f'{repository_dir}/Sun2009.dat')
-        M_500 = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 1], units="Msun")
-        error_M_500_p = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 2], units="Msun")
-        error_M_500_m = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 3], units="Msun")
-        fb_500 = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 4], units="dimensionless")
-        error_fb_500_p = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 5], units="dimensionless")
-        error_fb_500_m = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 6], units="dimensionless")
+        # raw = np.loadtxt(f'{repository_dir}/Sun2009.dat')
+        # M_500 = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 1], units="Msun")
+        # error_M_500_p = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 2], units="Msun")
+        # error_M_500_m = unyt.unyt_array((10 ** 13) * (0.73 / h_sim) * raw[:, 3], units="Msun")
+        # fb_500 = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 4], units="dimensionless")
+        # error_fb_500_p = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 5], units="dimensionless")
+        # error_fb_500_m = unyt.unyt_array((0.73 / h_sim) ** 1.5 * raw[:, 6], units="dimensionless")
+        #
+        # # Class parser
+        # # Define the scatter as offset from the mean value
+        # self.M_500 = M_500
+        # self.M_500_error = unyt.unyt_array((error_M_500_m, error_M_500_p))
+        # self.fb_500 = fb_500
+        # self.fb_500_error = unyt.unyt_array((error_fb_500_m, error_fb_500_p))
+        # self.M_500gas = M_500 * fb_500
+        # self.M_500gas_error = unyt.unyt_array((
+        #     self.M_500gas * (error_M_500_m / M_500 + error_fb_500_m / fb_500),
+        #     self.M_500gas * (error_M_500_p / M_500 + error_fb_500_p / fb_500)
+        # ))
 
-        # Class parser
-        # Define the scatter as offset from the mean value
-        self.M_500 = M_500
-        self.M_500_error = unyt.unyt_array((error_M_500_m, error_M_500_p))
-        self.fb_500 = fb_500
-        self.fb_500_error = unyt.unyt_array((error_fb_500_m, error_fb_500_p))
-        self.M_500gas = M_500 * fb_500
-        self.M_500gas_error = unyt.unyt_array((
-            self.M_500gas * (error_M_500_m / M_500 + error_fb_500_m / fb_500),
-            self.M_500gas * (error_M_500_p / M_500 + error_fb_500_p / fb_500)
-        ))
+        self.get_tab1()
+        self.get_tab3()
+        self.get_tab4()
 
-    def test(self):
-        data = self.load_table(self.data_files[1])
-
-        l = [len(x) for x in data]
-        print(l)
-
-    def load_table(self, file: str):
+    @staticmethod
+    def load_table(file: str):
 
         data = []
         with open(file) as f:
@@ -286,8 +285,93 @@ class Sun09(Observations):
             ):
                 line_data = line.strip().split('\t')
                 data.append(line_data)
+
         return data
 
+    def get_tab1(self):
+        data = self.load_table(self.data_files[1])
+
+        self.group_name: List[str] = []
+        self.redshift: List[float] = []
+
+        for line in data:
+            self.group_name.append(line[0])
+            self.redshift.append(float(line[1]))
+
+        self.group_name = np.array(self.group_name, dtype=str)
+        self.redshift = unyt.unyt_array(np.array(self.redshift), 'dimensionless')
+
+    def get_tab3(self):
+        data = self.load_table(self.data_files[2])
+
+        fields = ['T_500', 'T_2500', 'r_500', 'r_2500', 'M_500', 'f_gas500']
+        units = ['keV', 'keV', 'kpc', 'kpc', '1e13*Msun', 'dimensionless']
+        col_index = [1, 2, 3, 4, 5, 6]
+
+        for field, unit, col in zip(fields, units, col_index):
+
+            collector = []
+            for line in data:
+                collector.append(line[col])
+
+            for i, t in enumerate(collector):
+                t = re.sub('[()*]', '', t)
+                if '+or-' in t:
+                    t = t.split('+or-')[0]
+                elif '^' in t and '_' in t:
+                    t = t.split('^')[0]
+                t = t.strip()
+                if t == '':
+                    collector[i] = np.nan
+                else:
+                    collector[i] = float(t)
+
+            collector = unyt.unyt_array(np.array(collector), unit)
+            setattr(self, field, collector)
+
+        # Reconstruct r_1000 and r_1500 from the scaling-radii relations
+        # For tier 1 & 2 (those with M_500 defined)
+        # r1000 / r500 = 0.741 ± 0.013
+        # r1500 / r500 = 0.617 ± 0.011
+        not_tier_12 = np.isnan(self.M_500.value)
+        self.r_1000 = self.r_500.copy() * 0.617
+        self.r_1000[not_tier_12] = np.nan
+        self.r_1500 = self.r_500.copy() * 0.741
+        self.r_1500[not_tier_12] = np.nan
+
+    def get_tab4(self):
+        data = self.load_table(self.data_files[3])
+
+        fields = ['K_500', 'K_1000', 'K_1500', 'K_2500', 'K_0p15r500', 'K_30kpc']
+        units = ['keV*cm**2'] * 6
+        col_index = [1, 2, 3, 4, 5, 6]
+
+        for field, unit, col in zip(fields, units, col_index):
+
+            collector = []
+            for line in data:
+                collector.append(line[col])
+
+            for i, t in enumerate(collector):
+                t = re.sub('[()*]', '', t)
+                if '+or-' in t:
+                    t = t.split('+or-')[0]
+                elif '^' in t and '_' in t:
+                    t = t.split('^')[0]
+                t = t.strip()
+                if t == '':
+                    collector[i] = np.nan
+                else:
+                    collector[i] = float(t)
+
+            collector = unyt.unyt_array(np.array(collector), unit)
+            setattr(self, field, collector)
+
+        # Reconstruct r_1000 from the scaling-radii relations
+        # For tier 3 (those with K_1000 defined)
+        # r1000 ∼ 0.73r500
+        tier_3 = np.isnan(self.M_500) & ~np.isnan(self.K_1000)
+        self.r_1000[tier_3] = self.r_500[tier_3] * 0.73
 
 
 class Lovisari15(Observations):
@@ -1297,4 +1381,4 @@ class Mernier17(MetallicityScale):
 cosmic_fbary = Observations().cosmo_model.Ob0 / Observations().cosmo_model.Om0
 
 if __name__ == '__main__':
-    obs = Sun09().test()
+    obs = Sun09()
