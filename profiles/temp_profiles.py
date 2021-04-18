@@ -16,8 +16,7 @@ import sys
 
 # Make the register backend visible to the script
 sys.path.append("..")
-from literature import Sun2009
-from literature import Cosmology
+from literature import Sun2009, Cosmology
 
 # Constants
 mean_molecular_weight = 0.59
