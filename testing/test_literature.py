@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("..")
+
 from literature import *
 
 Barnes2017()

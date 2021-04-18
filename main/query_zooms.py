@@ -1,3 +1,7 @@
+import sys
+
+sys.path.append("..")
+
 from register import (
     calibration_zooms,
     completed_runs,
@@ -27,12 +31,8 @@ def query_exlzooms() -> None:
     print(f"\n{' Test: redshift data (z = 0.1) ':-^40s}")
     print(zooms_register[0].get_redshift(-3))
 
-    advanced_search = input((
-        "Press `y` to initialise the advanced search on incomplete runs. "
-        "Press any other key to quit.\t--> "
-    ))
-    if advanced_search == 'y':
-        calibration_zooms.analyse_incomplete_runs()
+    print("Initialise the advanced search on incomplete runs.")
+    calibration_zooms.analyse_incomplete_runs()
 
 
 if __name__ == '__main__':
