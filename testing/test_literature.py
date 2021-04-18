@@ -1,6 +1,6 @@
 import unittest
 
-from literature import *
+from ..literature import *
 
 
 class TestSum(unittest.TestCase):
