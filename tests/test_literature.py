@@ -1,7 +1,7 @@
 import sys
 import os
 
-sys.path.append(os.pardir)
+sys.path.append('..')
 
 from literature import *
 
