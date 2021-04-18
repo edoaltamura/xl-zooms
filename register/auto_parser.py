@@ -14,8 +14,9 @@ parser.add_argument(
     '-k',
     '--keywords',
     type=str,
+    default=['L'],
     nargs='+',
-    required=True
+    required=False
 )
 
 parser.add_argument(
