@@ -1,9 +1,5 @@
-import sys
-import os
 
-sys.path.append('..')
-
-from literature import *
+from ..literature import *
 
 if __name__ == '__main__':
     Barnes2017()
