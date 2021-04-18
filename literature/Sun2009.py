@@ -287,7 +287,7 @@ class Sun2009(Article):
                 axes.axhline(1, linestyle=':', color=color, alpha=alpha)
                 axes.axvline(1, linestyle=':', color=color, alpha=alpha)
             else:
-                raise ValueError((
+                print((
                     "The VKB05 adiabatic threshold should be plotted only when both "
                     "axes are in scaled units, since the line is calibrated on an NFW "
                     "profile with self-similar halos with an average concentration of "
