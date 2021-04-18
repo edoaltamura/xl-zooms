@@ -273,11 +273,11 @@ class Sun2009(Article):
             point_label = f"r{suffix:.<17s} Num(x,y) = {num_objects}"
             if stand_alone:
                 axes.scatter(x, y, label=point_label)
-                axes.errorbar(x, y, yerr=[[y_hi - y, y - y_low]], xerr=[[x_hi - x, x - x_low]], ls='none')
+                axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none')
             else:
                 axes.scatter(x, y, color=color, alpha=alpha)
-                axes.errorbar(x, y, yerr=[[y_hi - y, y - y_low]], xerr=[[x_hi - x, x - x_low]], ls='none', ecolor=color,
-                              alpha=alpha)
+                axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none',
+                              ecolor=color, alpha=alpha)
 
         if vkb05_line:
             if r_units == 'r500' and k_units == 'K500adi':
