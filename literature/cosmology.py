@@ -116,11 +116,13 @@ class Cosmology(object):
                 if self.verbose > 1:
                     print(f"Using the {model_name} cosmology")
                 self.cosmo_model = getattr(cosmology, model_name)
-                self.h = self.cosmo_model.h
-                self.Ob0 = self.cosmo_model.Ob0
-                self.Om0 = self.cosmo_model.Om0
-                self.fb = self.Ob0 / self.Om0
                 break
+
+        self.h = self.cosmo_model.h
+        self.Ob0 = self.cosmo_model.Ob0
+        self.Om0 = self.cosmo_model.Om0
+        self.fb = self.Ob0 / self.Om0
+
 
     def time_from_redshift(self, z: Union[float, List[float], np.ndarray]):
         """
