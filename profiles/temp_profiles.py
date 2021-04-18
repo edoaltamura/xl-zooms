@@ -248,7 +248,7 @@ ax.text(
         ec='none'
     )
 )
-Sun2009.overlay_entropy_profiles(ax, k_units='keVcm^2')
+Sun2009.overlay_entropy_profiles(axes=ax, k_units='keVcm^2')
 
 print("Entropy - dot particles")
 ax = axes[1, 0]
@@ -285,7 +285,7 @@ ax.text(
         ec='none'
     )
 )
-Sun2009.overlay_entropy_profiles(ax, k_units='keVcm^2')
+Sun2009.overlay_entropy_profiles(axes=ax, k_units='keVcm^2')
 
 print("Temperatures - shell average")
 ax = axes[0, 1]
