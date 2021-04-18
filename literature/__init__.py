@@ -10,3 +10,5 @@ from .PlanckSZ2015 import PlanckSZ2015
 from .Pratt2010 import Pratt2010
 from .Sun2009 import Sun2009
 from .Vikhlinin2006 import Vikhlinin2006
+
+from .cosmology import Cosmology

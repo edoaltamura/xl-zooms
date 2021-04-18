@@ -15,8 +15,9 @@ except:
 import sys
 
 # Make the register backend visible to the script
-sys.path.append("../observational_data")
-import observational_data as obs
+sys.path.append("..")
+from literature import Sun2009
+from literature import Cosmology
 
 # Constants
 mean_molecular_weight = 0.59
@@ -229,7 +230,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
     K500 = (
-            kBT500 / (3 * M500 * obs.cosmic_fbary / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
+            kBT500 / (3 * M500 * Cosmology.fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
     ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
@@ -246,6 +247,7 @@ ax.text(
         ec='none'
     )
 )
+Sun2009.overlay_entropy_profiles(axes, k_units='keVcm^2')
 
 print("Entropy - dot particles")
 ax = axes[1, 0]
@@ -265,7 +267,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
     K500 = (
-            kBT500 / (3 * M500 * obs.cosmic_fbary / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
+            kBT500 / (3 * M500 * Cosmology.fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
     ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
@@ -282,6 +284,7 @@ ax.text(
         ec='none'
     )
 )
+Sun2009.overlay_entropy_profiles(axes, k_units='keVcm^2')
 
 print("Temperatures - shell average")
 ax = axes[0, 1]
