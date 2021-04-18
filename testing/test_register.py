@@ -1,6 +1,10 @@
 import contextlib
 from tqdm import tqdm
 
+import sys
+
+sys.path.append("..")
+
 from register import (
     calibration_zooms,
     completed_runs,
