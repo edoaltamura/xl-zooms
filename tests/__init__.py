@@ -1,3 +1,3 @@
-import sys
-
-sys.path.append("..")  # Adds higher directory to python modules path.
+from .. import register
+from .. import literature
+from .. import profiles
