@@ -1,2 +1,2 @@
-import ..literature
-import ..register
+import literature
+import register
