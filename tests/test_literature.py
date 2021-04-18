@@ -1,3 +1,8 @@
+import sys
+import os
+
+sys.path.append(os.pardir)
+
 from literature import *
 
 if __name__ == '__main__':
