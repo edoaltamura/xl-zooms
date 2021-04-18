@@ -17,6 +17,8 @@ import sys
 # Make the register backend visible to the script
 sys.path.append("..")
 from literature import Sun2009, Cosmology
+Sun2009 = Sun2009()
+fb = Cosmology().fb
 
 # Constants
 mean_molecular_weight = 0.59
@@ -229,7 +231,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
     K500 = (
-            kBT500 / (3 * M500 * Cosmology.fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
+            kBT500 / (3 * M500 * fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
     ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
@@ -266,7 +268,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
     K500 = (
-            kBT500 / (3 * M500 * Cosmology.fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
+            kBT500 / (3 * M500 * fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
     ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
