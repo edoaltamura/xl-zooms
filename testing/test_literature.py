@@ -3,7 +3,7 @@ import unittest
 from literature import *
 
 
-class TestSum(unittest.TestCase):
+class TestLiterature(unittest.TestCase):
     def run_test(self):
         Barnes2017()
         Bohringer2007()
