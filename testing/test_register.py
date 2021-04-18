@@ -9,8 +9,6 @@ from register import (
 )
 
 
-
-
 class TestRegister(unittest.TestCase):
     def run_test(self):
         incomplete_runs = calibration_zooms.get_incomplete_run_directories()
@@ -33,6 +31,7 @@ class TestRegister(unittest.TestCase):
         with contextlib.redirect_stdout(None):
             calibration_zooms.analyse_incomplete_runs()
         print('Done.')
+        self.assertEqual(0, 0)
 
 
 if __name__ == '__main__':

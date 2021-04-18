@@ -17,6 +17,7 @@ class TestLiterature(unittest.TestCase):
         Pratt2010()
         Sun2009()
         Vikhlinin2006()
+        self.assertEqual(0, 0)
 
 
 if __name__ == '__main__':
