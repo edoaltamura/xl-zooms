@@ -1,3 +1,3 @@
-from .. import register
-from .. import literature
-from .. import profiles
+import sys
+
+sys.path.append("..")  # Adds higher directory to python modules path.
