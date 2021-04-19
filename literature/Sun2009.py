@@ -33,6 +33,7 @@ class Sun2009(Article):
         )
 
         self.hconv = 0.73 / self.h
+        self.hconv = 1
 
         if reduced_table:
             self.get_reduced_table()
