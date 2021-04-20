@@ -55,7 +55,7 @@ class HaloProperty(object):
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
-        sw_handle.gas.coordinates.convert_to_physical()
+        sw_handle.gas.coordinates#.convert_to_physical()
         sw_handle.gas.masses.convert_to_physical()
         sw_handle.gas.temperatures.convert_to_physical()
         sw_handle.gas.densities.convert_to_physical()
@@ -124,7 +124,7 @@ class HaloProperty(object):
             metric='euclidean'
         ).reshape(len(sw_handle.black_holes.coordinates), )
 
-        print(sw_handle.gas.radial_distances)
+        print(sw_handle.gas.radial_distances#)
 
         return sw_handle, vr_handle
 
