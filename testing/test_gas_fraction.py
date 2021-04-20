@@ -19,5 +19,4 @@ print(
     )
 )
 
-from typing import Callable
-print(type(gf.process_single_halo) == Callable)
+gf.process_catalogue()

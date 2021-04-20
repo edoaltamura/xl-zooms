@@ -146,7 +146,7 @@ class DataframePickler(CustomPickler):
         obj.to_pickle(self.filename)
 
         # Save data in text format (useful for consulting)
-        obj.to_csv(self.filename, header=True, index=False, sep='\t', mode='w')
+        obj.to_csv(self.filename.replace('pkl', 'txt'), header=True, index=False, sep='\t', mode='w')
 
         if not args.quiet:
             file_size = sizeof_fmt(

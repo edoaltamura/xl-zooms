@@ -11,6 +11,8 @@ class GasFraction(HaloProperty):
     def __init__(self):
         super().__init__()
 
+        self.label = 'f_gas'
+
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
@@ -43,3 +45,8 @@ class GasFraction(HaloProperty):
         gas_fraction = mhot500 / m500
 
         return gas_fraction
+
+    def process_catalogue(self):
+
+        catalogue = self._process_catalogue(GasFraction.process_single_halo)
+        self.dump_to_pickle(self.filename, catalogue)

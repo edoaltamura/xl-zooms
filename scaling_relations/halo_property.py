@@ -14,7 +14,7 @@ from register import (
     args,
     DataframePickler,
     Zoom,
-zooms_register
+    zooms_register
 )
 
 
@@ -172,15 +172,20 @@ class HaloProperty(object):
 
         return self.get_handles_from_paths(snapshot_file, catalog_file, **kwargs)
 
-    def read_from_file(self):
-        pickler = DataframePickler(self.storage_file)
+    @staticmethod
+    def read_from_file(storage_file):
+        pickler = DataframePickler(storage_file)
         return pickler.load_from_pickle()
 
+    @staticmethod
+    def dump_to_pickle(storage_file, obj: pd.DataFrame):
+        pickler = DataframePickler(storage_file)
+        return pickler.dump_to_pickle(obj)
 
-    def process_catalogue(self, _process_single_halo: Callable,
-                          find_keyword: Union[list, str] = None,
-                          concurrent_threading: bool = False,
-                          no_multithreading: bool = False) -> pd.DataFrame:
+    @staticmethod
+    def _process_catalogue(single_halo_method,
+                           concurrent_threading: bool = False,
+                           no_multithreading: bool = False) -> pd.DataFrame:
         """
         This function performs the collective multi-threaded I/O for processing
         the halos in the catalogue. It can accept different types of function
@@ -199,26 +204,19 @@ class HaloProperty(object):
         """
         # Print the CLI arguments that are parsed in the script
 
+        find_keyword = args.keywords
 
-        if find_keyword is None:
-            # If find_keyword is empty, collect all zooms
-            _zooms_register = zooms_register
-
-        elif type(find_keyword) is str:
-            _zooms_register = [zoom for zoom in zooms_register if find_keyword in zoom.run_name]
-
-        elif type(find_keyword) is list:
-            _zooms_register = []
-            for keyword in find_keyword:
-                for zoom in zooms_register:
-                    if keyword in zoom.run_name and zoom not in _zooms_register:
-                        _zooms_register.append(zoom)
+        _zooms_register = []
+        for keyword in find_keyword:
+            for zoom in zooms_register:
+                if keyword in zoom.run_name and zoom not in _zooms_register:
+                    _zooms_register.append(zoom)
 
         _name_list = [zoom.run_name for zoom in _zooms_register]
 
         if len(_zooms_register) == 1:
             print("Analysing one object only. Not using multiprocessing features.")
-            results = [_process_single_halo(_zooms_register[0])]
+            results = [single_halo_method(_zooms_register[0])]
 
         else:
 
@@ -228,7 +226,7 @@ class HaloProperty(object):
                 for i, zoom in enumerate(_zooms_register):
                     print(f"({i + 1}/{len(_zooms_register)}) Processing: {zoom.run_name}")
                     results.append(
-                        _process_single_halo(zoom)
+                        single_halo_method(zoom)
                     )
 
             else:
@@ -244,7 +242,7 @@ class HaloProperty(object):
                 try:
                     # The results of the multiprocessing Pool are returned in the same order as inputs
                     with threading_engine as pool:
-                        results = pool.map(_process_single_halo, iter(_zooms_register))
+                        results = pool.map(single_halo_method, iter(_zooms_register))
                 except Exception as error:
                     print((
                         f"The analysis stopped due to the error\n{error}\n"
@@ -253,7 +251,7 @@ class HaloProperty(object):
                     raise error
 
         # Recast output into a Pandas dataframe for further manipulation
-        columns = _process_single_halo.dataset_names
+        columns = single_halo_method.dataset_names
         results = pd.DataFrame(list(results), columns=columns)
         results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
         if not args.quiet:

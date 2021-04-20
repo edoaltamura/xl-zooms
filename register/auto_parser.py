@@ -85,4 +85,4 @@ except (FileNotFoundError, OSError):
 
 if not args.quiet:
     for parsed_argument in vars(args):
-        print(f"{parsed_argument} = {getattr(args, parsed_argument)}")
+        print(f"[parser] {parsed_argument} = {getattr(args, parsed_argument)}")
