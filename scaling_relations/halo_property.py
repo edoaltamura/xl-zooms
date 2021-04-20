@@ -1,7 +1,10 @@
+import sys
 import numpy as np
 import swiftsimio
 import velociraptor
 from scipy.spatial import distance
+
+sys.path.append("..")
 
 from register import (
     args,
