@@ -46,6 +46,13 @@ class HaloProperty(object):
         mask.constrain_spatial(region)
         sw_handle = swiftsimio.load(path_to_snap, mask=mask)
 
+        if len(sw_handle.gas.coordinates) == 0:
+            raise ValueError((
+                "The spatial masking of the snapshot returned 0 particles. "
+                "Check whether an appropriate aperture is selected and if "
+                "the physical/comoving units match."
+            ))
+
         # Convert datasets to physical quantities
         # R500c is already in physical units
         sw_handle.gas.coordinates.convert_to_physical()
@@ -69,6 +76,8 @@ class HaloProperty(object):
         # If the mask overlaps with the box boundaries, wrap coordinates.
         boxsize = sw_handle.metadata.boxsize[0]
         centre_coordinates = np.array([xcminpot, ycminpot, zcminpot], dtype=np.float64)
+        print(centre_coordinates)
+        print(sw_handle.gas.coordinates)
 
         # sw_handle.gas.coordinates = np.mod(
         #     sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
