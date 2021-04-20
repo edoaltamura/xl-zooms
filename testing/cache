@@ -769,5 +769,103 @@ do
     cd ..
 done
 
+declare -a arr=(
+"L0300N0564_VR18_+1res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth"
+"L0300N0564_VR18_+1res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth"
+"L0300N0564_VR18_+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth"
+"L0300N0564_VR18_+1res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth"
+"L0300N0564_VR37_+1res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth"
+"L0300N0564_VR18_+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth"
+"L0300N0564_VR18_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth"
+"L0300N0564_VR37_+1res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth"
+"L0300N0564_VR37_+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth"
+"L0300N0564_VR37_+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth"
+"L0300N0564_VR37_+1res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth"
+"L0300N0564_VR37_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth"
+"L0300N0564_VR139_+1res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth"
+)
 
-3151620 3151621 3151622 3151623 3151624 3151625 3151626 3151627 3151628 3151629 3151630 3151631 3151632
+for i in "${arr[@]}"
+do
+    echo $i
+    cd $i
+    sbatch resubmit
+    cd ..
+done
+
+module purge
+module load cmake/3.18.1
+module load intel_comp/2020-update2
+module load intel_mpi/2020-update2
+module load ucx/1.8.1
+module load parmetis/4.0.3-64bit
+module load parallel_hdf5/1.10.6
+module load fftw/3.3.8cosma7
+module load gsl/2.5
+export OMP_NUM_THREADS=28
+
+/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF/stf \
+    -I 2 \
+    -C vrconfig_3dfofbound_subhalos_SO_hydro_adiabatic.cfg \
+    -i L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0_adiabatic/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522 \
+    -o vr_partial_outputs/alpha0p0_adi
+
+/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF/stf \
+    -I 2 \
+    -C vrconfig_3dfofbound_subhalos_SO_hydro_adiabatic.cfg \
+    -i L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0_adiabatic/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522 \
+    -o vr_partial_outputs/alpha1p0_adi
+
+cmake . \
+    -DVR_USE_HYDRO=ON \
+    -DVR_USE_GAS=ON \
+    -DVR_USE_STAR=OFF \
+    -DVR_USE_BH=OFF \
+    -DVR_USE_SWIFT_INTERFACE=OFF \
+    -DCMAKE_CXX_FLAGS="-fPIC" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DVR_ZOOM_SIM=ON \
+    -DVR_MPI=OFF
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

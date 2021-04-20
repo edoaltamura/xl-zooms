@@ -33,7 +33,6 @@ class Sun2009(Article):
         )
 
         self.hconv = 0.73 / self.h
-        self.hconv = 1
 
         if reduced_table:
             self.get_reduced_table()
@@ -174,8 +173,23 @@ class Sun2009(Article):
         for i, (m500, z) in enumerate(zip(self.M_500, self.redshift)):
             self.K_500_adi[i] = 342 * unyt.keV * unyt.cm ** 2
             self.K_500_adi[i] *= (m500 / 1e14 / unyt.Msun) ** (2 / 3)
+            self.K_500_adi[i] *= (0.165 / self.fb) ** (2 / 3)
             self.K_500_adi[i] *= self.ez_function(z) ** (-2 / 3)
-            self.K_500_adi[i] *= self.cosmo_model.h ** (-4 / 3)
+            self.K_500_adi[i] *= self.h ** (-4 / 3)
+
+    def filter_by(self, selection_field: str, low: float, high: float):
+        selection_data = getattr(self, selection_field).value
+        fields = ['T_500', 'T_2500', 'r_500', 'r_2500', 'M_500', 'K_500',
+                  'K_1000', 'K_1500', 'K_2500', 'K_0p15r500', 'K_30kpc']
+        print(f'[Literature] {self.citation} data filtered by {selection_field}:({low:.2E}->{high:.2E})')
+        for i, selection_value in enumerate(selection_data):
+            if np.isnan(selection_value):
+                continue
+            elif selection_value < low or selection_value > high:
+                for field in fields:
+                    dataset = getattr(self, field)
+                    dataset[i] = np.nan
+                    setattr(self, field, dataset)
 
     def overlay_points(self, axes: plt.Axes, x: str, y: str) -> None:
         if axes is None:
@@ -206,14 +220,23 @@ class Sun2009(Article):
             axes.loglog()
             axes.set_xlabel(f'$r$ [{r_units}]')
             axes.set_ylabel(f'$K$ [${k_units}$]')
+            axes.axvline(1, linestyle=':', color=color, alpha=alpha)
 
         # Set-up entropy data
         fields = ['K_500', 'K_1000', 'K_1500', 'K_2500', 'K_0p15r500', 'K_30kpc']
         K_stat = dict()
         if k_units == 'K500adi':
             K_conv = 1 / getattr(self, 'K_500_adi')
+            axes.axhline(1, linestyle=':', color=color, alpha=alpha)
         elif k_units == 'keVcm^2':
             K_conv = np.ones_like(getattr(self, 'K_500_adi'))
+            axes.fill_between(
+                np.log10(np.array(axes.get_xlim())),
+                y1=np.nanmin(self.K_500_adi),
+                y2=np.nanmax(self.K_500_adi),
+                facecolor='k',
+                alpha=0.3
+            )
         else:
             raise ValueError("Conversion unit unknown.")
         for field in fields:
@@ -283,10 +306,8 @@ class Sun2009(Article):
         if vkb05_line:
             if r_units == 'r500' and k_units == 'K500adi':
                 r = np.linspace(*axes.get_xlim(), 31)
-                k = 1.40 * r ** 1.1 * self.hconv ** (-1 / 3) * self.cosmo_model.h ** (4 / 3)
+                k = 1.40 * r ** 1.1 / self.hconv
                 axes.plot(r, k, linestyle='--', color=color, alpha=alpha)
-                axes.axhline(1, linestyle=':', color=color, alpha=alpha)
-                axes.axvline(1, linestyle=':', color=color, alpha=alpha)
             else:
                 print((
                     "The VKB05 adiabatic threshold should be plotted only when both "

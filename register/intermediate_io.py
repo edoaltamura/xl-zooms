@@ -15,6 +15,7 @@ instance attributes back.
 """
 import os
 from warnings import warn
+from pandas import DataFrame, read_pickle
 
 try:
     import _pickle as pickle
@@ -134,3 +135,28 @@ class MultiObjPickler(CustomPickler):
         for obj in self.get_pickle_generator():
             collection_pkl.append(obj)
         return collection_pkl
+
+
+class DataframePickler(CustomPickler):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+    def dump_to_pickle(self, obj: DataFrame):
+        # Save data in pickle format (saves python object)
+        obj.to_pickle(self.filename)
+
+        # Save data in text format (useful for consulting)
+        obj.to_csv(self.filename, header=True, index=False, sep='\t', mode='w')
+
+        if not args.quiet:
+            file_size = sizeof_fmt(
+                os.path.getsize(
+                    self.filename
+                )
+            )
+            print(f"[io] Object saved to pkl [{file_size:s}]: {self.filename:s}")
+
+    def load_from_pickle(self):
+        self.large_file_warning()
+
+        return read_pickle(self.filename)

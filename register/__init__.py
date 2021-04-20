@@ -19,5 +19,6 @@ from .register import (
 
 from .intermediate_io import (
     SingleObjPickler,
-    MultiObjPickler
+    MultiObjPickler,
+    DataframePickler
 )

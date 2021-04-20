@@ -6,6 +6,7 @@ import numpy as np
 import swiftsimio as sw
 import velociraptor as vr
 from typing import Tuple
+import matplotlib.patheffects as path_effects
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -17,6 +18,7 @@ import sys
 # Make the register backend visible to the script
 sys.path.append("..")
 from literature import Sun2009, Cosmology
+
 Sun2009 = Sun2009()
 fb = Cosmology().fb
 
@@ -191,9 +193,17 @@ paths = {
         cwd + 'vr_partial_outputs/alpha1p0.properties',
         cwd + runname + '_alpha1p0/snapshots/' + runname + '_SNnobirth_2252.hdf5'
     ),
+    'adi0.': (
+        cwd + 'vr_partial_outputs/alpha0p0_adi.properties',
+        cwd + runname + '_alpha1p0_adiabatic/snapshots/' + runname + '_SNnobirth_2252.hdf5'
+    ),
+    'adi1.': (
+        cwd + 'vr_partial_outputs/alpha1p0_adi.properties',
+        cwd + runname + '_alpha1p0_adiabatic/snapshots/' + runname + '_SNnobirth_2252.hdf5'
+    ),
 }
 
-alpha_list = ['0.', '0.5', '0.7', '0.9', '1.']
+alpha_list = ['adi1.', '1.']
 
 name = "viridis"
 cmap = get_cmap(name)
@@ -201,6 +211,8 @@ cmap = get_cmap(name)
 fig = plt.figure(figsize=(9, 5))
 gs = fig.add_gridspec(2, 3, hspace=0.05, wspace=0.3)
 axes = gs.subplots(sharex=True, sharey=False)
+
+shadow = dict(path_effects=[path_effects.SimpleLineShadow(), path_effects.Normal()])
 
 for ax in axes.flat:
     ax.loglog()
@@ -234,7 +246,7 @@ for alpha_key in alpha_list:
             kBT500 / (3 * M500 * fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
-    ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--', **shadow)
     ax.set_ylabel(r'$K$ [keV cm$^2$]')
     ax.set_ylim([30, 1e4])
 ax.text(
@@ -271,7 +283,7 @@ for alpha_key in alpha_list:
             kBT500 / (3 * M500 * fb / (4 * np.pi * R500 ** 3 * unyt.mass_proton)) ** (2 / 3)
     ).to('keV*cm**2')
 
-    ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=K500, color=cmap(float(alpha_key)), linestyle='--', **shadow)
     ax.set_ylabel(r'$K$ [keV cm$^2$]')
     ax.set_ylim([30, 1e4])
 ax.text(
@@ -311,7 +323,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
 
-    ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--', **shadow)
     ax.set_ylabel(r'$k_BT$ [keV]')
     ax.set_ylim([1, 6])
 ax.text(
@@ -344,7 +356,7 @@ for alpha_key in alpha_list:
             unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2
     ).to('keV')
 
-    ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--')
+    ax.axhline(y=kBT500, color=cmap(float(alpha_key)), linestyle='--', **shadow)
     ax.set_ylabel(r'$k_BT$ [keV]')
     ax.set_ylim([0.1, 10])
     ax.set_xlabel(f'$r/r_{{500,true}}$')
