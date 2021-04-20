@@ -132,7 +132,7 @@ class HaloProperty(object):
             metric='euclidean'
         ).reshape(len(sw_handle.black_holes.coordinates), )
 
-        print(sw_handle.gas.radial_distances)
+        print(np.sort(sw_handle.gas.radial_distances))
 
         return sw_handle, vr_handle
 
