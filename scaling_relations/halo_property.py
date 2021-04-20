@@ -3,13 +3,18 @@ import numpy as np
 import swiftsimio
 import velociraptor
 from scipy.spatial import distance
+import pandas as pd
+from typing import Callable, List, Union
+from multiprocessing import Pool, cpu_count
+from concurrent.futures import ProcessPoolExecutor
 
 sys.path.append("..")
 
 from register import (
     args,
     DataframePickler,
-    Zoom
+    Zoom,
+zooms_register
 )
 
 
@@ -196,8 +201,6 @@ class HaloProperty(object):
         # Print the CLI arguments that are parsed in the script
 
 
-        print(f"z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}")
-
         if find_keyword is None:
             # If find_keyword is empty, collect all zooms
             _zooms_register = zooms_register
@@ -256,19 +259,5 @@ class HaloProperty(object):
         results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
         if not args.quiet:
             print(results.head())
-
-        if save_dataframe:
-            file_name = os.path.join(
-                f'{zooms_register[0].output_directory}',
-                f'{_process_single_halo.scaling_relation_name}'
-            )
-
-            # Save data in pickle format (saves python object)
-            results.to_pickle(f'{file_name}.pkl')
-
-            # Save data in text format (useful for consulting)
-            results.to_csv(f'{file_name}.txt', header=True, index=False, sep='\t', mode='w')
-
-            print(f"Catalogue file saved to {file_name}(.pkl/.txt)")
 
         return results
