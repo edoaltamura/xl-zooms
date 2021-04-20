@@ -70,25 +70,25 @@ class HaloProperty(object):
         boxsize = sw_handle.metadata.boxsize[0]
         centre_coordinates = np.array([xcminpot, ycminpot, zcminpot], dtype=np.float64)
 
-        sw_handle.gas.coordinates = np.mod(
-            sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
-            boxsize
-        ) + centre_coordinates - 0.5 * boxsize
-
-        sw_handle.dark_matter.coordinates = np.mod(
-            sw_handle.dark_matter.coordinates - centre_coordinates + 0.5 * boxsize,
-            boxsize
-        ) + centre_coordinates - 0.5 * boxsize
-
-        sw_handle.stars.coordinates = np.mod(
-            sw_handle.stars.coordinates - centre_coordinates + 0.5 * boxsize,
-            boxsize
-        ) + centre_coordinates - 0.5 * boxsize
-
-        sw_handle.black_holes.coordinates = np.mod(
-            sw_handle.black_holes.coordinates - centre_coordinates + 0.5 * boxsize,
-            boxsize
-        ) + centre_coordinates - 0.5 * boxsize
+        # sw_handle.gas.coordinates = np.mod(
+        #     sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
+        #     boxsize
+        # ) + centre_coordinates - 0.5 * boxsize
+        #
+        # sw_handle.dark_matter.coordinates = np.mod(
+        #     sw_handle.dark_matter.coordinates - centre_coordinates + 0.5 * boxsize,
+        #     boxsize
+        # ) + centre_coordinates - 0.5 * boxsize
+        #
+        # sw_handle.stars.coordinates = np.mod(
+        #     sw_handle.stars.coordinates - centre_coordinates + 0.5 * boxsize,
+        #     boxsize
+        # ) + centre_coordinates - 0.5 * boxsize
+        #
+        # sw_handle.black_holes.coordinates = np.mod(
+        #     sw_handle.black_holes.coordinates - centre_coordinates + 0.5 * boxsize,
+        #     boxsize
+        # ) + centre_coordinates - 0.5 * boxsize
 
         # Compute radial distances
         sw_handle.gas.radial_distances = distance.cdist(
