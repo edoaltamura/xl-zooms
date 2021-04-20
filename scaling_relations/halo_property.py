@@ -22,7 +22,7 @@ class HaloProperty(object):
     def get_handles_from_paths(
             path_to_snap: str,
             path_to_catalogue: str,
-            mask_radius_r500: float = 6
+            mask_radius_r500: float = 3
     ) -> tuple:
         # Read in halo properties
         vr_handle = velociraptor.load(path_to_catalogue)
