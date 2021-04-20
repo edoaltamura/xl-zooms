@@ -63,7 +63,7 @@ class HaloProperty(object):
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
-        sw_handle.gas.coordinates#.convert_to_physical()
+        sw_handle.gas.coordinates.convert_to_physical()
         sw_handle.gas.masses.convert_to_physical()
         sw_handle.gas.temperatures.convert_to_physical()
         sw_handle.gas.densities.convert_to_physical()
@@ -84,7 +84,7 @@ class HaloProperty(object):
         # If the mask overlaps with the box boundaries, wrap coordinates.
         boxsize = sw_handle.metadata.boxsize[0]
         centre_coordinates = np.array([xcminpot, ycminpot, zcminpot], dtype=np.float64)
-        print(centre_coordinates)
+        print(centre_coordinates, r500)
         print(sw_handle.gas.coordinates)
 
         # sw_handle.gas.coordinates = np.mod(
