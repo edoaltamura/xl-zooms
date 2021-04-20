@@ -184,6 +184,7 @@ class HaloProperty(object):
 
     @staticmethod
     def _process_catalogue(single_halo_method,
+                           labels: List[str],
                            concurrent_threading: bool = False,
                            no_multithreading: bool = False) -> pd.DataFrame:
         """
@@ -251,7 +252,7 @@ class HaloProperty(object):
                     raise error
 
         # Recast output into a Pandas dataframe for further manipulation
-        columns = single_halo_method.dataset_names
+        columns = labels
         results = pd.DataFrame(list(results), columns=columns)
         results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
         if not args.quiet:

@@ -11,7 +11,7 @@ class GasFraction(HaloProperty):
     def __init__(self):
         super().__init__()
 
-        self.label = 'f_gas'
+        self.labels = ['f_gas']
 
         self.filename = os.path.join(
             default_output_directory,
@@ -48,5 +48,5 @@ class GasFraction(HaloProperty):
 
     def process_catalogue(self):
 
-        catalogue = self._process_catalogue(self.process_single_halo)
+        catalogue = self._process_catalogue(self.process_single_halo, labels=self.labels)
         self.dump_to_pickle(self.filename, catalogue)
