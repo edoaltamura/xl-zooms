@@ -179,7 +179,6 @@ class HaloProperty(object):
 
     def process_catalogue(self, _process_single_halo: Callable,
                           find_keyword: Union[list, str] = None,
-                          save_dataframe: bool = False,
                           concurrent_threading: bool = False,
                           no_multithreading: bool = False) -> pd.DataFrame:
         """
