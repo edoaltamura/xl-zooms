@@ -82,3 +82,7 @@ try:
     plt.style.use(matplotlib_stylesheet)
 except (FileNotFoundError, OSError):
     print('Could not find the mnras.mplstyle style-sheet.')
+
+if not args.quiet:
+    for parsed_argument in vars(args):
+        print(f"{parsed_argument} = {getattr(args, parsed_argument)}")

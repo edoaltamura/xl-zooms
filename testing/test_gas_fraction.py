@@ -18,3 +18,4 @@ print(
         path_to_catalogue=cat
     )
 )
+print(type(gf.process_single_halo))

@@ -1,14 +1,21 @@
+import os.path
 import unyt
 import numpy as np
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas
+from register import Zoom, Tcut_halogas, default_output_directory
 
 
 class GasFraction(HaloProperty):
 
     def __init__(self):
         super().__init__()
+
+        self.filename = os.path.join(
+            default_output_directory,
+            'intermediate',
+            'gas_fractions.pkl'
+        )
 
     def process_single_halo(
             self,
