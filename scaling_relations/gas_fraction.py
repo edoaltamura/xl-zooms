@@ -48,5 +48,5 @@ class GasFraction(HaloProperty):
 
     def process_catalogue(self):
 
-        catalogue = self._process_catalogue(GasFraction.process_single_halo)
+        catalogue = self._process_catalogue(self.process_single_halo)
         self.dump_to_pickle(self.filename, catalogue)
