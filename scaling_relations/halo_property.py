@@ -3,6 +3,7 @@ import numpy as np
 import swiftsimio
 import velociraptor
 from scipy.spatial import distance
+from unyt import Mpc
 
 sys.path.append("..")
 
@@ -113,7 +114,7 @@ class HaloProperty(object):
                 sw_handle.gas.coordinates,
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
-            ).reshape(len(sw_handle.gas.coordinates), )
+            ).reshape(len(sw_handle.gas.coordinates), ) * Mpc
         )
 
         sw_handle.dark_matter.radial_distances = swiftsimio.cosmo_array(
@@ -121,7 +122,7 @@ class HaloProperty(object):
                 sw_handle.dark_matter.coordinates,
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
-            ).reshape(len(sw_handle.dark_matter.coordinates), )
+            ).reshape(len(sw_handle.dark_matter.coordinates), ) * Mpc
         )
 
         sw_handle.stars.radial_distances = swiftsimio.cosmo_array(
@@ -129,7 +130,7 @@ class HaloProperty(object):
                 sw_handle.stars.coordinates,
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
-            ).reshape(len(sw_handle.stars.coordinates), )
+            ).reshape(len(sw_handle.stars.coordinates), ) * Mpc
         )
 
         sw_handle.black_holes.radial_distances = swiftsimio.cosmo_array(
@@ -137,7 +138,7 @@ class HaloProperty(object):
                 sw_handle.black_holes.coordinates,
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
-            ).reshape(len(sw_handle.black_holes.coordinates), )
+            ).reshape(len(sw_handle.black_holes.coordinates), ) * Mpc
         )
 
         print(np.sort(sw_handle.gas.radial_distances))
