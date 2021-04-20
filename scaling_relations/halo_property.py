@@ -64,7 +64,6 @@ class HaloProperty(object):
         sw_handle.stars.velocities.convert_to_physical()
 
         sw_handle.black_holes.coordinates.convert_to_physical()
-        sw_handle.black_holes.masses.convert_to_physical()
         sw_handle.black_holes.velocities.convert_to_physical()
 
         # If the mask overlaps with the box boundaries, wrap coordinates.
