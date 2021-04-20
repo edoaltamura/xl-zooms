@@ -17,7 +17,7 @@ class GasFraction(HaloProperty):
             path_to_catalogue: str = None,
             **kwargs
     ):
-        vr_data, sw_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
+        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
