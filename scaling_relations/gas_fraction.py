@@ -28,7 +28,7 @@ class GasFraction(HaloProperty):
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        mhot500 = np.sum(sw_data.gas.masses[mask].to('Msun'))
+        mhot500 = np.sum(sw_data.gas.masses[mask])
         mhot500 = mhot500.to(unyt.Solar_Mass)
         gas_fraction = mhot500 / m500
 
