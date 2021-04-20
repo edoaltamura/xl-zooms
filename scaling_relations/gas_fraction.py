@@ -22,6 +22,9 @@ class GasFraction(HaloProperty):
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
 
+        sw_data.gas.radial_distances.convert_to_physical()
+        sw_data.gas.temperatures.convert_to_physical()
+
         # Select hot gas within sphere
         mask = np.where(
             (sw_data.gas.radial_distances <= r500) &

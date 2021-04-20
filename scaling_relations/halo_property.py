@@ -141,8 +141,6 @@ class HaloProperty(object):
             ).reshape(len(sw_handle.black_holes.coordinates), ) * Mpc
         )
 
-        print(np.sort(sw_handle.gas.radial_distances))
-
         return sw_handle, vr_handle
 
     def get_handles_from_zoom(
