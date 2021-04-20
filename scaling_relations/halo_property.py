@@ -39,9 +39,9 @@ class HaloProperty(object):
         mask = swiftsimio.mask(path_to_snap, spatial_only=True)
         mask_radius = mask_radius_r500 * r500
         region = [
-            [(xcminpot - mask_radius) / a, (xcminpot + mask_radius) / a],
-            [(ycminpot - mask_radius) / a, (ycminpot + mask_radius) / a],
-            [(zcminpot - mask_radius) / a, (zcminpot + mask_radius) / a]
+            [xcminpot / a - mask_radius / a, xcminpot / a + mask_radius / a],
+            [ycminpot / a - mask_radius / a, ycminpot / a + mask_radius / a],
+            [zcminpot / a - mask_radius / a, zcminpot / a + mask_radius / a]
         ]
         mask.constrain_spatial(region)
         sw_handle = swiftsimio.load(path_to_snap, mask=mask)
@@ -85,7 +85,7 @@ class HaloProperty(object):
         boxsize = sw_handle.metadata.boxsize[0]
         centre_coordinates = np.array([xcminpot, ycminpot, zcminpot], dtype=np.float64)
         print(centre_coordinates, r500)
-        print(sw_handle.gas.coordinates)
+        print(np.mean(sw_handle.gas.coordinates, axis=0))
 
         # sw_handle.gas.coordinates = np.mod(
         #     sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
