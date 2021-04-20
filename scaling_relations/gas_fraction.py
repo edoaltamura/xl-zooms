@@ -26,7 +26,7 @@ class GasFraction(HaloProperty):
         mask = np.where(
             (sw_data.gas.radial_distances <= r500) &
             (sw_data.gas.temperatures > Tcut_halogas) &
-            (sw_data.gas.fofgroup_ids == 1)
+            (sw_data.gas.fofgroup_ids == 0)
         )[0]
         mhot500 = np.sum(sw_data.gas.masses[mask])
         mhot500 = mhot500.to(unyt.Solar_Mass)
