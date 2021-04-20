@@ -115,8 +115,8 @@ class HaloProperty(object):
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
             ).reshape(len(sw_handle.gas.coordinates), ),
-            units=Mpc,
-            cosmo_factor=a
+            units='Mpc',
+            cosmo_factor=sw_handle.gas.coordinates.cosmo_factor
         )
 
         sw_handle.dark_matter.radial_distances = swiftsimio.cosmo_array(
@@ -125,8 +125,8 @@ class HaloProperty(object):
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
             ).reshape(len(sw_handle.dark_matter.coordinates), ),
-            units=Mpc,
-            cosmo_factor=a
+            units='Mpc',
+            cosmo_factor=sw_handle.dark_matter.coordinates.cosmo_factor
         )
 
         sw_handle.stars.radial_distances = swiftsimio.cosmo_array(
@@ -135,8 +135,8 @@ class HaloProperty(object):
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
             ).reshape(len(sw_handle.stars.coordinates), ),
-            units=Mpc,
-            cosmo_factor=a
+            units='Mpc',
+            cosmo_factor=sw_handle.stars.coordinates.cosmo_factor
         )
 
         sw_handle.black_holes.radial_distances = swiftsimio.cosmo_array(
@@ -145,8 +145,8 @@ class HaloProperty(object):
                 centre_coordinates.reshape(1, 3),
                 metric='euclidean'
             ).reshape(len(sw_handle.black_holes.coordinates), ),
-            units=Mpc,
-            cosmo_factor=a
+            units='Mpc',
+            cosmo_factor=sw_handle.black_holes.coordinates.cosmo_factor
         )
 
         return sw_handle, vr_handle
