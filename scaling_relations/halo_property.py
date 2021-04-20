@@ -76,7 +76,7 @@ class HaloProperty(object):
         # If the mask overlaps with the box boundaries, wrap coordinates.
         boxsize = sw_handle.metadata.boxsize[0]
         centre_coordinates = np.array([xcminpot, ycminpot, zcminpot], dtype=np.float64)
-        print(centre_coordinates, a)
+        print(centre_coordinates)
         print(sw_handle.gas.coordinates)
 
         # sw_handle.gas.coordinates = np.mod(
