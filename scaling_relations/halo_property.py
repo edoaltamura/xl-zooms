@@ -173,14 +173,14 @@ class HaloProperty(object):
         return self.get_handles_from_paths(snapshot_file, catalog_file, **kwargs)
 
     @staticmethod
-    def read_from_file(storage_file):
-        pickler = DataframePickler(storage_file)
-        return pickler.load_from_pickle()
-
-    @staticmethod
     def dump_to_pickle(storage_file, obj: pd.DataFrame):
         pickler = DataframePickler(storage_file)
         return pickler.dump_to_pickle(obj)
+
+    @staticmethod
+    def _read_catalogue(storage_file):
+        pickler = DataframePickler(storage_file)
+        return pickler.load_from_pickle()
 
     @staticmethod
     def _process_catalogue(single_halo_method,

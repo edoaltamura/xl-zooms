@@ -19,4 +19,6 @@ print(
     )
 )
 
-gf.process_catalogue()
+print(
+gf.read_catalogue()
+)

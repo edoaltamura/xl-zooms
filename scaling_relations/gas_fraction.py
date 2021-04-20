@@ -50,3 +50,7 @@ class GasFraction(HaloProperty):
 
         catalogue = self._process_catalogue(self.process_single_halo, labels=self.labels)
         self.dump_to_pickle(self.filename, catalogue)
+
+    def read_catalogue(self):
+
+        return self._read_catalogue(self.filename)
