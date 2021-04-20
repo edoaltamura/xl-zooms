@@ -27,21 +27,21 @@ class HaloProperty(object):
         # Read in halo properties
         vr_handle = velociraptor.load(path_to_catalogue)
         a = vr_handle.a
-        r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
-        xcminpot = vr_handle.positions.xcminpot[0].to('Mpc')
-        ycminpot = vr_handle.positions.ycminpot[0].to('Mpc')
-        zcminpot = vr_handle.positions.zcminpot[0].to('Mpc')
+        r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / a
+        xcminpot = vr_handle.positions.xcminpot[0].to('Mpc') / a
+        ycminpot = vr_handle.positions.ycminpot[0].to('Mpc') / a
+        zcminpot = vr_handle.positions.zcminpot[0].to('Mpc') / a
 
         # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
         # to filter particle coordinates, while VR outputs are in physical units.
         # Convert the region bounds to comoving, but keep the CoP and Rcrit in
         # physical units for later use.
-        mask = swiftsimio.mask(path_to_snap, spatial_only=True)
+        mask = swiftsimio.mask(path_to_snap)
         mask_radius = mask_radius_r500 * r500
         region = [
-            [xcminpot / a - mask_radius / a, xcminpot / a + mask_radius / a],
-            [ycminpot / a - mask_radius / a, ycminpot / a + mask_radius / a],
-            [zcminpot / a - mask_radius / a, zcminpot / a + mask_radius / a]
+            [xcminpot - mask_radius, xcminpot + mask_radius],
+            [ycminpot - mask_radius, ycminpot + mask_radius],
+            [zcminpot - mask_radius, zcminpot + mask_radius]
         ]
         mask.constrain_spatial(region)
         sw_handle = swiftsimio.load(path_to_snap, mask=mask)
@@ -63,23 +63,23 @@ class HaloProperty(object):
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
-        sw_handle.gas.coordinates.convert_to_physical()
-        sw_handle.gas.masses.convert_to_physical()
-        sw_handle.gas.temperatures.convert_to_physical()
-        sw_handle.gas.densities.convert_to_physical()
-        sw_handle.gas.entropies.convert_to_physical()
-        sw_handle.gas.velocities.convert_to_physical()
-
-        sw_handle.dark_matter.coordinates.convert_to_physical()
-        sw_handle.dark_matter.masses.convert_to_physical()
-        sw_handle.dark_matter.velocities.convert_to_physical()
-
-        sw_handle.stars.coordinates.convert_to_physical()
-        sw_handle.stars.masses.convert_to_physical()
-        sw_handle.stars.velocities.convert_to_physical()
-
-        sw_handle.black_holes.coordinates.convert_to_physical()
-        sw_handle.black_holes.velocities.convert_to_physical()
+        # sw_handle.gas.coordinates.convert_to_physical()
+        # sw_handle.gas.masses.convert_to_physical()
+        # sw_handle.gas.temperatures.convert_to_physical()
+        # sw_handle.gas.densities.convert_to_physical()
+        # sw_handle.gas.entropies.convert_to_physical()
+        # sw_handle.gas.velocities.convert_to_physical()
+        #
+        # sw_handle.dark_matter.coordinates.convert_to_physical()
+        # sw_handle.dark_matter.masses.convert_to_physical()
+        # sw_handle.dark_matter.velocities.convert_to_physical()
+        #
+        # sw_handle.stars.coordinates.convert_to_physical()
+        # sw_handle.stars.masses.convert_to_physical()
+        # sw_handle.stars.velocities.convert_to_physical()
+        #
+        # sw_handle.black_holes.coordinates.convert_to_physical()
+        # sw_handle.black_holes.velocities.convert_to_physical()
 
         # If the mask overlaps with the box boundaries, wrap coordinates.
         boxsize = sw_handle.metadata.boxsize[0]
