@@ -32,7 +32,7 @@ class VRProperties(HaloProperty):
         r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
         m1000 = vr_data.spherical_overdensities.mass_1000_rhocrit[0].to('Msun')
         r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
-        m200 = vr_data.data.masses.m_200crit[0].to('Msun')
+        m200 = vr_data.masses.m_200crit[0].to('Msun')
         r200 = vr_data.radii.r_200crit[0].to('Mpc')
 
         m_star500c = vr_data.spherical_overdensities.mass_star_500_rhocrit[0].to('Msun')
