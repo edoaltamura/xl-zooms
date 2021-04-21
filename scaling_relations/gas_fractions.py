@@ -43,6 +43,7 @@ class GasFractions(HaloProperty):
 
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.temperatures.convert_to_physical()
+        sw_data.gas.masses.convert_to_physical()
 
         # Select hot gas within sphere
         mask = np.where(

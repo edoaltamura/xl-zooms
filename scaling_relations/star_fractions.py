@@ -42,7 +42,7 @@ class StarFractions(HaloProperty):
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
 
         sw_data.stars.radial_distances.convert_to_physical()
-        sw_data.stars.temperatures.convert_to_physical()
+        sw_data.stars.masses.convert_to_physical()
 
         # Select hot gas within sphere
         mask = np.where(
