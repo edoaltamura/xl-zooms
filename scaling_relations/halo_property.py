@@ -15,7 +15,7 @@ from register import (
     DataframePickler,
     Zoom,
     zooms_register,
-    EXLZooms
+    calibration_zooms
 )
 
 
@@ -282,7 +282,7 @@ class HaloProperty(object):
         results.insert(0, 'Run_name', pd.Series(_name_list, dtype=str))
         if not args.quiet:
             print(
-                f"z = {EXLZooms.redshift_from_index(args.redshift_index):.2f}"
+                f"z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}"
                 "\nOutput dataframe (head only):\n",
                 results.head()
             )
