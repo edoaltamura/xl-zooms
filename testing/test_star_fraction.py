@@ -2,10 +2,10 @@ import sys
 
 sys.path.append("..")
 
-from scaling_relations import GasFractions
+from scaling_relations import StarFractions
 from test_files import cat, snap
 
-gf = GasFractions()
+gf = StarFractions()
 print(
     gf.process_single_halo(
         path_to_snap=snap,
