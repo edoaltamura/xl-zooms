@@ -54,8 +54,8 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-refresh',
-    '--refresh-catalogue',
+    '-r',
+    '--refresh',
     default=False,
     required=False,
     action='store_true'
