@@ -28,7 +28,7 @@ parser.add_argument(
 )
 
 parser.add_argument(
-    '-r',
+    '-z',
     '--redshift-index',
     type=int,
     default=36,
