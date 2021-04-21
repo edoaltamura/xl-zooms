@@ -640,7 +640,7 @@ def load_exlzooms() -> list:
         )
 
 
-if args.refresh_catalogue:
+if args.refresh:
     dump_exlzooms()
 
 calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()
