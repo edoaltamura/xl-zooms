@@ -23,11 +23,11 @@ class GasFractions(HaloProperty):
 
         if value >= 1:
             raise RuntimeError((
-                f"The value for {self.labels[0]} must be between 0 and 1. "
+                f"The value for {self.labels[1]} must be between 0 and 1. "
                 f"Got {value} instead."
             ))
         elif 0.5 < value < 1:
-            warn(f"The value for {self.labels[0]} seems too high: {value}", RuntimeWarning)
+            warn(f"The value for {self.labels[1]} seems too high: {value}", RuntimeWarning)
 
     def process_single_halo(
             self,
