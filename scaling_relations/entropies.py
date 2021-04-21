@@ -1,12 +1,12 @@
 import os.path
-import unyt
 import numpy as np
+from warnings import warn
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas, default_output_directory
+from register import Zoom, Tcut_halogas, default_output_directory, args
 
 
-class GasFraction(HaloProperty):
+class Entropies(HaloProperty):
 
     def __init__(self):
         super().__init__()
@@ -16,8 +16,18 @@ class GasFraction(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            'gas_fractions.pkl'
+            f'gas_fractions_{args.redshift_index:04d}.pkl'
         )
+
+    def check_value(self, value):
+
+        if value >= 1:
+            raise RuntimeError((
+                f"The value for {self.labels[0]} must be between 0 and 1. "
+                f"Got {value} instead."
+            ))
+        elif 0.5 < value < 1:
+            warn(f"The value for {self.labels[0]} seems too high: {value}", RuntimeWarning)
 
     def process_single_halo(
             self,
@@ -41,9 +51,10 @@ class GasFraction(HaloProperty):
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
         mhot500 = np.sum(sw_data.gas.masses[mask])
-        mhot500 = mhot500.to(unyt.Solar_Mass)
+        mhot500 = mhot500.to('Msun')
         gas_fraction = mhot500 / m500
 
+        self.check_value(gas_fraction)
         return gas_fraction
 
     def process_catalogue(self):

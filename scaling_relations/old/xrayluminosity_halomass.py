@@ -23,10 +23,10 @@ except:
     pass
 
 # Make the register backend visible to the script
-sys.path.append("../zooms")
+sys.path.append("../../zooms")
 sys.path.append("../observational_data")
-sys.path.append("../hydrostatic_estimates")
-sys.path.append("../xray")
+sys.path.append("../../hydrostatic_estimates")
+sys.path.append("../../xray")
 
 # Import backend utilities
 from register import zooms_register, Tcut_halogas, calibration_zooms, Zoom

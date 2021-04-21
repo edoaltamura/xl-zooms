@@ -16,8 +16,8 @@ except:
 
 # Make the register backend visible to the script
 sys.path.append("../observational_data")
-sys.path.append("../scaling_relations")
-sys.path.append("../zooms")
+sys.path.append("..")
+sys.path.append("../../zooms")
 
 from register import zooms_register, Zoom, Tcut_halogas, calibration_zooms
 import observational_data as obs

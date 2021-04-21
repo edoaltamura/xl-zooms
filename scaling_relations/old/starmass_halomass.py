@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
 # Make the register backend visible to the script
-sys.path.append("../zooms")
+sys.path.append("../../zooms")
 sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list

@@ -14,7 +14,8 @@ from register import (
     args,
     DataframePickler,
     Zoom,
-    zooms_register
+    zooms_register,
+    EXLZooms
 )
 
 
@@ -182,6 +183,30 @@ class HaloProperty(object):
         pickler = DataframePickler(storage_file)
         return pickler.load_from_pickle()
 
+    def _get_zoom_from_catalogue(self,
+                                storage_file: str,
+                                zoom_obj: Zoom = None,
+                                zoom_name: str = None) -> pd.DataFrame:
+
+        assert zoom_obj is not None or zoom_name is not None, (
+            "Need to specify either `zoom_obj` or `zoom_name`."
+        )
+        name = zoom_name
+        if zoom_obj is not None:
+            name = zoom_obj.run_name
+
+        catalogue = self._read_catalogue(storage_file)
+
+        if name not in catalogue['Run_name'].unique():
+            raise RuntimeError((
+                f"The {name} zoom could not be found in the catalogue "
+                f"{storage_file}. Double check manually and regenerate "
+                "the catalogue if necessary. The `--restart` option can "
+                "be used."
+            ))
+
+        return catalogue.loc[catalogue['Run_name'] == name]
+
     @staticmethod
     def _process_catalogue(single_halo_method,
                            labels: List[str],
@@ -205,13 +230,14 @@ class HaloProperty(object):
         """
         # Print the CLI arguments that are parsed in the script
 
-        find_keyword = args.keywords
-
-        _zooms_register = []
-        for keyword in find_keyword:
-            for zoom in zooms_register:
-                if keyword in zoom.run_name and zoom not in _zooms_register:
-                    _zooms_register.append(zoom)
+        if args.refresh:
+            _zooms_register = zooms_register
+        else:
+            _zooms_register = []
+            for keyword in args.keywords:
+                for zoom in zooms_register:
+                    if keyword in zoom.run_name and zoom not in _zooms_register:
+                        _zooms_register.append(zoom)
 
         _name_list = [zoom.run_name for zoom in _zooms_register]
 
@@ -252,10 +278,13 @@ class HaloProperty(object):
                     raise error
 
         # Recast output into a Pandas dataframe for further manipulation
-        columns = labels
-        results = pd.DataFrame(list(results), columns=columns)
-        results.insert(0, 'Run name', pd.Series(_name_list, dtype=str))
+        results = pd.DataFrame(list(results), columns=labels)
+        results.insert(0, 'Run_name', pd.Series(_name_list, dtype=str))
         if not args.quiet:
-            print(results.head())
+            print(
+                f"z = {EXLZooms.redshift_from_index(args.redshift_index):.2f}"
+                "\nOutput dataframe (head only):\n",
+                results.head()
+            )
 
         return results

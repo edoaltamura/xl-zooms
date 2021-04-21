@@ -4,13 +4,13 @@ import os
 import unyt
 import numpy as np
 from typing import Tuple
-import h5py as h5
 import swiftsimio as sw
+import h5py as h5
 import pandas as pd
 import matplotlib.pyplot as plt
 
 # Make the register backend visible to the script
-sys.path.append("../zooms")
+sys.path.append("../../zooms")
 sys.path.append("../observational_data")
 
 from register import zooms_register, Zoom, Tcut_halogas, name_list
@@ -33,63 +33,68 @@ def process_single_halo(
 ) -> Tuple[unyt.unyt_quantity]:
     # Read in halo properties
     with h5.File(f'{path_to_catalogue}', 'r') as h5file:
-        M500c = unyt.unyt_quantity(h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass)
-        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
-        Thot500c = unyt.unyt_quantity(h5file['/SO_T_gas_highT_1.000000_times_500.000000_rhocrit'][0], unyt.K)
-        Zhot500c = unyt.unyt_quantity(h5file['/SO_Zmet_gas_highT_1.000000_times_500.000000_rhocrit'][0], unyt.solar_metallicity)
         XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc)
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
+        R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
+        R200c = unyt.unyt_quantity(h5file['/R_200crit'][0], unyt.Mpc)
+        M500c = unyt.unyt_quantity(
+            h5file['/SO_Mass_500_rhocrit'][0] * 1.e10, unyt.Solar_Mass
+        )
+        Mbh_aperture50kpc = unyt.unyt_quantity(
+            h5file['Aperture_SubgridMasses_aperture_total_bh_50_kpc'][0] * 1.e10, unyt.Solar_Mass
+        )
+        Mbh_max = unyt.unyt_quantity(
+            h5file['/SubgridMasses_max_bh'][0] * 1.e10, unyt.Solar_Mass
+        )
+        Mstar_bcg_50kpc = unyt.unyt_quantity(
+            h5file['/Aperture_mass_star_50_kpc'][0] * 1.e10, unyt.Solar_Mass
+        )
 
-    # Read in gas particles to compute the core-excised temperature
-    mask = sw.mask(f'{path_to_snap}', spatial_only=False)
-    region = [[XPotMin - R500c, XPotMin + R500c],
-              [YPotMin - R500c, YPotMin + R500c],
-              [ZPotMin - R500c, ZPotMin + R500c]]
-    mask.constrain_spatial(region)
-    mask.constrain_mask(
-        "gas", "temperatures",
-        Tcut_halogas * mask.units.temperature,
-        1.e12 * mask.units.temperature
-    )
-    data = sw.load(f'{path_to_snap}', mask=mask)
-    posGas = data.gas.coordinates
-    massGas = data.gas.masses
-    mass_weighted_temperatures = data.gas.temperatures * data.gas.masses
-    iron_fraction = data.gas.element_mass_fractions.iron * data.gas.masses
+        # Read in particles
+        mask = sw.mask(f'{path_to_snap}', spatial_only=True)
+        region = [[XPotMin - R200c, XPotMin + R200c],
+                  [YPotMin - R200c, YPotMin + R200c],
+                  [ZPotMin - R200c, ZPotMin + R200c]]
+        mask.constrain_spatial(region)
+        data = sw.load(f'{path_to_snap}', mask=mask)
 
-    # Select hot gas within sphere and without core
-    deltaX = posGas[:, 0] - XPotMin
-    deltaY = posGas[:, 1] - YPotMin
-    deltaZ = posGas[:, 2] - ZPotMin
-    deltaR = np.sqrt(deltaX ** 2 + deltaY ** 2 + deltaZ ** 2)
+        # Get positions for all BHs in the bounding region
+        bh_positions = data.black_holes.coordinates
+        bh_coordX = bh_positions[:, 0] - XPotMin
+        bh_coordY = bh_positions[:, 1] - YPotMin
+        bh_coordZ = bh_positions[:, 2] - ZPotMin
+        bh_radial_distance = np.sqrt(bh_coordX ** 2 + bh_coordY ** 2 + bh_coordZ ** 2)
 
-    index = np.where(deltaR < R500c)[0]
-    iron_fraction_500c = np.sum(iron_fraction[index]) / np.sum(massGas[index])
+        # The central SMBH will probably be massive: filter above 1e8 Msun
+        bh_masses = data.black_holes.subgrid_masses.to_physical()
+        bh_top_massive_index = np.where(bh_masses.to('Msun').value > 1.e8)[0]
 
-    index = np.where((deltaR > 0.15 * R500c) & (deltaR < R500c))[0]
-    Thot500c_nocore = np.sum(mass_weighted_temperatures[index]) / np.sum(massGas[index])
+        massive_bh_radial_distances = bh_radial_distance[bh_top_massive_index]
+        massive_bh_masses = bh_masses[bh_top_massive_index]
 
-    # Convert temperatures to keV
-    Thot500c = (Thot500c * unyt.boltzmann_constant).to('keV')
-    Thot500c_nocore = (Thot500c_nocore * unyt.boltzmann_constant).to('keV')
+        # Get the central BH closest to centre of halo at z=0
+        central_bh_index = np.argmin(bh_radial_distance[bh_top_massive_index])
+        central_bh_dr = massive_bh_radial_distances[central_bh_index]
+        central_bh_mass = massive_bh_masses[central_bh_index].to('Msun')
 
-    return M500c, Thot500c, Thot500c_nocore, Zhot500c, iron_fraction_500c
+    return M500c, Mbh_aperture50kpc, Mbh_max, central_bh_mass, central_bh_dr, Mstar_bcg_50kpc
 
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
     'M_500crit',
-    'Thot500c',
-    'Thot500c_nocore',
-    'Zhot500c',
-    'iron_fraction_500c'
+    'Mbh_aperture50kpc',
+    'Mbh_max',
+    'central_bh_mass',
+    'central_bh_dr',
+    'Mstar_bcg_50kpc',
 ])
 def _process_single_halo(zoom: Zoom):
     return process_single_halo(zoom.snapshot_file, zoom.catalog_file)
 
 
-def m500_Fe500(results: pd.DataFrame):
+def plot_bhmass_halomass(results: pd.DataFrame):
     fig, ax = plt.subplots()
     legend_handles = []
     for i in range(len(results)):
@@ -99,8 +104,8 @@ def m500_Fe500(results: pd.DataFrame):
             legend_handles.append(run_style['Legend handle'])
 
         ax.scatter(
-            results.loc[i, "Thot500c"],
-            results.loc[i, "Zhot500c"],
+            results.loc[i, "Mstar_bcg_50kpc"],
+            results.loc[i, "central_bh_mass"],
             marker=run_style['Marker style'],
             c=run_style['Color'],
             s=run_style['Marker size'],
@@ -132,15 +137,22 @@ def m500_Fe500(results: pd.DataFrame):
     # legend_obs = plt.legend(handles=handles, loc=4)
     # ax.add_artist(legend_obs)
 
-    ax.set_xlabel(r'$T_{500{\rm crit}}\ [{\rm keV}]$')
-    ax.set_ylabel(r'${\rm Z}_{500{\rm crit}}\ [{\rm Z}_{\odot}]$')
+    ax.set_xlabel(r'$M_{star, 50{\rm kpc}}\ [{\rm M}_{\odot}]$')
+    ax.set_ylabel(r'$M_{\rm BH}\ [{\rm M}_{\odot}]$')
     ax.set_xscale('log')
     ax.set_yscale('log')
-    fig.savefig(f'{zooms_register[0].output_directory}/t500_z500.png', dpi=300)
+    fig.savefig(f'{zooms_register[0].output_directory}/bhmass_halomass.png', dpi=300)
     plt.show()
     plt.close()
 
 
 if __name__ == "__main__":
-    results = utils.process_catalogue(_process_single_halo, find_keyword='Ref')
-    m500_Fe500(results)
+    import sys
+
+    if sys.argv[1]:
+        keyword = sys.argv[1]
+    else:
+        keyword = 'Ref'
+
+    results = utils.process_catalogue(_process_single_halo, find_keyword=keyword)
+    plot_bhmass_halomass(results)
