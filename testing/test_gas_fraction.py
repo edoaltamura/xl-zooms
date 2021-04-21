@@ -20,5 +20,5 @@ print(
 )
 
 print(
-gf.read_catalogue()
+gf.process_catalogue()
 )
