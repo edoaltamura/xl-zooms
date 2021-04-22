@@ -8,7 +8,7 @@ from unyt import mp, cm, Mpc, unyt_quantity
 from .halo_property import HaloProperty
 from register import Zoom, Tcut_halogas, default_output_directory, args
 
-sys.path.append("../../xray")
+sys.path.append("../xray")
 
 import cloudy_softband as cloudy
 
