@@ -115,25 +115,25 @@ class HaloProperty(object):
             ))
 
         # If the mask overlaps with the box boundaries, wrap coordinates.
-        boxsize = sw_handle.metadata.boxsize[0]
+        boxsize = sw_handle.metadata.boxsize
         centre_coordinates = unyt_array([xcminpot, ycminpot, zcminpot], xcminpot.units)
 
-        sw_handle.gas.coordinates = mod_unyt(
+        sw_handle.gas.coordinates = np.mod(
             sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
             boxsize
         ) + centre_coordinates - 0.5 * boxsize
 
-        sw_handle.dark_matter.coordinates = mod_unyt(
+        sw_handle.dark_matter.coordinates = np.mod(
             sw_handle.dark_matter.coordinates - centre_coordinates + 0.5 * boxsize,
             boxsize
         ) + centre_coordinates - 0.5 * boxsize
 
-        sw_handle.stars.coordinates = mod_unyt(
+        sw_handle.stars.coordinates = np.mod(
             sw_handle.stars.coordinates - centre_coordinates + 0.5 * boxsize,
             boxsize
         ) + centre_coordinates - 0.5 * boxsize
 
-        sw_handle.black_holes.coordinates = mod_unyt(
+        sw_handle.black_holes.coordinates = np.mod(
             sw_handle.black_holes.coordinates - centre_coordinates + 0.5 * boxsize,
             boxsize
         ) + centre_coordinates - 0.5 * boxsize
