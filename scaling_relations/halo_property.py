@@ -4,9 +4,11 @@ import swiftsimio
 import velociraptor
 from scipy.spatial import distance
 import pandas as pd
-from typing import Callable, List, Union
+from unyt import unyt_array
+from typing import Tuple, List, Union
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
+
 
 sys.path.append("..")
 
@@ -17,6 +19,34 @@ from register import (
     zooms_register,
     calibration_zooms
 )
+
+
+def histogram_unyt(data: unyt_array,
+                   bins: unyt_array = None,
+                   weights: unyt_array = None,
+                   **kwargs,) -> Tuple[unyt_array]:
+
+    assert data.shape == weights.shape, (
+        "Data and weights arrays must have the same shape. "
+        f"Detected data {data.shape}, weights {weights.shape}."
+    )
+
+    assert data.units == bins.units, (
+        "Data and bins must have the same units. "
+        f"Detected data {data.units}, bins {bins.units}."
+    )
+
+    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value, **kwargs)
+    hist *= weights.units
+    bin_edges *= data.units
+
+    return hist, bin_edges
+
+
+def cumsum_unyt(data: unyt_array, **kwargs) -> unyt_array:
+    res = np.cumsum(data.value, **kwargs)
+
+    return res * data.units
 
 
 class HaloProperty(object):

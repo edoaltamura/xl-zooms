@@ -10,6 +10,11 @@ from register import Zoom, Tcut_halogas, default_output_directory, args
 
 sys.path.append("../xray")
 
+import numba
+from multiprocessing import cpu_count
+
+numba.config.NUMBA_NUM_THREADS = cpu_count()
+
 import cloudy_softband as cloudy
 
 

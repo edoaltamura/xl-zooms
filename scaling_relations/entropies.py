@@ -1,9 +1,15 @@
 import os.path
 import numpy as np
 from warnings import warn
+from unyt import kb, mp, Mpc
+from scipy.interpolate import interp1d
 
-from .halo_property import HaloProperty
+from .halo_property import HaloProperty, histogram_unyt
 from register import Zoom, Tcut_halogas, default_output_directory, args
+
+# Constants
+mean_molecular_weight = 0.59
+mean_atomic_weight_per_free_electron = 1.14
 
 
 class Entropies(HaloProperty):
@@ -16,7 +22,7 @@ class Entropies(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'gas_fractions_{args.redshift_index:04d}.pkl'
+            f'entropies_{args.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):
@@ -38,24 +44,54 @@ class Entropies(HaloProperty):
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
-        m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+        r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
+        r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
+        r200 = vr_data.radii.r_200crit[0].to('Mpc')
 
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.temperatures.convert_to_physical()
 
         # Select hot gas within sphere
         mask = np.where(
-            (sw_data.gas.radial_distances <= r500) &
+            (sw_data.gas.radial_distances <= 3 * r500) &
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        mhot500 = np.sum(sw_data.gas.masses[mask])
-        mhot500 = mhot500.to('Msun')
-        gas_fraction = mhot500 / m500
 
-        self.check_value(gas_fraction)
-        return gas_fraction
+        sw_data.gas.radial_distances = sw_data.gas.radial_distances[mask]
+        sw_data.gas.masses = sw_data.gas.masses[mask]
+        sw_data.gas.temperatures = sw_data.gas.temperatures[mask]
+
+        radial_distances_scaled = sw_data.gas.radial_distances / r500
+
+        # Define radial bins and shell volumes
+        lbins = np.logspace(-3, 3, 300) * radial_distances_scaled.units
+        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances_scaled.units
+        volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
+
+        mass_weights, _ = histogram_unyt(radial_distances_scaled, bins=lbins, weights=sw_data.gas.masses)
+        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+        density_profile = mass_weights / volume_shell
+        number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
+
+        mass_weighted_temperatures = (sw_data.gas.temperatures * kb).to('keV') * sw_data.gas.masses
+        temperature_weights, _ = histogram_unyt(radial_distances_scaled, bins=lbins, weights=mass_weighted_temperatures)
+        temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
+        temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+
+        entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
+
+        entropy_interpolate = interp1d(radial_bin_centres * r500, entropy_profile,
+                                       kind='quadratic', fill_value='extrapolate')
+
+        k30kpc = entropy_interpolate(0.03 * Mpc) * entropy_profile.units
+        k500 = entropy_interpolate(r500) * entropy_profile.units
+        k2500 = entropy_interpolate(r2500) * entropy_profile.units
+        k1000 = entropy_interpolate(r1000) * entropy_profile.units
+        k200 = entropy_interpolate(r200) * entropy_profile.units
+
+        return k30kpc, k2500, k1000, k500, k200
 
     def process_catalogue(self):
 
