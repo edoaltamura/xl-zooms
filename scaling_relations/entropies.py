@@ -43,11 +43,12 @@ class Entropies(HaloProperty):
             path_to_catalogue: str = None,
             **kwargs
     ):
-        kwarg_parser = dict(zoom_obj=None, path_to_snap=None, path_to_catalogue=None)
-        sw_data, vr_data = self.get_handles_from_zoom(**kwarg_parser, **kwargs)
+        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
+
+        kwarg_parser = dict(zoom_obj=zoom_obj, path_to_snap=path_to_snap, path_to_catalogue=path_to_catalogue)
 
         try:
             r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
