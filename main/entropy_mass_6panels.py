@@ -18,7 +18,7 @@ except:
 
 fig = plt.figure(figsize=(9, 5))
 gs = fig.add_gridspec(2, 3, hspace=0.05, wspace=0.3)
-axes = gs.subplots(sharex=True, sharey=False)
+axes = gs.subplots(sharex=True, sharey=True)
 
 shadow = dict(path_effects=[path_effects.SimpleLineShadow(), path_effects.Normal()])
 
@@ -35,16 +35,16 @@ axes[0, 0].set_ylabel('Entropy [keV cm$^2$]')
 axes[0, 0].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
 axes[0, 1].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
 axes[0, 2].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
-axes[0, 0].scatter((catalogue['T500_nocore'] * kb).to('keV'), catalogue['k500'], ms=1)
-axes[0, 1].scatter((catalogue['T500_nocore'] * kb).to('keV'), catalogue['k1000'], ms=1)
-axes[0, 2].scatter((catalogue['T500_nocore'] * kb).to('keV'), catalogue['k1500'], ms=1)
+axes[0, 0].scatter([(t * kb).to('keV') for t in catalogue['T500_nocore']], catalogue['k500'], ms=1)
+axes[0, 1].scatter([(t * kb).to('keV') for t in catalogue['T500_nocore']], catalogue['k1000'], ms=1)
+axes[0, 2].scatter([(t * kb).to('keV') for t in catalogue['T500_nocore']], catalogue['k1500'], ms=1)
 
 axes[1, 0].set_ylabel('Entropy [keV cm$^2$]')
 axes[1, 0].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 1].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 2].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
-axes[1, 0].scatter((catalogue['T2500_nocore'] * kb).to('keV'), catalogue['k2500'], ms=1)
-axes[1, 1].scatter((catalogue['T2500_nocore'] * kb).to('keV'), catalogue['k500'], ms=1)
-axes[1, 2].scatter((catalogue['T2500_nocore'] * kb).to('keV'), catalogue['k30kpc'], ms=1)
+axes[1, 0].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k2500'], ms=1)
+axes[1, 1].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k500'], ms=1)
+axes[1, 2].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k30kpc'], ms=1)
 
 plt.show()
