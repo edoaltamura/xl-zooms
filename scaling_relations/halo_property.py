@@ -319,7 +319,8 @@ class HaloProperty(object):
                     with threading_engine as pool:
                         results = list(tqdm(
                             pool.imap(single_halo_method, iter(_zooms_register)),
-                            total=len(_zooms_register)
+                            total=len(_zooms_register),
+                            disable=args.quiet
                         ))
                 except Exception as error:
                     print((

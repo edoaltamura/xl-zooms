@@ -28,11 +28,6 @@ Attributes:
     will only consider gas particles above this temperature, excluding cold gas
     and gas on the equation of state.
 
-    SILENT_PROGRESSBAR (bool): Specifies whether progress-bars called with
-    `tqdm` should appear in the console when the pipeline is run. E.g. for
-    long computations, or when running in the background with `nohup [cmd] &`,
-    you may want to set this to `True` to avoid printing the progress-bar.
-
     calibration_zooms (EXLZooms): class instance which can be used to retrieve
     info directly from the base class or to call some useful static methods.
 
@@ -536,7 +531,7 @@ class Zoom(object):
         with zipfile.ZipFile(os.path.join(snip_path, 'snipshots.zip'), 'r') as archive:
             all_snips = archive.namelist()
             all_snips.sort(key=lambda x: int(x[-9:-5]))
-            for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=SILENT_PROGRESSBAR):
+            for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=args.quiet):
                 snip_handle = io.BytesIO(archive.open(snip_name).read())
                 with h5py.File(snip_handle, 'r') as f:
                     z = f['Header'].attrs['Redshift'][0]

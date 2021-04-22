@@ -8,7 +8,6 @@ routines that call them.
 import os
 
 Tcut_halogas = 1.e5  # Kelvin
-SILENT_PROGRESSBAR = False  # Refers to `tqdm`
 default_output_directory: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
 if not os.path.isdir(default_output_directory):
