@@ -46,6 +46,7 @@ def cumsum_unyt(data: unyt_array) -> unyt_array:
 
     return res * data.units
 
+def foo(): pass
 
 class HaloProperty(object):
 
@@ -306,7 +307,7 @@ class HaloProperty(object):
 
             else:
 
-                def foo(): pass
+
 
                 print("Running with multithreading.")
                 num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
