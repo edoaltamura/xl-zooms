@@ -16,8 +16,8 @@ except:
     pass
 
 
-fig = plt.figure(figsize=(8, 5))
-gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.03)
+fig = plt.figure(figsize=(7, 5))
+gs = fig.add_gridspec(2, 3, hspace=0.2, wspace=0.)
 axes = gs.subplots(sharex=True, sharey=True)
 
 shadow = dict(path_effects=[path_effects.SimpleLineShadow(), path_effects.Normal()])
@@ -51,11 +51,11 @@ for model in models:
     axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=1)
     axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=1)
 
-    axes[0, 0].text(0., 0., r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
-    axes[0, 1].text(0., 0., r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
-    axes[0, 2].text(0., 0., r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
-    axes[1, 0].text(0., 0., r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
-    axes[1, 1].text(0., 0., r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
-    axes[1, 2].text(0., 0., r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
+    axes[0, 0].text(0., 1., r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
+    axes[0, 1].text(0., 1., r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
+    axes[0, 2].text(0., 1., r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
+    axes[1, 0].text(0., 1., r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
+    axes[1, 1].text(0., 1., r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
+    axes[1, 2].text(0., 1., r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
 
 plt.show()
