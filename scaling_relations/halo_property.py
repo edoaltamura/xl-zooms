@@ -4,7 +4,7 @@ import swiftsimio
 import velociraptor
 from scipy.spatial import distance
 import pandas as pd
-from p_tqdm import p_map
+from tqdm import tqdm
 from unyt import unyt_array
 from typing import Tuple, List
 from multiprocessing import Pool, cpu_count
@@ -307,8 +307,6 @@ class HaloProperty(object):
 
             else:
 
-
-
                 print("Running with multithreading.")
                 num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
                 print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
@@ -324,10 +322,10 @@ class HaloProperty(object):
                         #     list(pool.imap(single_halo_method, iter(_zooms_register))),
                         #     total=len(_zooms_register)
                         # )
-                        results = p_map(
-                            list(pool.imap(foo, iter(_zooms_register))),
+                        results = list(tqdm(
+                            pool.imap(foo, iter(_zooms_register)),
                             total=len(_zooms_register)
-                        )
+                        ))
                 except Exception as error:
                     print((
                         f"The analysis stopped due to the error\n{error}\n"
