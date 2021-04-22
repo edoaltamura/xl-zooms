@@ -1,7 +1,6 @@
 import sys
 import os.path
 import numpy as np
-from copy import copy
 from warnings import warn
 from unyt import mp, cm, Mpc, unyt_quantity
 
