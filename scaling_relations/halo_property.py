@@ -306,6 +306,8 @@ class HaloProperty(object):
 
             else:
 
+                def foo(): pass
+
                 print("Running with multithreading.")
                 num_threads = len(_zooms_register) if len(_zooms_register) < cpu_count() else cpu_count()
                 print(f"Analysis of {len(_zooms_register):d} zooms mapped onto {num_threads:d} CPUs.")
@@ -318,7 +320,7 @@ class HaloProperty(object):
                     # The results of the multiprocessing Pool are returned in the same order as inputs
                     with threading_engine as pool:
                         results = p_map(
-                            list(pool.imap(single_halo_method, iter(_zooms_register))),
+                            list(pool.imap(foo, iter(_zooms_register))),
                             total=len(_zooms_register)
                         )
                 except Exception as error:
