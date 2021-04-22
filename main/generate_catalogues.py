@@ -14,8 +14,8 @@ catalogue_starters = [
     # MWTemperatures(),
     # Relaxation(),
     # XrayLuminosities(),
-    # Entropies(),
-    SphericalOverdensities(density_contrast=1500.),
+    Entropies(),
+    # SphericalOverdensities(density_contrast=1500.),
 ]
 
 dump_memory_usage()
