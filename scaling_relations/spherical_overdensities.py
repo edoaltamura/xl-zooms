@@ -72,10 +72,10 @@ class SphericalOverdensities(HaloProperty):
         ]
 
         fof_ids = np.r_[
-            sw_data.gas.fofgroups_ids,
-            sw_data.dark_matter.fofgroups_ids,
-            sw_data.stars.fofgroups_ids,
-            sw_data.black_holes.fofgroups_ids
+            sw_data.gas.fofgroup_ids,
+            sw_data.dark_matter.fofgroup_ids,
+            sw_data.stars.fofgroup_ids,
+            sw_data.black_holes.fofgroup_ids
         ]
 
         # Select all particles within sphere
