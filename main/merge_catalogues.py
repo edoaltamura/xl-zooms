@@ -37,4 +37,5 @@ for f in files[1:]:
         axis=1
     )
 
+catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
 print(catalogue.head())
