@@ -103,7 +103,7 @@ class SphericalOverdensities(HaloProperty):
         density_profile = cumulative_mass_profile / volume_sphere / rho_crit
 
         # For better stability, clip the initial 20% of the profile
-        clip = int((len(lbins) - 1) / 3)
+        clip = int((len(lbins) - 1) / 10)
 
         print(density_profile[clip:], clip)
 
