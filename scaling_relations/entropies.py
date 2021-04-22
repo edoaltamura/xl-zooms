@@ -17,7 +17,7 @@ class Entropies(HaloProperty):
     def __init__(self):
         super().__init__()
 
-        self.labels = ['f_gas']
+        self.labels = ['k30kpc', 'k2500', 'k1000', 'k500', 'k200']
 
         self.filename = os.path.join(
             default_output_directory,
