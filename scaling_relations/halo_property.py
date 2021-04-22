@@ -9,7 +9,6 @@ from typing import Tuple, List, Union
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
 
-
 sys.path.append("..")
 
 from register import (
@@ -24,7 +23,6 @@ from register import (
 def histogram_unyt(data: unyt_array,
                    bins: unyt_array = None,
                    weights: unyt_array = None) -> Tuple[unyt_array]:
-
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
         f"Detected data {data.shape}, weights {weights.shape}."
@@ -46,6 +44,13 @@ def cumsum_unyt(data: unyt_array) -> unyt_array:
     res = np.cumsum(data.value)
 
     return res * data.units
+
+
+def mod_unyt(x1: unyt_array, x2: unyt_array) -> unyt_array:
+    x2 = x2.to(x1.units)
+    res = np.mod(x1.value, x2.value)
+
+    return res * x1.units
 
 
 class HaloProperty(object):
@@ -70,7 +75,7 @@ class HaloProperty(object):
         Returns:
 
         TODO:
-            * Coordinate wrapping compatible with unyt_array
+
         """
         # Read in halo properties
         vr_handle = velociraptor.load(path_to_catalogue)
@@ -114,25 +119,25 @@ class HaloProperty(object):
         boxsize = sw_handle.metadata.boxsize[0]
         centre_coordinates = np.array([xcminpot, ycminpot, zcminpot], dtype=np.float64)
 
-        # sw_handle.gas.coordinates = np.mod(
-        #     sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
-        #     boxsize
-        # ) + centre_coordinates - 0.5 * boxsize
-        #
-        # sw_handle.dark_matter.coordinates = np.mod(
-        #     sw_handle.dark_matter.coordinates - centre_coordinates + 0.5 * boxsize,
-        #     boxsize
-        # ) + centre_coordinates - 0.5 * boxsize
-        #
-        # sw_handle.stars.coordinates = np.mod(
-        #     sw_handle.stars.coordinates - centre_coordinates + 0.5 * boxsize,
-        #     boxsize
-        # ) + centre_coordinates - 0.5 * boxsize
-        #
-        # sw_handle.black_holes.coordinates = np.mod(
-        #     sw_handle.black_holes.coordinates - centre_coordinates + 0.5 * boxsize,
-        #     boxsize
-        # ) + centre_coordinates - 0.5 * boxsize
+        sw_handle.gas.coordinates = mod_unyt(
+            sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
+            boxsize
+        ) + centre_coordinates - 0.5 * boxsize
+
+        sw_handle.dark_matter.coordinates = mod_unyt(
+            sw_handle.dark_matter.coordinates - centre_coordinates + 0.5 * boxsize,
+            boxsize
+        ) + centre_coordinates - 0.5 * boxsize
+
+        sw_handle.stars.coordinates = mod_unyt(
+            sw_handle.stars.coordinates - centre_coordinates + 0.5 * boxsize,
+            boxsize
+        ) + centre_coordinates - 0.5 * boxsize
+
+        sw_handle.black_holes.coordinates = mod_unyt(
+            sw_handle.black_holes.coordinates - centre_coordinates + 0.5 * boxsize,
+            boxsize
+        ) + centre_coordinates - 0.5 * boxsize
 
         # Compute radial distances
         sw_handle.gas.radial_distances = swiftsimio.cosmo_array(
@@ -213,9 +218,9 @@ class HaloProperty(object):
         return pickler.load_from_pickle()
 
     def _get_zoom_from_catalogue(self,
-                                storage_file: str,
-                                zoom_obj: Zoom = None,
-                                zoom_name: str = None) -> pd.DataFrame:
+                                 storage_file: str,
+                                 zoom_obj: Zoom = None,
+                                 zoom_name: str = None) -> pd.DataFrame:
 
         assert zoom_obj is not None or zoom_name is not None, (
             "Need to specify either `zoom_obj` or `zoom_name`."
