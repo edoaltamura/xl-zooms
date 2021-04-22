@@ -78,9 +78,9 @@ class Entropies(HaloProperty):
         radial_distances_scaled = sw_data.gas.radial_distances / r500
 
         # Define radial bins and shell volumes
-        lbins = np.logspace(
-            np.log10(radial_distances_scaled.min().value),
-            np.log10(radial_distances_scaled.max().value),
+        lbins = np.linspace(
+            radial_distances_scaled.min().value,
+            radial_distances_scaled.max().value,
             300
         ) * radial_distances_scaled.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances_scaled.units
