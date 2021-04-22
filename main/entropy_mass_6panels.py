@@ -1,4 +1,4 @@
-from merge_catalogues import catalogue, select_runs
+from merge_catalogues import catalogue, select_runs, models
 
 from matplotlib import pyplot as plt
 from matplotlib.cm import get_cmap
@@ -16,7 +16,7 @@ except:
     pass
 
 
-fig = plt.figure(figsize=(9, 5))
+fig = plt.figure(figsize=(8, 5))
 gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.03)
 axes = gs.subplots(sharex=True, sharey=True)
 
@@ -35,16 +35,27 @@ axes[0, 0].set_ylabel('Entropy [keV cm$^2$]')
 axes[0, 0].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
 axes[0, 1].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
 axes[0, 2].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
-axes[0, 0].scatter([(t * kb).to('keV') for t in catalogue['T500_nocore']], catalogue['k500'], s=1)
-axes[0, 1].scatter([(t * kb).to('keV') for t in catalogue['T500_nocore']], catalogue['k1000'], s=1)
-axes[0, 2].scatter([(t * kb).to('keV') for t in catalogue['T500_nocore']], catalogue['k1500'], s=1)
 
 axes[1, 0].set_ylabel('Entropy [keV cm$^2$]')
 axes[1, 0].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 1].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 2].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
-axes[1, 0].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k2500'], s=1)
-axes[1, 1].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k0p15r500'], s=1)
-axes[1, 2].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k30kpc'], s=1)
+
+for model in models:
+    df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
+
+    axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], s=1)
+    axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], s=1)
+    axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], s=1)
+    axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], s=1)
+    axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=1)
+    axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=1)
+
+    axes[0, 0].text(0., 0., r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
+    axes[0, 1].text(0., 0., r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
+    axes[0, 2].text(0., 0., r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
+    axes[1, 0].text(0., 0., r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
+    axes[1, 1].text(0., 0., r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
+    axes[1, 2].text(0., 0., r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
 
 plt.show()

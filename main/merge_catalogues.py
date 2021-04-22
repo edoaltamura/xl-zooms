@@ -56,7 +56,7 @@ def select_runs():
 
 models = []
 for n in name_list:
-    n = ' '.join(n.split('_')[2:])
+    n = '_'.join(n.split('_')[2:])
     models.append(n)
 models = list(set(models))
 
