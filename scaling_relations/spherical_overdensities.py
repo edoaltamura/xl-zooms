@@ -50,7 +50,7 @@ class SphericalOverdensities(HaloProperty):
         sw_data.stars.radial_distances.convert_to_physical()
         sw_data.stars.masses.convert_to_physical()
         sw_data.black_holes.radial_distances.convert_to_physical()
-        sw_data.black_holes.masses.convert_to_physical()
+        sw_data.black_holes.subgrid_masses.convert_to_physical()
 
         # Calculate the critical density for the cross-hair marker
         rho_crit = unyt_quantity(
