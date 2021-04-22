@@ -88,7 +88,6 @@ class SphericalOverdensities(HaloProperty):
 
         radial_distances = radial_distances[mask] * Mpc / r500
         masses = masses[mask] * 1e10 * Solar_Mass
-        print(radial_distances, masses)
 
         # Define radial bins and shell volumes
         lbins = np.logspace(
@@ -106,14 +105,14 @@ class SphericalOverdensities(HaloProperty):
         print(density_profile)
 
         density_interpolate = interp1d(density_profile, radial_bin_centres * r500,
-                                       kind='linear', fill_value='extrapolate')
+                                       kind='quadratic', fill_value='extrapolate')
 
         mass_interpolate = interp1d(radial_bin_centres * r500, cumulative_mass_profile,
-                                    kind='linear', fill_value='extrapolate')
+                                    kind='quadratic', fill_value='extrapolate')
 
         r_delta = density_interpolate(self.density_contrast) * r500.units
         m_delta = mass_interpolate(r_delta) * mass_weights.units
-
+        print(r500, vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun'))
         return r_delta, m_delta
 
     def process_catalogue(self):
