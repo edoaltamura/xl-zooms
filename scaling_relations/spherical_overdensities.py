@@ -80,7 +80,7 @@ class SphericalOverdensities(HaloProperty):
 
         # Select all particles within sphere
         mask = np.where(
-            (radial_distances <= 3 * r500) &
+            (radial_distances <= 1.5 * r500) &
             (fof_ids == 1)
         )[0]
 
@@ -115,7 +115,7 @@ class SphericalOverdensities(HaloProperty):
 
         r_delta = density_interpolate(self.density_contrast) * r500.units
         m_delta = mass_interpolate(r_delta) * mass_weights.units
-        print(r500, vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun'))
+
         return r_delta, m_delta
 
     def process_catalogue(self):
