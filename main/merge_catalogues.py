@@ -39,6 +39,7 @@ for f in files[1:]:
 
 # Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
+print(catalogue.columns)
 print(catalogue.head())
 
 
