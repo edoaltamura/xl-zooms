@@ -17,7 +17,7 @@ except:
 
 
 fig = plt.figure(figsize=(9, 5))
-gs = fig.add_gridspec(2, 3, hspace=0.05, wspace=0.3)
+gs = fig.add_gridspec(2, 3, hspace=0.3, wspace=0.03)
 axes = gs.subplots(sharex=True, sharey=True)
 
 shadow = dict(path_effects=[path_effects.SimpleLineShadow(), path_effects.Normal()])
@@ -44,7 +44,7 @@ axes[1, 0].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 1].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 2].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 0].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k2500'], s=1)
-axes[1, 1].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k500'], s=1)
+axes[1, 1].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k0p15r500'], s=1)
 axes[1, 2].scatter([(t * kb).to('keV') for t in catalogue['T2500_nocore']], catalogue['k30kpc'], s=1)
 
 plt.show()
