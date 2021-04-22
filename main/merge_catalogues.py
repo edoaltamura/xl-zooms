@@ -18,7 +18,6 @@ files = []
 for f in os.listdir(catalogues_dir):
     if (
             f.endswith('.pkl') and
-            args.mass_estimator in f and
             f'{args.redshift_index:04d}' in f and
             'register' not in f
     ):
