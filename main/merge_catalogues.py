@@ -24,8 +24,8 @@ for f in os.listdir(catalogues_dir):
     ):
         files.append(os.path.join(catalogues_dir, f))
 
-    elif 'vrproperties' in f or 'spherical_overdensities' in f:
-        files.append(os.path.join(catalogues_dir, f))
+    # elif 'vrproperties' in f or 'spherical_overdensities' in f:
+    #     files.append(os.path.join(catalogues_dir, f))
 
 catalogue = DataframePickler(files[0]).load_from_pickle()
 
