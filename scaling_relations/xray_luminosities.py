@@ -63,7 +63,7 @@ class XrayLuminosities(HaloProperty):
         emissivities = cloudy.interpolate_xray(
             data_nH,
             data_T,
-            sw_data.gas.element_mass_fractions
+            masked_sw_data.gas.element_mass_fractions
         )
 
         log10_Mpc3_to_cm3 = np.log10(Mpc.get_conversion_factor(cm)[0] ** 3)
