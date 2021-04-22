@@ -63,11 +63,10 @@ class Entropies(HaloProperty):
         r200 = vr_data.radii.r_200crit[0].to('Mpc')
 
         sw_data.gas.radial_distances.convert_to_physical()
-        sw_data.gas.temperatures.convert_to_physical()
 
         # Select hot gas within sphere
         mask = np.where(
-            (sw_data.gas.radial_distances <= 3 * r500) &
+            (sw_data.gas.radial_distances <= 2 * r500) &
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
@@ -79,7 +78,11 @@ class Entropies(HaloProperty):
         radial_distances_scaled = sw_data.gas.radial_distances / r500
 
         # Define radial bins and shell volumes
-        lbins = np.logspace(-3, 3, 300) * radial_distances_scaled.units
+        lbins = np.logspace(
+            np.log10(radial_distances_scaled.min().value),
+            np.log10(radial_distances_scaled.max().value),
+            300
+        ) * radial_distances_scaled.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances_scaled.units
         volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
@@ -105,7 +108,7 @@ class Entropies(HaloProperty):
         k1000 = entropy_interpolate(r1000) * entropy_profile.units
         k200 = entropy_interpolate(r200) * entropy_profile.units
 
-        return k30kpc, k2500, k1500 , k1000, k500, k200
+        return k30kpc, k2500, k1500, k1000, k500, k200
 
     def process_catalogue(self):
 
