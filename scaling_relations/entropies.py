@@ -5,6 +5,7 @@ from unyt import kb, mp, Mpc
 from scipy.interpolate import interp1d
 
 from .halo_property import HaloProperty, histogram_unyt
+from .spherical_overdensities import SphericalOverdensities
 from register import Zoom, Tcut_halogas, default_output_directory, args
 
 # Constants
@@ -17,7 +18,7 @@ class Entropies(HaloProperty):
     def __init__(self):
         super().__init__()
 
-        self.labels = ['k30kpc', 'k2500', 'k1000', 'k500', 'k200']
+        self.labels = ['k30kpc', 'k2500', 'k1500', 'k1000', 'k500', 'k200']
 
         self.filename = os.path.join(
             default_output_directory,
@@ -46,7 +47,17 @@ class Entropies(HaloProperty):
 
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
-        r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
+
+        try:
+            r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
+        except:
+            r1000 = SphericalOverdensities(density_contrast=1000).process_single_halo(zoom_obj=zoom_obj)[0]
+
+        try:
+            r1500 = vr_data.spherical_overdensities.r_1500_rhocrit[0].to('Mpc')
+        except:
+            r1500 = SphericalOverdensities(density_contrast=1500).process_single_halo(zoom_obj=zoom_obj)[0]
+
         r200 = vr_data.radii.r_200crit[0].to('Mpc')
 
         sw_data.gas.radial_distances.convert_to_physical()
@@ -88,10 +99,11 @@ class Entropies(HaloProperty):
         k30kpc = entropy_interpolate(0.03 * Mpc) * entropy_profile.units
         k500 = entropy_interpolate(r500) * entropy_profile.units
         k2500 = entropy_interpolate(r2500) * entropy_profile.units
+        k1500 = entropy_interpolate(r1500) * entropy_profile.units
         k1000 = entropy_interpolate(r1000) * entropy_profile.units
         k200 = entropy_interpolate(r200) * entropy_profile.units
 
-        return k30kpc, k2500, k1000, k500, k200
+        return k30kpc, k2500, k1500, k1000, k500, k200
 
     def process_catalogue(self):
 
