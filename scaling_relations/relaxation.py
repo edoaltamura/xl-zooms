@@ -60,7 +60,7 @@ class Relaxation(HaloProperty):
         gas_velocities[:, 2] -= peculiar_velocity[2]
 
         # Compute square of the modulus (einsum faster than linalg.norm)
-        v2 = np.einsum('...i,...i', gas_velocities, gas_velocities)
+        v2 = np.einsum('...i,...i', gas_velocities, gas_velocities) * (gas_velocities.units ** 2)
         kbT = kb * sw_data.gas.temperatures * sw_data.gas.masses
 
         Ekin = np.sum(0.5 * sw_data.gas.masses[mask] * v2[mask]).to("1.e10*Mpc**2*Msun/Gyr**2")
