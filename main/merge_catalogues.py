@@ -5,23 +5,22 @@ import pandas as pd
 sys.path.append("..")
 
 from register import (
-    calibration_zooms,
-    completed_runs,
-    zooms_register,
     default_output_directory,
+    zooms_register,
+    args,
     DataframePickler,
 )
 
-mass_estimator = 'true'
-
 catalogues_dir = os.path.join(default_output_directory, 'intermediate')
+
 
 files = []
 
 for f in os.listdir(catalogues_dir):
     if (
             f.endswith('.pkl') and
-            mass_estimator in f and
+            args.mass_estimator in f and
+            f'{args.redshift_index:04d}' in f and
             'register' not in f
     ):
         files.append(os.path.join(catalogues_dir, f))
@@ -37,5 +36,19 @@ for f in files[1:]:
         axis=1
     )
 
+# Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
 print(catalogue.head())
+
+
+
+def select_runs():
+    _zooms_register = []
+    for keyword in args.keywords:
+        for zoom in zooms_register:
+            if keyword in zoom.run_name and zoom not in _zooms_register:
+                _zooms_register.append(zoom)
+
+    _name_list = [zoom.run_name for zoom in _zooms_register]
+
+    return _name_list

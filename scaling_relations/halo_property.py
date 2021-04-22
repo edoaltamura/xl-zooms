@@ -4,6 +4,7 @@ import swiftsimio
 import velociraptor
 from scipy.spatial import distance
 import pandas as pd
+from tqdm import tqdm
 from unyt import unyt_array
 from typing import Tuple, List
 from multiprocessing import Pool, cpu_count
@@ -86,7 +87,6 @@ class HaloProperty(object):
         )
 
         return result
-
 
     def get_handles_from_paths(
             self,
@@ -317,7 +317,10 @@ class HaloProperty(object):
                 try:
                     # The results of the multiprocessing Pool are returned in the same order as inputs
                     with threading_engine as pool:
-                        results = pool.map(single_halo_method, iter(_zooms_register))
+                        results = tqdm(
+                            pool.imap(single_halo_method, iter(_zooms_register)),
+                            total=len(_zooms_register)
+                        )
                 except Exception as error:
                     print((
                         f"The analysis stopped due to the error\n{error}\n"
