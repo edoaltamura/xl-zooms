@@ -46,7 +46,7 @@ def cumsum_unyt(data: unyt_array) -> unyt_array:
 
     return res * data.units
 
-def foo(): pass
+def foo(arg): pass
 
 class HaloProperty(object):
 
@@ -320,6 +320,10 @@ class HaloProperty(object):
                 try:
                     # The results of the multiprocessing Pool are returned in the same order as inputs
                     with threading_engine as pool:
+                        # results = p_map(
+                        #     list(pool.imap(single_halo_method, iter(_zooms_register))),
+                        #     total=len(_zooms_register)
+                        # )
                         results = p_map(
                             list(pool.imap(foo, iter(_zooms_register))),
                             total=len(_zooms_register)
