@@ -9,6 +9,7 @@ from register import (
     zooms_register,
     args,
     DataframePickler,
+name_list
 )
 
 catalogues_dir = os.path.join(default_output_directory, 'intermediate')
@@ -53,3 +54,11 @@ def select_runs():
     _name_list = [zoom.run_name for zoom in _zooms_register]
 
     return _name_list
+
+models = []
+for n in name_list:
+    n = ''.join(n.split('_')[2:])
+    models.append(n)
+models = set(models)
+
+print(models)

@@ -24,9 +24,6 @@ shadow = dict(path_effects=[path_effects.SimpleLineShadow(), path_effects.Normal
 
 for ax in axes.flat:
     ax.loglog()
-    ax.axvline(x=1, color='k', linestyle='--')
-    ax.set_xlim([1e-3, 2])
-
 
 # 'Run_name', 'm_gas', 'f_gas', 'T500', 'T2500', 'T500_nocore',
 #        'T2500_nocore', 'r2500', 'r1000', 'r500', 'r200', 'm2500', 'm1000',
