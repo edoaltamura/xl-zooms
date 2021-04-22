@@ -18,7 +18,7 @@ class Entropies(HaloProperty):
     def __init__(self):
         super().__init__()
 
-        self.labels = ['k30kpc', 'k2500', 'k1500', 'k1000', 'k500', 'k200']
+        self.labels = ['k30kpc', 'k0p15r500', 'k2500', 'k1500', 'k1000', 'k500', 'k200']
 
         self.filename = os.path.join(
             default_output_directory,
@@ -101,13 +101,14 @@ class Entropies(HaloProperty):
         entropy_interpolate = interp1d(radial_bin_centres * r500, entropy_profile, kind='linear')
 
         k30kpc = entropy_interpolate(0.03 * Mpc) * entropy_profile.units
-        k500 = entropy_interpolate(r500) * entropy_profile.units
+        k0p15r500 = entropy_interpolate(0.15 * r500) * entropy_profile.units
         k2500 = entropy_interpolate(r2500) * entropy_profile.units
         k1500 = entropy_interpolate(r1500) * entropy_profile.units
         k1000 = entropy_interpolate(r1000) * entropy_profile.units
+        k500 = entropy_interpolate(r500) * entropy_profile.units
         k200 = entropy_interpolate(r200) * entropy_profile.units
 
-        return k30kpc, k2500, k1500, k1000, k500, k200
+        return k30kpc, k0p15r500, k2500, k1500, k1000, k500, k200
 
     def process_catalogue(self):
 
