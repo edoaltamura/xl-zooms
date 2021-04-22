@@ -105,11 +105,8 @@ class SphericalOverdensities(HaloProperty):
         # For better stability, clip the initial 5% of the profile
         clip = int((len(lbins) - 1) / 20)
 
-        density_interpolate = interp1d(density_profile[clip:], radial_bin_centres[clip:] * r500,
-                                       kind='quadratic', fill_value='extrapolate')
-
-        mass_interpolate = interp1d(radial_bin_centres[clip:] * r500, cumulative_mass_profile[clip:],
-                                    kind='quadratic', fill_value='extrapolate')
+        density_interpolate = interp1d(density_profile[clip:], radial_bin_centres[clip:] * r500, kind='linear')
+        mass_interpolate = interp1d(radial_bin_centres[clip:] * r500, cumulative_mass_profile[clip:], kind='linear')
 
         r_delta = density_interpolate(self.density_contrast) * r500.units
         m_delta = mass_interpolate(r_delta) * mass_weights.units

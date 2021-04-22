@@ -23,8 +23,7 @@ from register import (
 
 def histogram_unyt(data: unyt_array,
                    bins: unyt_array = None,
-                   weights: unyt_array = None,
-                   **kwargs,) -> Tuple[unyt_array]:
+                   weights: unyt_array = None) -> Tuple[unyt_array]:
 
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
@@ -36,15 +35,15 @@ def histogram_unyt(data: unyt_array,
         f"Detected data {data.units}, bins {bins.units}."
     )
 
-    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value, **kwargs)
+    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value)
     hist *= weights.units
     bin_edges *= data.units
 
     return hist, bin_edges
 
 
-def cumsum_unyt(data: unyt_array, **kwargs) -> unyt_array:
-    res = np.cumsum(data.value, **kwargs)
+def cumsum_unyt(data: unyt_array) -> unyt_array:
+    res = np.cumsum(data.value)
 
     return res * data.units
 

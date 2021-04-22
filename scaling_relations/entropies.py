@@ -100,8 +100,7 @@ class Entropies(HaloProperty):
 
         print(entropy_profile)
 
-        entropy_interpolate = interp1d(radial_bin_centres * r500, entropy_profile,
-                                       kind='quadratic', fill_value='extrapolate')
+        entropy_interpolate = interp1d(radial_bin_centres * r500, entropy_profile, kind='linear')
 
         k30kpc = entropy_interpolate(0.03 * Mpc) * entropy_profile.units
         k500 = entropy_interpolate(r500) * entropy_profile.units
