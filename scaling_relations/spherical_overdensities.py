@@ -84,10 +84,10 @@ class SphericalOverdensities(HaloProperty):
             (fof_ids == 1)
         )[0]
 
-        del fof_ids
-
         radial_distances = radial_distances[mask] * Mpc / r500
         masses = masses[mask] * 1e10 * Solar_Mass
+
+        del fof_ids, mask
 
         # Define radial bins and shell volumes
         lbins = np.linspace(
