@@ -58,7 +58,44 @@ class HaloProperty(object):
         pass
 
     @staticmethod
+    def wrap_coordinates(
+            coords: swiftsimio.cosmo_array,
+            centre: unyt_array,
+            boxsize: unyt_array
+    ) -> swiftsimio.cosmo_array:
+        result_numeric = np.mod(
+            coords.value - centre.value + 0.5 * boxsize.value,
+            boxsize.value
+        ) + centre.value - 0.5 * boxsize.value
+
+        result = swiftsimio.cosmo_array(
+            result_numeric,
+            units=coords.units,
+            cosmo_factor=coords.cosmo_factor
+        )
+
+        return result
+
+    @staticmethod
+    def get_radial_distance(
+            coords: swiftsimio.cosmo_array,
+            centre: unyt_array
+    ) -> swiftsimio.cosmo_array:
+        result = swiftsimio.cosmo_array(
+            distance.cdist(
+                coords,
+                centre.reshape(1, 3),
+                metric='euclidean'
+            ).reshape(len(coords), ),
+            units='Mpc',
+            cosmo_factor=coords.cosmo_factor
+        )
+
+        return result
+
+
     def get_handles_from_paths(
+            self,
             path_to_snap: str,
             path_to_catalogue: str,
             mask_radius_r500: float = 3
@@ -118,65 +155,49 @@ class HaloProperty(object):
         boxsize = sw_handle.metadata.boxsize
         centre_coordinates = unyt_array([xcminpot, ycminpot, zcminpot], xcminpot.units)
 
-        sw_handle.gas.coordinates = np.mod(
-            sw_handle.gas.coordinates - centre_coordinates + 0.5 * boxsize,
+        sw_handle.gas.coordinates = self.wrap_coordinates(
+            sw_handle.gas.coordinates,
+            centre_coordinates,
             boxsize
-        ) + centre_coordinates - 0.5 * boxsize
+        )
 
-        sw_handle.dark_matter.coordinates = np.mod(
-            sw_handle.dark_matter.coordinates - centre_coordinates + 0.5 * boxsize,
+        sw_handle.dark_matter.coordinates = self.wrap_coordinates(
+            sw_handle.dark_matter.coordinates,
+            centre_coordinates,
             boxsize
-        ) + centre_coordinates - 0.5 * boxsize
+        )
 
-        sw_handle.stars.coordinates = np.mod(
-            sw_handle.stars.coordinates - centre_coordinates + 0.5 * boxsize,
+        sw_handle.stars.coordinates = self.wrap_coordinates(
+            sw_handle.stars.coordinates,
+            centre_coordinates,
             boxsize
-        ) + centre_coordinates - 0.5 * boxsize
+        )
 
-        sw_handle.black_holes.coordinates = np.mod(
-            sw_handle.black_holes.coordinates - centre_coordinates + 0.5 * boxsize,
+        sw_handle.black_holes.coordinates = self.wrap_coordinates(
+            sw_handle.black_holes.coordinates,
+            centre_coordinates,
             boxsize
-        ) + centre_coordinates - 0.5 * boxsize
+        )
 
         # Compute radial distances
-        sw_handle.gas.radial_distances = swiftsimio.cosmo_array(
-            distance.cdist(
-                sw_handle.gas.coordinates,
-                centre_coordinates.reshape(1, 3),
-                metric='euclidean'
-            ).reshape(len(sw_handle.gas.coordinates), ),
-            units='Mpc',
-            cosmo_factor=sw_handle.gas.coordinates.cosmo_factor
+        sw_handle.gas.radial_distances = self.get_radial_distance(
+            sw_handle.gas.coordinates,
+            centre_coordinates
         )
 
-        sw_handle.dark_matter.radial_distances = swiftsimio.cosmo_array(
-            distance.cdist(
-                sw_handle.dark_matter.coordinates,
-                centre_coordinates.reshape(1, 3),
-                metric='euclidean'
-            ).reshape(len(sw_handle.dark_matter.coordinates), ),
-            units='Mpc',
-            cosmo_factor=sw_handle.dark_matter.coordinates.cosmo_factor
+        sw_handle.dark_matter.radial_distances = self.get_radial_distance(
+            sw_handle.dark_matter.coordinates,
+            centre_coordinates
         )
 
-        sw_handle.stars.radial_distances = swiftsimio.cosmo_array(
-            distance.cdist(
-                sw_handle.stars.coordinates,
-                centre_coordinates.reshape(1, 3),
-                metric='euclidean'
-            ).reshape(len(sw_handle.stars.coordinates), ),
-            units='Mpc',
-            cosmo_factor=sw_handle.stars.coordinates.cosmo_factor
+        sw_handle.stars.radial_distances = self.get_radial_distance(
+            sw_handle.stars.coordinates,
+            centre_coordinates
         )
 
-        sw_handle.black_holes.radial_distances = swiftsimio.cosmo_array(
-            distance.cdist(
-                sw_handle.black_holes.coordinates,
-                centre_coordinates.reshape(1, 3),
-                metric='euclidean'
-            ).reshape(len(sw_handle.black_holes.coordinates), ),
-            units='Mpc',
-            cosmo_factor=sw_handle.black_holes.coordinates.cosmo_factor
+        sw_handle.black_holes.radial_distances = self.get_radial_distance(
+            sw_handle.black_holes.coordinates,
+            centre_coordinates
         )
 
         return sw_handle, vr_handle
