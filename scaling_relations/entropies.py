@@ -48,15 +48,17 @@ class Entropies(HaloProperty):
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
 
+        kwarg_parser = dict(zoom_obj=None, path_to_snap=None, path_to_catalogue=None)
+
         try:
             r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
         except:
-            r1000 = SphericalOverdensities(density_contrast=1000).process_single_halo(zoom_obj=zoom_obj)[0]
+            r1000 = SphericalOverdensities(density_contrast=1000).process_single_halo(**kwarg_parser)[0]
 
         try:
             r1500 = vr_data.spherical_overdensities.r_1500_rhocrit[0].to('Mpc')
         except:
-            r1500 = SphericalOverdensities(density_contrast=1500).process_single_halo(zoom_obj=zoom_obj)[0]
+            r1500 = SphericalOverdensities(density_contrast=1500).process_single_halo(**kwarg_parser)[0]
 
         r200 = vr_data.radii.r_200crit[0].to('Mpc')
 
@@ -103,7 +105,7 @@ class Entropies(HaloProperty):
         k1000 = entropy_interpolate(r1000) * entropy_profile.units
         k200 = entropy_interpolate(r200) * entropy_profile.units
 
-        return k30kpc, k2500, k1500, k1000, k500, k200
+        return k30kpc, k2500, k1500 , k1000, k500, k200
 
     def process_catalogue(self):
 
