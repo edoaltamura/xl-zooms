@@ -13,7 +13,7 @@ catalogue_starters = [
     # StarFractions(),
     # MWTemperatures(),
     # Relaxation(),
-    XrayLuminosities(),
+    # XrayLuminosities(),
     # Entropies(),
     SphericalOverdensities(density_contrast=1500.),
 ]
