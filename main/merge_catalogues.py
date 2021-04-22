@@ -40,8 +40,7 @@ for f in files[1:]:
 
 # Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
-print(catalogue.columns)
-print(catalogue.head())
+print(catalogue.info())
 
 
 def select_runs():
@@ -59,6 +58,6 @@ models = []
 for n in name_list:
     n = ''.join(n.split('_')[2:])
     models.append(n)
-models = set(models)
+models = list(set(models))
 
 print(models)
