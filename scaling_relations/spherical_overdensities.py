@@ -96,11 +96,11 @@ class SphericalOverdensities(HaloProperty):
             300
         ) * radial_distances.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
-        volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
+        volume_sphere = (4. * np.pi / 3.) * r500 ** 3 * lbins[1:] ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
         cumulative_mass_profile = cumsum_unyt(mass_weights)
-        density_profile = cumulative_mass_profile / volume_shell / rho_crit
+        density_profile = cumulative_mass_profile / volume_sphere / rho_crit
 
         density_interpolate = interp1d(density_profile, radial_bin_centres * r500,
                                        kind='quadratic', fill_value='extrapolate')
