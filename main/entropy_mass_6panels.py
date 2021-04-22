@@ -57,11 +57,11 @@ for model in models:
     axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
     axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
 
-    sun2009.overlay_points(axes[0, 0], 'T_500', 'K_500', color='k', marker='^')
-    sun2009.overlay_points(axes[0, 1], 'T_500', 'K_1000', color='k', marker='^')
-    sun2009.overlay_points(axes[0, 2], 'T_500', 'K_1500', color='k', marker='^')
-    sun2009.overlay_points(axes[1, 0], 'T_2500', 'K_2500', color='k', marker='^')
-    sun2009.overlay_points(axes[1, 1], 'T_2500', 'K_0p15r500', color='k', marker='^')
-    sun2009.overlay_points(axes[1, 2], 'T_2500', 'K_30kpc', color='k', marker='^')
+    sun2009.overlay_points(axes[0, 0], 'T_500', 'K_500', color='k', marker='*')
+    sun2009.overlay_points(axes[0, 1], 'T_500', 'K_1000', color='k', marker='*')
+    sun2009.overlay_points(axes[0, 2], 'T_500', 'K_1500', color='k', marker='*')
+    sun2009.overlay_points(axes[1, 0], 'T_2500', 'K_2500', color='k', marker='*')
+    sun2009.overlay_points(axes[1, 1], 'T_2500', 'K_0p15r500', color='k', marker='*')
+    sun2009.overlay_points(axes[1, 2], 'T_2500', 'K_30kpc', color='k', marker='*')
 
 plt.show()
