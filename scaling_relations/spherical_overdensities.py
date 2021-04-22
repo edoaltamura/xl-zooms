@@ -65,10 +65,10 @@ class SphericalOverdensities(HaloProperty):
         ]
 
         masses = np.r_[
-            sw_data.gas.masses,
-            sw_data.dark_matter.masses,
-            sw_data.stars.masses,
-            sw_data.black_holes.subgrid_masses
+            sw_data.gas.masses.to('Msun'),
+            sw_data.dark_matter.masses.to('Msun'),
+            sw_data.stars.masses.to('Msun'),
+            sw_data.black_holes.subgrid_masses.to('Msun')
         ]
 
         fof_ids = np.r_[
@@ -87,8 +87,8 @@ class SphericalOverdensities(HaloProperty):
         del fof_ids
 
         radial_distances = radial_distances[mask] / r500
-        masses = masses[mask].to('Msun')
-        print(masses)
+        masses = masses[mask]
+        print(radial_distances, masses)
 
         # Define radial bins and shell volumes
         lbins = np.logspace(
