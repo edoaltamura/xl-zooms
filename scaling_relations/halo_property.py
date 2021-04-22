@@ -5,7 +5,7 @@ import velociraptor
 from scipy.spatial import distance
 import pandas as pd
 from unyt import unyt_array
-from typing import Tuple, List, Union
+from typing import Tuple, List
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
 
@@ -44,12 +44,6 @@ def cumsum_unyt(data: unyt_array) -> unyt_array:
     res = np.cumsum(data.value)
 
     return res * data.units
-
-
-def mod_unyt(x1: unyt_array, x2: unyt_array) -> unyt_array:
-    res = np.mod(x1.value, x2.to(x1.units).value)
-
-    return res * x1.units
 
 
 class HaloProperty(object):
