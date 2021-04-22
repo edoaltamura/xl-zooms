@@ -37,36 +37,7 @@ class XrayLuminosities(HaloProperty):
             warn(f"The value for {self.labels[1]} seems too high: {value}", RuntimeWarning)
 
     @staticmethod
-    def get_emissivities(sw_data, mask):
-
-        masked_sw_data = copy(sw_data)
-        masked_sw_data.gas.densities = masked_sw_data.gas.densities[mask]
-        masked_sw_data.gas.temperatures = masked_sw_data.gas.temperatures[mask]
-        masked_sw_data.gas.masses = masked_sw_data.gas.masses[mask]
-        masked_sw_data.gas.element_mass_fractions.hydrogen = masked_sw_data.gas.element_mass_fractions.hydrogen[mask]
-        masked_sw_data.gas.element_mass_fractions.helium = masked_sw_data.gas.element_mass_fractions.helium[mask]
-        masked_sw_data.gas.element_mass_fractions.carbon = masked_sw_data.gas.element_mass_fractions.carbon[mask]
-        masked_sw_data.gas.element_mass_fractions.nitrogen = masked_sw_data.gas.element_mass_fractions.nitrogen[mask]
-        masked_sw_data.gas.element_mass_fractions.oxygen = masked_sw_data.gas.element_mass_fractions.oxygen[mask]
-        masked_sw_data.gas.element_mass_fractions.neon = masked_sw_data.gas.element_mass_fractions.neon[mask]
-        masked_sw_data.gas.element_mass_fractions.magnesium = masked_sw_data.gas.element_mass_fractions.magnesium[mask]
-        masked_sw_data.gas.element_mass_fractions.silicon = masked_sw_data.gas.element_mass_fractions.silicon[mask]
-        masked_sw_data.gas.element_mass_fractions.iron = masked_sw_data.gas.element_mass_fractions.iron[mask]
-
-        # Compute hydrogen number density and the log10
-        # of the temperature to provide to the xray interpolator.
-        data_nH = np.log10(
-            masked_sw_data.gas.element_mass_fractions.hydrogen * masked_sw_data.gas.densities.to('g*cm**-3') / mp)
-        data_T = np.log10(masked_sw_data.gas.temperatures.value)
-
-        # Interpolate the Cloudy table to get emissivities
-        emissivities = cloudy.interpolate_xray(
-            data_nH,
-            data_T,
-            masked_sw_data.gas.element_mass_fractions
-        )
-
-        log10_Mpc3_to_cm3 = np.log10(Mpc.get_conversion_factor(cm)[0] ** 3)
+    def get_emissivities(sw_data, emissivities, mask):
 
         # The `data.gas.masses` and `data.gas.densities` datasets are formatted as
         # `numpy.float32` and are not well-behaved when trying to convert their ratio
@@ -78,17 +49,17 @@ class XrayLuminosities(HaloProperty):
         # adding the log10 of the conversion factor (2.9379989445851786e+73) to the
         # result of the `logsumexp` function.
         # $L_X = 10^{\log_{10} (\sum_i \epsilon_i) + log10_Mpc3_to_cm3}$
+        log10_Mpc3_to_cm3 = np.log10(Mpc.get_conversion_factor(cm)[0] ** 3)
+
         LX = unyt_quantity(
             10 ** (
                     cloudy.logsumexp(
-                        emissivities,
-                        b=(masked_sw_data.gas.masses / masked_sw_data.gas.densities).value,
+                        emissivities[mask],
+                        b=(sw_data.gas.masses[mask] / sw_data.gas.densities[mask]).value,
                         base=10.
                     ) + log10_Mpc3_to_cm3
             ), 'erg/s'
         )
-
-        del masked_sw_data, data_nH, data_T, emissivities
 
         return LX
 
@@ -108,7 +79,18 @@ class XrayLuminosities(HaloProperty):
         sw_data.gas.temperatures.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
 
-        sw_data.gas.mw_temperatures = sw_data.gas.temperatures * sw_data.gas.masses
+        # Compute hydrogen number density and the log10
+        # of the temperature to provide to the xray interpolator.
+        data_nH = np.log10(
+            sw_data.gas.element_mass_fractions.hydrogen * sw_data.gas.densities.to('g*cm**-3') / mp)
+        data_T = np.log10(sw_data.gas.temperatures.value)
+
+        # Interpolate the Cloudy table to get emissivities
+        emissivities = cloudy.interpolate_xray(
+            data_nH,
+            data_T,
+            sw_data.gas.element_mass_fractions
+        )
 
         # Select hot gas within sphere
         mask = np.where(
@@ -116,14 +98,14 @@ class XrayLuminosities(HaloProperty):
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        LX500 = self.get_emissivities(sw_data, mask)
+        LX500 = self.get_emissivities(sw_data, emissivities, mask)
 
         mask = np.where(
             (sw_data.gas.radial_distances <= r2500) &
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        LX2500 = self.get_emissivities(sw_data, mask)
+        LX2500 = self.get_emissivities(sw_data, emissivities, mask)
 
         # Select hot gas within spherical shell (no core)
         mask = np.where(
@@ -132,7 +114,7 @@ class XrayLuminosities(HaloProperty):
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        LX500_nocore = self.get_emissivities(sw_data, mask)
+        LX500_nocore = self.get_emissivities(sw_data, emissivities, mask)
 
         mask = np.where(
             (sw_data.gas.radial_distances >= 0.15 * r500) &
@@ -140,7 +122,7 @@ class XrayLuminosities(HaloProperty):
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        LX2500_nocore = self.get_emissivities(sw_data, mask)
+        LX2500_nocore = self.get_emissivities(sw_data, emissivities, mask)
 
         return LX500, LX2500, LX500_nocore, LX2500_nocore
 
