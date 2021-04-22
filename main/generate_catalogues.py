@@ -26,8 +26,7 @@ for cs in catalogue_starters:
     try:
         cs.process_catalogue()
     except Exception as e:
-        print(e)
-        print("Continue to next iteration.")
+        print(e, "Continue to next iteration.", sep='\n')
         pass
 
     dump_memory_usage()
