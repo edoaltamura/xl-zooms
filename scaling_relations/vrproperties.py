@@ -14,7 +14,7 @@ class VRProperties(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'vrproperties_{args.redshift_index:04d}.pkl'
+            f'vrproperties_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
         )
 
     def process_single_halo(

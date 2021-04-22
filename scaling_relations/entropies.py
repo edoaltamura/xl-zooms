@@ -98,8 +98,6 @@ class Entropies(HaloProperty):
 
         entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
 
-        print(entropy_profile)
-
         entropy_interpolate = interp1d(radial_bin_centres * r500, entropy_profile, kind='linear')
 
         k30kpc = entropy_interpolate(0.03 * Mpc) * entropy_profile.units

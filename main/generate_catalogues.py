@@ -8,13 +8,13 @@ from register import dump_memory_usage
 dump_memory_usage()
 
 catalogue_starters = [
-    VRProperties(),
-    GasFractions(),
-    StarFractions(),
-    MWTemperatures(),
-    Relaxation(),
+    # VRProperties(),
+    # GasFractions(),
+    # StarFractions(),
+    # MWTemperatures(),
+    # Relaxation(),
     XrayLuminosities(),
-    Entropies(),
+    # Entropies(),
     SphericalOverdensities(density_contrast=1500.),
 ]
 
