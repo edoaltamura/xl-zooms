@@ -93,7 +93,7 @@ class SphericalOverdensities(HaloProperty):
         lbins = np.linspace(
             radial_distances.min().value / 1.1,
             radial_distances.max().value * 1.1,
-            50
+            200
         ) * radial_distances.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
         volume_sphere = (4. * np.pi / 3.) * r500 ** 3 * lbins[1:] ** 3
