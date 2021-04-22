@@ -39,7 +39,7 @@ class XrayLuminosities(HaloProperty):
     @staticmethod
     def get_emissivities(sw_data, mask):
 
-        masked_sw_data = deepcopy(sw_data)
+        masked_sw_data = copy(sw_data)
         masked_sw_data.gas.densities = masked_sw_data.gas.densities[mask]
         masked_sw_data.gas.temperatures = masked_sw_data.gas.temperatures[mask]
         masked_sw_data.gas.masses = masked_sw_data.gas.masses[mask]
