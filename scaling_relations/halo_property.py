@@ -47,8 +47,7 @@ def cumsum_unyt(data: unyt_array) -> unyt_array:
 
 
 def mod_unyt(x1: unyt_array, x2: unyt_array) -> unyt_array:
-    x2 = x2.to(x1.units)
-    res = np.mod(x1.value, x2.value)
+    res = np.mod(x1.value, x2.to(x1.units).value)
 
     return res * x1.units
 
