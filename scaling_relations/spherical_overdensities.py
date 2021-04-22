@@ -2,7 +2,7 @@ import os.path
 import numpy as np
 from warnings import warn
 from scipy.interpolate import interp1d
-from unyt import kb, mp, Mpc, Msun, unyt_quantity
+from unyt import kb, mp, Mpc, Solar_Mass, unyt_quantity
 
 from .halo_property import HaloProperty, histogram_unyt, cumsum_unyt
 from register import Zoom, default_output_directory, args
@@ -87,7 +87,7 @@ class SphericalOverdensities(HaloProperty):
         del fof_ids
 
         radial_distances = radial_distances[mask] * Mpc / r500
-        masses = masses[mask] * 1e10 * Msun
+        masses = masses[mask] * 1e10 * Solar_Mass
         print(radial_distances, masses)
 
         # Define radial bins and shell volumes
