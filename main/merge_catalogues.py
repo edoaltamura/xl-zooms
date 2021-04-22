@@ -13,7 +13,6 @@ from register import (
 
 catalogues_dir = os.path.join(default_output_directory, 'intermediate')
 
-
 files = []
 
 for f in os.listdir(catalogues_dir):
@@ -21,7 +20,9 @@ for f in os.listdir(catalogues_dir):
             f.endswith('.pkl') and
             args.mass_estimator in f and
             f'{args.redshift_index:04d}' in f and
-            'register' not in f
+            'register' not in f or
+            'vrproperties' in f or
+            'spherical_overdensities' in f
     ):
         files.append(os.path.join(catalogues_dir, f))
 
@@ -39,7 +40,6 @@ for f in files[1:]:
 # Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
 print(catalogue.head())
-
 
 
 def select_runs():
