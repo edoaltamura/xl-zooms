@@ -191,7 +191,7 @@ class Sun2009(Article):
                     dataset[i] = np.nan
                     setattr(self, field, dataset)
 
-    def overlay_points(self, axes: plt.Axes, x: str, y: str, color: str = 'k', marker: str = '.') -> None:
+    def overlay_points(self, axes: plt.Axes, x: str, y: str, **kwargs) -> None:
         if axes is None:
             fig, axes = plt.subplots()
             axes.loglog()
@@ -200,7 +200,7 @@ class Sun2009(Article):
 
         x = getattr(self, x)
         y = getattr(self, y)
-        axes.scatter(x, y, color=color, marker=marker)
+        axes.scatter(x, y, **kwargs)
         plt.show()
 
     def overlay_entropy_profiles(
