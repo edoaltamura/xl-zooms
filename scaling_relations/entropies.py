@@ -23,7 +23,7 @@ class Entropies(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'entropies_{args.redshift_index:04d}.pkl'
+            f'entropies_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):

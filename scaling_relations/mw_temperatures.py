@@ -16,7 +16,7 @@ class MWTemperatures(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'mw_temperatures_{args.redshift_index:04d}.pkl'
+            f'mw_temperatures_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):

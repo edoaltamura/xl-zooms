@@ -16,7 +16,7 @@ class GasFractions(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'gas_fractions_{args.redshift_index:04d}.pkl'
+            f'gas_fractions_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):

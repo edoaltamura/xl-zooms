@@ -1,11 +1,10 @@
-import os
 import h5py
+import os.path
 import numpy as np
 from numba import jit
 
 
-class Interpolate(object):
-
+class interpolate:
     def init(self):
         pass
 
@@ -32,7 +31,7 @@ def find_dx(subdata, bins, idx_0):
     return dx_p
 
 
-@jit(nopython=True)
+# @jit(nopython = True)
 def find_idx(subdata, bins, dbins):
     idx_p = np.zeros((len(subdata), 2))
     for i in range(len(subdata)):
@@ -45,9 +44,15 @@ def find_idx(subdata, bins, dbins):
 
 @jit(nopython=True)
 def find_idx_he(subdata, bins):
+    num_bins = len(bins)
     idx_p = np.zeros((len(subdata), 2))
     for i in range(len(subdata)):
-        idx_p[i, :] = np.sort(np.argsort(np.abs(bins - subdata[i]))[:2])
+        # idx_p[i, :] = np.sort(np.argsort(np.abs(bins - subdata[i]))[:2])
+
+        # When closest to the highest bin, or above the highest bin, return the one but highest bin,
+        # otherwise we will select a second bin which is outside the binrange
+        bin_below = min(np.argsort(np.abs(bins[bins <= subdata[i]] - subdata[i]))[0], num_bins - 2)
+        idx_p[i, :] = np.array([bin_below, bin_below + 1])
 
     return idx_p
 
@@ -57,7 +62,7 @@ def find_dx_he(subdata, bins, idx_0):
     dx_p = np.zeros(len(subdata))
     for i in range(len(subdata)):
         dx_p[i] = np.abs(subdata[i] - bins[idx_0[i]]) / (bins[idx_0[i] + 1] - bins[idx_0[i]])
-    # dx_p1[i] = np.abs(bins[idx_0[i+1]] - subdata[i])
+        # dx_p1[i] = np.abs(bins[idx_0[i+1]] - subdata[i])
 
     return dx_p
 
@@ -99,30 +104,73 @@ def get_table_interp(dn, dT, dx_T, dx_n, idx_T, idx_n, idx_he, dx_he, X_Ray, abu
     return f_n_T_Z
 
 
-def interpolate_xray(data_n, data_T, element_mass_fractions):
-    mass_fraction = np.zeros((len(data_n), 9))
-
-    # get individual mass fraction
-    mass_fraction[:, 0] = element_mass_fractions.hydrogen
-    mass_fraction[:, 1] = element_mass_fractions.helium
-    mass_fraction[:, 2] = element_mass_fractions.carbon
-    mass_fraction[:, 3] = element_mass_fractions.nitrogen
-    mass_fraction[:, 4] = element_mass_fractions.oxygen
-    mass_fraction[:, 5] = element_mass_fractions.neon
-    mass_fraction[:, 6] = element_mass_fractions.magnesium
-    mass_fraction[:, 7] = element_mass_fractions.silicon
-    mass_fraction[:, 8] = element_mass_fractions.iron
-
-    interp = Interpolate()
+def interpolate_X_Ray(data_n, data_T, element_mass_fractions, fill_value=-50.):
+    # Initialise interpolation class
+    interp = interpolate()
     interp.load_table()
 
+    # Initialise the emissivity array which will be returned
+    emissivities = np.zeros_like(data_n, dtype=float)
+
+    # Create density mask, round to avoid numerical errors
+    density_mask = (data_n >= np.round(interp.density_bins.min(), 1)) & (
+            data_n <= np.round(interp.density_bins.max(), 1))
+    # Create temperature mask, round to avoid numerical errors
+    temperature_mask = (data_T >= np.round(interp.temperature_bins.min(), 1)) & (
+            data_T <= np.round(interp.temperature_bins.max(), 1))
+
+    # Combine masks
+    joint_mask = density_mask & temperature_mask
+
+    # Check if within density and temperature bounds
+    density_bounds = np.sum(density_mask) == density_mask.shape[0]
+    temperature_bounds = np.sum(temperature_mask) == temperature_mask.shape[0]
+    if ~(density_bounds & temperature_bounds):
+        # If no fill_value is set, return an error with some explanation
+        if fill_value == None:
+            print('Temperature or density are outside of the interpolation range and no fill_value is supplied')
+            print('Temperature ranges between log(T) = 5 and log(T) = 9.5')
+            print('Density ranges between log(nH) = -8 and log(nH) = 6')
+            print(
+                'Set the kwarg "fill_value = some value" to set all particles outside of the interpolation range to "some value"')
+            print('Or limit your particle data set to be within the interpolation range')
+            raise ValueError
+        else:
+            emissivities[~joint_mask] = fill_value
+
+    mass_fraction = np.zeros((len(data_n[joint_mask]), 9))
+
+    # get individual mass fraction
+    mass_fraction[:, 0] = element_mass_fractions.hydrogen[joint_mask]
+    mass_fraction[:, 1] = element_mass_fractions.helium[joint_mask]
+    mass_fraction[:, 2] = element_mass_fractions.carbon[joint_mask]
+    mass_fraction[:, 3] = element_mass_fractions.nitrogen[joint_mask]
+    mass_fraction[:, 4] = element_mass_fractions.oxygen[joint_mask]
+    mass_fraction[:, 5] = element_mass_fractions.neon[joint_mask]
+    mass_fraction[:, 6] = element_mass_fractions.magnesium[joint_mask]
+    mass_fraction[:, 7] = element_mass_fractions.silicon[joint_mask]
+    mass_fraction[:, 8] = element_mass_fractions.iron[joint_mask]
+
+    # From Cooling tables, integrate into X-Ray tables in a future version
+    solar_mass_fractions = np.array([7.3738831e-01, 2.4924204e-01, 2.3647151e-03, 6.9290539e-04,
+                                     5.7326527e-03, 1.2564836e-03, 7.0797943e-04, 6.6494779e-04,
+                                     1.2919896e-03])
+
+    # At the moment the tables only go up to solar metallicity for He
+    # Enforce this for all metals to have consistency
+    max_metallicity = 1
+    clip_mass_fractions = solar_mass_fractions * max_metallicity
+    # Reset such to mass fractions of Hydrogen = 1
+    clip_mass_fractions /= clip_mass_fractions[0]
+    mass_fraction = np.clip(mass_fraction, a_min=0, a_max=clip_mass_fractions)
+
     # Find density offsets
-    idx_n = find_idx(data_n, interp.density_bins, interp.dn)
-    dx_n = find_dx(data_n, interp.density_bins, idx_n[:, 0].astype(int))
+    idx_n = find_idx(data_n[joint_mask], interp.density_bins, interp.dn)
+    dx_n = find_dx(data_n[joint_mask], interp.density_bins, idx_n[:, 0].astype(int))
 
     # Find temperature offsets
-    idx_T = find_idx(data_T, interp.temperature_bins, interp.dT)
-    dx_T = find_dx(data_T, interp.temperature_bins, idx_T[:, 0].astype(int))
+    idx_T = find_idx(data_T[joint_mask], interp.temperature_bins, interp.dT)
+    dx_T = find_dx(data_T[joint_mask], interp.temperature_bins, idx_T[:, 0].astype(int))
 
     # Find element offsets
     # mass of ['hydrogen', 'helium', 'carbon', 'nitrogen', 'oxygen', 'neon', 'magnesium', 'silicon', 'iron']
@@ -134,10 +182,7 @@ def interpolate_xray(data_n, data_T, element_mass_fractions):
 
     # Add columns for Calcium and Sulphur and add Iron at the end
     abundance_to_solar = np.c_[
-        abundance_to_solar[:, :-1],
-        abundance_to_solar[:, -2],
-        abundance_to_solar[:, -2],
-        abundance_to_solar[:, -1]
+        abundance_to_solar[:, :-1], abundance_to_solar[:, -2], abundance_to_solar[:, -2], abundance_to_solar[:, -1]
     ]
 
     # Find helium offsets
@@ -145,8 +190,9 @@ def interpolate_xray(data_n, data_T, element_mass_fractions):
     dx_he = find_dx_he(np.log10(abundances[:, 1]), interp.He_bins, idx_he[:, 0].astype(int))
 
     print(f'Start interpolation on {mass_fraction.shape[0]:d} particles.')
-    emissivities = get_table_interp(interp.dn, interp.dT, dx_T, dx_n, idx_T.astype(int), idx_n.astype(int),
-                                    idx_he.astype(int), dx_he, interp.X_Ray, abundance_to_solar[:, 2:])
+    emissivities[joint_mask] = get_table_interp(interp.dn, interp.dT, dx_T, dx_n, idx_T.astype(int),
+                                                idx_n.astype(int), idx_he.astype(int), dx_he, interp.X_Ray,
+                                                abundance_to_solar[:, 2:])
 
     return emissivities
 

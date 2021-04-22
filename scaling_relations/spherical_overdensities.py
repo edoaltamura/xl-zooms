@@ -19,7 +19,7 @@ class SphericalOverdensities(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'spherical_overdensities_{args.redshift_index:04d}.pkl'
+            f'spherical_overdensities_dc{density_contrast:.0f}_{args.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):

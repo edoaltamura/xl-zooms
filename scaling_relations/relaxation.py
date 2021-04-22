@@ -16,7 +16,7 @@ class Relaxation(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'relaxation_{args.redshift_index:04d}.pkl'
+            f'relaxation_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
         )
 
     @staticmethod
