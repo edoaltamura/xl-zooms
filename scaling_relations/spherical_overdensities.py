@@ -68,7 +68,7 @@ class SphericalOverdensities(HaloProperty):
             sw_data.gas.masses,
             sw_data.dark_matter.masses,
             sw_data.stars.masses,
-            sw_data.black_holes.masses
+            sw_data.black_holes.subgrid_masses
         ]
 
         fof_ids = np.r_[
