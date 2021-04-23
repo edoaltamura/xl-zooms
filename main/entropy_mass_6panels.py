@@ -10,17 +10,14 @@ sys.path.append("..")
 from literature import Sun2009
 from register import args
 
-
 try:
     plt.style.use("../register/mnras.mplstyle")
 except:
     pass
 
-
 fig = plt.figure(figsize=(7, 5))
 gs = fig.add_gridspec(2, 3, hspace=0.2, wspace=0.)
 axes = gs.subplots(sharex=True, sharey=True)
-
 
 for ax in axes.flat:
     ax.loglog()
@@ -62,19 +59,21 @@ axes[1, 1].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 2].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 
 sun2009 = Sun2009()
-axes[0, 0].scatter(sun2009.T_500, sun2009.K_500, color='k', marker='*', edgecolors='none', alpha=0.6)
-axes[0, 1].scatter(sun2009.T_500, sun2009.K_1000, color='k', marker='*', edgecolors='none', alpha=0.6)
-axes[0, 2].scatter(sun2009.T_500, sun2009.K_1500, color='k', marker='*', edgecolors='none', alpha=0.6)
-axes[1, 0].scatter(sun2009.T_2500, sun2009.K_2500, color='k', marker='*', edgecolors='none', alpha=0.6)
-axes[1, 1].scatter(sun2009.T_2500, sun2009.K_0p15r500, color='k', marker='*', edgecolors='none', alpha=0.6)
-axes[1, 2].scatter(sun2009.T_2500, sun2009.K_30kpc, color='k', marker='*', edgecolors='none', alpha=0.6)
+kwargs = dict(color='k', marker='*', edgecolors='none', alpha=0.6)
+axes[0, 0].scatter(sun2009.T_500, sun2009.K_500, **kwargs)
+axes[0, 1].scatter(sun2009.T_500, sun2009.K_1000, **kwargs)
+axes[0, 2].scatter(sun2009.T_500, sun2009.K_1500, **kwargs)
+axes[1, 0].scatter(sun2009.T_2500, sun2009.K_2500, **kwargs)
+axes[1, 1].scatter(sun2009.T_2500, sun2009.K_0p15r500, **kwargs)
+axes[1, 2].scatter(sun2009.T_2500, sun2009.K_30kpc, **kwargs)
 
-axes[0, 0].text(0.03, 0.97, r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
-axes[0, 1].text(0.03, 0.97, r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
-axes[0, 2].text(0.03, 0.97, r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
-axes[1, 0].text(0.03, 0.97, r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
-axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
-axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
+kwargs = dict(horizontalalignment='left', verticalalignment='top')
+axes[0, 0].text(0.03, 0.97, r'$K_{500}$', transform=axes[0, 0].transAxes, **kwargs)
+axes[0, 1].text(0.03, 0.97, r'$K_{1000}$', transform=axes[0, 1].transAxes, **kwargs)
+axes[0, 2].text(0.03, 0.97, r'$K_{1500}$', transform=axes[0, 2].transAxes, **kwargs)
+axes[1, 0].text(0.03, 0.97, r'$K_{2500}$', transform=axes[1, 0].transAxes, **kwargs)
+axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', transform=axes[1, 1].transAxes, **kwargs)
+axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', transform=axes[1, 2].transAxes, **kwargs)
 
 colors = list('rgbkc')
 counter = 0
@@ -84,26 +83,24 @@ for model in models:
     for keyword in args.keywords:
 
         if keyword in model:
-
             df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
 
-            axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], s=2, color=colors[counter])
-            axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], s=2, color=colors[counter])
-            axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], s=2, color=colors[counter])
-            axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], s=2, color=colors[counter])
-            axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=2, color=colors[counter])
-            axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=2, color=colors[counter])
+            kwargs = dict(s=2, color=colors[counter], edgecolors='none')
 
-            handles.append(
-                Line2D([], [], color=colors[counter], marker='.', markeredgecolor='none', linestyle='None', markersize=4,
-                       label=model)
-                   )
+            axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], **kwargs)
+            axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], **kwargs)
+            axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], **kwargs)
+            axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], **kwargs)
+            axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], **kwargs)
+            axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], **kwargs)
+
+            handles.append(Line2D([], [], color=colors[counter], marker='.', markeredgecolor='none', linestyle='None',
+                                  markersize=4, label=model))
 
             counter += 1
-handles.append(
-                Line2D([], [], color='k', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
-                       label=sun2009.citation)
-                   )
+
+handles.append(Line2D([], [], color='k', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
+                      label=sun2009.citation))
 legend_obs = plt.legend(handles=handles, frameon=True, facecolor='w', edgecolor='none')
 axes[0, 1].add_artist(legend_obs)
 plt.show()
