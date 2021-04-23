@@ -101,7 +101,8 @@ for model in models:
 
 handles.append(Line2D([], [], color='k', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                       label=sun2009.citation))
-plt.legend(handles=handles, frameon=True, facecolor='w', edgecolor='k', bbox_to_anchor=(0., 1.02, 1., .102),
+l = plt.legend(handles=handles, frameon=True, facecolor='w', edgecolor='k', bbox_to_anchor=(0., 1.02, 1., .102),
            loc='lower left',
            ncol=2, mode="expand", borderaxespad=0.)
+axes[0, 0].add_artist(l)
 plt.show()
