@@ -1,6 +1,7 @@
 from merge_catalogues import catalogue, select_runs, models
 from matplotlib import pyplot as plt
 from unyt import kb
+from matplotlib.lines import Line2D
 
 import sys
 
@@ -30,25 +31,25 @@ for ax in axes.flat:
 #        'k30kpc', 'k2500', 'k1500', 'k1000', 'k500', 'k200', 'Ekin', 'Etherm',
 #        'r_1500', 'm_1500', 'LX500', 'LX2500', 'LX500_nocore', 'LX2500_nocore'
 
-['-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth',
- '-8res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth',
- '+1res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth',
- '+1res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth',
- '-8res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth',
- '+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth',
- '-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth',
- '+1res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth',
- '-8res_Ref',
- '-8res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth',
- '-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth',
- '+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth',
- '-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth',
- '-8res_Isotropic',
- '+1res_Isotropic',
- '+1res_MinimumDistance',
- '-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth',
- '+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth',
- '-8res_MinimumDistance']
+# ['-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth',
+#  '-8res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth',
+#  '+1res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth',
+#  '+1res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth',
+#  '-8res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth',
+#  '+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth',
+#  '-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth',
+#  '+1res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth',
+#  '-8res_Ref',
+#  '-8res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth',
+#  '-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth',
+#  '+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth',
+#  '-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth',
+#  '-8res_Isotropic',
+#  '+1res_Isotropic',
+#  '+1res_MinimumDistance',
+#  '-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth',
+#  '+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth',
+#  '-8res_MinimumDistance']
 
 axes[0, 0].set_ylabel('Entropy [keV cm$^2$]')
 axes[0, 0].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
@@ -60,6 +61,24 @@ axes[1, 0].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 1].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 2].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 
+sun2009 = Sun2009()
+axes[0, 0].scatter(sun2009.T_500, sun2009.K_500, color='k', marker='*', edgecolors='none', alpha=0.6)
+axes[0, 1].scatter(sun2009.T_500, sun2009.K_1000, color='k', marker='*', edgecolors='none', alpha=0.6)
+axes[0, 2].scatter(sun2009.T_500, sun2009.K_1500, color='k', marker='*', edgecolors='none', alpha=0.6)
+axes[1, 0].scatter(sun2009.T_2500, sun2009.K_2500, color='k', marker='*', edgecolors='none', alpha=0.6)
+axes[1, 1].scatter(sun2009.T_2500, sun2009.K_0p15r500, color='k', marker='*', edgecolors='none', alpha=0.6)
+axes[1, 2].scatter(sun2009.T_2500, sun2009.K_30kpc, color='k', marker='*', edgecolors='none', alpha=0.6)
+
+axes[0, 0].text(0.03, 0.97, r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
+axes[0, 1].text(0.03, 0.97, r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
+axes[0, 2].text(0.03, 0.97, r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
+axes[1, 0].text(0.03, 0.97, r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
+axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
+axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
+
+colors = list('rgbkc')
+counter = 0
+handles = []
 for model in models:
 
     for keyword in args.keywords:
@@ -68,26 +87,23 @@ for model in models:
 
             df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
 
-            axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], s=1)
-            axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], s=1)
-            axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], s=1)
-            axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], s=1)
-            axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=1)
-            axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=1)
+            axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], s=2, color=colors[counter])
+            axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], s=2, color=colors[counter])
+            axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], s=2, color=colors[counter])
+            axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], s=2, color=colors[counter])
+            axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=2, color=colors[counter])
+            axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=2, color=colors[counter])
 
-            axes[0, 0].text(0.03, 0.97, r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
-            axes[0, 1].text(0.03, 0.97, r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
-            axes[0, 2].text(0.03, 0.97, r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
-            axes[1, 0].text(0.03, 0.97, r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
-            axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
-            axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
+            handles.append(
+                Line2D([], [], color=colors[counter], marker='.', markeredgecolor='none', linestyle='None', markersize=4,
+                       label=model)
+                   )
 
-sun2009 = Sun2009()
-axes[0, 0].scatter(sun2009.T_500, sun2009.K_500, color='k', marker='*', edgecolors='none')
-axes[0, 1].scatter(sun2009.T_500, sun2009.K_1000, color='k', marker='*', edgecolors='none')
-axes[0, 2].scatter(sun2009.T_500, sun2009.K_1500, color='k', marker='*', edgecolors='none')
-axes[1, 0].scatter(sun2009.T_2500, sun2009.K_2500, color='k', marker='*', edgecolors='none')
-axes[1, 1].scatter(sun2009.T_2500, sun2009.K_0p15r500, color='k', marker='*', edgecolors='none')
-axes[1, 2].scatter(sun2009.T_2500, sun2009.K_30kpc, color='k', marker='*', edgecolors='none')
-
+            counter += 1
+handles.append(
+                Line2D([], [], color='k', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
+                       label=sun2009.citation)
+                   )
+legend_obs = plt.legend(handles=handles, frameon=True, facecolor='w', edgecolor='none')
+axes[0, 1].add_artist(legend_obs)
 plt.show()
