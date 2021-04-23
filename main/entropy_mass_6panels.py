@@ -101,6 +101,6 @@ for model in models:
 
 handles.append(Line2D([], [], color='k', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                       label=sun2009.citation))
-axes[0, 0].legend(handles=handles, frameon=True, facecolor='w', edgecolor='k', bbox_to_anchor=(0., 1.02, 1., .102),
+axes[0, 0].legend(handles=handles, frameon=True, facecolor='w', edgecolor='none', bbox_to_anchor=(0., 1.02, 1., .102),
            loc='lower left', mode="expand", borderaxespad=0.)
 plt.show()
