@@ -15,7 +15,7 @@ try:
 except:
     pass
 
-fig = plt.figure(figsize=(7, 6))
+fig = plt.figure(figsize=(6, 6))
 gs = fig.add_gridspec(2, 3, hspace=0.2, wspace=0.)
 axes = gs.subplots(sharex=True, sharey=True)
 
