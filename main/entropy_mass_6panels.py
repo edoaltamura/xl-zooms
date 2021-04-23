@@ -7,6 +7,7 @@ import sys
 sys.path.append("..")
 
 from literature import Sun2009
+from register import args
 
 
 try:
@@ -29,6 +30,26 @@ for ax in axes.flat:
 #        'k30kpc', 'k2500', 'k1500', 'k1000', 'k500', 'k200', 'Ekin', 'Etherm',
 #        'r_1500', 'm_1500', 'LX500', 'LX2500', 'LX500_nocore', 'LX2500_nocore'
 
+['-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth',
+ '-8res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth',
+ '+1res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth',
+ '+1res_Isotropic_fixedAGNdT8_Nheat1_SNnobirth',
+ '-8res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth',
+ '+1res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth',
+ '-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth',
+ '+1res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth',
+ '-8res_Ref',
+ '-8res_Isotropic_fixedAGNdT9_Nheat1_SNnobirth',
+ '-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth',
+ '+1res_Isotropic_fixedAGNdT8.5_Nheat1_SNnobirth',
+ '-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth',
+ '-8res_Isotropic',
+ '+1res_Isotropic',
+ '+1res_MinimumDistance',
+ '-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth',
+ '+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth',
+ '-8res_MinimumDistance']
+
 axes[0, 0].set_ylabel('Entropy [keV cm$^2$]')
 axes[0, 0].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
 axes[0, 1].set_xlabel('$k_BT_{500}^{>0.15 r_{500}}$ [keV]')
@@ -40,21 +61,26 @@ axes[1, 1].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 axes[1, 2].set_xlabel('$k_BT_{2500}^{>0.15 r_{500}}$ [keV]')
 
 for model in models:
-    df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
 
-    axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], s=1)
-    axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], s=1)
-    axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], s=1)
-    axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], s=1)
-    axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=1)
-    axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=1)
+    for keyword in args.keywords:
 
-    axes[0, 0].text(0.03, 0.97, r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
-    axes[0, 1].text(0.03, 0.97, r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
-    axes[0, 2].text(0.03, 0.97, r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
-    axes[1, 0].text(0.03, 0.97, r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
-    axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
-    axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
+        if keyword in model:
+
+            df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
+
+            axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], s=1)
+            axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], s=1)
+            axes[0, 2].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1500'], s=1)
+            axes[1, 0].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k2500'], s=1)
+            axes[1, 1].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k0p15r500'], s=1)
+            axes[1, 2].scatter([(t * kb).to('keV') for t in df['T2500_nocore']], df['k30kpc'], s=1)
+
+            axes[0, 0].text(0.03, 0.97, r'$K_{500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 0].transAxes)
+            axes[0, 1].text(0.03, 0.97, r'$K_{1000}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 1].transAxes)
+            axes[0, 2].text(0.03, 0.97, r'$K_{1500}$', horizontalalignment='left', verticalalignment='top', transform=axes[0, 2].transAxes)
+            axes[1, 0].text(0.03, 0.97, r'$K_{2500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 0].transAxes)
+            axes[1, 1].text(0.03, 0.97, r'$K_{0.15r500}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 1].transAxes)
+            axes[1, 2].text(0.03, 0.97, r'$K_{30 \rm kpc}$', horizontalalignment='left', verticalalignment='top', transform=axes[1, 2].transAxes)
 
 sun2009 = Sun2009()
 axes[0, 0].scatter(sun2009.T_500, sun2009.K_500, color='k', marker='*', edgecolors='none')
