@@ -85,7 +85,7 @@ for model in models:
         if keyword in model:
             df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
 
-            kwargs = dict(s=2, color=colors[counter], edgecolors='none')
+            kwargs = dict(s=5, color=colors[counter], edgecolors='none')
 
             axes[0, 0].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k500'], **kwargs)
             axes[0, 1].scatter([(t * kb).to('keV') for t in df['T500_nocore']], df['k1000'], **kwargs)
@@ -101,8 +101,7 @@ for model in models:
 
 handles.append(Line2D([], [], color='k', marker='*', markeredgecolor='none', linestyle='None', markersize=4,
                       label=sun2009.citation))
-l = plt.legend(handles=handles, frameon=True, facecolor='w', edgecolor='k', bbox_to_anchor=(0., 1.02, 1., .102),
+axes[0, 0].legend(handles=handles, frameon=True, facecolor='w', edgecolor='k', bbox_to_anchor=(0., 1.02, 1., .102),
            loc='lower left',
            ncol=2, mode="expand", borderaxespad=0.)
-axes[0, 0].add_artist(l)
 plt.show()
