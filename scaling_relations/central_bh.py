@@ -61,7 +61,7 @@ class CentralBH(HaloProperty):
         # Get gas particles close to the BH
         # Select hot gas within sphere
         mask_gas = np.where(
-            (sw_data.gas.radial_distances <= r500) &
+            (sw_data.gas.radial_distances <= map_extent_radius) &
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
