@@ -72,10 +72,13 @@ class CentralBH(HaloProperty):
         kwargs_gas = dict(
             c=sw_data.gas.temperatures[mask_gas],
             cmap='coolwarm',
-            norm=colors.LogNorm(vmin=1e5, vmax=1e10),
-            marker='.', edgecolors='none', alpha=0.9, s=2
+            norm=colors.LogNorm(
+                vmin=sw_data.gas.temperatures[mask_gas].min(),
+                vmax=sw_data.gas.temperatures[mask_gas].max()
+            ),
+            marker='.', edgecolors='none'
         )
-        kwargs_bh = dict(color='k', marker='*', edgecolors='none', alpha=0.6)
+        kwargs_bh = dict(color='k', marker='*', edgecolors='none')
 
         axes[0, 0].scatter(sw_data.gas.coordinates[mask_gas, 0], sw_data.gas.coordinates[mask_gas, 1], **kwargs_gas)
         axes[0, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
