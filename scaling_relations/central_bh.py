@@ -64,7 +64,7 @@ class CentralBH(HaloProperty):
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
 
-        fig = plt.figure(figsize=(6, 6))
+        fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
         axes = gs.subplots(sharex=True, sharey=True)
 
