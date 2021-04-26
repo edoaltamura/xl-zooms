@@ -19,7 +19,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 100 * kpc,
+            map_extent_radius: unyt_quantity = 50 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=0.5, **kwargs)
@@ -39,14 +39,6 @@ class CentralBH(HaloProperty):
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
-
-
-        sw_data.gas.coordinates[:, 0] -= xcminpot
-        sw_data.gas.coordinates[:, 1] -= ycminpot
-        sw_data.gas.coordinates[:, 2] -= zcminpot
-        sw_data.black_holes.coordinates[:, 0] -= xcminpot
-        sw_data.black_holes.coordinates[:, 1] -= ycminpot
-        sw_data.black_holes.coordinates[:, 2] -= zcminpot
 
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
