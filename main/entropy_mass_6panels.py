@@ -8,7 +8,7 @@ import sys
 sys.path.append("..")
 
 from literature import Sun2009
-from register import args
+from register import args, calibration_zooms
 
 try:
     plt.style.use("../register/mnras.mplstyle")
@@ -103,4 +103,12 @@ handles.append(Line2D([], [], color='k', marker='*', markeredgecolor='none', lin
                       label=sun2009.citation))
 axes[0, 0].legend(handles=handles, frameon=True, facecolor='w', edgecolor='none', bbox_to_anchor=(0., 1.02, 1., .102),
            loc='lower left', mode="expand", borderaxespad=0.)
+
+fig.suptitle(
+    (
+        f"z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}\t\t (snap {args.redshift_index:04d})"
+    ),
+    fontsize=7
+)
+
 plt.show()
