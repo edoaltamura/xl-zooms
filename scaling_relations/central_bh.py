@@ -59,11 +59,12 @@ class CentralBH(HaloProperty):
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
-        print(f"Plotting {len(mask_gas):d} gas particles")
+
         gas_coord = sw_data.gas.coordinates[mask_gas].value
         gas_coord[:, 0] -= xcminpot
         gas_coord[:, 1] -= ycminpot
         gas_coord[:, 2] -= zcminpot
+        print(f"Plotting {len(mask_gas):d} gas particles", gas_coord)
 
         fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
