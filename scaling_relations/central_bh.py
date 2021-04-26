@@ -19,10 +19,10 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 50 * kpc,
+            map_extent_radius: unyt_quantity = 10 * kpc,
             **kwargs
     ):
-        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=0.15, **kwargs)
+        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=0.1, **kwargs)
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
@@ -74,7 +74,7 @@ class CentralBH(HaloProperty):
             c=sw_data.gas.temperatures[mask_gas],
             cmap='coolwarm',
             norm=colors.LogNorm(vmin=1e5, vmax=1e10),
-            marker='.', edgecolors='none', alpha=0.6, s=3
+            marker='.', edgecolors='none', alpha=0.9, s=2
         )
         kwargs_bh = dict(color='k', marker='*', edgecolors='none', alpha=0.6)
 
