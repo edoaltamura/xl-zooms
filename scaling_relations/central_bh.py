@@ -51,10 +51,7 @@ class CentralBH(HaloProperty):
         sw_data.black_holes.coordinates[:, 1] -= ycminpot
         sw_data.black_holes.coordinates[:, 2] -= zcminpot
 
-        mask_bh = np.where(
-            (sw_data.black_holes.radial_distances <= map_extent_radius) &
-            (sw_data.black_holes.fofgroup_ids == 1)
-        )[0]
+        mask_bh = np.where(sw_data.black_holes.radial_distances <= map_extent_radius)[0]
 
         print(f"Plotting {len(mask_bh):d} BHs")
 
