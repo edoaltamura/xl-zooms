@@ -19,7 +19,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 5 * kpc,
+            map_extent_radius: unyt_quantity = 50 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
@@ -103,8 +103,6 @@ class CentralBH(HaloProperty):
         axes[1, 0].set_ylim([-map_extent_radius, map_extent_radius])
         axes[1, 0].set_aspect('equal')
 
-        axes[1, 1].get_xaxis().set_visible(False)
-        axes[1, 1].get_yaxis().set_visible(False)
-
+        axes[1, 1].remove()
 
         plt.show()
