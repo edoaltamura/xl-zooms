@@ -30,6 +30,8 @@ class CentralBH(HaloProperty):
         ycminpot = vr_data.positions.ycminpot[0].to('Mpc')
         zcminpot = vr_data.positions.zcminpot[0].to('Mpc')
 
+        map_extent_radius = map_extent_radius.to('Mpc')
+
         sw_data.black_holes.radial_distances.convert_to_physical()
         sw_data.black_holes.subgrid_masses.convert_to_physical()
 
