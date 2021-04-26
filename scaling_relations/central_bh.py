@@ -19,7 +19,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 10 * kpc,
+            map_extent_radius: unyt_quantity = 20 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=0.1, **kwargs)
@@ -40,18 +40,15 @@ class CentralBH(HaloProperty):
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
 
+        sw_data.gas.coordinates[:, 0] = sw_data.gas.coordinates[:, 0] - xcminpot
+        sw_data.gas.coordinates[:, 1] = sw_data.gas.coordinates[:, 1] - ycminpot
+        sw_data.gas.coordinates[:, 2] = sw_data.gas.coordinates[:, 2] - zcminpot
+        sw_data.black_holes.coordinates[:, 0] = sw_data.black_holes.coordinates[:, 0] - xcminpot
+        sw_data.black_holes.coordinates[:, 1] = sw_data.black_holes.coordinates[:, 1] - ycminpot
+        sw_data.black_holes.coordinates[:, 2] = sw_data.black_holes.coordinates[:, 2] - zcminpot
+
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
-        central_bh_id_target = sw_data.black_holes.particle_ids[central_bh_index]
-        central_bh_index = np.where(sw_data.black_holes.particle_ids == central_bh_id_target)[0]
-
-        sw_data.gas.coordinates[:, 0] -= xcminpot
-        sw_data.gas.coordinates[:, 1] -= ycminpot
-        sw_data.gas.coordinates[:, 2] -= zcminpot
-        sw_data.black_holes.coordinates[:, 0] -= xcminpot
-        sw_data.black_holes.coordinates[:, 1] -= ycminpot
-        sw_data.black_holes.coordinates[:, 2] -= zcminpot
-
         mask_bh = np.where(sw_data.black_holes.radial_distances <= mapsize)[0]
 
         print(f"Plotting {len(mask_bh):d} BHs")
