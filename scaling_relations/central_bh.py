@@ -40,12 +40,12 @@ class CentralBH(HaloProperty):
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
 
-        # sw_data.gas.coordinates[:, 0] = sw_data.gas.coordinates[:, 0] - xcminpot
-        # sw_data.gas.coordinates[:, 1] = sw_data.gas.coordinates[:, 1] - ycminpot
-        # sw_data.gas.coordinates[:, 2] = sw_data.gas.coordinates[:, 2] - zcminpot
-        # sw_data.black_holes.coordinates[:, 0] = sw_data.black_holes.coordinates[:, 0] - xcminpot
-        # sw_data.black_holes.coordinates[:, 1] = sw_data.black_holes.coordinates[:, 1] - ycminpot
-        # sw_data.black_holes.coordinates[:, 2] = sw_data.black_holes.coordinates[:, 2] - zcminpot
+        sw_data.gas.coordinates[:, 0] -= xcminpot
+        sw_data.gas.coordinates[:, 1] -= ycminpot
+        sw_data.gas.coordinates[:, 2] -= zcminpot
+        sw_data.black_holes.coordinates[:, 0] -= xcminpot
+        sw_data.black_holes.coordinates[:, 1] -= ycminpot
+        sw_data.black_holes.coordinates[:, 2] -= zcminpot
 
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
