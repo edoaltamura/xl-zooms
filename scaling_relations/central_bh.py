@@ -56,6 +56,8 @@ class CentralBH(HaloProperty):
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
 
+        print(f"Plotting {len(mask_bh):d} BHs")
+
         # Get gas particles close to the BH
         # Select hot gas within sphere
         mask_gas = np.where(
@@ -63,6 +65,7 @@ class CentralBH(HaloProperty):
             (sw_data.gas.temperatures > Tcut_halogas) &
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
+        print(f"Plotting {len(mask_gas):d} gas particles")
 
         fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
