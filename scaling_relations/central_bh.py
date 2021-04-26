@@ -40,6 +40,7 @@ class CentralBH(HaloProperty):
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
 
+
         sw_data.gas.coordinates[:, 0] -= xcminpot
         sw_data.gas.coordinates[:, 1] -= ycminpot
         sw_data.gas.coordinates[:, 2] -= zcminpot
@@ -50,6 +51,7 @@ class CentralBH(HaloProperty):
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
         mask_bh = np.where(sw_data.black_holes.radial_distances <= mapsize)[0]
+        bh_coord = sw_data.black_holes.coordinates[mask_bh]
 
         print(f"Plotting {len(mask_bh):d} BHs")
 
@@ -61,10 +63,11 @@ class CentralBH(HaloProperty):
             (sw_data.gas.fofgroup_ids == 1)
         )[0]
         print(f"Plotting {len(mask_gas):d} gas particles")
+        gas_coord = sw_data.gas.coordinates[mask_gas]
 
         fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
-        axes = gs.subplots(sharex=False, sharey=False)
+        axes = gs.subplots(sharex=True, sharey=True)
 
         kwargs_gas = dict(
             c=sw_data.gas.temperatures[mask_gas],
@@ -77,31 +80,31 @@ class CentralBH(HaloProperty):
         )
         kwargs_bh = dict(color='k', marker='*', edgecolors='none')
 
-        axes[0, 0].scatter(sw_data.gas.coordinates[mask_gas, 0], sw_data.gas.coordinates[mask_gas, 1], **kwargs_gas)
-        axes[0, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
-        axes[0, 0].scatter(sw_data.black_holes.coordinates[central_bh_index, 0], sw_data.black_holes.coordinates[central_bh_index, 1], color='r', marker='*', edgecolors='none', s=20)
-        # axes[0, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
-        # axes[0, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
-        axes[0, 0].set_xlim([xcminpot - mapsize, xcminpot + mapsize])
-        axes[0, 0].set_ylim([ycminpot - mapsize, ycminpot + mapsize])
+        axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
+        axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
+        # axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], color='r', marker='*', edgecolors='none', s=20)
+        axes[0, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
+        axes[0, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
+        axes[0, 0].set_xlim([-mapsize, mapsize])
+        axes[0, 0].set_ylim([-mapsize, mapsize])
         axes[0, 0].set_aspect('equal')
 
-        axes[0, 1].scatter(sw_data.gas.coordinates[mask_gas, 2], sw_data.gas.coordinates[mask_gas, 1], **kwargs_gas)
-        axes[0, 1].scatter(sw_data.black_holes.coordinates[mask_bh, 2], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
-        axes[0, 1].scatter(sw_data.black_holes.coordinates[central_bh_index, 2], sw_data.black_holes.coordinates[central_bh_index, 1], color='r', marker='*', edgecolors='none', s=20)
-        # axes[0, 1].axhline(y=0, linestyle='--', linewidth=1, color='grey')
-        # axes[0, 1].axvline(x=0, linestyle='--', linewidth=1, color='grey')
-        axes[0, 1].set_xlim([zcminpot - mapsize, zcminpot + mapsize])
-        axes[0, 1].set_ylim([ycminpot - mapsize, ycminpot + mapsize])
+        axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
+        axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
+        # axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], color='r', marker='*', edgecolors='none', s=20)
+        axes[0, 1].axhline(y=0, linestyle='--', linewidth=1, color='grey')
+        axes[0, 1].axvline(x=0, linestyle='--', linewidth=1, color='grey')
+        axes[0, 1].set_xlim([-mapsize, mapsize])
+        axes[0, 1].set_ylim([-mapsize, mapsize])
         axes[0, 1].set_aspect('equal')
 
-        axes[1, 0].scatter(sw_data.gas.coordinates[mask_gas, 0], sw_data.gas.coordinates[mask_gas, 2], **kwargs_gas)
-        axes[1, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 2], **kwargs_bh)
-        axes[1, 0].scatter(sw_data.black_holes.coordinates[central_bh_index, 0], sw_data.black_holes.coordinates[central_bh_index, 2], color='r', marker='*', edgecolors='none', s=20)
-        # axes[1, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
-        # axes[1, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
-        axes[1, 0].set_xlim([xcminpot - mapsize, xcminpot + mapsize])
-        axes[1, 0].set_ylim([zcminpot - mapsize, zcminpot + mapsize])
+        axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
+        axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
+        # axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], color='r', marker='*', edgecolors='none', s=20)
+        axes[1, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
+        axes[1, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
+        axes[1, 0].set_xlim([-mapsize, mapsize])
+        axes[1, 0].set_ylim([-mapsize, mapsize])
         axes[1, 0].set_aspect('equal')
 
         axes[1, 1].remove()
