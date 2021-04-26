@@ -33,17 +33,16 @@ class CentralBH(HaloProperty):
         mapsize = map_extent_radius.to('Mpc')
 
         sw_data.black_holes.radial_distances.convert_to_physical()
+        sw_data.black_holes.coordinates.convert_to_physical()
         sw_data.black_holes.subgrid_masses.convert_to_physical()
 
-        # The central SMBH will probably be massive.
-        # Narrow down the search to the BH with top 5% in mass
-        bh_top_massive_index = np.where(
-            sw_data.black_holes.subgrid_masses > np.percentile(sw_data.black_holes.subgrid_masses.value, 95)
-        )[0]
+        sw_data.gas.radial_distances.convert_to_physical()
+        sw_data.gas.coordinates.convert_to_physical()
+        sw_data.gas.masses.convert_to_physical()
 
         # Get the central BH closest to centre of halo
-        central_bh_index = np.argmin(sw_data.black_holes.radial_distances[bh_top_massive_index])
-        central_bh_id_target = sw_data.black_holes.particle_ids[bh_top_massive_index][central_bh_index]
+        central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
+        central_bh_id_target = sw_data.black_holes.particle_ids[central_bh_index]
         central_bh_index = np.where(sw_data.black_holes.particle_ids == central_bh_id_target)[0]
 
         sw_data.gas.coordinates[:, 0] -= xcminpot
