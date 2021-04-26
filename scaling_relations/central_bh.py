@@ -41,11 +41,11 @@ class CentralBH(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
 
         sw_data.gas.coordinates[:, 0] = sw_data.gas.coordinates[:, 0] - xcminpot
-        sw_data.gas.coordinates[:, 1] = sw_data.gas.coordinates[:, 1] - ycminpot
-        sw_data.gas.coordinates[:, 2] = sw_data.gas.coordinates[:, 2] - zcminpot
-        sw_data.black_holes.coordinates[:, 0] = sw_data.black_holes.coordinates[:, 0] - xcminpot
-        sw_data.black_holes.coordinates[:, 1] = sw_data.black_holes.coordinates[:, 1] - ycminpot
-        sw_data.black_holes.coordinates[:, 2] = sw_data.black_holes.coordinates[:, 2] - zcminpot
+        # sw_data.gas.coordinates[:, 1] = sw_data.gas.coordinates[:, 1] - ycminpot
+        # sw_data.gas.coordinates[:, 2] = sw_data.gas.coordinates[:, 2] - zcminpot
+        # sw_data.black_holes.coordinates[:, 0] = sw_data.black_holes.coordinates[:, 0] - xcminpot
+        # sw_data.black_holes.coordinates[:, 1] = sw_data.black_holes.coordinates[:, 1] - ycminpot
+        # sw_data.black_holes.coordinates[:, 2] = sw_data.black_holes.coordinates[:, 2] - zcminpot
 
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
@@ -82,8 +82,8 @@ class CentralBH(HaloProperty):
         axes[0, 0].scatter(sw_data.black_holes.coordinates[central_bh_index, 0], sw_data.black_holes.coordinates[central_bh_index, 1], color='r', marker='*', edgecolors='none', s=20)
         axes[0, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
-        axes[0, 0].set_xlim([-mapsize, mapsize])
-        axes[0, 0].set_ylim([-mapsize, mapsize])
+        # axes[0, 0].set_xlim([-mapsize, mapsize])
+        # axes[0, 0].set_ylim([-mapsize, mapsize])
         axes[0, 0].set_aspect('equal')
 
         axes[0, 1].scatter(sw_data.gas.coordinates[mask_gas, 2], sw_data.gas.coordinates[mask_gas, 1], **kwargs_gas)
@@ -91,8 +91,8 @@ class CentralBH(HaloProperty):
         axes[0, 1].scatter(sw_data.black_holes.coordinates[central_bh_index, 2], sw_data.black_holes.coordinates[central_bh_index, 1], color='r', marker='*', edgecolors='none', s=20)
         axes[0, 1].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 1].axvline(x=0, linestyle='--', linewidth=1, color='grey')
-        axes[0, 1].set_xlim([-mapsize, mapsize])
-        axes[0, 1].set_ylim([-mapsize, mapsize])
+        # axes[0, 1].set_xlim([-mapsize, mapsize])
+        # axes[0, 1].set_ylim([-mapsize, mapsize])
         axes[0, 1].set_aspect('equal')
 
         axes[1, 0].scatter(sw_data.gas.coordinates[mask_gas, 0], sw_data.gas.coordinates[mask_gas, 2], **kwargs_gas)
@@ -100,8 +100,8 @@ class CentralBH(HaloProperty):
         axes[1, 0].scatter(sw_data.black_holes.coordinates[central_bh_index, 0], sw_data.black_holes.coordinates[central_bh_index, 2], color='r', marker='*', edgecolors='none', s=20)
         axes[1, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[1, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
-        axes[1, 0].set_xlim([-mapsize, mapsize])
-        axes[1, 0].set_ylim([-mapsize, mapsize])
+        # axes[1, 0].set_xlim([-mapsize, mapsize])
+        # axes[1, 0].set_ylim([-mapsize, mapsize])
         axes[1, 0].set_aspect('equal')
 
         axes[1, 1].remove()
