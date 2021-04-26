@@ -69,7 +69,7 @@ class CentralBH(HaloProperty):
         axes = gs.subplots(sharex=True, sharey=True)
 
         kwargs_gas = dict(
-            color=sw_data.gas.temperatures[mask_gas],
+            c=sw_data.gas.temperatures[mask_gas],
             cmap='coolwarm',
             norm=colors.LogNorm(vmin=1e5, vmax=1e10),
             marker='.', edgecolors='none', alpha=0.6
