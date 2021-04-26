@@ -104,11 +104,11 @@ handles.append(Line2D([], [], color='k', marker='*', markeredgecolor='none', lin
 axes[0, 0].legend(handles=handles, frameon=True, facecolor='w', edgecolor='none', bbox_to_anchor=(0., 1.02, 1., .102),
            loc='lower left', mode="expand", borderaxespad=0.)
 
-fig.suptitle(
-    (
-        f"z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}\t\t (snap {args.redshift_index:04d})"
-    ),
-    fontsize=7
-)
+# fig.suptitle(
+#     (
+#         f"z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}\t\t (snap {args.redshift_index:04d})"
+#     ),
+#     fontsize=7
+# )
 
 plt.show()
