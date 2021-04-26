@@ -77,17 +77,17 @@ class CentralBH(HaloProperty):
         kwargs_bh = dict(color='k', marker='*', edgecolors='none', alpha=0.6)
 
         axes[0, 0].scatter(sw_data.gas.coordinates[mask_gas, 0], sw_data.gas.coordinates[mask_gas, 1], **kwargs_gas)
-        axes[0, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
+        # axes[0, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
         axes[0, 0].scatter(sw_data.black_holes.coordinates[central_bh_index, 0], sw_data.black_holes.coordinates[central_bh_index, 1], color='r', marker='*', edgecolors='none', size=10)
         axes[0, 0].scatter([0], [0], color='k', marker='x', edgecolor='none', size=10)
 
         axes[0, 1].scatter(sw_data.gas.coordinates[mask_gas, 2], sw_data.gas.coordinates[mask_gas, 1], **kwargs_gas)
-        axes[0, 1].scatter(sw_data.black_holes.coordinates[mask_bh, 2], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
+        # axes[0, 1].scatter(sw_data.black_holes.coordinates[mask_bh, 2], sw_data.black_holes.coordinates[mask_bh, 1], **kwargs_bh)
         axes[0, 1].scatter(sw_data.black_holes.coordinates[central_bh_index, 2], sw_data.black_holes.coordinates[central_bh_index, 1], color='r', marker='*', edgecolors='none', size=10)
         axes[0, 1].scatter([0], [0], color='k', marker='x', edgecolor='none', size=10)
 
         axes[1, 0].scatter(sw_data.gas.coordinates[mask_gas, 0], sw_data.gas.coordinates[mask_gas, 2], **kwargs_gas)
-        axes[1, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 2], **kwargs_bh)
+        # axes[1, 0].scatter(sw_data.black_holes.coordinates[mask_bh, 0], sw_data.black_holes.coordinates[mask_bh, 2], **kwargs_bh)
         axes[1, 0].scatter(sw_data.black_holes.coordinates[central_bh_index, 0], sw_data.black_holes.coordinates[central_bh_index, 2], color='r', marker='*', edgecolors='none', size=10)
         axes[1, 0].scatter([0], [0], color='k', marker='x', edgecolor='none', size=10)
 
