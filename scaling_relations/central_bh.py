@@ -64,7 +64,7 @@ class CentralBH(HaloProperty):
 
         fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
-        axes = gs.subplots(sharex=True, sharey=True)
+        axes = gs.subplots(sharex=False, sharey=False)
 
         kwargs_gas = dict(
             c=sw_data.gas.temperatures[mask_gas],
