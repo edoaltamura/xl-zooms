@@ -104,7 +104,8 @@ class CentralBH(HaloProperty):
             marker='*',
             edgecolors='none',
             s=[ms_init / 2 * 4 ** n for n in stars_mass_scaled],
-            alpha=0.4
+            alpha=0.3,
+            zorder=3
         )
 
         kwargs_bh = dict(
@@ -170,15 +171,15 @@ class CentralBH(HaloProperty):
             s001.set_sizes([a * 4 ** n for n in gas_mass_scaled])
             s002.set_sizes([a * 4 ** n for n in bh_mass_scaled])
             s003.set_sizes([a * 4 ** n for n in stars_mass_scaled])
-            s004.set_sizes([a * 4 ** n for n in bh_mass_scaled[central_bh_index]])
+            s004.set_sizes(a * 4 ** bh_mass_scaled[central_bh_index])
             s011.set_sizes([a * 4 ** n for n in gas_mass_scaled])
             s012.set_sizes([a * 4 ** n for n in bh_mass_scaled])
             s013.set_sizes([a * 4 ** n for n in stars_mass_scaled])
-            s014.set_sizes([a * 4 ** n for n in bh_mass_scaled[central_bh_index]])
+            s014.set_sizes(a * 4 ** bh_mass_scaled[central_bh_index])
             s101.set_sizes([a * 4 ** n for n in gas_mass_scaled])
             s102.set_sizes([a * 4 ** n for n in bh_mass_scaled])
             s103.set_sizes([a * 4 ** n for n in stars_mass_scaled])
-            s104.set_sizes([a * 4 ** n for n in bh_mass_scaled[central_bh_index]])
+            s104.set_sizes(a * 4 ** bh_mass_scaled[central_bh_index])
             fig.canvas.draw_idle()  # redraw the plot
 
         # the final step is to specify that the slider needs to
