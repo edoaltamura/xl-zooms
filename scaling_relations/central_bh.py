@@ -96,7 +96,7 @@ class CentralBH(HaloProperty):
                 vmax=sw_data.gas.star_formation_rates[mask_gas].max()
             ),
             s=[ms_init * 4 ** n for n in gas_mass_scaled],
-            marker='.', edgecolors='none'
+            marker='.', edgecolors='none', zorder=4
         )
 
         kwargs_stars = dict(
@@ -119,10 +119,10 @@ class CentralBH(HaloProperty):
         axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
         axes[0, 0].scatter(stars_coord[:, 0], stars_coord[:, 1], **kwargs_stars)
         axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], facecolors='g', marker='*', edgecolors='none', s=ms_init*4**bh_mass_scaled[central_bh_index])
-        axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
+        axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=2))
 
-        axes[0, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
-        axes[0, 0].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
+        axes[0, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=2)
+        axes[0, 0].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=2)
         axes[0, 0].set_xlim([-mapsize, mapsize])
         axes[0, 0].set_ylim([-mapsize, mapsize])
         axes[0, 0].set_aspect('equal')
@@ -132,10 +132,10 @@ class CentralBH(HaloProperty):
         axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
         axes[0, 1].scatter(stars_coord[:, 2], stars_coord[:, 1], **kwargs_stars)
         axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], facecolors='g', marker='*', edgecolors='none', s=ms_init*4**bh_mass_scaled[central_bh_index])
-        axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
+        axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=2))
 
-        axes[0, 1].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
-        axes[0, 1].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
+        axes[0, 1].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=2)
+        axes[0, 1].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=2)
         axes[0, 1].set_xlim([-mapsize, mapsize])
         axes[0, 1].set_ylim([-mapsize, mapsize])
         axes[0, 1].set_aspect('equal')
@@ -145,10 +145,10 @@ class CentralBH(HaloProperty):
         axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
         axes[1, 0].scatter(stars_coord[:, 0], stars_coord[:, 2], **kwargs_stars)
         axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], facecolors='g', marker='*', edgecolors='none', s=ms_init*4**bh_mass_scaled[central_bh_index])
-        axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
+        axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=2))
 
-        axes[1, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
-        axes[1, 0].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
+        axes[1, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=2)
+        axes[1, 0].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=2)
         axes[1, 0].set_xlim([-mapsize, mapsize])
         axes[1, 0].set_ylim([-mapsize, mapsize])
         axes[1, 0].set_aspect('equal')
