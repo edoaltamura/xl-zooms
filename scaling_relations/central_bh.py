@@ -20,7 +20,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 10 * kpc,
+            map_extent_radius: unyt_quantity = 100 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=1, **kwargs)
@@ -104,7 +104,7 @@ class CentralBH(HaloProperty):
             marker='.',
             edgecolors='none',
             s=[ms_init / 2 * 4 ** n for n in stars_mass_scaled],
-            alpha=0.3,
+            alpha=0.1,
             zorder=1
         )
 
