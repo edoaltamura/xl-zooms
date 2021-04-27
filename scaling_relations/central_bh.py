@@ -20,7 +20,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 7 * kpc,
+            map_extent_radius: unyt_quantity = 100 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=1, **kwargs)
@@ -113,7 +113,8 @@ class CentralBH(HaloProperty):
             facecolors='k',
             marker='*',
             edgecolors='none',
-            s=[ms_init*4**n for n in bh_mass_scaled]
+            s=[ms_init*4**n for n in bh_mass_scaled],
+            zorder=4
         )
 
         axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
