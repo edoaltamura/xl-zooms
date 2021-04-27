@@ -71,13 +71,15 @@ class CentralBH(HaloProperty):
         sw_data.stars.coordinates.convert_to_physical()
         sw_data.stars.masses.convert_to_physical()
 
-        stars_coord = sw_data.stars.coordinates[mask_gas].value
+        mask_stars = np.where(sw_data.stars.radial_distances <= mapsize)[0]
+
+        stars_coord = sw_data.stars.coordinates[mask_stars].value
         stars_coord[:, 0] -= xcminpot.v
         stars_coord[:, 1] -= ycminpot.v
         stars_coord[:, 2] -= zcminpot.v
-        stars_mass = sw_data.stars.masses[mask_gas]
+        stars_mass = sw_data.stars.masses[mask_stars]
         stars_mass_scaled = (stars_mass - stars_mass.min()) / (stars_mass.max() - stars_mass.min())
-        print(f"Plotting {len(mask_gas):d} gas particles")
+        print(f"Plotting {len(mask_stars):d} star particles")
         print(f"Stars mass: max {stars_mass.max().to('Msun'):.2E}, min {stars_mass.min().to('Msun'):.2E}")
 
         fig = plt.figure(figsize=(3, 3))
