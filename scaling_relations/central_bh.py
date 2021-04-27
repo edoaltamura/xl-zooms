@@ -47,6 +47,8 @@ class CentralBH(HaloProperty):
         bh_coord[:, 0] -= xcminpot.v
         bh_coord[:, 1] -= ycminpot.v
         bh_coord[:, 2] -= zcminpot.v
+        bh_mass = sw_data.black_holes.subgrid_masses[mask_bh]
+        bh_mass_scaled = (bh_mass - bh_mass.min()) / (bh_mass.max() - bh_mass.min())
 
         print(f"Plotting {len(mask_bh):d} BHs")
 
@@ -77,7 +79,13 @@ class CentralBH(HaloProperty):
             ),
             marker='.', edgecolors='none'
         )
-        kwargs_bh = dict(color='k', marker='*', edgecolors='none')
+
+        kwargs_bh = dict(
+            color='k',
+            marker='*',
+            edgecolors='none',
+            s=[10*2**n for n in bh_mass_scaled]
+        )
 
         axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
         axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
