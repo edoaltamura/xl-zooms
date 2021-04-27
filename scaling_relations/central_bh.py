@@ -89,7 +89,7 @@ class CentralBH(HaloProperty):
         ms_init = 20
 
         kwargs_gas = dict(
-            c=sw_data.gas.temperatures[mask_gas],
+            c=sw_data.gas.star_formation_rates[mask_gas],
             cmap='coolwarm',
             norm=colors.SymLogNorm(
                 vmin=sw_data.gas.star_formation_rates[mask_gas].min(),
