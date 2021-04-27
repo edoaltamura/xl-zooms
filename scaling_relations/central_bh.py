@@ -19,7 +19,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 50 * kpc,
+            map_extent_radius: unyt_quantity = 10 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=1, **kwargs)
@@ -84,7 +84,7 @@ class CentralBH(HaloProperty):
                 vmin=sw_data.gas.temperatures[mask_gas].min(),
                 vmax=sw_data.gas.temperatures[mask_gas].max()
             ),
-            s=[1 * 4 ** n for n in gas_mass_scaled],
+            s=[20 * 4 ** n for n in gas_mass_scaled],
             marker='.', edgecolors='none'
         )
 
@@ -92,13 +92,13 @@ class CentralBH(HaloProperty):
             color='k',
             marker='*',
             edgecolors='none',
-            s=[7*4**n for n in bh_mass_scaled]
+            s=[20*4**n for n in bh_mass_scaled]
         )
 
         axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
         axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
-        axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], color='lime', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
-        axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.5, edgecolor='none', zorder=1))
+        axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], color='g', marker='*', edgecolors='none', s=20*4**bh_mass_scaled[central_bh_index])
+        axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
 
         axes[0, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
         axes[0, 0].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
@@ -109,8 +109,8 @@ class CentralBH(HaloProperty):
 
         axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
         axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
-        axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], color='lime', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
-        axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.5, edgecolor='none', zorder=1))
+        axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], color='g', marker='*', edgecolors='none', s=20*4**bh_mass_scaled[central_bh_index])
+        axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
 
         axes[0, 1].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
         axes[0, 1].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
@@ -121,8 +121,8 @@ class CentralBH(HaloProperty):
 
         axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
         axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
-        axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], color='lime', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
-        axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.5, edgecolor='none', zorder=1))
+        axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], color='g', marker='*', edgecolors='none', s=20*4**bh_mass_scaled[central_bh_index])
+        axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
 
         axes[1, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
         axes[1, 0].axvline(x=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
