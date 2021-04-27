@@ -100,10 +100,11 @@ class CentralBH(HaloProperty):
         )
 
         kwargs_stars = dict(
-            color='b',
+            color='aqua',
             marker='*',
             edgecolors='none',
-            s=[ms_init * 4 ** n for n in stars_mass_scaled]
+            s=[ms_init / 2 * 4 ** n for n in stars_mass_scaled],
+            alpha=0.4
         )
 
         kwargs_bh = dict(
