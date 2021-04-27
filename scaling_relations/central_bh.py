@@ -84,7 +84,7 @@ class CentralBH(HaloProperty):
             color='k',
             marker='*',
             edgecolors='none',
-            s=[2*10*2**n for n in bh_mass_scaled]
+            s=[20*2**n for n in bh_mass_scaled]
         )
 
         axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
