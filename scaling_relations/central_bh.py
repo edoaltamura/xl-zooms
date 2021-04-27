@@ -154,6 +154,8 @@ class CentralBH(HaloProperty):
         axes[1, 0].set_xlabel('x [Mpc]')
         axes[1, 0].set_ylabel('z [Mpc]')
 
+        axes[1, 1].remove()
+
         a_slider = Slider(plt.axes([0.1, 0.05, 0.8, 0.05]),  # the axes object containing the slider
                           'a',  # the name of the slider parameter
                           3,  # minimal value of the parameter
