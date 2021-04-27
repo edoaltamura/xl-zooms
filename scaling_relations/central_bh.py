@@ -40,8 +40,6 @@ class CentralBH(HaloProperty):
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
 
-        print(sw_data.black_holes.coordinates)
-
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances)
         mask_bh = np.where(sw_data.black_holes.radial_distances <= mapsize)[0]
@@ -50,7 +48,7 @@ class CentralBH(HaloProperty):
         bh_coord[:, 1] -= ycminpot.v
         bh_coord[:, 2] -= zcminpot.v
 
-        print(f"Plotting {len(mask_bh):d} BHs", bh_coord)
+        print(f"Plotting {len(mask_bh):d} BHs")
 
         # Get gas particles close to the BH
         # Select hot gas within sphere
@@ -64,7 +62,7 @@ class CentralBH(HaloProperty):
         gas_coord[:, 0] -= xcminpot.v
         gas_coord[:, 1] -= ycminpot.v
         gas_coord[:, 2] -= zcminpot.v
-        print(f"Plotting {len(mask_gas):d} gas particles", gas_coord)
+        print(f"Plotting {len(mask_gas):d} gas particles")
 
         fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
