@@ -92,8 +92,8 @@ class CentralBH(HaloProperty):
             c=sw_data.gas.temperatures[mask_gas],
             cmap='coolwarm',
             norm=colors.LogNorm(
-                vmin=sw_data.gas.temperatures[mask_gas].min(),
-                vmax=sw_data.gas.temperatures[mask_gas].max()
+                vmin=sw_data.gas.star_formation_rates[mask_gas].min(),
+                vmax=sw_data.gas.star_formation_rates[mask_gas].max()
             ),
             s=[ms_init * 4 ** n for n in gas_mass_scaled],
             marker='.', edgecolors='none'
@@ -104,7 +104,7 @@ class CentralBH(HaloProperty):
             marker='.',
             edgecolors='none',
             s=[ms_init / 2 * 4 ** n for n in stars_mass_scaled],
-            alpha=0.1,
+            alpha=0.2,
             zorder=1
         )
 
