@@ -94,7 +94,7 @@ class CentralBH(HaloProperty):
             norm=colors.SymLogNorm(
                 vmin=sw_data.gas.star_formation_rates[mask_gas].min(),
                 vmax=sw_data.gas.star_formation_rates[mask_gas].max(),
-                linthresh=1e-4
+                linthresh=1e-7
             ),
             s=[ms_init * 4 ** n for n in gas_mass_scaled],
             marker='.', edgecolors='none', zorder=4
