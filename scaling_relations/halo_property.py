@@ -149,29 +149,29 @@ class HaloProperty(object):
         boxsize = sw_handle.metadata.boxsize
         centre_coordinates = unyt_array([xcminpot, ycminpot, zcminpot], xcminpot.units)
 
-        # sw_handle.gas.coordinates = self.wrap_coordinates(
-        #     sw_handle.gas.coordinates,
-        #     centre_coordinates,
-        #     boxsize
-        # )
-        #
-        # sw_handle.dark_matter.coordinates = self.wrap_coordinates(
-        #     sw_handle.dark_matter.coordinates,
-        #     centre_coordinates,
-        #     boxsize
-        # )
-        #
-        # sw_handle.stars.coordinates = self.wrap_coordinates(
-        #     sw_handle.stars.coordinates,
-        #     centre_coordinates,
-        #     boxsize
-        # )
-        #
-        # sw_handle.black_holes.coordinates = self.wrap_coordinates(
-        #     sw_handle.black_holes.coordinates,
-        #     centre_coordinates,
-        #     boxsize
-        # )
+        sw_handle.gas.coordinates = self.wrap_coordinates(
+            sw_handle.gas.coordinates,
+            centre_coordinates,
+            boxsize
+        )
+
+        sw_handle.dark_matter.coordinates = self.wrap_coordinates(
+            sw_handle.dark_matter.coordinates,
+            centre_coordinates,
+            boxsize
+        )
+
+        sw_handle.stars.coordinates = self.wrap_coordinates(
+            sw_handle.stars.coordinates,
+            centre_coordinates,
+            boxsize
+        )
+
+        sw_handle.black_holes.coordinates = self.wrap_coordinates(
+            sw_handle.black_holes.coordinates,
+            centre_coordinates,
+            boxsize
+        )
 
         # Compute radial distances
         sw_handle.gas.radial_distances = self.get_radial_distance(
