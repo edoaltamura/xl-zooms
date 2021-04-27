@@ -95,6 +95,7 @@ class CentralBH(HaloProperty):
         axes[0, 0].set_xlim([-mapsize, mapsize])
         axes[0, 0].set_ylim([-mapsize, mapsize])
         axes[0, 0].set_aspect('equal')
+        axes[0, 0].set_ylabel('y [Mpc]')
 
         axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
         axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
@@ -104,6 +105,7 @@ class CentralBH(HaloProperty):
         axes[0, 1].set_xlim([-mapsize, mapsize])
         axes[0, 1].set_ylim([-mapsize, mapsize])
         axes[0, 1].set_aspect('equal')
+        axes[0, 1].set_xlabel('z [Mpc]')
 
         axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
         axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
@@ -113,6 +115,8 @@ class CentralBH(HaloProperty):
         axes[1, 0].set_xlim([-mapsize, mapsize])
         axes[1, 0].set_ylim([-mapsize, mapsize])
         axes[1, 0].set_aspect('equal')
+        axes[1, 0].set_xlabel('x [Mpc]')
+        axes[1, 0].set_ylabel('z [Mpc]')
 
         axes[1, 1].remove()
 
