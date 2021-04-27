@@ -19,7 +19,7 @@ class CentralBH(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            map_extent_radius: unyt_quantity = 5 * kpc,
+            map_extent_radius: unyt_quantity = 50 * kpc,
             **kwargs
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=1, **kwargs)
@@ -84,7 +84,7 @@ class CentralBH(HaloProperty):
                 vmin=sw_data.gas.temperatures[mask_gas].min(),
                 vmax=sw_data.gas.temperatures[mask_gas].max()
             ),
-            s=[10 * 4 ** n for n in gas_mass_scaled],
+            s=[2 * 4 ** n for n in gas_mass_scaled],
             marker='.', edgecolors='none'
         )
 
