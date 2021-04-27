@@ -86,12 +86,12 @@ class CentralBH(HaloProperty):
             color='k',
             marker='*',
             edgecolors='none',
-            s=[20*2**n for n in bh_mass_scaled]
+            s=[10*4**n for n in bh_mass_scaled]
         )
 
         axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
         axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
-        axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], color='brown', marker='*', edgecolors='none', s=20*2**bh_mass_scaled[central_bh_index])
+        axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], color='brown', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
         axes[0, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 0].set_xlim([-mapsize, mapsize])
@@ -101,7 +101,7 @@ class CentralBH(HaloProperty):
 
         axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
         axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
-        axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], color='brown', marker='*', edgecolors='none', s=20*2**bh_mass_scaled[central_bh_index])
+        axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], color='brown', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
         axes[0, 1].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 1].axvline(x=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 1].set_xlim([-mapsize, mapsize])
@@ -111,7 +111,7 @@ class CentralBH(HaloProperty):
 
         axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
         axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
-        axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], color='brown', marker='*', edgecolors='none', s=20*2**bh_mass_scaled[central_bh_index])
+        axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], color='brown', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
         axes[1, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[1, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
         axes[1, 0].set_xlim([-mapsize, mapsize])
