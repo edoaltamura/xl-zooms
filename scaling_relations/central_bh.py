@@ -35,7 +35,7 @@ class CentralBH(HaloProperty):
         sw_data.black_holes.radial_distances.convert_to_physical()
         sw_data.black_holes.coordinates.convert_to_physical()
         sw_data.black_holes.subgrid_masses.convert_to_physical()
-        sw_data.black_holes.smoothing_lenghts.convert_to_physical()
+        sw_data.black_holes.smoothing_lengths.convert_to_physical()
 
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.coordinates.convert_to_physical()
@@ -48,7 +48,7 @@ class CentralBH(HaloProperty):
         bh_coord[:, 2] -= zcminpot.v
         bh_mass = sw_data.black_holes.subgrid_masses[mask_bh]
         bh_mass_scaled = (bh_mass - bh_mass.min()) / (bh_mass.max() - bh_mass.min())
-        bh_smoothing_lenghts = sw_data.black_holes.smoothing_lenghts[mask_bh]
+        bh_smoothing_lenghts = sw_data.black_holes.smoothing_lengths[mask_bh]
 
         # Get the central BH closest to centre of halo
         central_bh_index = np.argmin(sw_data.black_holes.radial_distances[mask_bh])
