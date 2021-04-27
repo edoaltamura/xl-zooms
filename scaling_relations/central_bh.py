@@ -97,12 +97,12 @@ class CentralBH(HaloProperty):
                 linthresh=1e-7
             ),
             s=[ms_init * 4 ** n for n in gas_mass_scaled],
-            marker='.', edgecolors='none', zorder=4
+            marker='.', edgecolors='none', zorder=4, alpha=0.2
         )
 
         kwargs_stars = dict(
             color='aqua',
-            marker='.',
+            marker='^',
             edgecolors='none',
             s=[ms_init / 2 * 4 ** n for n in stars_mass_scaled],
             alpha=0.2,
