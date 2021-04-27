@@ -105,7 +105,7 @@ class CentralBH(HaloProperty):
             edgecolors='none',
             s=[ms_init / 2 * 4 ** n for n in stars_mass_scaled],
             alpha=0.3,
-            zorder=3
+            zorder=1
         )
 
         kwargs_bh = dict(
@@ -115,10 +115,10 @@ class CentralBH(HaloProperty):
             s=[ms_init*4**n for n in bh_mass_scaled]
         )
 
-        s001 = axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
-        s002 = axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
-        s003 = axes[0, 0].scatter(stars_coord[:, 0], stars_coord[:, 1], **kwargs_stars)
-        s004 = axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], facecolors='none', marker='.', edgecolors='g', s=ms_init*4**bh_mass_scaled[central_bh_index])
+        axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
+        axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
+        axes[0, 0].scatter(stars_coord[:, 0], stars_coord[:, 1], **kwargs_stars)
+        axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], facecolors='none', marker='.', edgecolors='g', s=ms_init*4**bh_mass_scaled[central_bh_index])
         axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
 
         axes[0, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
@@ -128,10 +128,10 @@ class CentralBH(HaloProperty):
         axes[0, 0].set_aspect('equal')
         axes[0, 0].set_ylabel('y [Mpc]')
 
-        s011 = axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
-        s012 = axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
-        s013 = axes[0, 1].scatter(stars_coord[:, 2], stars_coord[:, 1], **kwargs_stars)
-        s014 = axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], facecolors='none', marker='.', edgecolors='g', s=ms_init*4**bh_mass_scaled[central_bh_index])
+        axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
+        axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
+        axes[0, 1].scatter(stars_coord[:, 2], stars_coord[:, 1], **kwargs_stars)
+        axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], facecolors='none', marker='.', edgecolors='g', s=ms_init*4**bh_mass_scaled[central_bh_index])
         axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
 
         axes[0, 1].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
@@ -141,10 +141,10 @@ class CentralBH(HaloProperty):
         axes[0, 1].set_aspect('equal')
         axes[0, 1].set_xlabel('z [Mpc]')
 
-        s101 = axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
-        s102 = axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
-        s103 = axes[1, 0].scatter(stars_coord[:, 0], stars_coord[:, 2], **kwargs_stars)
-        s104 = axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], facecolors='none', marker='.', edgecolors='g', s=ms_init*4**bh_mass_scaled[central_bh_index])
+        axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
+        axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
+        axes[1, 0].scatter(stars_coord[:, 0], stars_coord[:, 2], **kwargs_stars)
+        axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], facecolors='none', marker='.', edgecolors='g', s=ms_init*4**bh_mass_scaled[central_bh_index])
         axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], facecolor='lime', alpha=0.3, edgecolor='none', zorder=1))
 
         axes[1, 0].axhline(y=0, linestyle='--', linewidth=0.5, color='k', zorder=1)
@@ -156,34 +156,5 @@ class CentralBH(HaloProperty):
         axes[1, 0].set_ylabel('z [Mpc]')
 
         axes[1, 1].remove()
-
-        a_slider = Slider(plt.axes([0.1, 0.05, 0.8, 0.05]),  # the axes object containing the slider
-                          'a',  # the name of the slider parameter
-                          3,  # minimal value of the parameter
-                          40,  # maximal value of the parameter
-                          valinit=ms_init  # initial value of the parameter
-                          )
-
-        # Next we define a function that will be executed each time the value
-        # indicated by the slider changes. The variable of this function will
-        # be assigned the value of the slider.
-        def update(a):
-            s001.set_sizes([a * 4 ** n for n in gas_mass_scaled])
-            s002.set_sizes([a * 4 ** n for n in bh_mass_scaled])
-            s003.set_sizes([a * 4 ** n for n in stars_mass_scaled])
-            s004.set_sizes(a * 4 ** bh_mass_scaled[central_bh_index])
-            s011.set_sizes([a * 4 ** n for n in gas_mass_scaled])
-            s012.set_sizes([a * 4 ** n for n in bh_mass_scaled])
-            s013.set_sizes([a * 4 ** n for n in stars_mass_scaled])
-            s014.set_sizes(a * 4 ** bh_mass_scaled[central_bh_index])
-            s101.set_sizes([a * 4 ** n for n in gas_mass_scaled])
-            s102.set_sizes([a * 4 ** n for n in bh_mass_scaled])
-            s103.set_sizes([a * 4 ** n for n in stars_mass_scaled])
-            s104.set_sizes(a * 4 ** bh_mass_scaled[central_bh_index])
-            fig.canvas.draw_idle()  # redraw the plot
-
-        # the final step is to specify that the slider needs to
-        # execute the above function when its value changes
-        a_slider.on_changed(update)
 
         plt.show()
