@@ -153,8 +153,8 @@ class CentralBH(HaloProperty):
         axes[1, 0].set_xlabel('x [Mpc]')
         axes[1, 0].set_ylabel('z [Mpc]')
 
-        a_slider = Slider(axes[1, 1],  # the axes object containing the slider
-                          'new_ms',  # the name of the slider parameter
+        a_slider = Slider(plt.axes([0.1, 0.05, 0.8, 0.05]),  # the axes object containing the slider
+                          'a',  # the name of the slider parameter
                           3,  # minimal value of the parameter
                           40,  # maximal value of the parameter
                           valinit=ms_init  # initial value of the parameter
@@ -163,19 +163,19 @@ class CentralBH(HaloProperty):
         # Next we define a function that will be executed each time the value
         # indicated by the slider changes. The variable of this function will
         # be assigned the value of the slider.
-        def update(new_ms):
-            s001.set_sizes([new_ms * 4 ** n for n in gas_mass_scaled])
-            s002.set_sizes([new_ms * 4 ** n for n in bh_mass_scaled])
-            s003.set_sizes([new_ms * 4 ** n for n in stars_mass_scaled])
-            s004.set_sizes([new_ms * 4 ** n for n in bh_mass_scaled[central_bh_index]])
-            s011.set_sizes([new_ms * 4 ** n for n in gas_mass_scaled])
-            s012.set_sizes([new_ms * 4 ** n for n in bh_mass_scaled])
-            s013.set_sizes([new_ms * 4 ** n for n in stars_mass_scaled])
-            s014.set_sizes([new_ms * 4 ** n for n in bh_mass_scaled[central_bh_index]])
-            s101.set_sizes([new_ms * 4 ** n for n in gas_mass_scaled])
-            s102.set_sizes([new_ms * 4 ** n for n in bh_mass_scaled])
-            s103.set_sizes([new_ms * 4 ** n for n in stars_mass_scaled])
-            s104.set_sizes([new_ms * 4 ** n for n in bh_mass_scaled[central_bh_index]])
+        def update(a):
+            s001.set_sizes([a * 4 ** n for n in gas_mass_scaled])
+            s002.set_sizes([a * 4 ** n for n in bh_mass_scaled])
+            s003.set_sizes([a * 4 ** n for n in stars_mass_scaled])
+            s004.set_sizes([a * 4 ** n for n in bh_mass_scaled[central_bh_index]])
+            s011.set_sizes([a * 4 ** n for n in gas_mass_scaled])
+            s012.set_sizes([a * 4 ** n for n in bh_mass_scaled])
+            s013.set_sizes([a * 4 ** n for n in stars_mass_scaled])
+            s014.set_sizes([a * 4 ** n for n in bh_mass_scaled[central_bh_index]])
+            s101.set_sizes([a * 4 ** n for n in gas_mass_scaled])
+            s102.set_sizes([a * 4 ** n for n in bh_mass_scaled])
+            s103.set_sizes([a * 4 ** n for n in stars_mass_scaled])
+            s104.set_sizes([a * 4 ** n for n in bh_mass_scaled[central_bh_index]])
             fig.canvas.draw_idle()  # redraw the plot
 
         # the final step is to specify that the slider needs to
