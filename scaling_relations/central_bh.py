@@ -71,7 +71,7 @@ class CentralBH(HaloProperty):
         gas_mass = sw_data.gas.masses[mask_gas]
         gas_mass_scaled = (gas_mass - gas_mass.min()) / (gas_mass.max() - gas_mass.min())
         print(f"Plotting {len(mask_gas):d} gas particles")
-        print("Gas mass - max, min:", gas_mass.max(), gas_mass.min())
+        print(f"Gas mass: max {gas_mass.max().to('Msun'):.2E}, min {gas_mass.min().to('Msun'):.2E}")
 
         fig = plt.figure(figsize=(3, 3))
         gs = fig.add_gridspec(2, 2, hspace=0., wspace=0.)
@@ -98,7 +98,7 @@ class CentralBH(HaloProperty):
         axes[0, 0].scatter(gas_coord[:, 0], gas_coord[:, 1], **kwargs_gas)
         axes[0, 0].scatter(bh_coord[:, 0], bh_coord[:, 1], **kwargs_bh)
         axes[0, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1], color='brown', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
-        axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], color='brown', clip_on=False, alpha=0.5, edgecolor='none'))
+        axes[0, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='brown', alpha=0.2, edgecolor='none'))
 
         axes[0, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
@@ -110,7 +110,7 @@ class CentralBH(HaloProperty):
         axes[0, 1].scatter(gas_coord[:, 2], gas_coord[:, 1], **kwargs_gas)
         axes[0, 1].scatter(bh_coord[:, 2], bh_coord[:, 1], **kwargs_bh)
         axes[0, 1].scatter(bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1], color='brown', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
-        axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], color='brown', clip_on=False, alpha=0.5, edgecolor='none'))
+        axes[0, 1].add_patch(plt.Circle((bh_coord[central_bh_index, 2], bh_coord[central_bh_index, 1]), bh_smoothing_lenghts[central_bh_index], facecolor='brown', alpha=0.2, edgecolor='none'))
 
         axes[0, 1].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[0, 1].axvline(x=0, linestyle='--', linewidth=1, color='grey')
@@ -122,7 +122,7 @@ class CentralBH(HaloProperty):
         axes[1, 0].scatter(gas_coord[:, 0], gas_coord[:, 2], **kwargs_gas)
         axes[1, 0].scatter(bh_coord[:, 0], bh_coord[:, 2], **kwargs_bh)
         axes[1, 0].scatter(bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2], color='brown', marker='*', edgecolors='none', s=10*4**bh_mass_scaled[central_bh_index])
-        axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], color='brown', clip_on=False, alpha=0.5, edgecolor='none'))
+        axes[1, 0].add_patch(plt.Circle((bh_coord[central_bh_index, 0], bh_coord[central_bh_index, 2]), bh_smoothing_lenghts[central_bh_index], facecolor='brown', alpha=0.2, edgecolor='none'))
 
         axes[1, 0].axhline(y=0, linestyle='--', linewidth=1, color='grey')
         axes[1, 0].axvline(x=0, linestyle='--', linewidth=1, color='grey')
