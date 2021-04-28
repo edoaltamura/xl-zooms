@@ -202,6 +202,7 @@ class TemperatureDensity(HaloProperty):
             bins=[density_bins, temperature_bins]
         )
         vmax = np.max(H)
+        print(vmax)
         mappable = axes[0, 1].pcolormesh(
             density_edges, temperature_edges, H.T,
             norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
