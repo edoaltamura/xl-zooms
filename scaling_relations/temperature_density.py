@@ -111,36 +111,23 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.densities_before_last_agnevent.convert_to_physical()
         sw_data.gas.densities_at_last_agnevent.convert_to_physical()
 
-        index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
-            0]
+
 
         gamma = 5 / 3
 
         if agn_time is None:
+            index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
+                0]
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
             temperature = sw_data.gas.temperatures.to('K').value[index]
-        elif agn_time == 'before':
-            density = sw_data.gas.densities_before_last_agnevent
-            density[density <= 0] = np.nan
-            number_density = (density / mh).to('cm**-3').value[index]
-            A = sw_data.gas.entropies_before_last_agnevent * sw_data.gas.masses
-            A[A <= 0] = np.nan
-            rho = density
-            temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
-            temperature = temperature.to('K').value[index]
 
-            number_density = number_density[~np.isnan(number_density)]
-            temperature = temperature[~np.isnan(temperature)]
-        elif agn_time == 'after':
-            density = sw_data.gas.densities_before_last_agnevent
-            density[density <= 0] = np.nan
-            number_density = (density / mh).to('cm**-3').value[index]
-            A = sw_data.gas.entropies_at_last_agnevent * sw_data.gas.masses
-            A[A <= 0] = np.nan
-            rho = density
-            temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
-            temperature = temperature.to('K').value[index]
-            temperature[temperature <= 0] = np.nan
+        elif agn_time == 'before':
+            index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1) & (sw_data.gas.densities_before_last_agnevent > 0))[0]
+            density = sw_data.gas.densities_before_last_agnevent[index]
+            number_density = (density / mh).to('cm**-3').value
+            A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.gas.masses[index]
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
+            temperature = temperature.to('K').value
 
         print(number_density, temperature)
 
