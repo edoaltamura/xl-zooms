@@ -120,20 +120,20 @@ class TemperatureDensity(HaloProperty):
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
             temperature = sw_data.gas.temperatures.to('K').value[index]
         elif agn_time == 'before':
-            number_density = sw_data.gas.densities_before_last_agnevent
-            number_density[number_density <= 0] = np.nan
-            number_density = (sw_data.gas.densities_before_last_agnevent / mh).to('cm**-3').value[index]
+            density = sw_data.gas.densities_before_last_agnevent
+            density[density <= 0] = np.nan
+            number_density = (density / mh).to('cm**-3').value[index]
             A = sw_data.gas.entropies_before_last_agnevent * sw_data.gas.masses
-            rho = sw_data.gas.densities_before_last_agnevent
+            rho = density
             temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value[index]
             temperature[temperature <= 0] = np.nan
         elif agn_time == 'after':
-            number_density = sw_data.gas.densities_before_last_agnevent
-            number_density[number_density <= 0] = np.nan
-            number_density = (sw_data.gas.densities_at_last_agnevent / mh).to('cm**-3').value[index]
+            density = sw_data.gas.densities_before_last_agnevent
+            density[density <= 0] = np.nan
+            number_density = (density / mh).to('cm**-3').value[index]
             A = sw_data.gas.entropies_at_last_agnevent * sw_data.gas.masses
-            rho = sw_data.gas.densities_at_last_agnevent
+            rho = density
             temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value[index]
             temperature[temperature <= 0] = np.nan
