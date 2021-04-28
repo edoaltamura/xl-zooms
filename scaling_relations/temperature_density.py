@@ -6,6 +6,7 @@ from matplotlib import pyplot as plt
 import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
+from matplotlib.colors import LogNorm
 
 from .halo_property import HaloProperty
 from register import Zoom, Tcut_halogas, default_output_directory, args
