@@ -140,7 +140,7 @@ class TemperatureDensity(HaloProperty):
             temperature = temperature.to('K').value[index]
             temperature[temperature <= 0] = np.nan
 
-        print(number_density, temperature)
+        print(number_density[~np.isnan(number_density)], temperature)
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
