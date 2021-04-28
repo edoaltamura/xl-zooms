@@ -108,11 +108,31 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.temperatures.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
+        sw_data.gas.densities_before_last_agnevent.convert_to_physical()
+        sw_data.gas.densities_at_last_agnevent.convert_to_physical()
 
         index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
             0]
-        number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
-        temperature = sw_data.gas.temperatures.to('K').value[index]
+
+        gamma = 5 / 3
+
+        if agn_time is None:
+            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
+            temperature = sw_data.gas.temperatures.to('K').value[index]
+        elif agn_time == 'before':
+            number_density = (sw_data.gas.densities_before_last_agnevent / mh).to('cm**-3').value[index]
+            number_density[number_density < 0] = np.nan
+            A = sw_data.gas.entropies_before_last_agnevent
+            rho = sw_data.gas.densities_before_last_agnevent
+            temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
+            temperature = temperature.to('K').value[index]
+        elif agn_time == 'after':
+            number_density = (sw_data.gas.densities_at_last_agnevent / mh).to('cm**-3').value[index]
+            number_density[number_density < 0] = np.nan
+            A = sw_data.gas.entropies_at_last_agnevent
+            rho = sw_data.gas.densities_at_last_agnevent
+            temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
+            temperature = temperature.to('K').value[index]
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
