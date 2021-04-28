@@ -129,8 +129,6 @@ class TemperatureDensity(HaloProperty):
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
-        print(number_density[number_density==0], temperature[temperature==0])
-
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
         agn_flag = agn_flag > 0
@@ -146,8 +144,8 @@ class TemperatureDensity(HaloProperty):
         y = temperature
 
         # Set the limits of the figure.
-        # assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
-        # assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
+        assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
+        assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
         density_bounds = [1e-6, 1e4]  # in nh/cm^3
         temperature_bounds = [1e3, 1e10]  # in K
