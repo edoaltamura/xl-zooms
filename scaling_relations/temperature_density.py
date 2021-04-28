@@ -129,6 +129,14 @@ class TemperatureDensity(HaloProperty):
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
+        elif agn_time == 'after':
+            index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1) & (sw_data.gas.densities_at_last_agnevent > 0))[0]
+            density = sw_data.gas.densities_at_last_agnevent[index]
+            number_density = (density / mh).to('cm**-3').value
+            A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.gas.masses[index]
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
+            temperature = temperature.to('K').value
+
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
         agn_flag = agn_flag > 0
