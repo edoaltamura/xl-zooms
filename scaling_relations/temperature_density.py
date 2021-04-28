@@ -89,6 +89,7 @@ class TemperatureDensity(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
+            agn_time: str = None,
             **kwargs
     ):
         aperture_fraction = args.aperture_percent / 100
@@ -239,7 +240,7 @@ class TemperatureDensity(HaloProperty):
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
         fig.suptitle(
             (
-                f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
+                f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
                 f"Keywords: {''.join(args.keywords)}\n"
                 f"Central FoF group only"
