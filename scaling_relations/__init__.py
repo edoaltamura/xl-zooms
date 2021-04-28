@@ -10,3 +10,4 @@ from .entropies import Entropies
 from .spherical_overdensities import SphericalOverdensities
 
 from .central_bh import CentralBH
+from .temperature_density import TemperatureDensity

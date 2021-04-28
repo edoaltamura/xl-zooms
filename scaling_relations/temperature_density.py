@@ -1,15 +1,16 @@
-import os.path
 import numpy as np
-from warnings import warn
-from unyt import unyt_quantity, kpc, Mpc, mh
+from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp
 from matplotlib import pyplot as plt
-import matplotlib.colors as colors
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import Zoom, calibration_zooms, args
+
+mean_molecular_weight = 0.59
+mean_atomic_weight_per_free_electron = 1.14
+
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
@@ -21,10 +22,11 @@ def latex_float(f):
     else:
         return float_str
 
+
 def draw_adiabats(axes, density_bins, temperature_bins):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
     # temperature_interps *= unyt.K * unyt.boltzmann_constant
-    entropy_interps = temperature_interps * unyt.K * unyt.boltzmann_constant / (density_interps / unyt.cm ** 3) ** (2 / 3)
+    entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
@@ -90,7 +92,8 @@ class TemperatureDensity(HaloProperty):
             mask_radius_r500: float = 1,
             **kwargs
     ):
-        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, mask_radius_r500=mask_radius_r500, **kwargs)
+        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
+                                                      mask_radius_r500=mask_radius_r500, **kwargs)
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
@@ -105,7 +108,8 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.temperatures.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        index = np.where((sw_data.black_holes.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[0]
+        index = np.where((sw_data.black_holes.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
+            0]
         number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
         temperature = (sw_data.gas.temperatures).to('K').value[index]
 
@@ -147,11 +151,8 @@ class TemperatureDensity(HaloProperty):
             ax.loglog()
             draw_adiabats(ax, density_bins, temperature_bins)
             # Draw cross-hair marker
-            M500 = object_database['M500'].mean()
-            R500 = object_database['R500'].mean()
-            nH_500 = object_database['nH_500'].mean().value
-            T500 = (unyt.G * mean_molecular_weight * M500 * unyt.mass_proton / R500 / 2 / unyt.boltzmann_constant).to(
-                'K').value
+
+            T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
             ax.hlines(y=T500, xmin=nH_500 / 5, xmax=nH_500 * 5, colors='k', linestyles='-', lw=1)
             ax.vlines(x=nH_500, ymin=T500 / 10, ymax=T500 * 10, colors='k', linestyles='-', lw=1)
 
@@ -248,9 +249,9 @@ class TemperatureDensity(HaloProperty):
 
         if not args.quiet:
             plt.show()
-        fig.savefig(
-            f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
-            dpi=300
-        )
+        # fig.savefig(
+        #     f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
+        #     dpi=300
+        # )
 
         plt.close()
