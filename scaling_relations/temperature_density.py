@@ -143,7 +143,7 @@ class TemperatureDensity(HaloProperty):
         x = number_density
         y = temperature
 
-        print(temperature)
+        print(temperature.max())
 
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
