@@ -124,6 +124,7 @@ class TemperatureDensity(HaloProperty):
             density[density <= 0] = np.nan
             number_density = (density / mh).to('cm**-3').value[index]
             A = sw_data.gas.entropies_before_last_agnevent * sw_data.gas.masses
+            A[A <= 0] = np.nan
             rho = density
             temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value[index]
@@ -133,6 +134,7 @@ class TemperatureDensity(HaloProperty):
             density[density <= 0] = np.nan
             number_density = (density / mh).to('cm**-3').value[index]
             A = sw_data.gas.entropies_at_last_agnevent * sw_data.gas.masses
+            A[A <= 0] = np.nan
             rho = density
             temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value[index]
