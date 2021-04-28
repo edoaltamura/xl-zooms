@@ -129,7 +129,7 @@ class TemperatureDensity(HaloProperty):
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
-        print(number_density[number_density<0], temperature[temperature<0])
+        print(number_density[number_density==0], temperature[temperature==0])
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
