@@ -102,16 +102,16 @@ class TemperatureDensity(HaloProperty):
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
-        sw_data.black_holes.radial_distances.convert_to_physical()
+        sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.temperatures.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        index = np.where((sw_data.black_holes.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
+        index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
             0]
         number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
-        temperature = (sw_data.gas.temperatures).to('K').value[index]
+        temperature = sw_data.gas.temperatures.to('K').value[index]
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
