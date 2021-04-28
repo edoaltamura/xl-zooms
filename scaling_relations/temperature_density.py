@@ -143,8 +143,6 @@ class TemperatureDensity(HaloProperty):
         x = number_density
         y = temperature
 
-        print(temperature.max())
-
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
         assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
@@ -182,7 +180,7 @@ class TemperatureDensity(HaloProperty):
             x, y, bins=[density_bins, temperature_bins]
         )
 
-        vmax = np.max(H)
+        vmax = np.max(H) + 1
         mappable = axes[0, 0].pcolormesh(
             density_edges, temperature_edges, H.T,
             norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
@@ -201,8 +199,7 @@ class TemperatureDensity(HaloProperty):
             y[(snii_flag & ~agn_flag)],
             bins=[density_bins, temperature_bins]
         )
-        vmax = np.max(H)
-        print(vmax)
+        vmax = np.max(H) + 1
         mappable = axes[0, 1].pcolormesh(
             density_edges, temperature_edges, H.T,
             norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
@@ -221,7 +218,7 @@ class TemperatureDensity(HaloProperty):
             y[(agn_flag & ~snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-        vmax = np.max(H)
+        vmax = np.max(H) + 1
         mappable = axes[1, 1].pcolormesh(
             density_edges, temperature_edges, H.T,
             norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
@@ -240,7 +237,7 @@ class TemperatureDensity(HaloProperty):
             y[(agn_flag & snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-        vmax = np.max(H)
+        vmax = np.max(H) + 1
         mappable = axes[1, 0].pcolormesh(
             density_edges, temperature_edges, H.T,
             norm=LogNorm(vmin=1, vmax=vmax), cmap='Purples_r', alpha=0.6
