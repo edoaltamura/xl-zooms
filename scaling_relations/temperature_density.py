@@ -121,10 +121,10 @@ class TemperatureDensity(HaloProperty):
             temperature = sw_data.gas.temperatures.to('K').value[index]
         elif agn_time == 'before':
             density = sw_data.gas.densities_before_last_agnevent
-            density[density <= 0] = np.nan
+            density = density[density > 0]
             number_density = (density / mh).to('cm**-3').value[index]
             A = sw_data.gas.entropies_before_last_agnevent * sw_data.gas.masses
-            A[A <= 0] = np.nan
+            A = A[A > 0]
             rho = density
             temperature = mean_molecular_weight * (gamma - 1) * (A * rho ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value[index]
