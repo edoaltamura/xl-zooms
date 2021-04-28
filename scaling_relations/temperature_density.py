@@ -89,16 +89,16 @@ class TemperatureDensity(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            mask_radius_r500: float = 1,
             **kwargs
     ):
+        aperture_fraction = args.aperture_percent / 100
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
-                                                      mask_radius_r500=mask_radius_r500, **kwargs)
+                                                      mask_radius_r500=aperture_fraction, **kwargs)
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
 
-        aperture_fraction = mask_radius_r500 * r500
+        aperture_fraction = aperture_fraction * r500
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
@@ -241,7 +241,7 @@ class TemperatureDensity(HaloProperty):
             (
                 f"Aperture = {aperture_fraction:.2f} $R_{{500}}$\t\t"
                 f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-                f"{''.join(args.keywords)}\n"
+                f"Keywords: {''.join(args.keywords)}\n"
                 f"Central FoF group only"
             ),
             fontsize=7

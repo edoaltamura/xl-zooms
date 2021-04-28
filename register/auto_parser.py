@@ -61,6 +61,15 @@ parser.add_argument(
     action='store_true'
 )
 
+parser.add_argument(
+    '-a',
+    '--aperture-percent',
+    type=int,
+    default=100,
+    required=False,
+    choices=list(range(3, 300))
+)
+
 # Note: you can still add routine-specific arguments after calling this
 # The final version of the `args` objects will be created when calling
 # `args = parser.parse_args()`
