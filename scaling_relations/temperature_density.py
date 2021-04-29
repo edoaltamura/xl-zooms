@@ -346,7 +346,7 @@ class TemperatureDensity(HaloProperty):
         z_agn_recent_text = ''
         if agn_time is not None:
             z_agn_recent_text = (
-                f"Selecting gas heated since redshift: {z_agn_recent} "
+                f"Selecting gas {agn_time:s} heated since redshift: {z_agn_recent} "
                 f"(a = {1 / (z_agn_recent + 1):.2f})\n"
             )
 
