@@ -31,7 +31,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
-    levels = [10 ** k for k in range(-4, 5)]
+    levels = [1e-4, 1e-2, 1, 1e2, 1e4]
     levels += [float(k500)]
     levels.sort()
     print(levels)
@@ -57,7 +57,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
             logvert = np.log10(path.vertices)
 
             # Align with same x-value
-            if levels[i] > 1:
+            if levels[i] < 1:
                 log_rho = -4.5
             else:
                 log_rho = 16
