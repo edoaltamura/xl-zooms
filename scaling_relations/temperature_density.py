@@ -166,7 +166,7 @@ class TemperatureDensity(HaloProperty):
         assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
         density_bounds = [1e-6, 1e4]  # in nh/cm^3
-        temperature_bounds = [40, 1e10]  # in K
+        temperature_bounds = [1e3, 1e10]  # in K
         bins = 256
 
         # Make the norm object to define the image stretch
