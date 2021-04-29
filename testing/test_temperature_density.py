@@ -10,6 +10,6 @@ print(
     gf.process_single_halo(
         path_to_snap=snap,
         path_to_catalogue=cat,
-        agn_time='before'
+        agn_time='after'
     )
 )
