@@ -11,6 +11,7 @@ from literature import Cosmology
 
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
+cosmic_hydrogen_mass_fraction = 0.76 * Cosmology().fb
 
 
 def latex_float(f):
@@ -158,10 +159,12 @@ class TemperatureDensity(HaloProperty):
         rho_crit = unyt_quantity(
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
-        nH_500 = (rho_crit * 500 / mh).to('cm**-3')
+        nH_500 = (cosmic_hydrogen_mass_fraction * rho_crit * 500 / mh).to('cm**-3')
 
         x = number_density
         y = temperature
+
+        print("Number of particles being plotted", len(x), len(y))
 
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
