@@ -11,7 +11,7 @@ from literature import Cosmology
 
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
-cosmic_hydrogen_mass_fraction = 0.76 * Cosmology().fb
+primordial_hydrogen_mass_fraction = 0.76
 
 
 def latex_float(f):
@@ -119,7 +119,7 @@ class TemperatureDensity(HaloProperty):
         if agn_time is None:
             index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
                 0]
-            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index]
+            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
         elif agn_time == 'before':
@@ -129,7 +129,7 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.densities_before_last_agnevent > 0) &
                 (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 1)))
             )[0]
-            density = sw_data.gas.densities_before_last_agnevent[index]
+            density = sw_data.gas.densities_before_last_agnevent[index] * primordial_hydrogen_mass_fraction
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
@@ -143,7 +143,7 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.densities_at_last_agnevent > 0) &
                 (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 1)))
             )[0]
-            density = sw_data.gas.densities_at_last_agnevent[index]
+            density = sw_data.gas.densities_at_last_agnevent[index] * primordial_hydrogen_mass_fraction
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
@@ -159,7 +159,7 @@ class TemperatureDensity(HaloProperty):
         rho_crit = unyt_quantity(
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
-        nH_500 = (cosmic_hydrogen_mass_fraction * rho_crit * 500 / mh).to('cm**-3')
+        nH_500 = (primordial_hydrogen_mass_fraction * Cosmology().fb * rho_crit * 500 / mh).to('cm**-3')
 
         x = number_density
         y = temperature
