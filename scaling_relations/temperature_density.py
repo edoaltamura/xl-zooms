@@ -24,7 +24,7 @@ def latex_float(f):
         return float_str
 
 
-def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
+def draw_adiabats(axes, density_bins, temperature_bins, k500):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
     # temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
@@ -32,8 +32,8 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
 
     # Define entropy levels to plot
     levels = [10 ** k for k in range(-4, 5)]
-    if K500 is not None:
-        levels += [float(K500.value)]
+    levels += [float(k500)]
+    print(levels)
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
     contours = axes.contour(
         density_interps,
@@ -114,8 +114,6 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.densities_before_last_agnevent.convert_to_physical()
         sw_data.gas.densities_at_last_agnevent.convert_to_physical()
 
-
-
         gamma = 5 / 3
 
         if agn_time is None:
@@ -134,7 +132,8 @@ class TemperatureDensity(HaloProperty):
             density = sw_data.gas.densities_before_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
+                        gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
         elif agn_time == 'after':
@@ -147,7 +146,8 @@ class TemperatureDensity(HaloProperty):
             density = sw_data.gas.densities_at_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (gamma - 1) * mh / boltzmann_constant
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
+                        gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
@@ -191,11 +191,10 @@ class TemperatureDensity(HaloProperty):
             T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
             ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
             ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
-            K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)).to('keV*cm**2')
+            K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
+                        2 / 3)).to('keV*cm**2')
 
-            print(K500)
-
-            draw_adiabats(ax, density_bins, temperature_bins, K500=K500)
+            draw_adiabats(ax, density_bins, temperature_bins, k500=K500.value)
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1)
