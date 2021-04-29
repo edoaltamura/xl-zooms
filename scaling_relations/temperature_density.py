@@ -165,8 +165,6 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
-        sw_data.gas.densities_before_last_agnevent.convert_to_physical()
-        sw_data.gas.densities_at_last_agnevent.convert_to_physical()
 
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
@@ -188,7 +186,7 @@ class TemperatureDensity(HaloProperty):
             density = sw_data.gas.densities_before_last_agnevent[index] * a_heat[index] ** (-3.) * primordial_hydrogen_mass_fraction
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
+            temperature = mean_molecular_weight * (gamma - 1) * (A * (density / primordial_hydrogen_mass_fraction) ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
@@ -202,7 +200,7 @@ class TemperatureDensity(HaloProperty):
             density = sw_data.gas.densities_at_last_agnevent[index] * a_heat[index] ** (-3.) * primordial_hydrogen_mass_fraction
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
+            temperature = mean_molecular_weight * (gamma - 1) * (A * (density / primordial_hydrogen_mass_fraction) ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
@@ -220,7 +218,7 @@ class TemperatureDensity(HaloProperty):
         x = number_density
         y = temperature
 
-        print("Number of particles being plotted", len(x), len(y))
+        print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
