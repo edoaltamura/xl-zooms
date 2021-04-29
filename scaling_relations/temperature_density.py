@@ -9,6 +9,8 @@ from .halo_property import HaloProperty
 from register import Zoom, calibration_zooms, args
 from literature import Cosmology
 
+z_agn_recent = 0.5
+
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 primordial_hydrogen_mass_fraction = 0.76
@@ -27,7 +29,6 @@ def latex_float(f):
 
 def draw_adiabats(axes, density_bins, temperature_bins):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    # temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
@@ -81,6 +82,61 @@ def draw_adiabats(axes, density_bins, temperature_bins):
     )
 
 
+def draw_k500(axes, density_bins, temperature_bins, k500):
+    density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
+    entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
+    entropy_interps = entropy_interps.to('keV*cm**2').value
+
+    # Define entropy levels to plot
+    levels = [float(k500.value)]
+    fmt = {levels[0]: f'$K_{{500}} = {levels[0]:.1f}$ keV cm$^2$'}
+    contours = axes.contour(
+        density_interps,
+        temperature_interps,
+        entropy_interps,
+        levels,
+        colors='red',
+        linewidths=0.3,
+    )
+
+    # work with logarithms for loglog scale
+    # middle of the figure:
+    # xmin, xmax, ymin, ymax = plt.axis()
+    # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+
+    label_pos = []
+    i = 0
+    for line in contours.collections:
+        for path in line.get_paths():
+            logvert = np.log10(path.vertices)
+
+            # Align with same x-value
+            if levels[i] > 1:
+                log_rho = -4.5
+            else:
+                log_rho = 15
+
+            logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+            i += 1
+
+            # find closest point
+            logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
+            min_ind = np.argmin(logdist)
+            label_pos.append(10 ** logvert[min_ind, :])
+
+    # Draw contour labels
+    axes.clabel(
+        contours,
+        inline=True,
+        inline_spacing=3,
+        rightside_up=True,
+        colors='red',
+        fontsize=5,
+        fmt=fmt,
+        manual=label_pos,
+    )
+
+
 class TemperatureDensity(HaloProperty):
 
     def __init__(self):
@@ -112,9 +168,11 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.densities.convert_to_physical()
         sw_data.gas.densities_before_last_agnevent.convert_to_physical()
         sw_data.gas.densities_at_last_agnevent.convert_to_physical()
+        sw_data.gas.entropies.convert_to_physical()
+        sw_data.gas.entropies_before_last_agnevent.convert_to_physical()
+        sw_data.gas.entropies_at_last_agnevent.convert_to_physical()
 
         gamma = 5 / 3
-        z_agn_recent = 0.5
 
         if agn_time is None:
             index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
@@ -133,7 +191,7 @@ class TemperatureDensity(HaloProperty):
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
-                        gamma - 1) * mh / boltzmann_constant
+                    gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
         elif agn_time == 'after':
@@ -147,7 +205,7 @@ class TemperatureDensity(HaloProperty):
             number_density = (density / mh).to('cm**-3').value
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
-                        gamma - 1) * mh / boltzmann_constant
+                    gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
@@ -194,12 +252,13 @@ class TemperatureDensity(HaloProperty):
             ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
             ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
-                        2 / 3)).to('keV*cm**2')
+                    2 / 3)).to('keV*cm**2')
 
-            n_adiabats = np.array([1.e-5, 1.]) * nH_500.units
-            T_adiabats = (K500 * n_adiabats ** (2 / 3) / boltzmann_constant).to('K')
-            ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
+            # n_adiabats = np.array([1.e-5, 1.]) * nH_500.units
+            # T_adiabats = (K500 * n_adiabats ** (2 / 3) / boltzmann_constant).to('K')
+            # ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
 
+            draw_k500(ax, density_bins, temperature_bins, K500)
             draw_adiabats(ax, density_bins, temperature_bins)
 
             # Star formation threshold
@@ -287,8 +346,8 @@ class TemperatureDensity(HaloProperty):
             (
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-                f"Selecting gas heated since redshift: {z_agn_recent} (a = {1 / (z_agn_recent + 1):.2f})\n"
-                f"Central FoF group only"
+                f"Selecting gas heated since redshift: {z_agn_recent} (a = {1 / (z_agn_recent + 1):.2f})\n" if agn_time is None else ''
+                                                                                                                                     f"Central FoF group only"
             ),
             fontsize=7
         )
