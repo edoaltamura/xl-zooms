@@ -195,7 +195,7 @@ class TemperatureDensity(HaloProperty):
 
             nlog_adiabats = np.array([-4., 0.])
             Tlog_adiabats = np.log10(K500 / boltzmann_constant) + (2 / 3) * nlog_adiabats
-            ax.plot(10. ** nlog_adiabats, 10. ** Tlog_adiabats, linewidth=1, color='r')
+            ax.plot(10. ** nlog_adiabats, Tlog_adiabats, linewidth=1, color='r')
 
             draw_adiabats(ax, density_bins, temperature_bins)
 
