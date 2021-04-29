@@ -33,6 +33,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
     # Define entropy levels to plot
     levels = [10 ** k for k in range(-4, 5)]
     levels += [float(k500)]
+    levels.sort()
     print(levels)
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
     contours = axes.contour(
