@@ -15,7 +15,7 @@ mean_atomic_weight_per_free_electron = 1.14
 
 def latex_float(f):
     float_str = "{0:.2g}".format(f)
-    if f < 1e-2:
+    if f < 1e-2 or f > 1e3:
         float_str = "{0:.0e}".format(f)
     if "e" in float_str:
         base, exponent = float_str.split("e")
