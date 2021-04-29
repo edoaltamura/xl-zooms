@@ -83,7 +83,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
             density_interps,
             temperature_interps,
             entropy_interps,
-            K500.value,
+            K500.value.tolist(),
             colors='red',
             linewidths=0.3,
         )
@@ -94,7 +94,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
             rightside_up=True,
             colors='red',
             fontsize=5,
-            fmt={K500.value: f'${latex_float(K500.value)}$ keV cm$^2$'},
+            fmt={float(K500.value): f'${latex_float(float(K500.value))}$ keV cm$^2$'},
         )
 
 
