@@ -183,10 +183,10 @@ class TemperatureDensity(HaloProperty):
                 (a_heat > (1 / (z_agn_recent + 1)))
             )[0]
 
-            density = sw_data.gas.densities_before_last_agnevent[index] * a_heat[index] ** (-3.) * primordial_hydrogen_mass_fraction
-            number_density = (density / mh).to('cm**-3').value
+            density = sw_data.gas.densities_before_last_agnevent[index]
+            number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * (density / primordial_hydrogen_mass_fraction) ** (5 / 3 - 1)) / (
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
@@ -197,10 +197,10 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.densities_at_last_agnevent > 0) &
                 (a_heat > (1 / (z_agn_recent + 1)))
             )[0]
-            density = sw_data.gas.densities_at_last_agnevent[index] * a_heat[index] ** (-3.) * primordial_hydrogen_mass_fraction
-            number_density = (density / mh).to('cm**-3').value
+            density = sw_data.gas.densities_at_last_agnevent[index]
+            number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * (density / primordial_hydrogen_mass_fraction) ** (5 / 3 - 1)) / (
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / boltzmann_constant
             temperature = temperature.to('K').value
 
@@ -258,7 +258,7 @@ class TemperatureDensity(HaloProperty):
             draw_adiabats(ax, density_bins, temperature_bins)
 
             # Star formation threshold
-            ax.axvline(0.1, color='k', linestyle=':', lw=1)
+            ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -293,7 +293,7 @@ class TemperatureDensity(HaloProperty):
         cax = divider.append_axes("right", size="3%", pad=0.)
         plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
         # Heating temperatures
-        axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
+        axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
         txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 1].add_artist(txt)
 
@@ -314,7 +314,7 @@ class TemperatureDensity(HaloProperty):
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
         # Heating temperatures
-        axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
+        axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
 
         # PLOT AGN+SN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -333,8 +333,8 @@ class TemperatureDensity(HaloProperty):
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
         # Heating temperatures
-        axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1)
-        axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1)
+        axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
+        axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
         fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
