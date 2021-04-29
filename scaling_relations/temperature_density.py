@@ -126,7 +126,7 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.densities_before_last_agnevent > 0) &
-                (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 10)))
+                (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 1)))
             )[0]
             density = sw_data.gas.densities_before_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value
@@ -140,7 +140,7 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.densities_at_last_agnevent > 0) &
-                (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 10)))
+                (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 1)))
             )[0]
             density = sw_data.gas.densities_at_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value
@@ -195,7 +195,7 @@ class TemperatureDensity(HaloProperty):
 
             n_adiabats = np.array([1e-4, 1]) * nH_500.units
             T_adiabats = 10 ** (np.log10(K500 / boltzmann_constant) + (2 / 3) * np.log10(n_adiabats))
-            # ax.plot(n_adiabats, T_adiabats, marker=None, linewidth=1, color='r')
+            ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
 
             draw_adiabats(ax, density_bins, temperature_bins)
 
@@ -284,7 +284,7 @@ class TemperatureDensity(HaloProperty):
             (
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-                f"Keywords: {''.join(args.keywords)}\n"
+                f"Selecting gas heated since redshift: {z_agn_recent} (a = {1 / (z_agn_recent + 1)})\n"
                 f"Central FoF group only"
             ),
             fontsize=7
