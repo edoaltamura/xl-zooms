@@ -194,7 +194,7 @@ class TemperatureDensity(HaloProperty):
                         2 / 3)).to('keV*cm**2')
 
             n_adiabats = np.array([1.e-4, 1.]) * nH_500.units
-            T_adiabats = K500 * n_adiabats ** (2 / 3) / boltzmann_constant
+            T_adiabats = (K500 * n_adiabats ** (2 / 3) / boltzmann_constant).to('K')
             ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
 
             draw_adiabats(ax, density_bins, temperature_bins)
