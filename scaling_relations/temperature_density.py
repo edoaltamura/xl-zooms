@@ -193,9 +193,9 @@ class TemperatureDensity(HaloProperty):
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                         2 / 3)).to('keV*cm**2')
 
-            n_adiabats = np.array([1e-4, 1]) * nH_500.units
-            T_adiabats = 10 ** (np.log10(K500 / boltzmann_constant) + (2 / 3) * np.log10(n_adiabats))
-            ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
+            nlog_adiabats = np.array([-4, 0])
+            Tlog_adiabats = np.log10(K500 / boltzmann_constant) + (2 / 3) * nlog_adiabats
+            ax.plot(10 ** nlog_adiabats, 10 ** Tlog_adiabats, linewidth=1, color='r')
 
             draw_adiabats(ax, density_bins, temperature_bins)
 
@@ -284,7 +284,7 @@ class TemperatureDensity(HaloProperty):
             (
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-                f"Selecting gas heated since redshift: {z_agn_recent} (a = {1 / (z_agn_recent + 1)})\n"
+                f"Selecting gas heated since redshift: {z_agn_recent} (a = {1 / (z_agn_recent + 1):.2f})\n"
                 f"Central FoF group only"
             ),
             fontsize=7
