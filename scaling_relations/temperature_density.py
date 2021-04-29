@@ -193,7 +193,9 @@ class TemperatureDensity(HaloProperty):
             ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)).to('keV*cm**2')
 
-            draw_adiabats(ax, density_bins, temperature_bins, K500=K500.to('keV*cm**2'))
+            print(K500)
+
+            draw_adiabats(ax, density_bins, temperature_bins, K500=K500)
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1)
