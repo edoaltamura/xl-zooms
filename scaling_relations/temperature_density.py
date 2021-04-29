@@ -31,6 +31,8 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
 
     # Define entropy levels to plot
     levels = [10 ** k for k in range(-4, 5)]
+    if K500 is not None:
+        levels += [float(K500.value)]
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
     contours = axes.contour(
         density_interps,
@@ -77,25 +79,6 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
         fmt=fmt,
         manual=label_pos,
     )
-
-    if K500 is not None:
-        contours_k500 = axes.contour(
-            density_interps,
-            temperature_interps,
-            entropy_interps,
-            K500.value.tolist(),
-            colors='red',
-            linewidths=0.3,
-        )
-        axes.clabel(
-            contours_k500,
-            inline=True,
-            inline_spacing=3,
-            rightside_up=True,
-            colors='red',
-            fontsize=5,
-            fmt={float(K500.value): f'${latex_float(float(K500.value))}$ keV cm$^2$'},
-        )
 
 
 class TemperatureDensity(HaloProperty):
