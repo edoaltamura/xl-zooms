@@ -9,7 +9,7 @@ from .halo_property import HaloProperty
 from register import Zoom, calibration_zooms, args
 from literature import Cosmology
 
-z_agn_recent = 0.05
+z_agn_recent = 0.5
 
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
