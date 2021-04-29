@@ -24,7 +24,7 @@ def latex_float(f):
         return float_str
 
 
-def draw_adiabats(axes, density_bins, temperature_bins, k500):
+def draw_adiabats(axes, density_bins, temperature_bins):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
     # temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
@@ -32,9 +32,6 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
 
     # Define entropy levels to plot
     levels = [1e-4, 1e-2, 1, 1e2, 1e4]
-    levels += [float(k500)]
-    levels.sort()
-    print(levels)
     fmt = {value: f'${latex_float(value)}$ keV cm$^2$' for value in levels}
     contours = axes.contour(
         density_interps,
@@ -60,7 +57,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
             if levels[i] > 1:
                 log_rho = -4.5
             else:
-                log_rho = 9
+                log_rho = 15
 
             logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
             i += 1
@@ -116,6 +113,7 @@ class TemperatureDensity(HaloProperty):
         sw_data.gas.densities_at_last_agnevent.convert_to_physical()
 
         gamma = 5 / 3
+        z_agn_recent = 0.5
 
         if agn_time is None:
             index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
@@ -128,7 +126,7 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.densities_before_last_agnevent > 0) &
-                (sw_data.gas.last_agnfeedback_scale_factors > (2 / 3))  # z < 0.5
+                (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 10)))
             )[0]
             density = sw_data.gas.densities_before_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value
@@ -142,7 +140,7 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.densities_at_last_agnevent > 0) &
-                (sw_data.gas.last_agnfeedback_scale_factors > (2 / 3))  # z < 0.5
+                (sw_data.gas.last_agnfeedback_scale_factors > (1 / (z_agn_recent + 10)))
             )[0]
             density = sw_data.gas.densities_at_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value
@@ -194,6 +192,11 @@ class TemperatureDensity(HaloProperty):
             ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                         2 / 3)).to('keV*cm**2')
+
+            n_adiabats = list(ax.get_xlim())
+            print(n_adiabats)
+            T_adiabats = 10 ** (np.log10(K500 / boltzmann_constant) + (2 / 3) * n_adiabats)
+            ax.plot(n_adiabats, T_adiabats, m='none', lw=1, c='r')
 
             draw_adiabats(ax, density_bins, temperature_bins, k500=K500.value)
 
