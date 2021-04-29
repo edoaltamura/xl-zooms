@@ -198,7 +198,7 @@ class TemperatureDensity(HaloProperty):
             T_adiabats = 10 ** (np.log10(K500 / boltzmann_constant) + (2 / 3) * n_adiabats)
             ax.plot(n_adiabats, T_adiabats, m='none', lw=1, c='r')
 
-            draw_adiabats(ax, density_bins, temperature_bins, k500=K500.value)
+            draw_adiabats(ax, density_bins, temperature_bins)
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1)
