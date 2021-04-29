@@ -39,7 +39,6 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
         levels[::2],
         colors='aqua',
         linewidths=0.3,
-        alpha=0.6
     )
 
     # work with logarithms for loglog scale
@@ -77,7 +76,6 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
-        alpha=0.6
     )
 
     if K500 is not None:
@@ -88,7 +86,6 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
             K500.value,
             colors='red',
             linewidths=0.3,
-            alpha=0.6
         )
         axes.clabel(
             contours_k500,
@@ -98,7 +95,6 @@ def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
             colors='red',
             fontsize=5,
             fmt={K500.value: f'${latex_float(K500.value)}$ keV cm$^2$'},
-            alpha=0.6
         )
 
 
