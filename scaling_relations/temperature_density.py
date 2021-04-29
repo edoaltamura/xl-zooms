@@ -196,7 +196,7 @@ class TemperatureDensity(HaloProperty):
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                         2 / 3)).to('keV*cm**2')
 
-            n_adiabats = np.array([1.e-4, 1.]) * nH_500.units
+            n_adiabats = np.array([1.e-5, 1.]) * nH_500.units
             T_adiabats = (K500 * n_adiabats ** (2 / 3) / boltzmann_constant).to('K')
             ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
 
