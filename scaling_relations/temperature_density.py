@@ -40,7 +40,7 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
         density_interps,
         temperature_interps,
         entropy_interps,
-        levels[::2],
+        levels,
         colors='aqua',
         linewidths=0.3,
     )
