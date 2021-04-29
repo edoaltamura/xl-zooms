@@ -191,7 +191,7 @@ class TemperatureDensity(HaloProperty):
             T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
             ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
             ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
-            K500 = (T500 * K / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)).to('keV*cm**2')
+            K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)).to('keV*cm**2')
 
             draw_adiabats(ax, density_bins, temperature_bins, K500=K500.to('keV*cm**2'))
 
