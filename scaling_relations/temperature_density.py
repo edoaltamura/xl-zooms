@@ -23,7 +23,7 @@ def latex_float(f):
         return float_str
 
 
-def draw_adiabats(axes, density_bins, temperature_bins):
+def draw_adiabats(axes, density_bins, temperature_bins, K500 = None):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
     # temperature_interps *= unyt.K * unyt.boltzmann_constant
     entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
@@ -38,7 +38,8 @@ def draw_adiabats(axes, density_bins, temperature_bins):
         entropy_interps,
         levels[::2],
         colors='aqua',
-        linewidths=0.3
+        linewidths=0.3,
+        alpha=0.6
     )
 
     # work with logarithms for loglog scale
@@ -75,8 +76,30 @@ def draw_adiabats(axes, density_bins, temperature_bins):
         colors='aqua',
         fontsize=5,
         fmt=fmt,
-        manual=label_pos
+        manual=label_pos,
+        alpha=0.6
     )
+
+    if K500 is not None:
+        contours_k500 = axes.contour(
+            density_interps,
+            temperature_interps,
+            entropy_interps,
+            K500.value,
+            colors='red',
+            linewidths=0.3,
+            alpha=0.6
+        )
+        axes.clabel(
+            contours_k500,
+            inline=True,
+            inline_spacing=3,
+            rightside_up=True,
+            colors='red',
+            fontsize=5,
+            fmt={K500.value: f'${latex_float(K500.value)}$ keV cm$^2$'},
+            alpha=0.6
+        )
 
 
 class TemperatureDensity(HaloProperty):
@@ -183,12 +206,15 @@ class TemperatureDensity(HaloProperty):
 
         for ax in axes.flat:
             ax.loglog()
-            draw_adiabats(ax, density_bins, temperature_bins)
-            # Draw cross-hair marker
 
+            # Draw cross-hair marker
             T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
-            ax.hlines(y=T500, xmin=nH_500 / 5, xmax=nH_500 * 5, colors='k', linestyles='-', lw=1)
-            ax.vlines(x=nH_500, ymin=T500 / 10, ymax=T500 * 10, colors='k', linestyles='-', lw=1)
+            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
+            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
+            K500 = T500 * boltzmann_constant / nH_500 ** (2 / 3)
+
+            draw_adiabats(ax, density_bins, temperature_bins, K500=K500)
+
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1)
