@@ -57,10 +57,10 @@ def draw_adiabats(axes, density_bins, temperature_bins, k500):
             logvert = np.log10(path.vertices)
 
             # Align with same x-value
-            if levels[i] < 1:
+            if levels[i] > 1:
                 log_rho = -4.5
             else:
-                log_rho = 16
+                log_rho = 3
 
             logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
             i += 1
