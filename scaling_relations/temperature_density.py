@@ -46,8 +46,8 @@ def draw_adiabats(axes, density_bins, temperature_bins):
 
     # work with logarithms for loglog scale
     # middle of the figure:
-    # xmin, xmax, ymin, ymax = plt.axis()
-    # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+    xmin, xmax, ymin, ymax = plt.axis()
+    logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
     label_pos = []
     i = 0
@@ -61,7 +61,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
             else:
                 log_rho = 15
 
-            logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+            # logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
             i += 1
 
             # find closest point
@@ -101,8 +101,8 @@ def draw_k500(axes, density_bins, temperature_bins, k500):
 
     # work with logarithms for loglog scale
     # middle of the figure:
-    # xmin, xmax, ymin, ymax = plt.axis()
-    # logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+    xmin, xmax, ymin, ymax = plt.axis()
+    logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
     label_pos = []
     i = 0
@@ -116,7 +116,7 @@ def draw_k500(axes, density_bins, temperature_bins, k500):
             else:
                 log_rho = 15
 
-            logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+            # logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
             i += 1
 
             # find closest point
@@ -342,12 +342,20 @@ class TemperatureDensity(HaloProperty):
 
         fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
+
+        z_agn_recent_text = ''
+        if agn_time is not None:
+            z_agn_recent_text = (
+                f"Selecting gas heated since redshift: {z_agn_recent} "
+                "(a = {1 / (z_agn_recent + 1):.2f})\n"
+            )
+
         fig.suptitle(
             (
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-                f"Selecting gas heated since redshift: {z_agn_recent} (a = {1 / (z_agn_recent + 1):.2f})\n" if agn_time is None else ''
-                                                                                                                                     f"Central FoF group only"
+                f"{z_agn_recent_text:s}"
+                f"Central FoF group only"
             ),
             fontsize=7
         )
