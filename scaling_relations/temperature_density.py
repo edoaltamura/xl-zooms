@@ -296,6 +296,8 @@ class TemperatureDensity(HaloProperty):
         for i, (t, l) in enumerate(zip(ticks, ticklab)):
             if t < 100:
                 ticklab[i] = f'{int(t):d}'
+            else:
+                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
         cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
@@ -322,6 +324,8 @@ class TemperatureDensity(HaloProperty):
             for i, (t, l) in enumerate(zip(ticks, ticklab)):
                 if t < 100:
                     ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
             cbar.ax.set_yticklabels(ticklab)
 
         # Heating temperatures
@@ -348,6 +352,8 @@ class TemperatureDensity(HaloProperty):
         for i, (t, l) in enumerate(zip(ticks, ticklab)):
             if t < 100:
                 ticklab[i] = f'{int(t):d}'
+            else:
+                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
         cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
@@ -374,6 +380,8 @@ class TemperatureDensity(HaloProperty):
         for i, (t, l) in enumerate(zip(ticks, ticklab)):
             if t < 100:
                 ticklab[i] = f'{int(t):d}'
+            else:
+                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
         cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
