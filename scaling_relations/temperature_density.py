@@ -9,8 +9,6 @@ from .halo_property import HaloProperty
 from register import Zoom, calibration_zooms, args
 from literature import Cosmology
 
-z_agn_recent = 0.1
-
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 primordial_hydrogen_mass_fraction = 0.76
@@ -148,6 +146,8 @@ class TemperatureDensity(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None,
             agn_time: str = None,
+            z_agn_start: float = 0.1,
+            z_agn_end: float = 0.,
             **kwargs
     ):
         aperture_fraction = args.aperture_percent / 100
@@ -170,8 +170,12 @@ class TemperatureDensity(HaloProperty):
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
 
         if agn_time is None:
-            index = np.where((sw_data.gas.radial_distances < aperture_fraction) & (sw_data.gas.fofgroup_ids == 1))[
-                0]
+            index = np.where(
+                (sw_data.gas.radial_distances < aperture_fraction) &
+                (sw_data.gas.fofgroup_ids == 1) &
+                (a_heat > (1 / (z_agn_start + 1))) &
+                (a_heat < (1 / (z_agn_end + 1)))
+            )[0]
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
@@ -180,7 +184,8 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.densities_before_last_agnevent > 0) &
-                (a_heat > (1 / (z_agn_recent + 1)))
+                (a_heat > (1 / (z_agn_start + 1))) &
+                (a_heat < (1 / (z_agn_end + 1)))
             )[0]
 
             density = sw_data.gas.densities_before_last_agnevent[index]
@@ -195,7 +200,8 @@ class TemperatureDensity(HaloProperty):
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.densities_at_last_agnevent > 0) &
-                (a_heat > (1 / (z_agn_recent + 1)))
+                (a_heat > (1 / (z_agn_start + 1))) &
+                (a_heat < (1 / (z_agn_end + 1)))
             )[0]
             density = sw_data.gas.densities_at_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
@@ -249,10 +255,6 @@ class TemperatureDensity(HaloProperty):
             ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                     2 / 3)).to('keV*cm**2')
-
-            # n_adiabats = np.array([1.e-5, 1.]) * nH_500.units
-            # T_adiabats = (K500 * n_adiabats ** (2 / 3) / boltzmann_constant).to('K')
-            # ax.plot(n_adiabats, T_adiabats, linewidth=1, color='r')
 
             draw_k500(ax, density_bins, temperature_bins, K500)
             draw_adiabats(ax, density_bins, temperature_bins)
@@ -339,12 +341,10 @@ class TemperatureDensity(HaloProperty):
         fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
 
-        z_agn_recent_text = ''
-        if agn_time is not None:
-            z_agn_recent_text = (
-                f"Selecting gas {agn_time:s} heated since redshift: {z_agn_recent} "
-                f"(a = {1 / (z_agn_recent + 1):.2f})\n"
-            )
+        z_agn_recent_text = (
+            f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
+            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+        )
 
         fig.suptitle(
             (
