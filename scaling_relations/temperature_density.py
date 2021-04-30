@@ -342,9 +342,14 @@ class TemperatureDensity(HaloProperty):
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
 
         z_agn_recent_text = (
-            f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
-            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-        )
+                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+            )
+        if agn_time is not None:
+            z_agn_recent_text = (
+                f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
+                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+            )
 
         fig.suptitle(
             (
