@@ -125,7 +125,7 @@ class EntropyComparison(HaloProperty):
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
         assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
-        entropy_bounds = [1e-4, 1e4]  # in keV*cm**2
+        entropy_bounds = [10, 1e6]  # in keV*cm**2
         bins = 256
 
         # Make the norm object to define the image stretch
@@ -201,8 +201,6 @@ class EntropyComparison(HaloProperty):
                     ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
             cbar.ax.set_yticklabels(ticklab)
 
-        # Heating temperatures
-        axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
         txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 1].add_artist(txt)
 
