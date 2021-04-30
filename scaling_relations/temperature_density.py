@@ -40,6 +40,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
         levels,
         colors='aqua',
         linewidths=0.3,
+        alpha=0.5
     )
 
     # work with logarithms for loglog scale
@@ -77,6 +78,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
+        alpha=0.5
     )
 
 
@@ -95,6 +97,7 @@ def draw_k500(axes, density_bins, temperature_bins, k500):
         levels,
         colors='red',
         linewidths=0.3,
+        alpha=0.5
     )
 
     # work with logarithms for loglog scale
@@ -132,6 +135,7 @@ def draw_k500(axes, density_bins, temperature_bins, k500):
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
+        alpha=0.5
     )
 
 
