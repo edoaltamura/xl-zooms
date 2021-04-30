@@ -148,7 +148,7 @@ class EntropyComparison(HaloProperty):
         )
 
         fig = plt.figure(figsize=(5, 5))
-        gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.35)
+        gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.45)
         axes = gs.subplots()
 
         for ax in axes.flat:
