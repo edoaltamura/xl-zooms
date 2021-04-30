@@ -201,6 +201,7 @@ class EntropyComparison(HaloProperty):
         cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
         ticklab = cbar.ax.get_yticklabels()
         ticks = cbar.ax.get_yticks()
+        print(ticklab, ticks)
         for i, (t, l) in enumerate(zip(ticks, ticklab)):
             if t < 100:
                 ticklab[i] = f'{int(t):d}'
