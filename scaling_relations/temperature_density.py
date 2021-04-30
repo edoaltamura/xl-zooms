@@ -276,7 +276,14 @@ class TemperatureDensity(HaloProperty):
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
         divider = make_axes_locatable(axes[0, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+        ticklab = cbar.ax.get_yticklabels()
+        ticks = cbar.ax.get_yticks()
+        for i, (t, l) in enumerate(zip(ticks, ticklab)):
+            if t < 100:
+                ticklab[i] = f'{int(t):d}'
+        cbar.ax.set_yticklabels(ticklab)
+
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
 
@@ -286,14 +293,23 @@ class TemperatureDensity(HaloProperty):
             y[(snii_flag & ~agn_flag)],
             bins=[density_bins, temperature_bins]
         )
-        vmax = np.max(H) + 1
-        mappable = axes[0, 1].pcolormesh(
-            density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
-        )
-        divider = make_axes_locatable(axes[0, 1])
-        cax = divider.append_axes("right", size="3%", pad=0.)
-        plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
+
+        if (H > 0).any():
+            vmax = np.max(H) + 1
+            mappable = axes[0, 1].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
+            )
+            divider = make_axes_locatable(axes[0, 1])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+            cbar.ax.set_yticklabels(ticklab)
+
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
         txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
@@ -312,7 +328,14 @@ class TemperatureDensity(HaloProperty):
         )
         divider = make_axes_locatable(axes[1, 1])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+        ticklab = cbar.ax.get_yticklabels()
+        ticks = cbar.ax.get_yticks()
+        for i, (t, l) in enumerate(zip(ticks, ticklab)):
+            if t < 100:
+                ticklab[i] = f'{int(t):d}'
+        cbar.ax.set_yticklabels(ticklab)
+
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
         # Heating temperatures
@@ -331,7 +354,14 @@ class TemperatureDensity(HaloProperty):
         )
         divider = make_axes_locatable(axes[1, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+        ticklab = cbar.ax.get_yticklabels()
+        ticks = cbar.ax.get_yticks()
+        for i, (t, l) in enumerate(zip(ticks, ticklab)):
+            if t < 100:
+                ticklab[i] = f'{int(t):d}'
+        cbar.ax.set_yticklabels(ticklab)
+
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
         # Heating temperatures
