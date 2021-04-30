@@ -71,6 +71,19 @@ class EntropyComparison(HaloProperty):
         entropy_snapshot = boltzmann_constant * temperature / electron_number_density ** (2 / 3)
         entropy_snapshot = entropy_snapshot.to('keV*cm**2').value
 
+        # Entropy of all particles in aperture
+        index = np.where(
+            (sw_data.gas.radial_distances < aperture_fraction) &
+            (sw_data.gas.fofgroup_ids == 1) &
+            (sw_data.gas.temperatures > 1e5)
+        )[0]
+
+        electron_number_density = (sw_data.gas.densities / mh / mean_molecular_weight).to('cm**-3')[index]
+        temperature = sw_data.gas.temperatures.to('K')[index]
+        entropy_snapshot_all = boltzmann_constant * temperature / electron_number_density ** (2 / 3)
+        entropy_snapshot_all = entropy_snapshot_all.to('keV*cm**2').value
+
+
         if agn_time == 'before':
 
             index = np.where(
@@ -118,6 +131,7 @@ class EntropyComparison(HaloProperty):
 
         x = entropy_snapshot
         y = entropy_heat
+        z = sw_data.metadata.z
 
         print("Number of particles being plotted", len(x))
 
@@ -175,20 +189,23 @@ class EntropyComparison(HaloProperty):
         axes[0, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT SN HEATED PARTICLES ===============================================
-        axes[0, 1].hist(
-            y,
-            bins=np.logspace(
-                np.log10(y.min()), np.log10(y.max()), 100
-            )
+        hist_bins = np.logspace(
+            np.log10(np.min(np.r_[x, y, entropy_snapshot_all])),
+            np.log10(np.max(np.r_[x, y, entropy_snapshot_all])),
+            100
         )
+        axes[0, 1].hist(entropy_snapshot_all, bins=hist_bins, histtype='step', label=f'All hot gas at z={z:.2f}')
+        axes[0, 1].hist(x, bins=hist_bins, histtype='step', label=f'Heated gas at z={z:.2f}')
+        axes[0, 1].hist(y, bins=hist_bins, histtype='step', label='Heated gas at feedback time')
         axes[0, 1].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
         axes[0, 1].set_xlabel(f"Entropy ({agn_time:s} heating) [keV cm$^2$]")
         axes[0, 1].set_ylabel('Number of particles')
+        axes[0, 1].legend()
 
         # PLOT AGN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & ~snii_flag)],
-            y[(agn_flag & ~snii_flag)],
+            x[agn_flag],
+            y[agn_flag],
             bins=[entropy_bins, entropy_bins]
         )
         vmax = np.max(H) + 1
