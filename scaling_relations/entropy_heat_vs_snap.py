@@ -139,7 +139,7 @@ class EntropyComparison(HaloProperty):
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
         assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
-        entropy_bounds = [10, 1e4]  # in keV*cm**2
+        entropy_bounds = [1e-4, 1e6]  # in keV*cm**2
         bins = 256
 
         # Make the norm object to define the image stretch
