@@ -171,10 +171,6 @@ class TemperatureDensity(HaloProperty):
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
 
-        conditions = np.logical_and(
-
-        )
-
         if agn_time is None:
 
             if z_agn_start < 7.2 or z_agn_end > 0:
