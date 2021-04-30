@@ -171,24 +171,33 @@ class TemperatureDensity(HaloProperty):
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
 
+        conditions = np.logical_and(
+            (sw_data.gas.radial_distances < aperture_fraction),
+            (sw_data.gas.fofgroup_ids == 1)
+        )
+
         if agn_time is None:
-            index = np.where(
-                (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
-                (a_heat > (1 / (z_agn_start + 1))) &
-                (a_heat < (1 / (z_agn_end + 1)))
-            )[0]
+
+            if z_agn_start > 10 and z_agn_end < 1e-3:
+                conditions = np.logical_and(
+                    conditions,
+                    (a_heat > (1 / (z_agn_start + 1))),
+                    (a_heat < (1 / (z_agn_end + 1)))
+                )
+
+            index = np.where(conditions)[0]
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
         elif agn_time == 'before':
-            index = np.where(
-                (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
-                (sw_data.gas.densities_before_last_agnevent > 0) &
-                (a_heat > (1 / (z_agn_start + 1))) &
+
+            conditions = np.logical_and(
+                conditions,
+                (sw_data.gas.densities_before_last_agnevent > 0),
+                (a_heat > (1 / (z_agn_start + 1))),
                 (a_heat < (1 / (z_agn_end + 1)))
-            )[0]
+            )
+            index = np.where(conditions)[0]
 
             density = sw_data.gas.densities_before_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
@@ -198,13 +207,15 @@ class TemperatureDensity(HaloProperty):
             temperature = temperature.to('K').value
 
         elif agn_time == 'after':
-            index = np.where(
-                (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
-                (sw_data.gas.densities_at_last_agnevent > 0) &
-                (a_heat > (1 / (z_agn_start + 1))) &
+
+            conditions = np.logical_and(
+                conditions,
+                (sw_data.gas.densities_at_last_agnevent > 0),
+                (a_heat > (1 / (z_agn_start + 1))),
                 (a_heat < (1 / (z_agn_end + 1)))
-            )[0]
+            )
+            index = np.where(conditions)[0]
+
             density = sw_data.gas.densities_at_last_agnevent[index]
             number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
