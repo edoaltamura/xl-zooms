@@ -135,7 +135,7 @@ class EntropyComparison(HaloProperty):
 
         fig = plt.figure(figsize=(5, 5))
         gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.2)
-        axes = gs.subplots(sharex='col', sharey='row')
+        axes = gs.subplots()
 
         for ax in axes.flat:
             ax.loglog()
@@ -177,6 +177,8 @@ class EntropyComparison(HaloProperty):
         # PLOT SN HEATED PARTICLES ===============================================
         axes[0, 1].hist(y, bins=entropy_bins)
         axes[0, 1].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        axes[0, 1].set_xlabel(f"Entropy ({agn_time:s} heating) [keV cm$^2$]")
+        axes[0, 1].set_ylabel('Number of particles')
 
         # PLOT AGN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
