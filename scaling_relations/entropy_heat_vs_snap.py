@@ -175,7 +175,12 @@ class EntropyComparison(HaloProperty):
         axes[0, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT SN HEATED PARTICLES ===============================================
-        axes[0, 1].hist(y, bins=entropy_bins)
+        axes[0, 1].hist(
+            y,
+            bins=np.logspace(
+                np.log10(y.min()), np.log10(y.max()), 100
+            )
+        )
         axes[0, 1].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
         axes[0, 1].set_xlabel(f"Entropy ({agn_time:s} heating) [keV cm$^2$]")
         axes[0, 1].set_ylabel('Number of particles')
@@ -236,13 +241,15 @@ class EntropyComparison(HaloProperty):
         axes[1, 0].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
         axes[1, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
-        fig.text(0.5, 0.04, f"Entropy (z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}) [keV cm$^2$]", ha='center')
+        fig.text(0.5, 0.04,
+                 f"Entropy (z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}) [keV cm$^2$]",
+                 ha='center')
         fig.text(0.04, 0.5, f"Entropy ({agn_time:s} heating) [keV cm$^2$]", va='center', rotation='vertical')
 
         z_agn_recent_text = (
-                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-            )
+            f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+        )
         if agn_time is not None:
             z_agn_recent_text = (
                 f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
