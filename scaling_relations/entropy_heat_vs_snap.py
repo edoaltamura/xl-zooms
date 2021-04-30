@@ -95,7 +95,7 @@ class EntropyComparison(HaloProperty):
             )[0]
 
             density = sw_data.gas.densities_before_last_agnevent[index]
-            number_density = (density / mh / mean_molecular_weight).to('cm**-3')
+            electron_number_density = (density / mh / mean_molecular_weight).to('cm**-3')
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / boltzmann_constant
@@ -115,7 +115,7 @@ class EntropyComparison(HaloProperty):
             )[0]
 
             density = sw_data.gas.densities_at_last_agnevent[index]
-            number_density = (density / mh / mean_molecular_weight).to('cm**-3')
+            electron_number_density = (density / mh / mean_molecular_weight).to('cm**-3')
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / boltzmann_constant
