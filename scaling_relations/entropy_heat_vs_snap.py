@@ -145,10 +145,6 @@ class EntropyComparison(HaloProperty):
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                     2 / 3)).to('keV*cm**2')
 
-            # Star formation threshold
-            ax.axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
-            ax.axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
-
         # PLOT ALL PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[entropy_bins, entropy_bins]
@@ -175,9 +171,12 @@ class EntropyComparison(HaloProperty):
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
+        axes[0, 0].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        axes[0, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT SN HEATED PARTICLES ===============================================
-        axes[0, 1].remove()
+        axes[0, 1].hist(y, bins=entropy_bins)
+        axes[0, 1].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT AGN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -204,6 +203,8 @@ class EntropyComparison(HaloProperty):
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
+        axes[1, 1].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        axes[1, 1].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT AGN+SN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -230,6 +231,8 @@ class EntropyComparison(HaloProperty):
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
+        axes[1, 0].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        axes[1, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
 
         fig.text(0.5, 0.04, f"Entropy (z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}) [keV cm$^2$]", ha='center')
         fig.text(0.04, 0.5, f"Entropy ({agn_time:s} heating) [keV cm$^2$]", va='center', rotation='vertical')
