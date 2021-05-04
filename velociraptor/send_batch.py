@@ -129,7 +129,10 @@ for i, run_directory in enumerate(args.directories):
     print(f"Input data limit: {sizeof_fmt(job_limit)} per batch.")
 
     number_splits = snapshot_sizes.sum() // job_limit + 1
-    split_indices = np.split(np.arange(number_snapshots), number_splits)
+    chunk_items = np.ones(number_splits + 1, dtype=np.int) * len(snapshot_sizes) // number_splits
+    chunk_items[-1] = len(snapshot_sizes) % number_splits
+    print(chunk_items)
+    split_indices = np.split(np.arange(number_snapshots), chunk_items)
 
     for i, split_batch in enumerate(split_indices):
         print((
