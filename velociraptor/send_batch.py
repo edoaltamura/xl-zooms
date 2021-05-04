@@ -117,7 +117,7 @@ for i, run_directory in enumerate(args.directories):
         raise FileNotFoundError(f"No snapshot file found in {snaps_path}")
     else:
         print((
-            f"Found {number_snapshots:d} snapshots in directory "
+            f"\nFound {number_snapshots:d} snapshots in directory "
             f"{snaps_path}.\n"
             f"Total file size = {sizeof_fmt(snapshot_sizes.sum())}\n"
             f"Average file size = {sizeof_fmt(snapshot_sizes.mean())}\n"
