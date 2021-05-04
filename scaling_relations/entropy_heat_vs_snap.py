@@ -25,6 +25,22 @@ def latex_float(f):
         return float_str
 
 
+def add_identity(axes, *line_args, **line_kwargs):
+    identity, = axes.plot([], [], *line_args, **line_kwargs)
+
+    def callback(axes):
+        low_x, high_x = axes.get_xlim()
+        low_y, high_y = axes.get_ylim()
+        low = max(low_x, low_y)
+        high = min(high_x, high_y)
+        identity.set_data([low, high], [low, high])
+
+    callback(axes)
+    axes.callbacks.connect('xlim_changed', callback)
+    axes.callbacks.connect('ylim_changed', callback)
+    return axes
+
+
 class EntropyComparison(HaloProperty):
 
     def __init__(self):
@@ -82,7 +98,6 @@ class EntropyComparison(HaloProperty):
         temperature = sw_data.gas.temperatures.to('K')[index]
         entropy_snapshot_all = boltzmann_constant * temperature / electron_number_density ** (2 / 3)
         entropy_snapshot_all = entropy_snapshot_all.to('keV*cm**2').value
-
 
         if agn_time == 'before':
 
@@ -187,6 +202,7 @@ class EntropyComparison(HaloProperty):
         axes[0, 0].add_artist(txt)
         axes[0, 0].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
         axes[0, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        add_identity(axes[0, 0], color='k', linestyle='--', lw=1, zorder=0)
 
         # PLOT SN HEATED PARTICLES ===============================================
         hist_bins = np.logspace(
@@ -218,7 +234,7 @@ class EntropyComparison(HaloProperty):
         cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
         ticklab = cbar.ax.get_yticklabels()
         ticks = cbar.ax.get_yticks()
-        print(ticklab, ticks)
+
         for i, (t, l) in enumerate(zip(ticks, ticklab)):
             if t < 100:
                 ticklab[i] = f'{int(t):d}'
@@ -230,6 +246,7 @@ class EntropyComparison(HaloProperty):
         axes[1, 1].add_artist(txt)
         axes[1, 1].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
         axes[1, 1].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        add_identity(axes[1, 1], color='k', linestyle='--', lw=1, zorder=0)
 
         # PLOT AGN+SN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -258,6 +275,7 @@ class EntropyComparison(HaloProperty):
         axes[1, 0].add_artist(txt)
         axes[1, 0].axvline(K500, color='k', linestyle=':', lw=1, zorder=0)
         axes[1, 0].axhline(K500, color='k', linestyle=':', lw=1, zorder=0)
+        add_identity(axes[1, 0], color='k', linestyle='--', lw=1, zorder=0)
 
         fig.text(0.5, 0.04,
                  f"Entropy (z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}) [keV cm$^2$]",
@@ -266,7 +284,7 @@ class EntropyComparison(HaloProperty):
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+            f"({1 / (z_agn_end + 1):.2f} < a < {1 / (z_agn_start + 1):.2f})\n"
         )
         if agn_time is not None:
             z_agn_recent_text = (
