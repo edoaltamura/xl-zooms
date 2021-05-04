@@ -128,7 +128,7 @@ for i, run_directory in enumerate(args.directories):
     job_limit = 800 * 1024 * 1024 * 1024
     print(f"Input data limit: {sizeof_fmt(job_limit)} per batch.")
 
-    number_splits = snapshot_sizes.sum() // job_limit + 1
+    number_splits = snapshot_sizes.sum() // job_limit
     chunk_items = np.ones(number_splits + 1, dtype=np.int) * len(snapshot_sizes) // number_splits
     chunk_items[-1] = len(snapshot_sizes) % number_splits
     chunk_items = np.cumsum(chunk_items)
