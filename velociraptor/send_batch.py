@@ -1,4 +1,4 @@
-import sys
+from tqdm import tqdm
 import numpy as np
 from h5py import File as h5file
 import argparse
@@ -73,12 +73,6 @@ def make_stf_invoke(input_file: str, output_file: str):
     )
 
 
-def chunks(lst, n):
-    """Yield successive n-sized chunks from lst."""
-    for i in range(0, len(lst), n):
-        yield lst[i:i + n]
-
-
 for i, run_directory in enumerate(args.directories):
     snaps_path = os.path.join(run_directory, 'snapshots')
     catalogues_path = os.path.join(run_directory, 'stf')
@@ -89,7 +83,7 @@ for i, run_directory in enumerate(args.directories):
     snapshot_files = []
     snapshot_sizes = []
     stf_subdirs = []
-    for file in os.listdir(snaps_path):
+    for file in tqdm(os.listdir(snaps_path), desc='Collecting snapshots'):
 
         file_path = os.path.join(snaps_path, file)
         stf_subdir = os.path.join(catalogues_path, file.rstrip('.hdf5'))
