@@ -14,6 +14,14 @@ parser.add_argument(
     required=True
 )
 
+parser.add_argument(
+    '-i',
+    '--no-snapid',
+    default=False,
+    required=False,
+    action='store_true'
+)
+
 args = parser.parse_args()
 
 # Velociraptor invokes
@@ -83,15 +91,18 @@ for i, run_directory in enumerate(args.directories):
     snapshot_files = []
     snapshot_sizes = []
     stf_subdirs = []
-    for file in tqdm(os.listdir(snaps_path), desc='Collecting snapshots'):
+    for file in tqdm(os.listdir(snaps_path), desc='Identify snapshots'):
 
         file_path = os.path.join(snaps_path, file)
         stf_subdir = os.path.join(catalogues_path, file.rstrip('.hdf5'))
 
         if os.path.isfile(file_path) and file.endswith('.hdf5'):
 
-            with h5file(file_path, 'r') as f:
-                output_type = f['Header'].attrs['SelectOutput'].decode('ascii')
+            if not args.no_snapid:
+                with h5file(file_path, 'r') as f:
+                    output_type = f['Header'].attrs['SelectOutput'].decode('ascii')
+            else:
+                output_type = 'Default'
 
             # Check if the file is snapshot (keep) or snipshot (skip)
             if output_type == 'Default':
