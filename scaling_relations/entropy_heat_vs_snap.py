@@ -6,7 +6,7 @@ from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
 
 from .halo_property import HaloProperty
-from register import Zoom, calibration_zooms, args
+from register import Zoom, calibration_zooms, args, cooling_table
 from literature import Cosmology
 
 mean_molecular_weight = 0.59
@@ -39,6 +39,9 @@ def add_identity(axes, *line_args, **line_kwargs):
     axes.callbacks.connect('xlim_changed', callback)
     axes.callbacks.connect('ylim_changed', callback)
     return axes
+
+
+
 
 
 class EntropyComparison(HaloProperty):

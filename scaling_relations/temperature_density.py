@@ -5,8 +5,14 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
 
+
+import scipy.stats as stat
+import scipy.interpolate as sci
+import h5py as h5
+
+
 from .halo_property import HaloProperty
-from register import Zoom, calibration_zooms, args
+from register import Zoom, calibration_zooms, args, cooling_table
 from literature import Cosmology
 
 mean_molecular_weight = 0.59
@@ -131,6 +137,175 @@ def draw_k500(axes, density_bins, temperature_bins, k500):
         inline_spacing=3,
         rightside_up=True,
         colors='red',
+        fontsize=5,
+        fmt=fmt,
+        manual=label_pos,
+    )
+
+
+def get_axis_tables():
+    """
+    Grabs the cooling table information
+    """
+    g = h5.File(cooling_table, "r")
+
+    density_bins = g["/TableBins/DensityBins"][:]
+    U_bins = g["/TableBins/InternalEnergyBins"][:]
+    Z_bins = g["/TableBins/MetallicityBins"][:]
+    z_bins = g["/TableBins/RedshiftBins"][:]
+    T_bins = g["/TableBins/TemperatureBins"][:]
+
+    return density_bins, U_bins, Z_bins, z_bins, T_bins
+
+
+def get_cooling_rates():
+    """
+    Grabs the cooling table information
+    """
+    g = h5.File(cooling_table, "r")
+
+    return g["/Tdep/Cooling"]
+
+
+def get_heating_rates():
+    """
+    Grabs the cooling table information
+    """
+    g = h5.File(cooling_table, "r")
+
+    return g["/Tdep/Heating"]
+
+
+def calculate_mean_cooling_times(data):
+    tff = np.sqrt(3 * np.pi / (32 * G * data.gas.densities))
+
+    data_cooling = get_cooling_rates()
+    data_heating = get_heating_rates()
+
+    cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
+    heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
+
+    net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
+
+    axis = get_axis_tables()
+    nH_grid = axis[0]
+    T_grid = axis[4]
+    Z_grid = axis[2]
+
+    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
+                                              fill_value=-30)
+
+    hydrogen_fraction = data.gas.element_mass_fractions.hydrogen
+    gas_nH = (data.gas.densities / mh * hydrogen_fraction).to(cm ** -3)
+    log_gas_nH = np.log10(gas_nH)
+    temperature = data.gas.temperatures
+    log_gas_T = np.log10(temperature)
+    log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
+
+    # construct the matrix that we input in the interpolator
+    values_to_int = np.zeros((len(log_gas_T), 3))
+    values_to_int[:, 0] = log_gas_T
+    values_to_int[:, 1] = log_gas_Z
+    values_to_int[:, 2] = log_gas_nH
+
+    net_rates_found = f_net_rates(values_to_int)
+
+    cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
+
+    tff.to("Myr")
+
+
+def draw_cooling_contours(axes, density_bins, temperature_bins):
+    density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
+
+    tff = np.sqrt(3 * np.pi / (32 * G * density_interps))
+
+    data_cooling = get_cooling_rates()
+    data_heating = get_heating_rates()
+
+    cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
+    heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
+
+    net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
+
+    axis = get_axis_tables()
+    nH_grid = axis[0]
+    T_grid = axis[4]
+    Z_grid = axis[2]
+
+    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
+                                              fill_value=-30)
+
+    hydrogen_fraction = 0.76
+    gas_nH = (density_interps / mh * hydrogen_fraction).to(cm ** -3)
+    log_gas_nH = np.log10(gas_nH)
+    temperature = temperature_interps
+    log_gas_T = np.log10(temperature)
+    # log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
+    log_gas_Z = np.log10(1 / 3)
+
+    # construct the matrix that we input in the interpolator
+    values_to_int = np.zeros((len(log_gas_T), 3))
+    values_to_int[:, 0] = log_gas_T
+    values_to_int[:, 1] = log_gas_Z
+    values_to_int[:, 2] = log_gas_nH
+
+    net_rates_found = f_net_rates(values_to_int)
+
+    cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
+
+    # tff.to("Myr")
+    # free_fall_time = np.log10(tff.to("Myr"))
+    #
+    # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
+
+    function = np.power(10., cooling_time)
+
+    # Define entropy levels to plot
+    levels = [100, 500, 1000, 5000]
+    fmt = {value: f'${value}$ Myr' for value in levels}
+    contours = axes.contour(
+        density_interps,
+        temperature_interps,
+        function,
+        levels,
+        colors='aqua',
+        linewidths=0.3,
+        alpha=0.5
+    )
+
+    # work with logarithms for loglog scale
+    # middle of the figure:
+    xmin, xmax, ymin, ymax = axes.axis()
+    logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+
+    label_pos = []
+    i = 0
+    for line in contours.collections:
+        for path in line.get_paths():
+            logvert = np.log10(path.vertices)
+
+            # Align with same x-value
+            if levels[i] > 1:
+                log_rho = -4.5
+            else:
+                log_rho = 15
+
+            # logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
+            i += 1
+
+            # find closest point
+            logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
+            min_ind = np.argmin(logdist)
+            label_pos.append(10 ** logvert[min_ind, :])
+
+    # Draw contour labels
+    axes.clabel(
+        contours,
+        inline=True,
+        inline_spacing=3,
+        rightside_up=True,
+        colors='aqua',
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
@@ -272,6 +447,7 @@ class TemperatureDensity(HaloProperty):
 
             draw_k500(ax, density_bins, temperature_bins, K500)
             draw_adiabats(ax, density_bins, temperature_bins)
+            draw_cooling_contours(ax, density_bins, temperature_bins)
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
