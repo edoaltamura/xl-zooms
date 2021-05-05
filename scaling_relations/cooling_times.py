@@ -454,7 +454,9 @@ class CoolingTimes(HaloProperty):
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
-        print(w)
+        print(x.shape, x)
+        print(y.shape, y)
+        print(w.shape, w)
         H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
         print(H)
 
