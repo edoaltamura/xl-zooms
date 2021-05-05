@@ -244,7 +244,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
 
     log_gas_nH = np.log10(density_interps)
     log_gas_T = np.log10(temperature_interps)
-    log_gas_Z = np.ones_like(temperature_interps) * np.log10(1 / 3 / 0.0133714)
+    log_gas_Z = np.ones_like(temperature_interps) * np.log10(1e-4 / 0.0133714)
 
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
