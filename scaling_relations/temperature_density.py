@@ -237,7 +237,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
                                               fill_value=-30)
 
     hydrogen_fraction = 0.76
-    gas_nH = (density_interps / mh * hydrogen_fraction).to(cm ** -3)
+    gas_nH = (density_interps * cm ** -3 * hydrogen_fraction).to('cm**-3')
     log_gas_nH = np.log10(gas_nH)
     temperature = temperature_interps
     log_gas_T = np.log10(temperature)
