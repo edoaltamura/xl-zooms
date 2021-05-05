@@ -460,7 +460,10 @@ class CoolingTimes(HaloProperty):
         # H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
         # print(H)
 
-        plt.hist(w, bins=40)
+        plt.hist(w, bins=100)
+        plt.yscale('log')
+        plt.xlabel('$\log_{10}$(Cooling time [Myr])')
+        plt.ylabel('Number of particles')
 
         # if (H > 0).any():
         #     mappable = axes[0, 0].pcolormesh(
