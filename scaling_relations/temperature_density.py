@@ -260,16 +260,16 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     #
     # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
 
-    function = (10 ** cooling_time * s).to('Myr').reshape(_density_interps.shape)
+    function = (10 ** cooling_time * s).to('Myr')
     print(function)
 
     # Define entropy levels to plot
     levels = [100, 500, 1000, 5000]
     fmt = {value: f'${value}$ Myr' for value in levels}
     contours = axes.contour(
-        density_interps,
-        temperature_interps,
-        function,
+        _density_interps,
+        _temperature_interps,
+        function.reshape(_density_interps.shape),
         levels,
         colors='lime',
         linewidths=0.3,
