@@ -260,6 +260,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
 
     function = np.power(10., cooling_time)
+    print(function)
 
     # Define entropy levels to plot
     levels = [100, 500, 1000, 5000]
