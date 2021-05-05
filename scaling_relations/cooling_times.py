@@ -455,18 +455,12 @@ class CoolingTimes(HaloProperty):
 
         # PLOT ALL PARTICLES ===============================================
         print(w)
-        H, _, _ = np.histogram2d(x, y, bins=[density_bins, temperature_bins], weights=w)
-        print(H)
-        Nparticles, _, _ = np.histogram2d(x, y, bins=[density_bins, temperature_bins])
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
-
+        H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
         print(H)
 
         if (H > 0).any():
             mappable = axes[0, 0].pcolormesh(
-                density_edges, temperature_edges, H.T,
+                density_bins, temperature_bins, H.T,
                 norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
             )
             # create an axes on the right side of ax. The width of cax will be 5%
