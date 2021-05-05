@@ -424,9 +424,9 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
         )
 
-        fig = plt.figure(figsize=(5, 5))
-        gs = fig.add_gridspec(1, 1, hspace=0.1, wspace=0.2)
-        axes = gs.subplots()
+        # fig = plt.figure(figsize=(5, 5))
+        # gs = fig.add_gridspec(1, 1, hspace=0.1, wspace=0.2)
+        # axes = gs.subplots()
 
         # for ax in axes.flat[:4]:
         #     ax.loglog()
@@ -460,7 +460,7 @@ class CoolingTimes(HaloProperty):
         # H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
         # print(H)
 
-        axes[0, 0].hist(w, bins=40)
+        plt.hist(w, bins=40)
 
         # if (H > 0).any():
         #     mappable = axes[0, 0].pcolormesh(
@@ -599,28 +599,28 @@ class CoolingTimes(HaloProperty):
         # axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         # axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
-        fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
-        fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
-
-        z_agn_recent_text = (
-                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-            )
-        if agn_time is not None:
-            z_agn_recent_text = (
-                f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
-                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-            )
-
-        fig.suptitle(
-            (
-                f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
-                f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-                f"{z_agn_recent_text:s}"
-                f"Central FoF group only"
-            ),
-            fontsize=7
-        )
+        # fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
+        # fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
+        #
+        # z_agn_recent_text = (
+        #         f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+        #         f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+        #     )
+        # if agn_time is not None:
+        #     z_agn_recent_text = (
+        #         f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
+        #         f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+        #     )
+        #
+        # fig.suptitle(
+        #     (
+        #         f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
+        #         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
+        #         f"{z_agn_recent_text:s}"
+        #         f"Central FoF group only"
+        #     ),
+        #     fontsize=7
+        # )
 
         if not args.quiet:
             plt.show()
