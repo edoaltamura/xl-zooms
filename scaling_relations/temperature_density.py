@@ -392,9 +392,17 @@ class TemperatureDensity(HaloProperty):
             K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                     2 / 3)).to('keV*cm**2')
 
-            draw_k500(ax, density_bins, temperature_bins, K500)
-            draw_adiabats(ax, density_bins, temperature_bins)
-            draw_cooling_contours(ax, density_bins, temperature_bins)
+            # Make the norm object to define the image stretch
+            contour_density_bins = np.logspace(
+                np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
+            )
+            contour_temperature_bins = np.logspace(
+                np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
+            )
+
+            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
+            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins)
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
