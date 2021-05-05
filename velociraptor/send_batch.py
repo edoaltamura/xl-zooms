@@ -179,4 +179,4 @@ for i, run_directory in enumerate(args.directories):
                     )
 
             print(epilog, file=submit_file)
-            print()
+            print(end='\n\n')
