@@ -457,7 +457,7 @@ class CoolingTimes(HaloProperty):
         H, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[density_bins, temperature_bins], weights=w
         )
-
+        print(H)
         Nparticles, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[density_bins, temperature_bins]
         )
