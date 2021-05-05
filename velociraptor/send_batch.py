@@ -93,9 +93,9 @@ for i, run_directory in enumerate(args.directories):
     stf_subdirs = []
     snapshot_numbers_sort = []
     for file in tqdm(os.listdir(snaps_path), desc='Identify snapshots'):
-        print(file)
+
         file_path = os.path.join(snaps_path, file)
-        stf_subdir = os.path.join(catalogues_path, file.rstrip('.hdf5'))
+        stf_subdir = os.path.join(catalogues_path, file.remove('.hdf5'))
 
         if os.path.isfile(file_path) and file.endswith('.hdf5'):
 
@@ -110,8 +110,8 @@ for i, run_directory in enumerate(args.directories):
                 snapshot_files.append(file_path)
                 snapshot_sizes.append(os.path.getsize(file_path))
                 stf_subdirs.append(stf_subdir)
-                print(file_path.rstrip('.hdf5').split('_')[-1])
-                snapshot_numbers_sort.append(int(file_path.rstrip('.hdf5').split('_')[-1]))
+                print(file_path.remove('.hdf5').split('_')[-1])
+                snapshot_numbers_sort.append(int(file_path.remove('.hdf5').split('_')[-1]))
 
     number_snapshots = len(snapshot_files)
 
