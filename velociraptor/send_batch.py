@@ -132,8 +132,9 @@ for i, run_directory in enumerate(args.directories):
     chunk_items = np.ones(number_splits + 1, dtype=np.int) * len(snapshot_sizes) // number_splits
     chunk_items[-1] = len(snapshot_sizes) % number_splits
     chunk_items = np.cumsum(chunk_items)
-    print(chunk_items)
+
     split_indices = np.split(np.arange(number_snapshots), chunk_items)[:-1]
+    print(number_splits)
 
     for i, split_batch in enumerate(split_indices):
         print((
@@ -141,4 +142,8 @@ for i, run_directory in enumerate(args.directories):
             f"Invoking VR on {len(split_batch)} snapshots. "
             f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}"
         ))
+        # with open(f"vr_batch_{i + 1:02d}.slurm", "w") as text_file:
+        #     print(f"Purchase Amount: {TotalAmount}", file=text_file)
+
+
 
