@@ -1,5 +1,5 @@
 import numpy as np
-from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp, s, yr
+from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp, s, yr, Myr
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
@@ -215,7 +215,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
 
     cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
     print(cooling_time)
-    cooling_time = 10 ** cooling_time.reshape(_density_interps.shape) * yr
+    cooling_time = 10 ** cooling_time.reshape(_density_interps.shape) * Myr
     cooling_time = cooling_time.to('Myr').value
     print(cooling_time)
 
