@@ -463,7 +463,7 @@ class CoolingTimes(HaloProperty):
 
         mappable = axes[0, 0].pcolormesh(
             density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=H.min(), vmax=H.max()), cmap='Greys_r'
+            norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
         )
         # create an axes on the right side of ax. The width of cax will be 5%
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
@@ -499,7 +499,7 @@ class CoolingTimes(HaloProperty):
         if (H > 0).any():
             mappable = axes[0, 1].pcolormesh(
                 density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=H.min(), vmax=H.max()), cmap='Greens_r', alpha=0.6
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greens_r', alpha=0.6
             )
             divider = make_axes_locatable(axes[0, 1])
             cax = divider.append_axes("right", size="3%", pad=0.)
@@ -534,7 +534,7 @@ class CoolingTimes(HaloProperty):
 
         mappable = axes[1, 1].pcolormesh(
             density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=H.min(), vmax=H.max()), cmap='Reds_r', alpha=0.6
+            norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
         )
         divider = make_axes_locatable(axes[1, 1])
         cax = divider.append_axes("right", size="3%", pad=0.)
@@ -569,7 +569,7 @@ class CoolingTimes(HaloProperty):
 
         mappable = axes[1, 0].pcolormesh(
             density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=H.min(), vmax=H.max()), cmap='Purples_r', alpha=0.6
+            norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
         )
         divider = make_axes_locatable(axes[1, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
