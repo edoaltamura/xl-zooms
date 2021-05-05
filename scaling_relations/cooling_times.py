@@ -210,7 +210,7 @@ def calculate_mean_cooling_times(data):
 
     cooling_times = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
 
-    return 10 ** cooling_times
+    return cooling_times
 
 
 def draw_cooling_contours(axes, density_bins, temperature_bins):
