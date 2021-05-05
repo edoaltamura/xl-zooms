@@ -39,7 +39,7 @@ modules = (
 )
 
 parameter_file = "../vrconfig_3dfofbound_subhalos_SO_hydro.cfg"
-executable_path = "/cosma7/data/dp004/dc-alta2/xl-zooms/$switch_mode/VELOCIraptor-STF_hotgas_2020/stf"
+executable_path = "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf"
 
 epilog = (
     '\necho "Job done, info follows."\n'
