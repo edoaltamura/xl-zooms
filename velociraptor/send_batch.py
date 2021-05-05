@@ -146,7 +146,11 @@ for i, run_directory in enumerate(args.directories):
             "Snapshot number in this batch:"
         ))
 
-        with open(f"vr_batch_{i + 1:02d}.slurm", "w") as submit_file:
+        slurm_file = os.path.join(
+            run_directory,
+            f"vr_batch_{i + 1:02d}.slurm"
+        )
+        with open(slurm_file, "w") as submit_file:
 
             print(
                 make_sbatch_params(
