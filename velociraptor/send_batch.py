@@ -110,7 +110,6 @@ for i, run_directory in enumerate(args.directories):
                 snapshot_files.append(file_path)
                 snapshot_sizes.append(os.path.getsize(file_path))
                 stf_subdirs.append(stf_subdir)
-                print(file_path.replace('.hdf5', '').split('_')[-1])
                 snapshot_numbers_sort.append(int(file_path.replace('.hdf5', '').split('_')[-1]))
 
     number_snapshots = len(snapshot_files)
@@ -153,7 +152,7 @@ for i, run_directory in enumerate(args.directories):
             f"Batch {i + 1:02d}/{number_splits + 1:02d} | "
             f"Invoking VR on {len(split_batch)} snapshots. "
             f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}\n"
-            "Snapshot number in this batch:"
+            "Snapshot numbers in this batch:"
         ))
 
         slurm_file = os.path.join(
