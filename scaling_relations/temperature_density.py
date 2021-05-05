@@ -244,14 +244,6 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     for line in contours.collections:
         for path in line.get_paths():
             logvert = np.log10(path.vertices)
-
-            # Align with same x-value
-            if levels[i] > 1:
-                log_rho = -4.5
-            else:
-                log_rho = 15
-
-            # logmid = log_rho, np.log10(levels[i]) - 2 * log_rho / 3
             i += 1
 
             # find closest point
