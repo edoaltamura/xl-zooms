@@ -245,12 +245,12 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     log_gas_Z = np.log10(1 / 3)
 
     # construct the matrix that we input in the interpolator
-    values_to_int = np.zeros((len(log_gas_T), 3))
+    values_to_int = np.zeros((len(log_gas_T.flatten()), 3))
     values_to_int[:, 0] = log_gas_T
     values_to_int[:, 1] = log_gas_Z
     values_to_int[:, 2] = log_gas_nH
 
-    net_rates_found = f_net_rates(values_to_int)
+    net_rates_found = f_net_rates(values_to_int).reshape(temperature.shape)
 
     cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
 
