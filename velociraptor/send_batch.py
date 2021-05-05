@@ -64,7 +64,7 @@ def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str =
         f"# SBATCH -J {run_name}\n"
         "# SBATCH -o ./out_files/%x.%J.vr.out\n"
         "# SBATCH -e ./out_files/%x.%J.vr.err\n"
-        "# SBATCH -p cosma7\n"
+        "# SBATCH -p cosma7-prince\n"
         "# SBATCH -A dp004\n"
         "# SBATCH -t 72:00:00\n"
         f"export OMP_NUM_THREADS={cpus_per_task}\n"
@@ -161,22 +161,23 @@ for i, run_directory in enumerate(args.directories):
             print(modules, file=submit_file)
 
             for split_batch_item in split_batch:
+
                 if not os.path.isdir(stf_subdirs[split_batch_item]):
                     os.makedirs(stf_subdirs[split_batch_item])
 
-                    snap_number = snapshot_files[split_batch_item].rstrip('.hdf5').split('_')[-1]
-                    print(snap_number, end=' ')
+                snap_number = snapshot_files[split_batch_item].rstrip('.hdf5').split('_')[-1]
+                print(snap_number, end=' ')
 
-                    print(
-                        make_stf_invoke(
-                            input_file=snapshot_files[split_batch_item].rstrip('.hdf5'),
-                            output_file=os.path.join(
-                                stf_subdirs[split_batch_item],
-                                os.path.basename(stf_subdirs[split_batch_item])
-                            )
-                        ),
-                        file=submit_file
-                    )
+                print(
+                    make_stf_invoke(
+                        input_file=snapshot_files[split_batch_item].rstrip('.hdf5'),
+                        output_file=os.path.join(
+                            stf_subdirs[split_batch_item],
+                            os.path.basename(stf_subdirs[split_batch_item])
+                        )
+                    ),
+                    file=submit_file
+                )
 
             print(epilog, file=submit_file)
             print(end='\n\n')
