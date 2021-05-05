@@ -143,9 +143,26 @@ for i, run_directory in enumerate(args.directories):
             f"Invoking VR on {len(split_batch)} snapshots. "
             f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}"
         ))
+
+        print(make_sbatch_params(
+                    run_name=f"VR_batch_{i + 1:02d}_{os.path.basename(run_directory)}"
+                ))
+        print(modules)
+
         for split_batch_item in split_batch:
             if not os.path.isdir(stf_subdirs[split_batch_item]):
-                print(snapshot_files[split_batch][0], stf_subdirs[split_batch][0])
+                # os.makedirs(stf_subdirs[split_batch_item])
+
+                print(
+                    make_stf_invoke(
+                        input_file=snapshot_files[split_batch_item].rstrip('.hdf5'),
+                        output_file=os.path.join(
+                            stf_subdirs[split_batch_item],
+                            os.path.basename(stf_subdirs[split_batch_item])
+                        )
+                    )
+                )
+
         # with open(f"vr_batch_{i + 1:02d}.slurm", "w") as submit_file:
         #     print(
         #         make_sbatch_params(
