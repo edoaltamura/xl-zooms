@@ -1,15 +1,13 @@
 import numpy as np
-from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp
+from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp, s
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
 
-
 import scipy.stats as stat
 import scipy.interpolate as sci
 import h5py as h5
-
 
 from .halo_property import HaloProperty
 from register import Zoom, calibration_zooms, args, cooling_table
@@ -259,7 +257,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     #
     # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
 
-    function = np.power(10., cooling_time)
+    function = (np.power(10., cooling_time) * s).to('Myr')
     print(function)
 
     # Define entropy levels to plot
