@@ -95,7 +95,7 @@ for i, run_directory in enumerate(args.directories):
     for file in tqdm(os.listdir(snaps_path), desc='Identify snapshots'):
 
         file_path = os.path.join(snaps_path, file)
-        stf_subdir = os.path.join(catalogues_path, file.remove('.hdf5'))
+        stf_subdir = os.path.join(catalogues_path, file.replace('.hdf5', ''))
 
         if os.path.isfile(file_path) and file.endswith('.hdf5'):
 
