@@ -67,7 +67,7 @@ def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str =
         "# SBATCH -p cosma7\n"
         "# SBATCH -A dp004\n"
         "# SBATCH -t 72:00:00\n"
-        f"export OMP_NUM_THREADS={ntasks}\n"
+        f"export OMP_NUM_THREADS={cpus_per_task}\n"
     )
 
 
@@ -127,7 +127,7 @@ for i, run_directory in enumerate(args.directories):
         ))
 
     # Split tasks in jobs for 800 GB of input data each
-    job_limit = 800 * 1024 * 1024 * 1024
+    job_limit = 700 * 1024 * 1024 * 1024
     print(f"Input data limit: {sizeof_fmt(job_limit)} per batch.")
 
     number_splits = snapshot_sizes.sum() // job_limit + 1
@@ -138,39 +138,41 @@ for i, run_directory in enumerate(args.directories):
     split_indices = np.split(np.arange(number_snapshots), chunk_items)[:-1]
 
     for i, split_batch in enumerate(split_indices):
+
         print((
             f"Batch {i + 1:02d}/{number_splits + 1:02d} | "
             f"Invoking VR on {len(split_batch)} snapshots. "
-            f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}"
+            f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}\n"
+            "Snapshot number in this batch:"
         ))
 
-        print(make_sbatch_params(
-                    run_name=f"VR_batch_{i + 1:02d}_{os.path.basename(run_directory)}"
-                ))
-        print(modules)
+        with open(f"vr_batch_{i + 1:02d}.slurm", "w") as submit_file:
 
-        for split_batch_item in split_batch:
-            if not os.path.isdir(stf_subdirs[split_batch_item]):
-                # os.makedirs(stf_subdirs[split_batch_item])
+            print(
+                make_sbatch_params(
+                        run_name=f"VR_batch_{i + 1:02d}_{os.path.basename(run_directory)}"
+                    ),
+                file=submit_file
+            )
+            print(modules, file=submit_file)
 
-                print(
-                    make_stf_invoke(
-                        input_file=snapshot_files[split_batch_item].rstrip('.hdf5'),
-                        output_file=os.path.join(
-                            stf_subdirs[split_batch_item],
-                            os.path.basename(stf_subdirs[split_batch_item])
-                        )
+            for split_batch_item in split_batch:
+                if not os.path.isdir(stf_subdirs[split_batch_item]):
+                    os.makedirs(stf_subdirs[split_batch_item])
+
+                    snap_number = snapshot_files[split_batch_item].rstrip('.hdf5').split('_')[-1]
+                    print(snap_number, end=' ')
+
+                    print(
+                        make_stf_invoke(
+                            input_file=snapshot_files[split_batch_item].rstrip('.hdf5'),
+                            output_file=os.path.join(
+                                stf_subdirs[split_batch_item],
+                                os.path.basename(stf_subdirs[split_batch_item])
+                            )
+                        ),
+                        file=submit_file
                     )
-                )
 
-        # with open(f"vr_batch_{i + 1:02d}.slurm", "w") as submit_file:
-        #     print(
-        #         make_sbatch_params(
-        #             run_name=f"VR_batch_{i + 1:02d}_{os.path.basename(run_directory)}"
-        #         ),
-        #         file=submit_file
-        #     )
-        #     print(modules,file=submit_file)
-
-
-
+            print(epilog, file=submit_file)
+            print()
