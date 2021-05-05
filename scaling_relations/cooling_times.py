@@ -426,7 +426,7 @@ class CoolingTimes(HaloProperty):
 
         fig = plt.figure(figsize=(5, 5))
         gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.2)
-        axes = gs.subplots(sharex='col', sharey='row')
+        axes = gs.subplots()
 
         for ax in axes.flat[:4]:
             ax.loglog()
@@ -457,8 +457,8 @@ class CoolingTimes(HaloProperty):
         print(x.shape, x[np.isnan(x)])
         print(y.shape, y[np.isnan(y)])
         print(w.shape, w[np.isnan(w)])
-        H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
-        print(H)
+        # H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
+        # print(H)
 
         axes[0, 0].hist(w, bins=40)
 
