@@ -234,16 +234,17 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     T_grid = axis[4]
     Z_grid = axis[2]
 
-    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
-                                              fill_value=-30)
+    f_net_rates = sci.RegularGridInterpolator(
+        (T_grid, Z_grid, nH_grid),
+        net_rates,
+        method="linear",
+        bounds_error=False,
+        fill_value=-30
+    )
 
-    hydrogen_fraction = 0.76
-    gas_nH = density_interps * cm ** -3 * hydrogen_fraction
-    log_gas_nH = np.log10(gas_nH)
-    temperature = temperature_interps
-    log_gas_T = np.log10(temperature)
-    # log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
-    log_gas_Z = np.log10(1 / 3)
+    log_gas_nH = np.log10(density_interps)
+    log_gas_T = np.log10(temperature_interps)
+    log_gas_Z = np.ones_like(temperature_interps) * np.log10(1 / 3)
 
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
