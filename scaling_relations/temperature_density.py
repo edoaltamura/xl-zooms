@@ -217,7 +217,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     cooling_time = cooling_time.reshape(_density_interps.shape)
 
     # Define entropy levels to plot
-    levels = np.log10(np.array([1, 100, 500, 1000, 5000]))
+    levels = np.log10(np.array([1, 1e2, 1e3, 5e3, 1e4]))
     fmt = {value: f'${latex_float(10 ** value)}$ Myr' for value in levels}
     contours = axes.contour(
         _density_interps,
