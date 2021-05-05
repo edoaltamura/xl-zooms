@@ -261,7 +261,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     #
     # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
 
-    function = (10 ** cooling_time * Myr).to('Myr')
+    function = (10 ** cooling_time * s).to('Myr')
     print(function)
 
     # Define entropy levels to plot
