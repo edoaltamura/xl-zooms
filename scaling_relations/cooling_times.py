@@ -464,6 +464,9 @@ class CoolingTimes(HaloProperty):
         H[H <= 0] = np.nan
         Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
+
+        print(H)
+
         if (H > 0).any():
             mappable = axes[0, 0].pcolormesh(
                 density_edges, temperature_edges, H.T,
