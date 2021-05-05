@@ -171,7 +171,7 @@ for i, run_directory in enumerate(args.directories):
             for split_batch_item in split_batch:
 
                 if not os.path.isdir(stf_subdirs[split_batch_item]):
-                    print(stf_subdirs[split_batch_item])
+                    # print(stf_subdirs[split_batch_item])
                     os.mkdir(stf_subdirs[split_batch_item])
 
                 snap_number = snapshot_files[split_batch_item].rstrip('.hdf5').split('_')[-1]
