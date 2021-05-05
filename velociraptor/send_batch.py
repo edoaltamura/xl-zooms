@@ -3,6 +3,7 @@ import numpy as np
 from h5py import File as h5file
 import argparse
 import os.path
+import subprocess
 
 parser = argparse.ArgumentParser()
 
@@ -17,6 +18,14 @@ parser.add_argument(
 parser.add_argument(
     '-i',
     '--no-snapid',
+    default=False,
+    required=False,
+    action='store_true'
+)
+
+parser.add_argument(
+    '-s',
+    '--submit',
     default=False,
     required=False,
     action='store_true'
@@ -172,7 +181,6 @@ for i, run_directory in enumerate(args.directories):
             for split_batch_item in split_batch:
 
                 if not os.path.isdir(stf_subdirs[split_batch_item]):
-                    # print(stf_subdirs[split_batch_item])
                     os.mkdir(stf_subdirs[split_batch_item])
 
                 snap_number = snapshot_files[split_batch_item].replace('.hdf5', '').split('_')[-1]
@@ -191,3 +199,15 @@ for i, run_directory in enumerate(args.directories):
 
             print(epilog, file=submit_file)
             print(end='\n\n')
+
+        if args.submit:
+            print((
+                f"Submitting {os.path.basename(slurm_file)} to the queue...\n"
+                f"cwd >> {os.path.dirname(slurm_file)}\n"
+                f"cmd >> {' '.join(['sbatch', os.path.basename(slurm_file)])}"
+            ))
+            # p = subprocess.Popen(
+            #     ['sbatch', os.path.basename(slurm_file)],
+            #     cwd=os.path.dirname(slurm_file)
+            # )
+            # p.wait()
