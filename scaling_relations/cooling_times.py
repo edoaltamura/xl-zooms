@@ -406,8 +406,9 @@ class CoolingTimes(HaloProperty):
         print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
-        assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
-        assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
+        assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0.]}"
+        assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0.]}"
+        assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
 
         # density_bounds = [1e-6, 1e4]  # in nh/cm^3
         # temperature_bounds = [1e3, 1e10]  # in K
@@ -485,120 +486,120 @@ class CoolingTimes(HaloProperty):
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
 
-        # PLOT SN HEATED PARTICLES ===============================================
-        H, density_edges, temperature_edges = np.histogram2d(
-            x[(snii_flag & ~agn_flag)],
-            y[(snii_flag & ~agn_flag)],
-            bins=[density_bins, temperature_bins],
-            weights=w[(snii_flag & ~agn_flag)]
-        )
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x[(snii_flag & ~agn_flag)],
-            y[(snii_flag & ~agn_flag)],
-            bins=[density_bins, temperature_bins]
-        )
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
-
-        if (H > 0).any():
-            mappable = axes[0, 1].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greens_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[0, 1])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
-
-        # Heating temperatures
-        axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-        txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        axes[0, 1].add_artist(txt)
-
-        # PLOT AGN HEATED PARTICLES ===============================================
-        H, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & ~snii_flag)],
-            y[(agn_flag & ~snii_flag)],
-            bins=[density_bins, temperature_bins],
-            weights=w[(agn_flag & ~snii_flag)]
-        )
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & ~snii_flag)],
-            y[(agn_flag & ~snii_flag)],
-            bins=[density_bins, temperature_bins]
-        )
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
-
-        if (H > 0).any():
-            mappable = axes[1, 1].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[1, 1])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
-
-        txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        axes[1, 1].add_artist(txt)
-        # Heating temperatures
-        axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
-
-        # PLOT AGN+SN HEATED PARTICLES ===============================================
-        H, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & snii_flag)],
-            y[(agn_flag & snii_flag)],
-            bins=[density_bins, temperature_bins],
-            weights=w[(agn_flag & snii_flag)]
-        )
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & snii_flag)],
-            y[(agn_flag & snii_flag)],
-            bins=[density_bins, temperature_bins]
-        )
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
-
-        if (H > 0).any():
-            mappable = axes[1, 0].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[1, 0])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
-
-        txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        axes[1, 0].add_artist(txt)
-        # Heating temperatures
-        axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
-        axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+        # # PLOT SN HEATED PARTICLES ===============================================
+        # H, density_edges, temperature_edges = np.histogram2d(
+        #     x[(snii_flag & ~agn_flag)],
+        #     y[(snii_flag & ~agn_flag)],
+        #     bins=[density_bins, temperature_bins],
+        #     weights=w[(snii_flag & ~agn_flag)]
+        # )
+        # Nparticles, density_edges, temperature_edges = np.histogram2d(
+        #     x[(snii_flag & ~agn_flag)],
+        #     y[(snii_flag & ~agn_flag)],
+        #     bins=[density_bins, temperature_bins]
+        # )
+        # H[H <= 0] = np.nan
+        # Nparticles[Nparticles <= 0] = np.nan
+        # H /= Nparticles
+        #
+        # if (H > 0).any():
+        #     mappable = axes[0, 1].pcolormesh(
+        #         density_edges, temperature_edges, H.T,
+        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greens_r', alpha=0.6
+        #     )
+        #     divider = make_axes_locatable(axes[0, 1])
+        #     cax = divider.append_axes("right", size="3%", pad=0.)
+        #     cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
+        #     ticklab = cbar.ax.get_yticklabels()
+        #     ticks = cbar.ax.get_yticks()
+        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
+        #         if t < 100:
+        #             ticklab[i] = f'{int(t):d}'
+        #         else:
+        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        #     cbar.ax.set_yticklabels(ticklab)
+        #
+        # # Heating temperatures
+        # axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+        # txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        # axes[0, 1].add_artist(txt)
+        #
+        # # PLOT AGN HEATED PARTICLES ===============================================
+        # H, density_edges, temperature_edges = np.histogram2d(
+        #     x[(agn_flag & ~snii_flag)],
+        #     y[(agn_flag & ~snii_flag)],
+        #     bins=[density_bins, temperature_bins],
+        #     weights=w[(agn_flag & ~snii_flag)]
+        # )
+        # Nparticles, density_edges, temperature_edges = np.histogram2d(
+        #     x[(agn_flag & ~snii_flag)],
+        #     y[(agn_flag & ~snii_flag)],
+        #     bins=[density_bins, temperature_bins]
+        # )
+        # H[H <= 0] = np.nan
+        # Nparticles[Nparticles <= 0] = np.nan
+        # H /= Nparticles
+        #
+        # if (H > 0).any():
+        #     mappable = axes[1, 1].pcolormesh(
+        #         density_edges, temperature_edges, H.T,
+        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
+        #     )
+        #     divider = make_axes_locatable(axes[1, 1])
+        #     cax = divider.append_axes("right", size="3%", pad=0.)
+        #     cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+        #     ticklab = cbar.ax.get_yticklabels()
+        #     ticks = cbar.ax.get_yticks()
+        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
+        #         if t < 100:
+        #             ticklab[i] = f'{int(t):d}'
+        #         else:
+        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        #     cbar.ax.set_yticklabels(ticklab)
+        #
+        # txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        # axes[1, 1].add_artist(txt)
+        # # Heating temperatures
+        # axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
+        #
+        # # PLOT AGN+SN HEATED PARTICLES ===============================================
+        # H, density_edges, temperature_edges = np.histogram2d(
+        #     x[(agn_flag & snii_flag)],
+        #     y[(agn_flag & snii_flag)],
+        #     bins=[density_bins, temperature_bins],
+        #     weights=w[(agn_flag & snii_flag)]
+        # )
+        # Nparticles, density_edges, temperature_edges = np.histogram2d(
+        #     x[(agn_flag & snii_flag)],
+        #     y[(agn_flag & snii_flag)],
+        #     bins=[density_bins, temperature_bins]
+        # )
+        # H[H <= 0] = np.nan
+        # Nparticles[Nparticles <= 0] = np.nan
+        # H /= Nparticles
+        #
+        # if (H > 0).any():
+        #     mappable = axes[1, 0].pcolormesh(
+        #         density_edges, temperature_edges, H.T,
+        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
+        #     )
+        #     divider = make_axes_locatable(axes[1, 0])
+        #     cax = divider.append_axes("right", size="3%", pad=0.)
+        #     cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+        #     ticklab = cbar.ax.get_yticklabels()
+        #     ticks = cbar.ax.get_yticks()
+        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
+        #         if t < 100:
+        #             ticklab[i] = f'{int(t):d}'
+        #         else:
+        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        #     cbar.ax.set_yticklabels(ticklab)
+        #
+        # txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        # axes[1, 0].add_artist(txt)
+        # # Heating temperatures
+        # axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
+        # axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
         fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
