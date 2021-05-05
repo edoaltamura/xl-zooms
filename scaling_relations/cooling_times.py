@@ -309,7 +309,7 @@ class CoolingTimes(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None,
             agn_time: str = None,
-            z_agn_start: float = 0.1,
+            z_agn_start: float = 18,
             z_agn_end: float = 0.,
             **kwargs
     ):
@@ -402,7 +402,6 @@ class CoolingTimes(HaloProperty):
         x = number_density
         y = temperature
         w = cooling_times
-        print(w[w<=0.])
 
         print("Number of particles being plotted", len(x))
 
@@ -464,24 +463,24 @@ class CoolingTimes(HaloProperty):
         H[H <= 0] = np.nan
         Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
-
-        mappable = axes[0, 0].pcolormesh(
-            density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
-        )
-        # create an axes on the right side of ax. The width of cax will be 5%
-        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-        divider = make_axes_locatable(axes[0, 0])
-        cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-        ticklab = cbar.ax.get_yticklabels()
-        ticks = cbar.ax.get_yticks()
-        for i, (t, l) in enumerate(zip(ticks, ticklab)):
-            if t < 100:
-                ticklab[i] = f'{int(t):d}'
-            else:
-                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        cbar.ax.set_yticklabels(ticklab)
+        if (H > 0).any():
+            mappable = axes[0, 0].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
+            )
+            # create an axes on the right side of ax. The width of cax will be 5%
+            # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+            divider = make_axes_locatable(axes[0, 0])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
@@ -540,21 +539,22 @@ class CoolingTimes(HaloProperty):
         Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
 
-        mappable = axes[1, 1].pcolormesh(
-            density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
-        )
-        divider = make_axes_locatable(axes[1, 1])
-        cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-        ticklab = cbar.ax.get_yticklabels()
-        ticks = cbar.ax.get_yticks()
-        for i, (t, l) in enumerate(zip(ticks, ticklab)):
-            if t < 100:
-                ticklab[i] = f'{int(t):d}'
-            else:
-                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        cbar.ax.set_yticklabels(ticklab)
+        if (H > 0).any():
+            mappable = axes[1, 1].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
+            )
+            divider = make_axes_locatable(axes[1, 1])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
@@ -577,21 +577,22 @@ class CoolingTimes(HaloProperty):
         Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
 
-        mappable = axes[1, 0].pcolormesh(
-            density_edges, temperature_edges, H.T,
-            norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
-        )
-        divider = make_axes_locatable(axes[1, 0])
-        cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-        ticklab = cbar.ax.get_yticklabels()
-        ticks = cbar.ax.get_yticks()
-        for i, (t, l) in enumerate(zip(ticks, ticklab)):
-            if t < 100:
-                ticklab[i] = f'{int(t):d}'
-            else:
-                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        cbar.ax.set_yticklabels(ticklab)
+        if (H > 0).any():
+            mappable = axes[1, 0].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
+            )
+            divider = make_axes_locatable(axes[1, 0])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
