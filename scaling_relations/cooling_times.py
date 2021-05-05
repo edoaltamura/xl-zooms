@@ -456,9 +456,12 @@ class CoolingTimes(HaloProperty):
         H, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[density_bins, temperature_bins], weights=w
         )
+
         Nparticles, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[density_bins, temperature_bins]
         )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
 
         mappable = axes[0, 0].pcolormesh(
@@ -494,6 +497,8 @@ class CoolingTimes(HaloProperty):
             y[(snii_flag & ~agn_flag)],
             bins=[density_bins, temperature_bins]
         )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
 
         if (H > 0).any():
@@ -530,6 +535,8 @@ class CoolingTimes(HaloProperty):
             y[(agn_flag & ~snii_flag)],
             bins=[density_bins, temperature_bins]
         )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
 
         mappable = axes[1, 1].pcolormesh(
@@ -565,6 +572,8 @@ class CoolingTimes(HaloProperty):
             y[(agn_flag & snii_flag)],
             bins=[density_bins, temperature_bins]
         )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
 
         mappable = axes[1, 0].pcolormesh(
