@@ -269,7 +269,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         temperature_interps,
         function,
         levels,
-        colors='aqua',
+        colors='lime',
         linewidths=0.3,
         alpha=0.5
     )
@@ -305,7 +305,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         inline=True,
         inline_spacing=3,
         rightside_up=True,
-        colors='aqua',
+        colors='lime',
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
