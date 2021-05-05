@@ -115,7 +115,7 @@ for i, run_directory in enumerate(args.directories):
     snapshot_files = np.asarray(snapshot_files, dtype=np.str)
     stf_subdirs = np.asarray(stf_subdirs, dtype=np.str)
 
-    print(snapshot_files, stf_subdirs)
+    print(snapshot_files[0], stf_subdirs[0])
 
     if number_snapshots == 0:
         raise FileNotFoundError(f"No snapshot file found in {snaps_path}")
@@ -165,7 +165,8 @@ for i, run_directory in enumerate(args.directories):
             for split_batch_item in split_batch:
 
                 if not os.path.isdir(stf_subdirs[split_batch_item]):
-                    os.makedirs(stf_subdirs[split_batch_item])
+                    print(stf_subdirs[split_batch_item])
+                    os.mkdir(stf_subdirs[split_batch_item])
 
                 snap_number = snapshot_files[split_batch_item].rstrip('.hdf5').split('_')[-1]
                 print(snap_number, end=' ')
