@@ -206,8 +206,8 @@ for i, run_directory in enumerate(args.directories):
                 f"cwd >> {os.path.dirname(slurm_file)}\n"
                 f"cmd >> {' '.join(['sbatch', os.path.basename(slurm_file)])}\n\n"
             ))
-            # p = subprocess.Popen(
-            #     ['sbatch', os.path.basename(slurm_file)],
-            #     cwd=os.path.dirname(slurm_file)
-            # )
-            # p.wait()
+            p = subprocess.Popen(
+                ['sbatch', os.path.basename(slurm_file)],
+                cwd=os.path.dirname(slurm_file)
+            )
+            p.wait()
