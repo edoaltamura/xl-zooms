@@ -454,13 +454,10 @@ class CoolingTimes(HaloProperty):
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
-        H, density_edges, temperature_edges = np.histogram2d(
-            x, y, bins=[density_bins, temperature_bins], weights=w
-        )
+        print(w)
+        H, _, _ = np.histogram2d(x, y, bins=[density_bins, temperature_bins], weights=w)
         print(H)
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x, y, bins=[density_bins, temperature_bins]
-        )
+        Nparticles, _, _ = np.histogram2d(x, y, bins=[density_bins, temperature_bins])
         H[H <= 0] = np.nan
         Nparticles[Nparticles <= 0] = np.nan
         H /= Nparticles
