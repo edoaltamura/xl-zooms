@@ -214,12 +214,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     net_rates_found = f_net_rates(values_to_int)
 
     cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
-    print(cooling_time)
     cooling_time = cooling_time.reshape(_density_interps.shape)
-    # cooling_time = cooling_time.to('Myr').value
-    # print(cooling_time.min())
-    # print(cooling_time.max())
-    # print(cooling_time)
 
     # Define entropy levels to plot
     levels = np.log10(np.array([1, 100, 500, 1000, 5000]))
@@ -229,7 +224,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         _temperature_interps,
         cooling_time,
         levels,
-        colors='lime',
+        colors='green',
         linewidths=0.3,
         alpha=0.5
     )
@@ -257,7 +252,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         inline=True,
         inline_spacing=3,
         rightside_up=True,
-        colors='lime',
+        colors='green',
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
