@@ -174,52 +174,7 @@ def get_heating_rates():
     return g["/Tdep/Heating"]
 
 
-def calculate_mean_cooling_times(data):
-    tff = np.sqrt(3 * np.pi / (32 * G * data.gas.densities))
-
-    data_cooling = get_cooling_rates()
-    data_heating = get_heating_rates()
-
-    cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
-    heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
-
-    net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
-
-    axis = get_axis_tables()
-    nH_grid = axis[0]
-    T_grid = axis[4]
-    Z_grid = axis[2]
-
-    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
-                                              fill_value=-30)
-
-    hydrogen_fraction = data.gas.element_mass_fractions.hydrogen
-    gas_nH = (data.gas.densities / mh * hydrogen_fraction).to(cm ** -3)
-    log_gas_nH = np.log10(gas_nH)
-    temperature = data.gas.temperatures
-    log_gas_T = np.log10(temperature)
-    log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
-
-    # construct the matrix that we input in the interpolator
-    values_to_int = np.zeros((len(log_gas_T), 3))
-    values_to_int[:, 0] = log_gas_T
-    values_to_int[:, 1] = log_gas_Z
-    values_to_int[:, 2] = log_gas_nH
-
-    net_rates_found = f_net_rates(values_to_int)
-
-    cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
-
-    tff.to("Myr")
-
-
 def draw_cooling_contours(axes, density_bins, temperature_bins):
-    _density_interps, _temperature_interps = np.meshgrid(density_bins, temperature_bins)
-
-    density_interps = _density_interps.flatten()
-    temperature_interps = _temperature_interps.flatten()
-
-    tff = np.sqrt(3 * np.pi / (32 * G * density_interps))
 
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
@@ -242,9 +197,13 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         fill_value=-30
     )
 
+    _density_interps, _temperature_interps = np.meshgrid(density_bins, temperature_bins)
+    density_interps = _density_interps.flatten()
+    temperature_interps = _temperature_interps.flatten()
+
     log_gas_nH = np.log10(density_interps)
     log_gas_T = np.log10(temperature_interps)
-    log_gas_Z = np.ones_like(temperature_interps) * np.log10(1e-2 / 0.0133714)
+    log_gas_Z = np.ones_like(temperature_interps) * np.log10(1 / 3 / 0.0133714)
 
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
@@ -255,14 +214,10 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     net_rates_found = f_net_rates(values_to_int)
 
     cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
-
-    # tff.to("Myr")
-    # free_fall_time = np.log10(tff.to("Myr"))
-    #
-    # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
-
-    function = (10 ** cooling_time * yr).to('Myr')
-    print(function)
+    print(cooling_time)
+    cooling_time = 10 ** cooling_time.reshape(_density_interps.shape) * yr
+    cooling_time = cooling_time.to('Myr')
+    print(cooling_time)
 
     # Define entropy levels to plot
     levels = [1, 100, 500, 1000, 5000]
@@ -270,7 +225,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     contours = axes.contour(
         _density_interps,
         _temperature_interps,
-        function.reshape(_density_interps.shape),
+        cooling_time,
         levels,
         colors='lime',
         linewidths=0.3,
