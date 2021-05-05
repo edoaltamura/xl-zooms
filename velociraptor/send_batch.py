@@ -115,6 +115,8 @@ for i, run_directory in enumerate(args.directories):
     snapshot_files = np.asarray(snapshot_files, dtype=np.str)
     stf_subdirs = np.asarray(stf_subdirs, dtype=np.str)
 
+    print(snapshot_files, stf_subdirs)
+
     if number_snapshots == 0:
         raise FileNotFoundError(f"No snapshot file found in {snaps_path}")
     else:
