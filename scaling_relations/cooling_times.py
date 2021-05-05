@@ -428,30 +428,30 @@ class CoolingTimes(HaloProperty):
         gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.2)
         axes = gs.subplots()
 
-        for ax in axes.flat[:4]:
-            ax.loglog()
-
-            # Draw cross-hair marker
-            T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
-            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
-            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
-            K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
-                    2 / 3)).to('keV*cm**2')
-
-            # Make the norm object to define the image stretch
-            contour_density_bins = np.logspace(
-                np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
-            )
-            contour_temperature_bins = np.logspace(
-                np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
-            )
-
-            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
-            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
-            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins)
-
-            # Star formation threshold
-            ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
+        # for ax in axes.flat[:4]:
+        #     ax.loglog()
+        #
+        #     # Draw cross-hair marker
+        #     T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
+        #     ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
+        #     ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
+        #     K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
+        #             2 / 3)).to('keV*cm**2')
+        #
+        #     # Make the norm object to define the image stretch
+        #     contour_density_bins = np.logspace(
+        #         np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
+        #     )
+        #     contour_temperature_bins = np.logspace(
+        #         np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
+        #     )
+        #
+        #     draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
+        #     draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
+        #     draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins)
+        #
+        #     # Star formation threshold
+        #     ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
         print(x.shape, x[np.isnan(x)])
