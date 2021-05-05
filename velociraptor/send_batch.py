@@ -110,8 +110,8 @@ for i, run_directory in enumerate(args.directories):
                 snapshot_files.append(file_path)
                 snapshot_sizes.append(os.path.getsize(file_path))
                 stf_subdirs.append(stf_subdir)
-                print(file_path.remove('.hdf5').split('_')[-1])
-                snapshot_numbers_sort.append(int(file_path.remove('.hdf5').split('_')[-1]))
+                print(file_path.replace('.hdf5', '').split('_')[-1])
+                snapshot_numbers_sort.append(int(file_path.replace('.hdf5', '').split('_')[-1]))
 
     number_snapshots = len(snapshot_files)
 
@@ -176,12 +176,12 @@ for i, run_directory in enumerate(args.directories):
                     # print(stf_subdirs[split_batch_item])
                     os.mkdir(stf_subdirs[split_batch_item])
 
-                snap_number = snapshot_files[split_batch_item].rstrip('.hdf5').split('_')[-1]
+                snap_number = snapshot_files[split_batch_item].replace('.hdf5', '').split('_')[-1]
                 print(snap_number, end=' ')
 
                 print(
                     make_stf_invoke(
-                        input_file=snapshot_files[split_batch_item].rstrip('.hdf5'),
+                        input_file=snapshot_files[split_batch_item].replace('.hdf5', ''),
                         output_file=os.path.join(
                             stf_subdirs[split_batch_item],
                             os.path.basename(stf_subdirs[split_batch_item])
