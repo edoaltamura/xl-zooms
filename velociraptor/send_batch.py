@@ -49,6 +49,7 @@ modules = (
 
 parameter_file = "../vrconfig_3dfofbound_subhalos_SO_hydro.cfg"
 executable_path = "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf"
+slurm_queue = "cosma7-prince"
 
 epilog = (
     '\necho "Job done, info follows."\n'
@@ -56,7 +57,7 @@ epilog = (
 )
 
 
-def sizeof_fmt(num, suffix='B'):
+def sizeof_fmt(num, suffix='B') -> str:
     for unit in ['', 'Ki', 'Mi', 'Gi', 'Ti', 'Pi', 'Ei', 'Zi']:
         if abs(num) < 1024.0:
             return "%3.1f%s%s" % (num, unit, suffix)
@@ -64,7 +65,7 @@ def sizeof_fmt(num, suffix='B'):
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str = 'VR-analysis'):
+def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str = 'VR-analysis') -> str:
     return (
         f"#!/bin/bash -l\n"
         f"#SBATCH --ntasks={ntasks}\n"
@@ -73,14 +74,14 @@ def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str =
         f"#SBATCH -J {run_name}\n"
         f"#SBATCH -o ./out_files/%x.%J.vr.out\n"
         f"#SBATCH -e ./out_files/%x.%J.vr.err\n"
-        f"#SBATCH -p cosma7-prince\n"
+        f"#SBATCH -p {slurm_queue}\n"
         f"#SBATCH -A dp004\n"
         f"#SBATCH -t 72:00:00\n"
         f"export OMP_NUM_THREADS={cpus_per_task}\n"
     )
 
 
-def make_stf_invoke(input_file: str, output_file: str):
+def make_stf_invoke(input_file: str, output_file: str) -> str:
     return (
         f"{executable_path}"
         f" -I 2"
