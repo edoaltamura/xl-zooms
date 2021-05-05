@@ -204,7 +204,7 @@ for i, run_directory in enumerate(args.directories):
             print((
                 f"Submitting {os.path.basename(slurm_file)} to the queue...\n"
                 f"cwd >> {os.path.dirname(slurm_file)}\n"
-                f"cmd >> {' '.join(['sbatch', os.path.basename(slurm_file)])}"
+                f"cmd >> {' '.join(['sbatch', os.path.basename(slurm_file)])}\n\n"
             ))
             # p = subprocess.Popen(
             #     ['sbatch', os.path.basename(slurm_file)],
