@@ -214,7 +214,10 @@ def calculate_mean_cooling_times(data):
 
 
 def draw_cooling_contours(axes, density_bins, temperature_bins):
-    density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
+    _density_interps, _temperature_interps = np.meshgrid(density_bins, temperature_bins)
+
+    density_interps = _density_interps.flatten()
+    temperature_interps = _temperature_interps.flatten()
 
     tff = np.sqrt(3 * np.pi / (32 * G * density_interps))
 
@@ -235,7 +238,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
                                               fill_value=-30)
 
     hydrogen_fraction = 0.76
-    gas_nH = (density_interps * cm ** -3 * hydrogen_fraction).to('cm**-3')
+    gas_nH = density_interps * cm ** -3 * hydrogen_fraction
     log_gas_nH = np.log10(gas_nH)
     temperature = temperature_interps
     log_gas_T = np.log10(temperature)
@@ -243,12 +246,12 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     log_gas_Z = np.log10(1 / 3)
 
     # construct the matrix that we input in the interpolator
-    values_to_int = np.zeros((len(log_gas_T.flatten()), 3))
-    values_to_int[:, 0] = log_gas_T.flatten()
-    values_to_int[:, 1] = log_gas_Z.flatten()
-    values_to_int[:, 2] = log_gas_nH.flatten()
+    values_to_int = np.zeros((len(log_gas_T), 3))
+    values_to_int[:, 0] = log_gas_T
+    values_to_int[:, 1] = log_gas_Z
+    values_to_int[:, 2] = log_gas_nH
 
-    net_rates_found = f_net_rates(values_to_int).reshape(temperature.shape)
+    net_rates_found = f_net_rates(values_to_int)
 
     cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
 
@@ -257,7 +260,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     #
     # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
 
-    function = (np.power(10., cooling_time) * yr).to('Myr')
+    function = (np.power(10., cooling_time.reshape(_density_interps.shape)) * s).to('Myr')
     print(function)
 
     # Define entropy levels to plot
