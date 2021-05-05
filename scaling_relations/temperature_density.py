@@ -215,15 +215,15 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
 
     cooling_time = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
     print(cooling_time)
-    cooling_time = 10 ** cooling_time.reshape(_density_interps.shape) * Myr
-    cooling_time = cooling_time.to('Myr').value
-    print(cooling_time.min())
-    print(cooling_time.max())
-    print(cooling_time)
+    cooling_time = cooling_time.reshape(_density_interps.shape)
+    # cooling_time = cooling_time.to('Myr').value
+    # print(cooling_time.min())
+    # print(cooling_time.max())
+    # print(cooling_time)
 
     # Define entropy levels to plot
-    levels = [1, 100, 500, 1000, 5000]
-    fmt = {value: f'${value}$ Myr' for value in levels}
+    levels = np.log10(np.array(1, 100, 500, 1000, 5000))
+    fmt = {value: f'${latex_float(10 ** value)}$ Myr' for value in levels}
     contours = axes.contour(
         _density_interps,
         _temperature_interps,
