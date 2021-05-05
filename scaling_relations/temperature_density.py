@@ -1,5 +1,5 @@
 import numpy as np
-from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp, s, Myr
+from unyt import unyt_quantity, kpc, Mpc, mh, K, boltzmann_constant, cm, G, mp, s, yr
 from matplotlib import pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
@@ -261,7 +261,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     #
     # ratio_cooling_time_over_ff_time = cooling_time - free_fall_time
 
-    function = (10 ** cooling_time * s).to('Myr')
+    function = (10 ** cooling_time * yr).to('Myr')
     print(function)
 
     # Define entropy levels to plot
