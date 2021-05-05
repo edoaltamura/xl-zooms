@@ -135,7 +135,7 @@ for i, run_directory in enumerate(args.directories):
     print(chunk_items)
     split_indices = np.split(np.arange(number_snapshots), chunk_items)
 
-    for i, split_batch in enumerate(split_indices):
+    for i, split_batch in enumerate(split_indices[:-1]):
         print((
             f"Batch {i + 1}/{len(split_indices)} | "
             f"Invoking VR on {len(split_batch)} snapshots. "
