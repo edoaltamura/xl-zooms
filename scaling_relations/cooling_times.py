@@ -210,9 +210,7 @@ def calculate_mean_cooling_times(data):
 
     cooling_times = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
 
-    print(unyt_array(10 ** cooling_times, Myr))
-
-    return unyt_array(10 ** cooling_times, Myr)
+    return 10 ** cooling_times
 
 
 def draw_cooling_contours(axes, density_bins, temperature_bins):
@@ -403,7 +401,8 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
-        w = cooling_times.value
+        w = cooling_times
+        print(w[w<=0.])
 
         print("Number of particles being plotted", len(x))
 
