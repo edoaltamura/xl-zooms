@@ -12,3 +12,4 @@ from .spherical_overdensities import SphericalOverdensities
 from .central_bh import CentralBH
 from .temperature_density import TemperatureDensity
 from .entropy_heat_vs_snap import EntropyComparison
+from .cooling_times import CoolingTimes
