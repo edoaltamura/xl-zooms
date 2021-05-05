@@ -460,27 +460,29 @@ class CoolingTimes(HaloProperty):
         H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
         print(H)
 
-        if (H > 0).any():
-            mappable = axes[0, 0].pcolormesh(
-                density_bins, temperature_bins, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
-            )
-            # create an axes on the right side of ax. The width of cax will be 5%
-            # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-            divider = make_axes_locatable(axes[0, 0])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
+        axes[0, 0].hist(w, bins=40)
 
-        txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        axes[0, 0].add_artist(txt)
+        # if (H > 0).any():
+        #     mappable = axes[0, 0].pcolormesh(
+        #         density_bins, temperature_bins, H.T,
+        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
+        #     )
+        #     # create an axes on the right side of ax. The width of cax will be 5%
+        #     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        #     divider = make_axes_locatable(axes[0, 0])
+        #     cax = divider.append_axes("right", size="3%", pad=0.)
+        #     cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+        #     ticklab = cbar.ax.get_yticklabels()
+        #     ticks = cbar.ax.get_yticks()
+        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
+        #         if t < 100:
+        #             ticklab[i] = f'{int(t):d}'
+        #         else:
+        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        #     cbar.ax.set_yticklabels(ticklab)
+        #
+        # txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        # axes[0, 0].add_artist(txt)
 
         # # PLOT SN HEATED PARTICLES ===============================================
         # H, density_edges, temperature_edges = np.histogram2d(
