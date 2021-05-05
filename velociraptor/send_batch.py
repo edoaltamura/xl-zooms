@@ -110,6 +110,7 @@ for i, run_directory in enumerate(args.directories):
                 snapshot_files.append(file_path)
                 snapshot_sizes.append(os.path.getsize(file_path))
                 stf_subdirs.append(stf_subdir)
+                print(file_path.rstrip('.hdf5').split('_')[-1])
                 snapshot_numbers_sort.append(int(file_path.rstrip('.hdf5').split('_')[-1]))
 
     number_snapshots = len(snapshot_files)
