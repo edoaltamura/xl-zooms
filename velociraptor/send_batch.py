@@ -42,7 +42,7 @@ parameter_file = "../vrconfig_3dfofbound_subhalos_SO_hydro.cfg"
 executable_path = "/cosma7/data/dp004/dc-alta2/xl-zooms/$switch_mode/VELOCIraptor-STF_hotgas_2020/stf"
 
 epilog = (
-    'echo "Job done, info follows."\n'
+    '\necho "Job done, info follows."\n'
     'sacct -j $SLURM_JOBID --format=JobID,JobName,Partition,AveRSS,MaxRSS,AveVMSize,MaxVMSize,Elapsed,ExitCode\n'
 )
 
@@ -57,16 +57,16 @@ def sizeof_fmt(num, suffix='B'):
 
 def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str = 'VR-analysis'):
     return (
-        "# !/bin/bash -l\n"
-        f"# SBATCH --ntasks={ntasks}\n"
-        f"# SBATCH --cpus-per-task={cpus_per_task}\n"
-        "# SBATCH --exclusive\n"
-        f"# SBATCH -J {run_name}\n"
-        "# SBATCH -o ./out_files/%x.%J.vr.out\n"
-        "# SBATCH -e ./out_files/%x.%J.vr.err\n"
-        "# SBATCH -p cosma7-prince\n"
-        "# SBATCH -A dp004\n"
-        "# SBATCH -t 72:00:00\n"
+        f"#!/bin/bash -l\n"
+        f"#SBATCH --ntasks={ntasks}\n"
+        f"#SBATCH --cpus-per-task={cpus_per_task}\n"
+        f"#SBATCH --exclusive\n"
+        f"#SBATCH -J {run_name}\n"
+        f"#SBATCH -o ./out_files/%x.%J.vr.out\n"
+        f"#SBATCH -e ./out_files/%x.%J.vr.err\n"
+        f"#SBATCH -p cosma7-prince\n"
+        f"#SBATCH -A dp004\n"
+        f"#SBATCH -t 72:00:00\n"
         f"export OMP_NUM_THREADS={cpus_per_task}\n"
     )
 
