@@ -115,6 +115,7 @@ for i, run_directory in enumerate(args.directories):
     number_snapshots = len(snapshot_files)
 
     # Sort snapshots by their output number
+    assert len(snapshot_numbers_sort) == len(set(snapshot_numbers_sort)), "Snapshot numbers have duplicates!"
     snapshot_numbers_sort = np.asarray(snapshot_numbers_sort, dtype=np.int32)
     sort_key = np.argsort(snapshot_numbers_sort)
     snapshot_sizes = np.asarray(snapshot_sizes, dtype=np.int64)[sort_key]
