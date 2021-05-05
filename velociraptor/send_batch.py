@@ -93,7 +93,7 @@ for i, run_directory in enumerate(args.directories):
     stf_subdirs = []
     snapshot_numbers_sort = []
     for file in tqdm(os.listdir(snaps_path), desc='Identify snapshots'):
-
+        print(file)
         file_path = os.path.join(snaps_path, file)
         stf_subdir = os.path.join(catalogues_path, file.rstrip('.hdf5'))
 
