@@ -174,7 +174,7 @@ def get_heating_rates():
     return g["/Tdep/Heating"]
 
 
-def calculate_mean_cooling_times(data):
+def calculate_mean_cooling_times(data, net_rates: bool = False):
     tff = np.sqrt(3 * np.pi / (32 * G * data.gas.densities))
 
     data_cooling = get_cooling_rates()
@@ -183,7 +183,10 @@ def calculate_mean_cooling_times(data):
     cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
     heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
 
-    net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
+    if net_rates:
+        net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
+    else:
+        net_rates = np.log10(np.abs(np.power(10., cooling_rates)))
 
     axis = get_axis_tables()
     nH_grid = axis[0]
