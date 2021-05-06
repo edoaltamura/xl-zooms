@@ -404,7 +404,7 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
-        w = 10 ** cooling_times
+        w = cooling_times
 
         print("Number of particles being plotted", len(x))
 
@@ -464,7 +464,6 @@ class CoolingTimes(HaloProperty):
         # print(H)
 
         plt.hist(w, bins=100)
-        plt.xscale('log')
         plt.yscale('log')
         plt.xlabel('$\log_{10}$(Cooling time [Myr])')
         plt.ylabel('Number of particles')
