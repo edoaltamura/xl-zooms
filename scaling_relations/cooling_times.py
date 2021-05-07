@@ -169,7 +169,7 @@ def get_heating_rates():
     return g["/Tdep/Heating"]
 
 
-def calculate_mean_cooling_times(data, net_rates: bool = False):
+def calculate_mean_cooling_times(data, use_heating: bool = False):
     tff = np.sqrt(3 * np.pi / (32 * G * data.gas.densities))
 
     data_cooling = get_cooling_rates()
@@ -178,7 +178,7 @@ def calculate_mean_cooling_times(data, net_rates: bool = False):
     cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
     heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
 
-    if net_rates:
+    if use_heating:
         print('Net cooling rates: heating - cooling')
         net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
     else:
@@ -328,7 +328,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        cooling_times = calculate_mean_cooling_times(sw_data)
+        cooling_times = calculate_mean_cooling_times(sw_data, use_heating=False)
 
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
