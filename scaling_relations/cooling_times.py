@@ -376,19 +376,19 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
-        w = cooling_times
+        w = 10 ** cooling_times
 
         print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0.]}"
         assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0.]}"
-        # assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
+        assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
 
         # density_bounds = [1e-6, 1e4]  # in nh/cm^3
         # temperature_bounds = [1e3, 1e10]  # in K
         density_bounds = [1e-6, 1]  # in nh/cm^3
-        temperature_bounds = [1e6, 1e10]  # in K
+        temperature_bounds = [1e6, 1e9]  # in K
         bins = 256
 
         # Make the norm object to define the image stretch
@@ -429,11 +429,9 @@ class CoolingTimes(HaloProperty):
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
-        print(x.shape, x[np.isnan(x)])
-        print(y.shape, y[np.isnan(y)])
-        print(w.shape, w[np.isnan(w)])
-        H = stats.binned_statistic_2d(x, y, np.ones_like(x), statistic='count', bins=[density_bins, temperature_bins]).statistic
-        print(H[H<=0])
+        H = stats.binned_statistic_2d(x, y, w, statistic='count',
+                                      bins=[density_bins, temperature_bins]).statistic
+        print(H[H <= 0])
 
         # plt.hist(w, bins=100)
         # plt.yscale('log')
@@ -581,9 +579,9 @@ class CoolingTimes(HaloProperty):
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
 
         z_agn_recent_text = (
-                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-            )
+            f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+        )
         if agn_time is not None:
             z_agn_recent_text = (
                 f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
