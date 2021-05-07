@@ -31,10 +31,12 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
-    ticks = cbar.ax.get_yticks()
-    labels = cbar.ax.get_yticklabels()
+    ticks = cbar.ax.get_yticks(minor=False)
+    labels = cbar.ax.get_yticklabels(minor=False)
 
     for t, l in zip(ticks, labels):
+        print(t, l.get_text())
+        l.set_text('aaa')
         print(t, l)
 
     return cbar
