@@ -6,7 +6,7 @@ from unyt import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
-from matplotlib.ticker import FuncFormatter
+from matplotlib.ticker import ScalarFormatter
 
 from scipy import stats
 
@@ -30,10 +30,15 @@ def latex_float(f):
         return float_str
 
 
-def fmt(x, pos):
-    b = '{:.2f}'.format(x)
-    b = int(float(b))
-    return r'${}$'.format(b)
+def int_ticks(cbar):
+    ticklab = [t.get_text() for t in cbar.ax.get_yticklabels()]
+    for i, t in enumerate(ticklab):
+        if float(t) <= 100:
+            ticklab[i] = f'{int(t):d}'
+        else:
+            ticklab[i] = f'${latex_float(float(t))}$'
+    cbar.ax.set_yticklabels(ticklab)
+    return cbar
 
 
 def draw_adiabats(axes, density_bins, temperature_bins):
@@ -202,13 +207,8 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     T_grid = axis[4]
     Z_grid = axis[2]
 
-    f_net_rates = sci.RegularGridInterpolator(
-        (T_grid, Z_grid, nH_grid),
-        net_rates,
-        method="linear",
-        bounds_error=False,
-        fill_value=None
-    )
+    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
+                                              fill_value=-30)
 
     hydrogen_fraction = data.gas.element_mass_fractions.hydrogen
     gas_nH = (data.gas.densities / mh * hydrogen_fraction).to(cm ** -3)
@@ -252,7 +252,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         net_rates,
         method="linear",
         bounds_error=False,
-        fill_value=None
+        fill_value=-30
     )
 
     _density_interps, _temperature_interps = np.meshgrid(density_bins, temperature_bins)
@@ -275,7 +275,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     cooling_time = cooling_time.reshape(_density_interps.shape)
 
     # Define entropy levels to plot
-    levels = np.array([0, 1, 2, 3, 4, 5, 6, 7])
+    levels = np.log10(np.array([1, 1e2, 1e3, 5e3, 1e4, 1e6]))
     fmt = {value: f'${latex_float(10 ** value)}$ Myr' for value in levels}
     contours = axes.contour(
         _density_interps,
@@ -424,7 +424,6 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
-        w = cooling_times[index]
 
         print("Number of particles being plotted", len(x))
 
@@ -448,9 +447,9 @@ class CoolingTimes(HaloProperty):
 
         fig = plt.figure(figsize=(8, 5))
         gs = fig.add_gridspec(2, 3, hspace=0.1, wspace=0.2)
-        axes = gs.subplots()
+        axes = gs.subplots(sharex='col', sharey='row')
 
-        for ax in axes.flat[:-1]:
+        for ax in axes.flat:
             ax.loglog()
 
             # Draw cross-hair marker
@@ -489,7 +488,8 @@ class CoolingTimes(HaloProperty):
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
         divider = make_axes_locatable(axes[0, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax, format=FuncFormatter(fmt))
+        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+        int_ticks(cbar)
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
@@ -509,7 +509,8 @@ class CoolingTimes(HaloProperty):
             )
             divider = make_axes_locatable(axes[0, 1])
             cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax, format=FuncFormatter(fmt))
+            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
+            int_ticks(cbar)
 
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -531,11 +532,12 @@ class CoolingTimes(HaloProperty):
             )
             divider = make_axes_locatable(axes[0, 2])
             cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax, format=FuncFormatter(fmt))
+            cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax)
+            int_ticks(cbar)
 
         txt = AnchoredText("Not heated by SN or AGN", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
-
+        axes[1, 2].remove()
         # PLOT AGN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
             x[(agn_flag & ~snii_flag)],
@@ -549,7 +551,8 @@ class CoolingTimes(HaloProperty):
         )
         divider = make_axes_locatable(axes[1, 1])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax, format=FuncFormatter(fmt))
+        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+        int_ticks(cbar)
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
@@ -569,17 +572,14 @@ class CoolingTimes(HaloProperty):
         )
         divider = make_axes_locatable(axes[1, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax, format=FuncFormatter(fmt))
+        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+        int_ticks(cbar)
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
         # Heating temperatures
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-
-
-        # PDF of Cooling Times
-        axes[1, 2].hist(w)
 
         fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
