@@ -1,17 +1,12 @@
-import numpy as np
 from unyt import *
-from matplotlib import pyplot as plt
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.offsetbox import AnchoredText
-from matplotlib.colors import LogNorm
-
-import scipy.stats as stat
-import scipy.interpolate as sci
 import h5py as h5
+import scipy.interpolate as sci
+from matplotlib import pyplot as plt
+from unyt import *
 
-from .halo_property import HaloProperty
-from register import Zoom, calibration_zooms, args, cooling_table
 from literature import Cosmology
+from register import Zoom, args, cooling_table
+from .halo_property import HaloProperty
 
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
@@ -184,8 +179,10 @@ def calculate_mean_cooling_times(data, net_rates: bool = False):
     heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
 
     if net_rates:
+        print('Net cooling rates: heating - cooling')
         net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
     else:
+        print('Only cooling rates')
         net_rates = cooling_rates
 
     axis = get_axis_tables()
@@ -217,7 +214,6 @@ def calculate_mean_cooling_times(data, net_rates: bool = False):
 
 
 def draw_cooling_contours(axes, density_bins, temperature_bins):
-
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
 
