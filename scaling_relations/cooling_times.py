@@ -31,13 +31,20 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
-    ticks = cbar.ax.get_yticks(minor=False)
-    labels = cbar.ax.get_yticklabels(minor=False)
 
-    for t, l in zip(ticks, labels):
-        print(t, l.get_text())
-        l.set_text('aaa')
-        print(t, l)
+    for minor_flag in [True, False]:
+
+        ticks = cbar.ax.get_yticks(minor=minor_flag)
+        labels = cbar.ax.get_yticklabels(minor=minor_flag)
+
+        for t, l in zip(ticks, labels):
+
+            if float(t) < 100:
+                l.set_text(f'{int(float(t))}')
+            print(t, l)
+
+        cbar.ax.set_yticks(ticks, minor=minor_flag)
+        cbar.ax.set_yticklabels(labels, minor=minor_flag)
 
     return cbar
 
