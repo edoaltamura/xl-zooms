@@ -343,7 +343,7 @@ class CoolingTimes(HaloProperty):
 
         if agn_time is None:
 
-            if z_agn_start < 7.2 or z_agn_end > 0:
+            if z_agn_start < 7.2:
 
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
