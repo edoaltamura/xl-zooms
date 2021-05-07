@@ -31,14 +31,11 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
-    ticks = cbar.get_ticks()
-    labels = cbar.get_ticklabels()
+    ticks = cbar.ax.get_ticks()
+    labels = cbar.ax.get_ticklabels()
 
-    for t in ticks:
-        print(t)
-
-    for l in labels:
-        print(l)
+    for t, l in zip(ticks, labels):
+        print(t, l)
 
     return cbar
 
