@@ -355,7 +355,8 @@ class CoolingTimes(HaloProperty):
             else:
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
-                    (sw_data.gas.fofgroup_ids == 1)
+                    (sw_data.gas.fofgroup_ids == 1) &
+                    (cooling_times > 7)
                 )[0]
 
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
