@@ -433,7 +433,7 @@ class CoolingTimes(HaloProperty):
         print(y.shape, y[np.isnan(y)])
         print(w.shape, w[np.isnan(w)])
         H = stats.binned_statistic_2d(x, y, np.ones_like(x), statistic='count', bins=[density_bins, temperature_bins]).statistic
-        print(H)
+        print(H[H<=0])
 
         # plt.hist(w, bins=100)
         # plt.yscale('log')
