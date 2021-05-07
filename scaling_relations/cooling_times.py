@@ -204,9 +204,8 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     log_gas_T = np.log10(temperature)
     log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
 
-    too_hot = len(np.where(temperature > 10 ** 9.5)[0])
-    if too_hot > 0:
-        print(f'Detected {too_hot:d} particles hotter than 10^9.5 K.')
+    too_hot = len(np.where(temperature > 1e9)[0])
+    print(f'Detected {too_hot:d} particles hotter than 10^9 K.')
 
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
@@ -348,8 +347,6 @@ class CoolingTimes(HaloProperty):
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
-                    (sw_data.gas.temperatures > 1e5) &
-                    (sw_data.gas.temperatures < 1e9) &
                     (a_heat > (1 / (z_agn_start + 1))) &
                     (a_heat < (1 / (z_agn_end + 1)))
                 )[0]
@@ -431,6 +428,7 @@ class CoolingTimes(HaloProperty):
         # PLOT ALL PARTICLES ===============================================
         H = stats.binned_statistic_2d(x, y, w, statistic='count',
                                       bins=[density_bins, temperature_bins]).statistic
+        H[H <= 0] = np.nan
         print(H[H <= 0])
 
         # plt.hist(w, bins=100)
