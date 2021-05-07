@@ -262,7 +262,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     cooling_time = cooling_time.reshape(_density_interps.shape)
 
     # Define entropy levels to plot
-    levels = np.log10(np.array([1, 1e2, 1e3, 5e3, 1e4]))
+    levels = np.log10(np.array([1, 1e2, 1e3, 5e3, 1e4, 1e6]))
     fmt = {value: f'${latex_float(10 ** value)}$ Myr' for value in levels}
     contours = axes.contour(
         _density_interps,
@@ -350,13 +350,13 @@ class CoolingTimes(HaloProperty):
                     (sw_data.gas.fofgroup_ids == 1) &
                     (a_heat > (1 / (z_agn_start + 1))) &
                     (a_heat < (1 / (z_agn_end + 1))) &
-                    (cooling_times > 7)
+                    (cooling_times > 9)
                 )[0]
             else:
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
-                    (cooling_times > 7)
+                    (cooling_times > 9)
                 )[0]
 
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
