@@ -306,6 +306,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
 
 class CoolingTimes(HaloProperty):
 
+
     def __init__(self):
         super().__init__()
 
@@ -315,7 +316,7 @@ class CoolingTimes(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None,
             agn_time: str = None,
-            z_agn_start: float = 18,
+            z_agn_start: float = 0.1,
             z_agn_end: float = 0.,
             **kwargs
     ):
@@ -335,7 +336,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        cooling_times = calculate_mean_cooling_times(sw_data, use_heating=True)
+        cooling_times = calculate_mean_cooling_times(sw_data)
 
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
@@ -348,7 +349,8 @@ class CoolingTimes(HaloProperty):
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
                     (a_heat > (1 / (z_agn_start + 1))) &
-                    (a_heat < (1 / (z_agn_end + 1)))
+                    (a_heat < (1 / (z_agn_end + 1))) &
+                    (cooling_times > 7)
                 )[0]
             else:
                 index = np.where(
@@ -359,7 +361,40 @@ class CoolingTimes(HaloProperty):
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
-        cooling_times = cooling_times[index]
+        elif agn_time == 'before':
+
+            index = np.where(
+                (sw_data.gas.radial_distances < aperture_fraction) &
+                (sw_data.gas.fofgroup_ids == 1) &
+                (a_heat > (1 / (z_agn_start + 1))) &
+                (a_heat < (1 / (z_agn_end + 1))) &
+                (sw_data.gas.densities_before_last_agnevent > 0)
+            )[0]
+
+            density = sw_data.gas.densities_before_last_agnevent[index]
+            number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
+            A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
+                    gamma - 1) * mh / boltzmann_constant
+            temperature = temperature.to('K').value
+
+        elif agn_time == 'after':
+
+            index = np.where(
+                (sw_data.gas.radial_distances < aperture_fraction) &
+                (sw_data.gas.fofgroup_ids == 1) &
+                (a_heat > (1 / (z_agn_start + 1))) &
+                (a_heat < (1 / (z_agn_end + 1))) &
+                (sw_data.gas.densities_at_last_agnevent > 0)
+            )[0]
+
+            density = sw_data.gas.densities_at_last_agnevent[index]
+            number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
+            A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
+            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
+                    gamma - 1) * mh / boltzmann_constant
+            temperature = temperature.to('K').value
+
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
         agn_flag = agn_flag > 0
@@ -373,19 +408,17 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
-        w = 10 ** cooling_times
 
         print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
-        assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0.]}"
-        assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0.]}"
-        assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
+        assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
+        assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0]}"
 
         # density_bounds = [1e-6, 1e4]  # in nh/cm^3
         # temperature_bounds = [1e3, 1e10]  # in K
         density_bounds = [1e-6, 1]  # in nh/cm^3
-        temperature_bounds = [1e6, 1e9]  # in K
+        temperature_bounds = [1e6, 1e10]  # in K
         bins = 256
 
         # Make the norm object to define the image stretch
@@ -398,7 +431,7 @@ class CoolingTimes(HaloProperty):
 
         fig = plt.figure(figsize=(5, 5))
         gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.2)
-        axes = gs.subplots()
+        axes = gs.subplots(sharex='col', sharey='row')
 
         for ax in axes.flat:
             ax.loglog()
@@ -426,34 +459,28 @@ class CoolingTimes(HaloProperty):
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
-        H = stats.binned_statistic_2d(x, y, w, statistic='count',
-                                      bins=[density_bins, temperature_bins]).statistic
-        H[H <= 0] = np.nan
-        print(H[H <= 0])
+        H, density_edges, temperature_edges = np.histogram2d(
+            x, y, bins=[density_bins, temperature_bins]
+        )
 
-        # plt.hist(w, bins=100)
-        # plt.yscale('log')
-        # plt.xlabel('$\log_{10}$(Cooling time [Myr])')
-        # plt.ylabel('Number of particles')
-
-        if (H > 0).any():
-            mappable = axes[0, 0].pcolormesh(
-                density_bins, temperature_bins, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
-            )
-            # create an axes on the right side of ax. The width of cax will be 5%
-            # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-            divider = make_axes_locatable(axes[0, 0])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
+        vmax = np.max(H) + 1
+        mappable = axes[0, 0].pcolormesh(
+            density_edges, temperature_edges, H.T,
+            norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
+        )
+        # create an axes on the right side of ax. The width of cax will be 5%
+        # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+        divider = make_axes_locatable(axes[0, 0])
+        cax = divider.append_axes("right", size="3%", pad=0.)
+        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+        ticklab = cbar.ax.get_yticklabels()
+        ticks = cbar.ax.get_yticks()
+        for i, (t, l) in enumerate(zip(ticks, ticklab)):
+            if t < 100:
+                ticklab[i] = f'{int(t):d}'
+            else:
+                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
@@ -462,22 +489,14 @@ class CoolingTimes(HaloProperty):
         H, density_edges, temperature_edges = np.histogram2d(
             x[(snii_flag & ~agn_flag)],
             y[(snii_flag & ~agn_flag)],
-            bins=[density_bins, temperature_bins],
-            weights=w[(snii_flag & ~agn_flag)]
-        )
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x[(snii_flag & ~agn_flag)],
-            y[(snii_flag & ~agn_flag)],
             bins=[density_bins, temperature_bins]
         )
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
 
         if (H > 0).any():
+            vmax = np.max(H) + 1
             mappable = axes[0, 1].pcolormesh(
                 density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greens_r', alpha=0.6
+                norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
             )
             divider = make_axes_locatable(axes[0, 1])
             cax = divider.append_axes("right", size="3%", pad=0.)
@@ -500,34 +519,24 @@ class CoolingTimes(HaloProperty):
         H, density_edges, temperature_edges = np.histogram2d(
             x[(agn_flag & ~snii_flag)],
             y[(agn_flag & ~snii_flag)],
-            bins=[density_bins, temperature_bins],
-            weights=w[(agn_flag & ~snii_flag)]
-        )
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & ~snii_flag)],
-            y[(agn_flag & ~snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
-
-        if (H > 0).any():
-            mappable = axes[1, 1].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[1, 1])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
+        vmax = np.max(H) + 1
+        mappable = axes[1, 1].pcolormesh(
+            density_edges, temperature_edges, H.T,
+            norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
+        )
+        divider = make_axes_locatable(axes[1, 1])
+        cax = divider.append_axes("right", size="3%", pad=0.)
+        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+        ticklab = cbar.ax.get_yticklabels()
+        ticks = cbar.ax.get_yticks()
+        for i, (t, l) in enumerate(zip(ticks, ticklab)):
+            if t < 100:
+                ticklab[i] = f'{int(t):d}'
+            else:
+                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
@@ -538,34 +547,24 @@ class CoolingTimes(HaloProperty):
         H, density_edges, temperature_edges = np.histogram2d(
             x[(agn_flag & snii_flag)],
             y[(agn_flag & snii_flag)],
-            bins=[density_bins, temperature_bins],
-            weights=w[(agn_flag & snii_flag)]
-        )
-        Nparticles, density_edges, temperature_edges = np.histogram2d(
-            x[(agn_flag & snii_flag)],
-            y[(agn_flag & snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-        H[H <= 0] = np.nan
-        Nparticles[Nparticles <= 0] = np.nan
-        H /= Nparticles
-
-        if (H > 0).any():
-            mappable = axes[1, 0].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[1, 0])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
+        vmax = np.max(H) + 1
+        mappable = axes[1, 0].pcolormesh(
+            density_edges, temperature_edges, H.T,
+            norm=LogNorm(vmin=1, vmax=vmax), cmap='Purples_r', alpha=0.6
+        )
+        divider = make_axes_locatable(axes[1, 0])
+        cax = divider.append_axes("right", size="3%", pad=0.)
+        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+        ticklab = cbar.ax.get_yticklabels()
+        ticks = cbar.ax.get_yticks()
+        for i, (t, l) in enumerate(zip(ticks, ticklab)):
+            if t < 100:
+                ticklab[i] = f'{int(t):d}'
+            else:
+                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+        cbar.ax.set_yticklabels(ticklab)
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
@@ -577,9 +576,9 @@ class CoolingTimes(HaloProperty):
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
 
         z_agn_recent_text = (
-            f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-        )
+                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+            )
         if agn_time is not None:
             z_agn_recent_text = (
                 f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
