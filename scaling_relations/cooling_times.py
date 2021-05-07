@@ -461,8 +461,8 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
         )
 
-        fig = plt.figure(figsize=(8, 5))
-        gs = fig.add_gridspec(2, 3, hspace=0.25, wspace=0.3)
+        fig = plt.figure(figsize=(5, 5))
+        gs = fig.add_gridspec(3, 3, hspace=0.25, wspace=0.3)
         axes = gs.subplots()
 
         for ax in axes.flat:
