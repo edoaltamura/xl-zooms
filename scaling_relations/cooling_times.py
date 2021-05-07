@@ -461,8 +461,8 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
         )
 
-        fig = plt.figure(figsize=(5, 5))
-        gs = fig.add_gridspec(3, 3, hspace=0.25, wspace=0.3)
+        fig = plt.figure(figsize=(6, 6))
+        gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
         axes = gs.subplots()
 
         for ax in axes.flat:
@@ -489,6 +489,8 @@ class CoolingTimes(HaloProperty):
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
+            ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
+            ax.set_ylabel(r"Temperature [K]")
 
         # PLOT ALL PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -649,7 +651,6 @@ class CoolingTimes(HaloProperty):
         axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], histtype='step', label='Not heated')
         axes[2, 1].set_xlabel("Hydrogen fraction")
         axes[2, 1].set_ylabel('Number of particles')
-        axes[2, 1].legend()
 
         axes[2, 2].clear()
         axes[2, 2].set_xscale('linear')
@@ -661,10 +662,6 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], histtype='step', label='Not heated')
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metal mass fraction [Zsun])")
         axes[2, 2].set_ylabel('Number of particles')
-        axes[2, 2].legend()
-
-        fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
-        fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
