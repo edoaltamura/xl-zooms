@@ -28,6 +28,7 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
+    # Major ticks
     ticks = cbar.ax.get_yticks(minor=False)
     labels = cbar.ax.get_yticklabels(minor=False)
 
@@ -38,11 +39,10 @@ def int_ticks(cbar):
         if float(t) < 100:
             l.set_text(f'{int(float(t))}')
 
-        print(t, l)
-
     cbar.ax.set_yticks(ticks, minor=False)
     cbar.ax.set_yticklabels(labels, minor=False)
-    print()
+
+    # Minor ticks
     ticks = cbar.ax.get_yticks(minor=True)
     labels = cbar.ax.get_yticklabels(minor=True)
 
@@ -51,11 +51,8 @@ def int_ticks(cbar):
         if float(t) < 100 and num_majors < 2:
             l.set_text(f'{int(float(t))}')
 
-        print(t, l)
-
     cbar.ax.set_yticks(ticks, minor=True)
     cbar.ax.set_yticklabels(labels, minor=True)
-    print()
 
     return cbar
 
@@ -465,7 +462,7 @@ class CoolingTimes(HaloProperty):
         )
 
         fig = plt.figure(figsize=(8, 5))
-        gs = fig.add_gridspec(2, 3, hspace=0.1, wspace=0.2)
+        gs = fig.add_gridspec(2, 3, hspace=0.25, wspace=0.3)
         axes = gs.subplots()
 
         for ax in axes.flat:
@@ -626,6 +623,7 @@ class CoolingTimes(HaloProperty):
 
         axes[1, 2].clear()
         axes[1, 2].set_xscale('linear')
+        axes[1, 2].set_yscale('log')
         axes[1, 2].hist(w, histtype='step', label='All')
         axes[1, 2].hist(w[(agn_flag & snii_flag)], histtype='step', label='AGN & SN')
         axes[1, 2].hist(w[(agn_flag & ~snii_flag)], histtype='step', label='AGN')
