@@ -6,7 +6,7 @@ from unyt import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
-from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import MaxNLocator
 
 from scipy import stats
 
@@ -196,8 +196,13 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     T_grid = axis[4]
     Z_grid = axis[2]
 
-    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
-                                              fill_value=-30)
+    f_net_rates = sci.RegularGridInterpolator(
+        (T_grid, Z_grid, nH_grid),
+        net_rates,
+        method="linear",
+        bounds_error=True,
+        fill_value=None
+    )
 
     hydrogen_fraction = data.gas.element_mass_fractions.hydrogen
     gas_nH = (data.gas.densities / mh * hydrogen_fraction).to(cm ** -3)
@@ -240,8 +245,8 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         (T_grid, Z_grid, nH_grid),
         net_rates,
         method="linear",
-        bounds_error=False,
-        fill_value=-30
+        bounds_error=True,
+        fill_value=None
     )
 
     _density_interps, _temperature_interps = np.meshgrid(density_bins, temperature_bins)
@@ -264,7 +269,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     cooling_time = cooling_time.reshape(_density_interps.shape)
 
     # Define entropy levels to plot
-    levels = np.log10(np.array([1, 1e2, 1e3, 5e3, 1e4, 1e6]))
+    levels = np.array([0, 1, 2, 3, 4, 5, 6, 7])
     fmt = {value: f'${latex_float(10 ** value)}$ Myr' for value in levels}
     contours = axes.contour(
         _density_interps,
@@ -478,7 +483,7 @@ class CoolingTimes(HaloProperty):
         divider = make_axes_locatable(axes[0, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-        cax.yaxis.set_major_formatter(ScalarFormatter())
+        cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
@@ -499,7 +504,7 @@ class CoolingTimes(HaloProperty):
             divider = make_axes_locatable(axes[0, 1])
             cax = divider.append_axes("right", size="3%", pad=0.)
             cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-        cax.yaxis.set_major_formatter(ScalarFormatter())
+            cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
 
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -522,7 +527,7 @@ class CoolingTimes(HaloProperty):
             divider = make_axes_locatable(axes[0, 2])
             cax = divider.append_axes("right", size="3%", pad=0.)
             cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax)
-        cax.yaxis.set_major_formatter(ScalarFormatter())
+            cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
 
         txt = AnchoredText("Not heated by SN or AGN", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
@@ -541,7 +546,7 @@ class CoolingTimes(HaloProperty):
         divider = make_axes_locatable(axes[1, 1])
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-        cax.yaxis.set_major_formatter(ScalarFormatter())
+        cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
@@ -562,7 +567,7 @@ class CoolingTimes(HaloProperty):
         divider = make_axes_locatable(axes[1, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-        cax.yaxis.set_major_formatter(ScalarFormatter())
+        cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
