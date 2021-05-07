@@ -33,6 +33,7 @@ def latex_float(f):
 def int_ticks(cbar):
     ticklab = [t.get_text() for t in cbar.ax.get_yticklabels()]
     for i, t in enumerate(ticklab):
+        print(t, float(t))
         if float(t) <= 100:
             ticklab[i] = f'{int(t):d}'
         else:
