@@ -3,6 +3,10 @@ import h5py as h5
 import scipy.interpolate as sci
 from matplotlib import pyplot as plt
 from unyt import *
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.offsetbox import AnchoredText
+from matplotlib.colors import LogNorm
+from scipy import stats
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table
@@ -178,9 +182,6 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
     heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
 
-    print(cooling_rates)
-    print(heating_rates)
-
     if use_heating:
         print('Net cooling rates: heating - cooling')
         net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
@@ -202,6 +203,10 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     temperature = data.gas.temperatures
     log_gas_T = np.log10(temperature)
     log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
+
+    too_hot = len(np.where(temperature > 10 ** 9.5)[0])
+    if too_hot > 0:
+        print(f'Detected {too_hot:d} particles hotter than 10^9.5 K.')
 
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
@@ -357,40 +362,6 @@ class CoolingTimes(HaloProperty):
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * primordial_hydrogen_mass_fraction
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
-        elif agn_time == 'before':
-
-            index = np.where(
-                (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
-                (a_heat > (1 / (z_agn_start + 1))) &
-                (a_heat < (1 / (z_agn_end + 1))) &
-                (sw_data.gas.densities_before_last_agnevent > 0)
-            )[0]
-
-            density = sw_data.gas.densities_before_last_agnevent[index]
-            number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
-            A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
-                    gamma - 1) * mh / boltzmann_constant
-            temperature = temperature.to('K').value
-
-        elif agn_time == 'after':
-
-            index = np.where(
-                (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
-                (a_heat > (1 / (z_agn_start + 1))) &
-                (a_heat < (1 / (z_agn_end + 1))) &
-                (sw_data.gas.densities_at_last_agnevent > 0)
-            )[0]
-
-            density = sw_data.gas.densities_at_last_agnevent[index]
-            number_density = (density / mh).to('cm**-3').value * primordial_hydrogen_mass_fraction
-            A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
-            temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
-                    gamma - 1) * mh / boltzmann_constant
-            temperature = temperature.to('K').value
-
         cooling_times = cooling_times[index]
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
         snii_flag = sw_data.gas.heated_by_sniifeedback[index]
@@ -409,225 +380,225 @@ class CoolingTimes(HaloProperty):
 
         print("Number of particles being plotted", len(x))
 
-        # # Set the limits of the figure.
-        # assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0.]}"
-        # assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0.]}"
-        # assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
-        #
-        # # density_bounds = [1e-6, 1e4]  # in nh/cm^3
-        # # temperature_bounds = [1e3, 1e10]  # in K
-        # density_bounds = [1e-6, 1]  # in nh/cm^3
-        # temperature_bounds = [1e6, 1e10]  # in K
-        # bins = 256
-        #
-        # # Make the norm object to define the image stretch
-        # density_bins = np.logspace(
-        #     np.log10(density_bounds[0]), np.log10(density_bounds[1]), bins
-        # )
-        # temperature_bins = np.logspace(
-        #     np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
-        # )
+        # Set the limits of the figure.
+        assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0.]}"
+        assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0.]}"
+        assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
 
-        # fig = plt.figure(figsize=(5, 5))
-        # gs = fig.add_gridspec(1, 1, hspace=0.1, wspace=0.2)
-        # axes = gs.subplots()
+        # density_bounds = [1e-6, 1e4]  # in nh/cm^3
+        # temperature_bounds = [1e3, 1e10]  # in K
+        density_bounds = [1e-6, 1]  # in nh/cm^3
+        temperature_bounds = [1e6, 1e10]  # in K
+        bins = 256
 
-        # for ax in axes.flat[:4]:
-        #     ax.loglog()
-        #
-        #     # Draw cross-hair marker
-        #     T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
-        #     ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
-        #     ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
-        #     K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
-        #             2 / 3)).to('keV*cm**2')
-        #
-        #     # Make the norm object to define the image stretch
-        #     contour_density_bins = np.logspace(
-        #         np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
-        #     )
-        #     contour_temperature_bins = np.logspace(
-        #         np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
-        #     )
-        #
-        #     draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
-        #     draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
-        #     draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins)
-        #
-        #     # Star formation threshold
-        #     ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
+        # Make the norm object to define the image stretch
+        density_bins = np.logspace(
+            np.log10(density_bounds[0]), np.log10(density_bounds[1]), bins
+        )
+        temperature_bins = np.logspace(
+            np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
+        )
+
+        fig = plt.figure(figsize=(5, 5))
+        gs = fig.add_gridspec(1, 1, hspace=0.1, wspace=0.2)
+        axes = gs.subplots()
+
+        for ax in axes.flat[:4]:
+            ax.loglog()
+
+            # Draw cross-hair marker
+            T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
+            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
+            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
+            K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
+                    2 / 3)).to('keV*cm**2')
+
+            # Make the norm object to define the image stretch
+            contour_density_bins = np.logspace(
+                np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
+            )
+            contour_temperature_bins = np.logspace(
+                np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
+            )
+
+            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
+            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins)
+
+            # Star formation threshold
+            ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
 
         # PLOT ALL PARTICLES ===============================================
         print(x.shape, x[np.isnan(x)])
         print(y.shape, y[np.isnan(y)])
         print(w.shape, w[np.isnan(w)])
-        # H = stat.binned_statistic_2d(x, y, w, bins=[density_bins, temperature_bins]).statistic
-        # print(H)
+        H = stats.binned_statistic_2d(x, y, w, statistic='count', bins=[density_bins, temperature_bins]).statistic
+        print(H)
 
-        plt.hist(w, bins=100)
-        plt.yscale('log')
-        plt.xlabel('$\log_{10}$(Cooling time [Myr])')
-        plt.ylabel('Number of particles')
+        # plt.hist(w, bins=100)
+        # plt.yscale('log')
+        # plt.xlabel('$\log_{10}$(Cooling time [Myr])')
+        # plt.ylabel('Number of particles')
 
-        # if (H > 0).any():
-        #     mappable = axes[0, 0].pcolormesh(
-        #         density_bins, temperature_bins, H.T,
-        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
-        #     )
-        #     # create an axes on the right side of ax. The width of cax will be 5%
-        #     # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-        #     divider = make_axes_locatable(axes[0, 0])
-        #     cax = divider.append_axes("right", size="3%", pad=0.)
-        #     cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-        #     ticklab = cbar.ax.get_yticklabels()
-        #     ticks = cbar.ax.get_yticks()
-        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
-        #         if t < 100:
-        #             ticklab[i] = f'{int(t):d}'
-        #         else:
-        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        #     cbar.ax.set_yticklabels(ticklab)
-        #
-        # txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        # axes[0, 0].add_artist(txt)
+        if (H > 0).any():
+            mappable = axes[0, 0].pcolormesh(
+                density_bins, temperature_bins, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greys_r'
+            )
+            # create an axes on the right side of ax. The width of cax will be 5%
+            # of ax and the padding between cax and ax will be fixed at 0.05 inch.
+            divider = make_axes_locatable(axes[0, 0])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
 
-        # # PLOT SN HEATED PARTICLES ===============================================
-        # H, density_edges, temperature_edges = np.histogram2d(
-        #     x[(snii_flag & ~agn_flag)],
-        #     y[(snii_flag & ~agn_flag)],
-        #     bins=[density_bins, temperature_bins],
-        #     weights=w[(snii_flag & ~agn_flag)]
-        # )
-        # Nparticles, density_edges, temperature_edges = np.histogram2d(
-        #     x[(snii_flag & ~agn_flag)],
-        #     y[(snii_flag & ~agn_flag)],
-        #     bins=[density_bins, temperature_bins]
-        # )
-        # H[H <= 0] = np.nan
-        # Nparticles[Nparticles <= 0] = np.nan
-        # H /= Nparticles
-        #
-        # if (H > 0).any():
-        #     mappable = axes[0, 1].pcolormesh(
-        #         density_edges, temperature_edges, H.T,
-        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greens_r', alpha=0.6
-        #     )
-        #     divider = make_axes_locatable(axes[0, 1])
-        #     cax = divider.append_axes("right", size="3%", pad=0.)
-        #     cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-        #     ticklab = cbar.ax.get_yticklabels()
-        #     ticks = cbar.ax.get_yticks()
-        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
-        #         if t < 100:
-        #             ticklab[i] = f'{int(t):d}'
-        #         else:
-        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        #     cbar.ax.set_yticklabels(ticklab)
-        #
-        # # Heating temperatures
-        # axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-        # txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        # axes[0, 1].add_artist(txt)
-        #
-        # # PLOT AGN HEATED PARTICLES ===============================================
-        # H, density_edges, temperature_edges = np.histogram2d(
-        #     x[(agn_flag & ~snii_flag)],
-        #     y[(agn_flag & ~snii_flag)],
-        #     bins=[density_bins, temperature_bins],
-        #     weights=w[(agn_flag & ~snii_flag)]
-        # )
-        # Nparticles, density_edges, temperature_edges = np.histogram2d(
-        #     x[(agn_flag & ~snii_flag)],
-        #     y[(agn_flag & ~snii_flag)],
-        #     bins=[density_bins, temperature_bins]
-        # )
-        # H[H <= 0] = np.nan
-        # Nparticles[Nparticles <= 0] = np.nan
-        # H /= Nparticles
-        #
-        # if (H > 0).any():
-        #     mappable = axes[1, 1].pcolormesh(
-        #         density_edges, temperature_edges, H.T,
-        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
-        #     )
-        #     divider = make_axes_locatable(axes[1, 1])
-        #     cax = divider.append_axes("right", size="3%", pad=0.)
-        #     cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-        #     ticklab = cbar.ax.get_yticklabels()
-        #     ticks = cbar.ax.get_yticks()
-        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
-        #         if t < 100:
-        #             ticklab[i] = f'{int(t):d}'
-        #         else:
-        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        #     cbar.ax.set_yticklabels(ticklab)
-        #
-        # txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        # axes[1, 1].add_artist(txt)
-        # # Heating temperatures
-        # axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
-        #
-        # # PLOT AGN+SN HEATED PARTICLES ===============================================
-        # H, density_edges, temperature_edges = np.histogram2d(
-        #     x[(agn_flag & snii_flag)],
-        #     y[(agn_flag & snii_flag)],
-        #     bins=[density_bins, temperature_bins],
-        #     weights=w[(agn_flag & snii_flag)]
-        # )
-        # Nparticles, density_edges, temperature_edges = np.histogram2d(
-        #     x[(agn_flag & snii_flag)],
-        #     y[(agn_flag & snii_flag)],
-        #     bins=[density_bins, temperature_bins]
-        # )
-        # H[H <= 0] = np.nan
-        # Nparticles[Nparticles <= 0] = np.nan
-        # H /= Nparticles
-        #
-        # if (H > 0).any():
-        #     mappable = axes[1, 0].pcolormesh(
-        #         density_edges, temperature_edges, H.T,
-        #         norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
-        #     )
-        #     divider = make_axes_locatable(axes[1, 0])
-        #     cax = divider.append_axes("right", size="3%", pad=0.)
-        #     cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-        #     ticklab = cbar.ax.get_yticklabels()
-        #     ticks = cbar.ax.get_yticks()
-        #     for i, (t, l) in enumerate(zip(ticks, ticklab)):
-        #         if t < 100:
-        #             ticklab[i] = f'{int(t):d}'
-        #         else:
-        #             ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        #     cbar.ax.set_yticklabels(ticklab)
-        #
-        # txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
-        # axes[1, 0].add_artist(txt)
-        # # Heating temperatures
-        # axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
-        # axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+        txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        axes[0, 0].add_artist(txt)
 
-        # fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
-        # fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
-        #
-        # z_agn_recent_text = (
-        #         f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-        #         f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-        #     )
-        # if agn_time is not None:
-        #     z_agn_recent_text = (
-        #         f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
-        #         f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-        #     )
-        #
-        # fig.suptitle(
-        #     (
-        #         f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
-        #         f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
-        #         f"{z_agn_recent_text:s}"
-        #         f"Central FoF group only"
-        #     ),
-        #     fontsize=7
-        # )
+        # PLOT SN HEATED PARTICLES ===============================================
+        H, density_edges, temperature_edges = np.histogram2d(
+            x[(snii_flag & ~agn_flag)],
+            y[(snii_flag & ~agn_flag)],
+            bins=[density_bins, temperature_bins],
+            weights=w[(snii_flag & ~agn_flag)]
+        )
+        Nparticles, density_edges, temperature_edges = np.histogram2d(
+            x[(snii_flag & ~agn_flag)],
+            y[(snii_flag & ~agn_flag)],
+            bins=[density_bins, temperature_bins]
+        )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
+        H /= Nparticles
+
+        if (H > 0).any():
+            mappable = axes[0, 1].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Greens_r', alpha=0.6
+            )
+            divider = make_axes_locatable(axes[0, 1])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
+
+        # Heating temperatures
+        axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+        txt = AnchoredText("SNe heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        axes[0, 1].add_artist(txt)
+
+        # PLOT AGN HEATED PARTICLES ===============================================
+        H, density_edges, temperature_edges = np.histogram2d(
+            x[(agn_flag & ~snii_flag)],
+            y[(agn_flag & ~snii_flag)],
+            bins=[density_bins, temperature_bins],
+            weights=w[(agn_flag & ~snii_flag)]
+        )
+        Nparticles, density_edges, temperature_edges = np.histogram2d(
+            x[(agn_flag & ~snii_flag)],
+            y[(agn_flag & ~snii_flag)],
+            bins=[density_bins, temperature_bins]
+        )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
+        H /= Nparticles
+
+        if (H > 0).any():
+            mappable = axes[1, 1].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Reds_r', alpha=0.6
+            )
+            divider = make_axes_locatable(axes[1, 1])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
+
+        txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        axes[1, 1].add_artist(txt)
+        # Heating temperatures
+        axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
+
+        # PLOT AGN+SN HEATED PARTICLES ===============================================
+        H, density_edges, temperature_edges = np.histogram2d(
+            x[(agn_flag & snii_flag)],
+            y[(agn_flag & snii_flag)],
+            bins=[density_bins, temperature_bins],
+            weights=w[(agn_flag & snii_flag)]
+        )
+        Nparticles, density_edges, temperature_edges = np.histogram2d(
+            x[(agn_flag & snii_flag)],
+            y[(agn_flag & snii_flag)],
+            bins=[density_bins, temperature_bins]
+        )
+        H[H <= 0] = np.nan
+        Nparticles[Nparticles <= 0] = np.nan
+        H /= Nparticles
+
+        if (H > 0).any():
+            mappable = axes[1, 0].pcolormesh(
+                density_edges, temperature_edges, H.T,
+                norm=LogNorm(vmin=1e-3, vmax=H.max()), cmap='Purples_r', alpha=0.6
+            )
+            divider = make_axes_locatable(axes[1, 0])
+            cax = divider.append_axes("right", size="3%", pad=0.)
+            cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
+            ticklab = cbar.ax.get_yticklabels()
+            ticks = cbar.ax.get_yticks()
+            for i, (t, l) in enumerate(zip(ticks, ticklab)):
+                if t < 100:
+                    ticklab[i] = f'{int(t):d}'
+                else:
+                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
+            cbar.ax.set_yticklabels(ticklab)
+
+        txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
+        axes[1, 0].add_artist(txt)
+        # Heating temperatures
+        axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
+        axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+
+        fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
+        fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
+
+        z_agn_recent_text = (
+                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+            )
+        if agn_time is not None:
+            z_agn_recent_text = (
+                f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
+                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+            )
+
+        fig.suptitle(
+            (
+                f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
+                f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
+                f"{z_agn_recent_text:s}"
+                f"Central FoF group only"
+            ),
+            fontsize=7
+        )
 
         if not args.quiet:
             plt.show()
