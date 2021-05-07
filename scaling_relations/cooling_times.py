@@ -624,6 +624,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
+        axes[1, 2].clear()
         axes[1, 2].set_xscale('linear')
         axes[1, 2].hist(w, histtype='step', label='All')
         axes[1, 2].hist(w[(agn_flag & snii_flag)], histtype='step', label='AGN & SN')
