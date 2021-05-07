@@ -432,7 +432,7 @@ class CoolingTimes(HaloProperty):
         print(x.shape, x[np.isnan(x)])
         print(y.shape, y[np.isnan(y)])
         print(w.shape, w[np.isnan(w)])
-        H = stats.binned_statistic_2d(x, y, w, statistic='count', bins=[density_bins, temperature_bins]).statistic
+        H = stats.binned_statistic_2d(x, y, statistic='count', bins=[density_bins, temperature_bins]).statistic
         print(H)
 
         # plt.hist(w, bins=100)
