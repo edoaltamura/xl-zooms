@@ -1,4 +1,4 @@
-from unyt import *
+import numpy as np
 import h5py as h5
 import scipy.interpolate as sci
 from matplotlib import pyplot as plt
