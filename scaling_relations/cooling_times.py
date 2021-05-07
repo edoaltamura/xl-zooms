@@ -343,7 +343,7 @@ class CoolingTimes(HaloProperty):
 
         if agn_time is None:
 
-            if z_agn_start < 7.2:
+            if z_agn_start < 7.2 or z_agn_end > 0:
 
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
@@ -588,7 +588,7 @@ class CoolingTimes(HaloProperty):
         fig.suptitle(
             (
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
-                f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
+                f"$z = {sw_data.metadata.z:.2f}$\n"
                 f"{z_agn_recent_text:s}"
                 f"Central FoF group only"
             ),
