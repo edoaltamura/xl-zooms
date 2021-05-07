@@ -6,7 +6,7 @@ from unyt import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
-from matplotlib.ticker import ScalarFormatter
+from matplotlib.ticker import MaxNLocator
 
 from scipy import stats
 
@@ -31,14 +31,7 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
-    ticklab = [t.get_text() for t in cbar.ax.get_yticklabels()]
-    for i, t in enumerate(ticklab):
-        print(t)
-        if float(t) <= 100:
-            ticklab[i] = f'{int(t):d}'
-        else:
-            ticklab[i] = f'${latex_float(float(t))}$'
-    cbar.ax.set_yticklabels(ticklab)
+    cbar.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     return cbar
 
 
