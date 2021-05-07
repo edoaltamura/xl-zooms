@@ -343,6 +343,8 @@ class CoolingTimes(HaloProperty):
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
+                    (sw_data.gas.temperatures > 1e5) &
+                    (sw_data.gas.temperatures < 1e9) &
                     (a_heat > (1 / (z_agn_start + 1))) &
                     (a_heat < (1 / (z_agn_end + 1)))
                 )[0]
