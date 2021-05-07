@@ -483,8 +483,7 @@ class CoolingTimes(HaloProperty):
         # of ax and the padding between cax and ax will be fixed at 0.05 inch.
         divider = make_axes_locatable(axes[0, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-        cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
+        cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax, format='%d')
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
@@ -504,8 +503,7 @@ class CoolingTimes(HaloProperty):
             )
             divider = make_axes_locatable(axes[0, 1])
             cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-            cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
+            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax, format='%d')
 
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -527,8 +525,7 @@ class CoolingTimes(HaloProperty):
             )
             divider = make_axes_locatable(axes[0, 2])
             cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax)
-            cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
+            cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax, format='%d')
 
         txt = AnchoredText("Not heated by SN or AGN", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
@@ -546,8 +543,7 @@ class CoolingTimes(HaloProperty):
         )
         divider = make_axes_locatable(axes[1, 1])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-        cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
+        cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax, format='%d')
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
@@ -567,8 +563,7 @@ class CoolingTimes(HaloProperty):
         )
         divider = make_axes_locatable(axes[1, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
-        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-        cbar.ax.yaxis.set_major_formatter(MaxNLocator(integer=True))
+        cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax, format='%d')
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
