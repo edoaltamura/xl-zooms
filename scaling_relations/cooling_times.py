@@ -403,7 +403,7 @@ class CoolingTimes(HaloProperty):
         gs = fig.add_gridspec(2, 2, hspace=0.1, wspace=0.2)
         axes = gs.subplots()
 
-        for ax in axes.flat[:4]:
+        for ax in axes.flat:
             ax.loglog()
 
             # Draw cross-hair marker
