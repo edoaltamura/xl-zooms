@@ -200,7 +200,7 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
         (T_grid, Z_grid, nH_grid),
         net_rates,
         method="linear",
-        bounds_error=True,
+        bounds_error=False,
         fill_value=None
     )
 
@@ -245,7 +245,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         (T_grid, Z_grid, nH_grid),
         net_rates,
         method="linear",
-        bounds_error=True,
+        bounds_error=False,
         fill_value=None
     )
 
@@ -418,6 +418,7 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
+        w = cooling_times[index]
 
         print("Number of particles being plotted", len(x))
 
@@ -441,9 +442,9 @@ class CoolingTimes(HaloProperty):
 
         fig = plt.figure(figsize=(8, 5))
         gs = fig.add_gridspec(2, 3, hspace=0.1, wspace=0.2)
-        axes = gs.subplots(sharex='col', sharey='row')
+        axes = gs.subplots()
 
-        for ax in axes.flat:
+        for ax in axes.flat[:-1]:
             ax.loglog()
 
             # Draw cross-hair marker
@@ -531,7 +532,7 @@ class CoolingTimes(HaloProperty):
 
         txt = AnchoredText("Not heated by SN or AGN", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
-        axes[1, 2].remove()
+
         # PLOT AGN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
             x[(agn_flag & ~snii_flag)],
@@ -574,6 +575,10 @@ class CoolingTimes(HaloProperty):
         # Heating temperatures
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+
+
+        # PDF of Cooling Times
+        axes[1, 2].hist(w)
 
         fig.text(0.5, 0.04, r"Density [$n_H$ cm$^{-3}$]", ha='center')
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
