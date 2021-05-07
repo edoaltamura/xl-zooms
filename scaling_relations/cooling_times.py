@@ -32,7 +32,7 @@ def latex_float(f):
 
 def fmt(x, pos):
     b = '{:.2f}'.format(x)
-    b = int(b)
+    b = int(float(b))
     return r'${}$'.format(b)
 
 
