@@ -6,6 +6,8 @@ from unyt import *
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
+from matplotlib.ticker import ScalarFormatter
+
 from scipy import stats
 
 from literature import Cosmology
@@ -476,14 +478,7 @@ class CoolingTimes(HaloProperty):
         divider = make_axes_locatable(axes[0, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-        ticklab = cbar.ax.get_yticklabels()
-        ticks = cbar.ax.get_yticks()
-        for i, (t, l) in enumerate(zip(ticks, ticklab)):
-            if t < 100:
-                ticklab[i] = f'{int(t):d}'
-            else:
-                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        cbar.ax.set_yticklabels(ticklab)
+        cbar.ax.set_major_formatter(ScalarFormatter())
 
         txt = AnchoredText("All particles", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
@@ -504,14 +499,7 @@ class CoolingTimes(HaloProperty):
             divider = make_axes_locatable(axes[0, 1])
             cax = divider.append_axes("right", size="3%", pad=0.)
             cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
+            cbar.ax.set_major_formatter(ScalarFormatter())
 
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -534,14 +522,7 @@ class CoolingTimes(HaloProperty):
             divider = make_axes_locatable(axes[0, 2])
             cax = divider.append_axes("right", size="3%", pad=0.)
             cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax)
-            ticklab = cbar.ax.get_yticklabels()
-            ticks = cbar.ax.get_yticks()
-            for i, (t, l) in enumerate(zip(ticks, ticklab)):
-                if t < 100:
-                    ticklab[i] = f'{int(t):d}'
-                else:
-                    ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-            cbar.ax.set_yticklabels(ticklab)
+            cbar.ax.set_major_formatter(ScalarFormatter())
 
         txt = AnchoredText("Not heated by SN or AGN", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
@@ -560,14 +541,7 @@ class CoolingTimes(HaloProperty):
         divider = make_axes_locatable(axes[1, 1])
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-        ticklab = cbar.ax.get_yticklabels()
-        ticks = cbar.ax.get_yticks()
-        for i, (t, l) in enumerate(zip(ticks, ticklab)):
-            if t < 100:
-                ticklab[i] = f'{int(t):d}'
-            else:
-                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        cbar.ax.set_yticklabels(ticklab)
+        cbar.ax.set_major_formatter(ScalarFormatter())
 
         txt = AnchoredText("AGN heated only", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
@@ -588,14 +562,7 @@ class CoolingTimes(HaloProperty):
         divider = make_axes_locatable(axes[1, 0])
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-        ticklab = cbar.ax.get_yticklabels()
-        ticks = cbar.ax.get_yticks()
-        for i, (t, l) in enumerate(zip(ticks, ticklab)):
-            if t < 100:
-                ticklab[i] = f'{int(t):d}'
-            else:
-                ticklab[i] = f'$10^{{{int(np.log10(t)):d}}}$'
-        cbar.ax.set_yticklabels(ticklab)
+        cbar.ax.set_major_formatter(ScalarFormatter())
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
