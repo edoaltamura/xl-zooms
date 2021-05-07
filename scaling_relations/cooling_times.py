@@ -32,21 +32,35 @@ def latex_float(f):
 
 def int_ticks(cbar):
 
-    for minor_flag in [True, False]:
+    ticks = cbar.ax.get_yticks(minor=False)
+    labels = cbar.ax.get_yticklabels(minor=False)
 
-        ticks = cbar.ax.get_yticks(minor=minor_flag)
-        labels = cbar.ax.get_yticklabels(minor=minor_flag)
+    for t, l in zip(ticks, labels):
 
-        for t, l in zip(ticks, labels):
+        if float(t) < 100:
+            l.set_text(f'{int(float(t))}')
 
-            if float(t) < 100:
-                if not minor_flag or len(l.get_text()) > 0:
-                    l.set_text(f'{int(float(t))}')
+        print(t, l)
 
-            print(t, l)
+    cbar.ax.set_yticks(ticks, minor=False)
+    cbar.ax.set_yticklabels(labels, minor=False)
+    print()
+    ticks = cbar.ax.get_yticks(minor=True)
+    labels = cbar.ax.get_yticklabels(minor=True)
 
-        cbar.ax.set_yticks(ticks, minor=minor_flag)
-        cbar.ax.set_yticklabels(labels, minor=minor_flag)
+    label_length = [len(l.get_text()) for l in labels]
+    label_length = [n for n in label_length if n > 0]
+    contains_minors = len(label_length) > 0
+
+    for t, l in zip(ticks, labels):
+
+        if float(t) < 100 and contains_minors:
+            l.set_text(f'{int(float(t))}')
+
+        print(t, l)
+
+    cbar.ax.set_yticks(ticks, minor=True)
+    cbar.ax.set_yticklabels(labels, minor=True)
 
     return cbar
 
