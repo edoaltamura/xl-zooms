@@ -1,14 +1,10 @@
-import numpy as np
 import h5py as h5
 import scipy.interpolate as sci
 from matplotlib import pyplot as plt
-from unyt import *
-from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.offsetbox import AnchoredText
 from matplotlib.colors import LogNorm
-from matplotlib.ticker import MaxNLocator
-
-from scipy import stats
+from matplotlib.offsetbox import AnchoredText
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+from unyt import *
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table
@@ -31,9 +27,10 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
-
     ticks = cbar.ax.get_yticks(minor=False)
     labels = cbar.ax.get_yticklabels(minor=False)
+
+    num_majors = len(labels)
 
     for t, l in zip(ticks, labels):
 
@@ -48,19 +45,16 @@ def int_ticks(cbar):
     ticks = cbar.ax.get_yticks(minor=True)
     labels = cbar.ax.get_yticklabels(minor=True)
 
-    label_length = [len(l.get_text()) for l in labels]
-    label_length = [n for n in label_length if n > 0]
-    contains_minors = len(label_length) > 0
-
     for t, l in zip(ticks, labels):
 
-        if float(t) < 100 and contains_minors:
+        if float(t) < 100 and num_majors < 2:
             l.set_text(f'{int(float(t))}')
 
         print(t, l)
 
     cbar.ax.set_yticks(ticks, minor=True)
     cbar.ax.set_yticklabels(labels, minor=True)
+    print()
 
     return cbar
 
@@ -343,7 +337,6 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
 
 class CoolingTimes(HaloProperty):
 
-
     def __init__(self):
         super().__init__()
 
@@ -609,9 +602,9 @@ class CoolingTimes(HaloProperty):
         fig.text(0.04, 0.5, r"Temperature [K]", va='center', rotation='vertical')
 
         z_agn_recent_text = (
-                f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
-                f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
-            )
+            f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+            f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
+        )
         if agn_time is not None:
             z_agn_recent_text = (
                 f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
