@@ -31,7 +31,12 @@ def latex_float(f):
 
 
 def int_ticks(cbar):
-    cbar.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    ticks = cbar.ax.yaxis.get_ticks()
+    labels = cbar.ax.yaxis.get_ticklabels()
+
+    for t in ticks:
+        print(t)
+
     return cbar
 
 
