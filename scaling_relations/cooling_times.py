@@ -39,8 +39,10 @@ def int_ticks(cbar):
 
         for t, l in zip(ticks, labels):
 
-            if float(t) < 100 and len(l.get_text()) > 0:
-                l.set_text(f'{int(float(t))}')
+            if float(t) < 100:
+                if not minor_flag or len(l.get_text()) > 0:
+                    l.set_text(f'{int(float(t))}')
+
             print(t, l)
 
         cbar.ax.set_yticks(ticks, minor=minor_flag)
