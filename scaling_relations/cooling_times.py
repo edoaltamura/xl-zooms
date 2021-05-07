@@ -316,7 +316,7 @@ class CoolingTimes(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None,
             agn_time: str = None,
-            z_agn_start: float = 0.1,
+            z_agn_start: float = 18,
             z_agn_end: float = 0.,
             **kwargs
     ):
