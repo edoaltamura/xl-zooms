@@ -383,7 +383,7 @@ class CoolingTimes(HaloProperty):
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0.]}"
         assert (y > 0).all(), f"Found negative value(s) in y: {y[y <= 0.]}"
-        assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
+        # assert (w > 0).all(), f"Found negative value(s) in w: {w[w <= 0.]}"
 
         # density_bounds = [1e-6, 1e4]  # in nh/cm^3
         # temperature_bounds = [1e3, 1e10]  # in K
