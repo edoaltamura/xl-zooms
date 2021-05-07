@@ -37,6 +37,9 @@ def int_ticks(cbar):
     for t in ticks:
         print(t)
 
+    for l in labels:
+        print(l)
+
     return cbar
 
 
