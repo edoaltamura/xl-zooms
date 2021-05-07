@@ -186,7 +186,7 @@ def calculate_mean_cooling_times(data, net_rates: bool = False):
     if net_rates:
         net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
     else:
-        net_rates = np.log10(np.abs(np.power(10., cooling_rates)))
+        net_rates = cooling_rates
 
     axis = get_axis_tables()
     nH_grid = axis[0]
