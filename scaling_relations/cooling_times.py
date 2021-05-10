@@ -217,8 +217,8 @@ def calculate_mean_cooling_times(data):
     print(f"Tables have {net_rates.ndim:d} dimensions.")
     for i in range(net_rates.ndim):
         print((
-            f"Min along axis {i}: {10 ** np.amin(net_rates, axis=i)} | "
-            f"Max along axis {i}: {10 ** np.amax(net_rates, axis=i)}"
+            f"Min along axis {i}: {10 ** np.amin(net_rates, axis=i).min()} | "
+            f"Max along axis {i}: {10 ** np.amax(net_rates, axis=i).max()}"
         ))
     print()
 
