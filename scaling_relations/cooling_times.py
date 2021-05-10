@@ -459,8 +459,8 @@ class CoolingTimes(HaloProperty):
 
         # density_bounds = [1e-6, 1e4]  # in nh/cm^3
         # temperature_bounds = [1e3, 1e10]  # in K
-        density_bounds = [1e-6, 1]  # in nh/cm^3
-        temperature_bounds = [1e6, 1e10]  # in K
+        density_bounds = [1e-4, 1]  # in nh/cm^3
+        temperature_bounds = [1e6, 1e9]  # in K
         bins = 256
 
         # Make the norm object to define the image stretch
@@ -471,8 +471,8 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
         )
 
-        fig = plt.figure(figsize=(9, 6))
-        gs = fig.add_gridspec(3, 4, hspace=0.3, wspace=0.3)
+        fig = plt.figure(figsize=(10, 6))
+        gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
         axes = gs.subplots()
 
         for ax in axes.flat:
@@ -635,41 +635,45 @@ class CoolingTimes(HaloProperty):
 
         axes[1, 2].remove()
 
+        bins = np.linspace(w.min(), w.max(), 51)
+
         axes[2, 0].clear()
         axes[2, 0].set_xscale('linear')
         axes[2, 0].set_yscale('log')
-        axes[2, 0].hist(w, bins=50, histtype='step', label='All')
-        axes[2, 0].hist(w[(agn_flag & snii_flag)], bins=50, histtype='step', label='AGN & SN')
-        axes[2, 0].hist(w[(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
-        axes[2, 0].hist(w[(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
-        axes[2, 0].hist(w[(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[2, 0].hist(w, bins=bins, histtype='step', label='All')
+        axes[2, 0].hist(w[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+        axes[2, 0].hist(w[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+        axes[2, 0].hist(w[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+        axes[2, 0].hist(w[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 0].set_xlabel(f"$\log_{{10}}$(Cooling time [Myr])")
         axes[2, 0].set_ylabel('Number of particles')
         axes[2, 0].legend()
 
         hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
+        bins = np.linspace(hydrogen_fraction.min(), hydrogen_fraction.max(), 51)
 
         axes[2, 1].clear()
         axes[2, 1].set_xscale('linear')
         axes[2, 1].set_yscale('log')
-        axes[2, 1].hist(hydrogen_fraction, bins=50, histtype='step', label='All')
-        axes[2, 1].hist(hydrogen_fraction[(agn_flag & snii_flag)], bins=50, histtype='step', label='AGN & SN')
-        axes[2, 1].hist(hydrogen_fraction[(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
-        axes[2, 1].hist(hydrogen_fraction[(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
-        axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[2, 1].hist(hydrogen_fraction, bins=bins, histtype='step', label='All')
+        axes[2, 1].hist(hydrogen_fraction[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+        axes[2, 1].hist(hydrogen_fraction[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+        axes[2, 1].hist(hydrogen_fraction[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+        axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 1].set_xlabel("Hydrogen fraction")
         axes[2, 1].set_ylabel('Number of particles')
 
         log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
+        bins = np.linspace(log_gas_Z.min(), log_gas_Z.max(), 51)
 
         axes[2, 2].clear()
         axes[2, 2].set_xscale('linear')
         axes[2, 2].set_yscale('log')
-        axes[2, 2].hist(log_gas_Z, bins=50, histtype='step', label='All')
-        axes[2, 2].hist(log_gas_Z[(agn_flag & snii_flag)], bins=50, histtype='step', label='AGN & SN')
-        axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
-        axes[2, 2].hist(log_gas_Z[(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
-        axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[2, 2].hist(log_gas_Z, bins=bins, histtype='step', label='All')
+        axes[2, 2].hist(log_gas_Z[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+        axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+        axes[2, 2].hist(log_gas_Z[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+        axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metal mass fraction [Zsun])")
         axes[2, 2].set_ylabel('Number of particles')
