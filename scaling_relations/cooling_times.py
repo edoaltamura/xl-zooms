@@ -231,7 +231,9 @@ def calculate_mean_cooling_times(data):
     log_gas_nH = np.log10(gas_nH)
     temperature = data.gas.temperatures
     log_gas_T = np.log10(temperature)
-    log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / solar_metallicity)
+
+    with np.errstate(divide='ignore'):
+        log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / solar_metallicity)
 
     # Values that go over the interpolation range are clipped to 0.5 Zsun
     if (log_gas_Z > 0.5).any():
