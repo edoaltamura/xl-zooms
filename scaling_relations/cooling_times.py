@@ -202,8 +202,7 @@ def get_heating_rates():
     return g["/Tdep/Heating"]
 
 
-def calculate_mean_cooling_times(data, use_heating: bool = False):
-    tff = np.sqrt(3 * np.pi / (32 * G * data.gas.densities))
+def calculate_mean_cooling_times(data):
 
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
@@ -211,12 +210,17 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     cooling_rates = np.log10(np.power(10., data_cooling[0, :, :, :, -2]) + np.power(10., data_cooling[0, :, :, :, -1]))
     heating_rates = np.log10(np.power(10., data_heating[0, :, :, :, -2]) + np.power(10., data_heating[0, :, :, :, -1]))
 
-    if use_heating:
-        print('Net cooling rates: heating - cooling')
-        net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
-    else:
-        print('Only cooling rates')
-        net_rates = cooling_rates
+    print('Net cooling rates: heating - cooling')
+    net_rates = np.log10(np.abs(np.power(10., heating_rates) - np.power(10., cooling_rates)))
+
+    print('Table interpolation bounds:')
+    print(f"Tables have {net_rates.ndim:d} dimensions.")
+    for i in range(net_rates.ndim):
+        print((
+            f"Min along axis {i}: {10 ** np.amin(net_rates, axis=i)} | "
+            f"Max along axis {i}: {10 ** np.amax(net_rates, axis=i)}"
+        ))
+    print()
 
     axis = get_axis_tables()
     nH_grid = axis[0]
@@ -369,7 +373,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        cooling_times = calculate_mean_cooling_times(sw_data, use_heating=True)
+        cooling_times = calculate_mean_cooling_times(sw_data)
 
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
