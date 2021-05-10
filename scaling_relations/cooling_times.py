@@ -223,8 +223,13 @@ def calculate_mean_cooling_times(data, use_heating: bool = False):
     T_grid = axis[4]
     Z_grid = axis[2]
 
-    f_net_rates = sci.RegularGridInterpolator((T_grid, Z_grid, nH_grid), net_rates, method="linear", bounds_error=False,
-                                              fill_value=-30)
+    f_net_rates = sci.RegularGridInterpolator(
+        (T_grid, Z_grid, nH_grid),
+        net_rates,
+        method="linear",
+        bounds_error=False,
+        fill_value=0
+    )
 
     hydrogen_fraction = data.gas.element_mass_fractions.hydrogen
     gas_nH = (data.gas.densities / mh * hydrogen_fraction).to(cm ** -3)
@@ -378,14 +383,12 @@ class CoolingTimes(HaloProperty):
                     (sw_data.gas.fofgroup_ids == 1) &
                     (a_heat > (1 / (z_agn_start + 1))) &
                     (a_heat < (1 / (z_agn_end + 1))) &
-                    (cooling_times > 9) &
                     (sw_data.gas.temperatures > 1.5)
                 )[0]
             else:
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
-                    (cooling_times > 9) &
                     (sw_data.gas.temperatures > 1.5)
                 )[0]
 
