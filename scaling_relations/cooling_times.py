@@ -675,7 +675,7 @@ class CoolingTimes(HaloProperty):
         axes[0, 3].hist(x[(agn_flag & ~snii_flag)], bins=density_edges, histtype='step', label='AGN')
         axes[0, 3].hist(x[(~agn_flag & snii_flag)], bins=density_edges, histtype='step', label='SN')
         axes[0, 3].hist(x[(~agn_flag & ~snii_flag)], bins=density_edges, histtype='step', label='Not heated')
-        axes[0, 3].set_xlabel(f"values_to_int[:, 0]")
+        axes[0, 3].set_xlabel(f"Density [$n_H$ cm$^{{-3}}$]")
         axes[0, 3].set_ylabel('Number of particles')
         axes[0, 3].legend()
         axes[1, 3].clear()
@@ -686,7 +686,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].hist(y[(agn_flag & ~snii_flag)], bins=temperature_edges, histtype='step', label='AGN')
         axes[1, 3].hist(y[(~agn_flag & snii_flag)], bins=temperature_edges, histtype='step', label='SN')
         axes[1, 3].hist(y[(~agn_flag & ~snii_flag)], bins=temperature_edges, histtype='step', label='Not heated')
-        axes[1, 3].set_xlabel("values_to_int[:, 1]")
+        axes[1, 3].set_xlabel("Temperature [K]")
         axes[1, 3].set_ylabel('Number of particles')
         axes[2, 3].remove()
 
