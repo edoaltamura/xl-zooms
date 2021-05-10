@@ -732,6 +732,7 @@ class CoolingTimes(HaloProperty):
         )
 
         if not args.quiet:
+            fig.set_tight_layout(False)
             plt.show()
         # fig.savefig(
         #     f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
