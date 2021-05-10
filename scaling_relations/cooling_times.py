@@ -14,6 +14,7 @@ from .halo_property import HaloProperty
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
 primordial_hydrogen_mass_fraction = 0.76
+solar_metallicity = 0.0133714
 
 
 def latex_float(f):
@@ -230,7 +231,7 @@ def calculate_mean_cooling_times(data):
     log_gas_nH = np.log10(gas_nH)
     temperature = data.gas.temperatures
     log_gas_T = np.log10(temperature)
-    log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
+    log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / solar_metallicity)
 
     # Values that go over the interpolation range are clipped to 0.5 Zsun
     if (log_gas_Z > 0.5).any():
@@ -242,11 +243,15 @@ def calculate_mean_cooling_times(data):
         ))
         log_gas_Z[log_gas_Z > 0.5] = 0.5
 
-    if (data.gas.metal_mass_fractions.value <= 0.).any():
+    if (data.gas.metal_mass_fractions.value < solar_metallicity * 1.e-50).any():
         print((
-            f"Found {(data.gas.metal_mass_fractions.value <= 0.).sum()} particles below the lower "
-            "metallicity bound in the interpolation tables (1e-50)."
+            f"Found {(data.gas.metal_mass_fractions.value < solar_metallicity * 1.e-50).sum()} "
+            "particles below the lower "
+            "metallicity bound in the interpolation tables. Values of "
+            "log10(Z/Zsun) < -50 are floored to -50 for the calculation of "
+            "net cooling times."
         ))
+        log_gas_Z[data.gas.metal_mass_fractions.value < solar_metallicity * 1.e-50] = -50
 
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
