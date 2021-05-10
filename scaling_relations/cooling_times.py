@@ -387,7 +387,13 @@ class CoolingTimes(HaloProperty):
         cooling_times = calculate_mean_cooling_times(sw_data)
 
         gamma = 5 / 3
-        a_heat = sw_data.gas.last_agnfeedback_scale_factors
+
+        try:
+            a_heat = sw_data.gas.last_agnfeedback_scale_factors
+        except AttributeError as e:
+            print(e)
+            print('Setting `last_agnfeedback_scale_factors` with 0.1.')
+            a_heat = np.ones_like(cooling_times) / 10
 
         if agn_time is None:
 
