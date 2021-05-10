@@ -255,7 +255,7 @@ def calculate_mean_cooling_times(data):
 
     cooling_times = np.log10(3. / 2. * 1.38e-16) + log_gas_T - log_gas_nH - net_rates_found - np.log10(3.154e13)
 
-    return cooling_times
+    return cooling_times, values_to_int
 
 
 def draw_cooling_contours(axes, density_bins, temperature_bins):
@@ -373,7 +373,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        cooling_times = calculate_mean_cooling_times(sw_data)
+        cooling_times, values_to_int = calculate_mean_cooling_times(sw_data)
 
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
@@ -447,6 +447,7 @@ class CoolingTimes(HaloProperty):
         x = number_density
         y = temperature
         w = cooling_times[index]
+        values_to_int = values_to_int[index]
 
         print("Number of particles being plotted", len(x))
 
@@ -469,7 +470,7 @@ class CoolingTimes(HaloProperty):
         )
 
         fig = plt.figure(figsize=(6, 6))
-        gs = fig.add_gridspec(3, 3, hspace=0.3, wspace=0.3)
+        gs = fig.add_gridspec(3, 4, hspace=0.3, wspace=0.3)
         axes = gs.subplots()
 
         for ax in axes.flat:
@@ -669,6 +670,40 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metal mass fraction [Zsun])")
         axes[2, 2].set_ylabel('Number of particles')
+
+        axes[3, 0].clear()
+        axes[3, 0].set_xscale('linear')
+        axes[3, 0].set_yscale('log')
+        axes[3, 0].hist(values_to_int[:, 0], bins=50, histtype='step', label='All')
+        axes[3, 0].hist(values_to_int[:, 0][(agn_flag & snii_flag)], bins=50, histtype='step', label='AGN & SN')
+        axes[3, 0].hist(values_to_int[:, 0][(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
+        axes[3, 0].hist(values_to_int[:, 0][(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
+        axes[3, 0].hist(values_to_int[:, 0][(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[3, 0].set_xlabel(f"values_to_int[:, 0]")
+        axes[3, 0].set_ylabel('Number of particles')
+        axes[3, 0].legend()
+
+        axes[3, 1].clear()
+        axes[3, 1].set_xscale('linear')
+        axes[3, 1].set_yscale('log')
+        axes[3, 1].hist(values_to_int[:, 1], bins=50, histtype='step', label='All')
+        axes[3, 1].hist(values_to_int[:, 1][(agn_flag & snii_flag)], bins=50, histtype='step', label='AGN & SN')
+        axes[3, 1].hist(values_to_int[:, 1][(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
+        axes[3, 1].hist(values_to_int[:, 1][(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
+        axes[3, 1].hist(values_to_int[:, 1][(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[3, 1].set_xlabel("values_to_int[:, 1]")
+        axes[3, 1].set_ylabel('Number of particles')
+
+        axes[3, 2].clear()
+        axes[3, 2].set_xscale('linear')
+        axes[3, 2].set_yscale('log')
+        axes[3, 2].hist(values_to_int[:, 2], bins=50, histtype='step', label='All')
+        axes[3, 2].hist(values_to_int[:, 2][(agn_flag & snii_flag)], bins=50, histtype='step', label='AGN & SN')
+        axes[3, 2].hist(values_to_int[:, 2][(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
+        axes[3, 2].hist(values_to_int[:, 2][(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
+        axes[3, 2].hist(values_to_int[:, 2][(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[3, 2].set_xlabel(f"values_to_int[:, 2]")
+        axes[3, 2].set_ylabel('Number of particles')
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
