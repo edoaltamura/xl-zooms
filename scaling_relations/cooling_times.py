@@ -369,7 +369,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        cooling_times = calculate_mean_cooling_times(sw_data)
+        cooling_times = calculate_mean_cooling_times(sw_data, use_heating=True)
 
         gamma = 5 / 3
         a_heat = sw_data.gas.last_agnfeedback_scale_factors
@@ -630,7 +630,7 @@ class CoolingTimes(HaloProperty):
 
         axes[2, 0].clear()
         axes[2, 0].set_xscale('linear')
-        axes[2, 0].set_yscale('linear')
+        axes[2, 0].set_yscale('log')
         axes[2, 0].hist(w, histtype='step', label='All')
         axes[2, 0].hist(w[(agn_flag & snii_flag)], histtype='step', label='AGN & SN')
         axes[2, 0].hist(w[(agn_flag & ~snii_flag)], histtype='step', label='AGN')
@@ -646,7 +646,7 @@ class CoolingTimes(HaloProperty):
 
         axes[2, 1].clear()
         axes[2, 1].set_xscale('linear')
-        axes[2, 1].set_yscale('linear')
+        axes[2, 1].set_yscale('log')
         axes[2, 1].hist(hydrogen_fraction, histtype='step', label='All')
         axes[2, 1].hist(hydrogen_fraction[(agn_flag & snii_flag)], histtype='step', label='AGN & SN')
         axes[2, 1].hist(hydrogen_fraction[(agn_flag & ~snii_flag)], histtype='step', label='AGN')
@@ -657,7 +657,7 @@ class CoolingTimes(HaloProperty):
 
         axes[2, 2].clear()
         axes[2, 2].set_xscale('linear')
-        axes[2, 2].set_yscale('linear')
+        axes[2, 2].set_yscale('log')
         axes[2, 2].hist(log_gas_Z, histtype='step', label='All')
         axes[2, 2].hist(log_gas_Z[(agn_flag & snii_flag)], histtype='step', label='AGN & SN')
         axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], histtype='step', label='AGN')
