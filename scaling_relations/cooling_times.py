@@ -242,6 +242,12 @@ def calculate_mean_cooling_times(data):
         ))
         log_gas_Z[log_gas_Z > 0.5] = 0.5
 
+    if (data.gas.metal_mass_fractions.value <= 0.).any():
+        print((
+            f"Found {(data.gas.metal_mass_fractions.value <= 0.).sum()} particles below the lower "
+            "metallicity bound in the interpolation tables (1e-50)."
+        ))
+
     # construct the matrix that we input in the interpolator
     values_to_int = np.zeros((len(log_gas_T), 3))
     values_to_int[:, 0] = log_gas_T
@@ -643,8 +649,6 @@ class CoolingTimes(HaloProperty):
 
         hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
 
-        log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
-
         axes[2, 1].clear()
         axes[2, 1].set_xscale('linear')
         axes[2, 1].set_yscale('log')
@@ -656,6 +660,8 @@ class CoolingTimes(HaloProperty):
         axes[2, 1].set_xlabel("Hydrogen fraction")
         axes[2, 1].set_ylabel('Number of particles')
 
+        log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
+
         axes[2, 2].clear()
         axes[2, 2].set_xscale('linear')
         axes[2, 2].set_yscale('log')
@@ -664,6 +670,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], bins=50, histtype='step', label='AGN')
         axes[2, 2].hist(log_gas_Z[(~agn_flag & snii_flag)], bins=50, histtype='step', label='SN')
         axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=50, histtype='step', label='Not heated')
+        axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metal mass fraction [Zsun])")
         axes[2, 2].set_ylabel('Number of particles')
 
@@ -678,6 +685,7 @@ class CoolingTimes(HaloProperty):
         axes[0, 3].set_xlabel(f"Density [$n_H$ cm$^{{-3}}$]")
         axes[0, 3].set_ylabel('Number of particles')
         axes[0, 3].legend()
+
         axes[1, 3].clear()
         axes[1, 3].set_xscale('log')
         axes[1, 3].set_yscale('log')
