@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import h5py as h5
 import scipy.interpolate as sci
 from matplotlib import pyplot as plt
@@ -723,6 +724,7 @@ class CoolingTimes(HaloProperty):
 
         fig.suptitle(
             (
+                f"{os.path.basename(path_to_snap)}\n"
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {sw_data.metadata.z:.2f}$\n"
                 f"{z_agn_recent_text:s}"
