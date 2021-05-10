@@ -242,6 +242,9 @@ def calculate_mean_cooling_times(data):
     log_gas_T = np.log10(temperature)
     log_gas_Z = np.log10(data.gas.metal_mass_fractions.value / 0.0133714)
 
+    # Values that go over the interpolation range are clipped to 0.5 Zsun
+    log_gas_Z[log_gas_Z > 0.5] = 0.5
+
     too_hot = len(np.where(temperature > 1e9)[0])
     print(f'Detected {too_hot:d} particles hotter than 10^9 K.')
 
@@ -387,15 +390,13 @@ class CoolingTimes(HaloProperty):
                     (sw_data.gas.fofgroup_ids == 1) &
                     (a_heat > (1 / (z_agn_start + 1))) &
                     (a_heat < (1 / (z_agn_end + 1))) &
-                    (sw_data.gas.temperatures > 1e5) &
-                    (np.log10(sw_data.gas.metal_mass_fractions.value / 0.0133714) > 0.5)
+                    (sw_data.gas.temperatures > 1e5)
                 )[0]
             else:
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
-                    (sw_data.gas.temperatures > 1e5) &
-                    (np.log10(sw_data.gas.metal_mass_fractions.value / 0.0133714) > 0.5)
+                    (sw_data.gas.temperatures > 1e5)
                 )[0]
 
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * sw_data.gas.element_mass_fractions.hydrogen[index]
