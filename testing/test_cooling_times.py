@@ -55,7 +55,7 @@ gf = CoolingTimes()
 #         z_agn_end=3
 #     )
 
-dir = '/cosma/home/dp004/dc-alta2/data6/xl-zooms/'
+dir = '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/'
 
 snaps = [dir + i for i in [
     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036.hdf5",
