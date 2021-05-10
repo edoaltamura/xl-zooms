@@ -397,13 +397,15 @@ class CoolingTimes(HaloProperty):
                     (sw_data.gas.fofgroup_ids == 1) &
                     (a_heat > (1 / (z_agn_start + 1))) &
                     (a_heat < (1 / (z_agn_end + 1))) &
-                    (sw_data.gas.temperatures > 1e5)
+                    (sw_data.gas.temperatures > 1e5) &
+                    (cooling_times > 0)
                 )[0]
             else:
                 index = np.where(
                     (sw_data.gas.radial_distances < aperture_fraction) &
                     (sw_data.gas.fofgroup_ids == 1) &
-                    (sw_data.gas.temperatures > 1e5)
+                    (sw_data.gas.temperatures > 1e5) &
+                    (cooling_times > 0)
                 )[0]
 
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * sw_data.gas.element_mass_fractions.hydrogen[index]
@@ -681,8 +683,8 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
         axes[2, 2].hist(log_gas_Z[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
         axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
-        axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=1, zorder=0)
-        axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metal mass fraction [Zsun])")
+        axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=0.5, zorder=0)
+        axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metallicity [Z$_\odot$])")
         axes[2, 2].set_ylabel('Number of particles')
 
         axes[0, 3].clear()
