@@ -532,7 +532,7 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("All particles", loc="upper right", edgecolor='none', pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("All particles", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
 
         # PLOT SN HEATED PARTICLES ===============================================
@@ -559,7 +559,7 @@ class CoolingTimes(HaloProperty):
 
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-        txt = AnchoredText("SNe heated only", loc="upper right", edgecolor='none', pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("SNe heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 1].add_artist(txt)
 
         # PLOT NOT HEATED PARTICLES ===============================================
@@ -584,7 +584,7 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("Not heated by SN or AGN", loc="upper right", edgecolor='none', pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("Not heated by SN or AGN", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
 
         # PLOT AGN HEATED PARTICLES ===============================================
@@ -609,7 +609,7 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("AGN heated only", loc="upper right", edgecolor='none', pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("AGN heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
         # Heating temperatures
         axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -636,7 +636,7 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("AGN and SNe heated", loc="upper right", edgecolor='none', pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("AGN and SNe heated", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
         # Heating temperatures
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
