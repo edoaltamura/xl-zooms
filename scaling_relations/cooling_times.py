@@ -324,7 +324,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
     )
 
     if use_labels:
-        fmt = {value: f'{prefix}${latex_float(10 ** value)}$ Myr' for value in levels}
+        fmt = {value: f'{prefix}${latex_float(10 ** value)}$ Myr' for value in _levels}
 
         # work with logarithms for loglog scale
         # middle of the figure:
