@@ -171,7 +171,7 @@ for i, run_directory in enumerate(args.directories):
 
         slurm_file = os.path.join(
             run_directory,
-            f"vr_batch_{i + 1:02d}.slurm"
+            f"vr_batch_{i:02d}.slurm"
         )
         with open(slurm_file, "w") as submit_file:
 
