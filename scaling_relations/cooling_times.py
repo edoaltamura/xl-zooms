@@ -9,7 +9,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from unyt import *
 
 from literature import Cosmology
-from register import Zoom, args, cooling_table
+from register import Zoom, args, cooling_table, default_output_directory
 from .halo_property import HaloProperty
 
 mean_molecular_weight = 0.59
@@ -205,7 +205,6 @@ def get_heating_rates():
 
 
 def calculate_mean_cooling_times(data):
-
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
 
@@ -269,7 +268,7 @@ def calculate_mean_cooling_times(data):
     return cooling_times
 
 
-def draw_cooling_contours(axes, density_bins, temperature_bins):
+def draw_cooling_contours(axes, density_bins, temperature_bins, levels=[1.e4], color='green', prefix=''):
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
 
@@ -311,14 +310,14 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
     cooling_time = cooling_time.reshape(_density_interps.shape)
 
     # Define entropy levels to plot
-    levels = np.log10(np.array([1, 1e2, 1e3, 1e4, 1e5]))
-    fmt = {value: f'${latex_float(10 ** value)}$ Myr' for value in levels}
+    levels = np.log10(np.array(levels))
+    fmt = {value: f'{prefix}${latex_float(10 ** value)}$ Myr' for value in levels}
     contours = axes.contour(
         _density_interps,
         _temperature_interps,
         cooling_time,
         levels,
-        colors='green',
+        colors=color,
         linewidths=0.3,
         alpha=0.5
     )
@@ -346,7 +345,7 @@ def draw_cooling_contours(axes, density_bins, temperature_bins):
         inline=True,
         inline_spacing=3,
         rightside_up=True,
-        colors='green',
+        colors=color,
         fontsize=5,
         fmt=fmt,
         manual=label_pos,
@@ -415,7 +414,8 @@ class CoolingTimes(HaloProperty):
                     (cooling_times > 0)
                 )[0]
 
-            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * sw_data.gas.element_mass_fractions.hydrogen[index]
+            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * \
+                             sw_data.gas.element_mass_fractions.hydrogen[index]
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
         elif agn_time == 'before':
@@ -511,7 +511,13 @@ class CoolingTimes(HaloProperty):
 
             draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
             draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
-            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins)
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
+                                  levels=[1, 1e2, 1e3, 1e4, 1e5],
+                                  color='green')
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
+                                  levels=[Cosmology().age(sw_data.metadata.z).to('Myr').value],
+                                  prefix='$t_H(z)=$',
+                                  color='red')
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
@@ -539,7 +545,8 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("All particles", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("All particles", loc="upper right", frameon=False, pad=0.4, borderpad=0,
+                           prop={"fontsize": 8})
         axes[0, 0].add_artist(txt)
 
         # PLOT SN HEATED PARTICLES ===============================================
@@ -566,7 +573,8 @@ class CoolingTimes(HaloProperty):
 
         # Heating temperatures
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-        txt = AnchoredText("SNe heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("SNe heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0,
+                           prop={"fontsize": 8})
         axes[0, 1].add_artist(txt)
 
         # PLOT NOT HEATED PARTICLES ===============================================
@@ -591,7 +599,8 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("Not heated by SN or AGN", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("Not heated by SN or AGN", loc="upper right", frameon=False, pad=0.4, borderpad=0,
+                           prop={"fontsize": 8})
         axes[0, 2].add_artist(txt)
 
         # PLOT AGN HEATED PARTICLES ===============================================
@@ -616,7 +625,8 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("AGN heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("AGN heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0,
+                           prop={"fontsize": 8})
         axes[1, 1].add_artist(txt)
         # Heating temperatures
         axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -643,7 +653,8 @@ class CoolingTimes(HaloProperty):
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
-        txt = AnchoredText("AGN and SNe heated", loc="upper right", frameon=False, pad=0.4, borderpad=0, prop={"fontsize": 8})
+        txt = AnchoredText("AGN and SNe heated", loc="upper right", frameon=False, pad=0.4, borderpad=0,
+                           prop={"fontsize": 8})
         axes[1, 0].add_artist(txt)
         # Heating temperatures
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
@@ -742,9 +753,13 @@ class CoolingTimes(HaloProperty):
         if not args.quiet:
             fig.set_tight_layout(False)
             plt.show()
-        # fig.savefig(
-        #     f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
-        #     dpi=300
-        # )
+
+        fig.savefig(
+            os.path.join(
+                default_output_directory,
+                f"cooling_times_{os.path.basename(path_to_snap)[:-5].replace('.', 'p')}.png"
+            ),
+            dpi=300
+        )
 
         plt.close()

@@ -161,6 +161,14 @@ class Cosmology(object):
 
         return self.cosmo_model.luminosity_distance(*args, **kwargs)
 
+    def age(self, *args, **kwargs) -> unyt.unyt_quantity:
+
+        t = self.cosmo_model.age(*args, **kwargs)
+        value = t.value
+        units = str(t.units)
+        return unyt.unyt_quantity(value, units)
+
+
 
 class Article(Cosmology):
 
