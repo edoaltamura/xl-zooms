@@ -747,7 +747,7 @@ class CoolingTimes(HaloProperty):
             (
                 f"{os.path.basename(path_to_snap)}\n"
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
-                f"$z = {sw_data.metadata.z:.2f}$\n"
+                f"$z = {sw_data.metadata.z:.2f}$\tAge = {Cosmology().age(sw_data.metadata.z)}\n"
                 f"{z_agn_recent_text:s}"
                 f"Central FoF group only"
             ),
