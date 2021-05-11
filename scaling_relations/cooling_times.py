@@ -268,7 +268,8 @@ def calculate_mean_cooling_times(data):
     return cooling_times
 
 
-def draw_cooling_contours(axes, density_bins, temperature_bins, levels=[1.e4], color='green', prefix='', use_labels=False):
+def draw_cooling_contours(axes, density_bins, temperature_bins,
+                          levels=[1.e4], color='green', prefix='', use_labels=True):
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
 
@@ -676,9 +677,11 @@ class CoolingTimes(HaloProperty):
         axes[2, 0].hist(w[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
         axes[2, 0].hist(w[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
         axes[2, 0].hist(w[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
+        axes[2, 0].axvline(np.log10(Cosmology().age(sw_data.metadata.z).to('Myr').value),
+                           color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 0].set_xlabel(f"$\log_{{10}}$(Cooling time [Myr])")
         axes[2, 0].set_ylabel('Number of particles')
-        axes[2, 0].legend()
+        axes[2, 0].legend(loc = "upper left")
 
         hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
         bins = np.linspace(hydrogen_fraction.min(), hydrogen_fraction.max(), 51)
@@ -709,26 +712,30 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metallicity [Z$_\odot$])")
         axes[2, 2].set_ylabel('Number of particles')
 
+        bins = np.linspace(x.min(), x.max(), 51)
+
         axes[0, 3].clear()
         axes[0, 3].set_xscale('log')
         axes[0, 3].set_yscale('log')
-        axes[0, 3].hist(x, bins=density_edges, histtype='step', label='All')
-        axes[0, 3].hist(x[(agn_flag & snii_flag)], bins=density_edges, histtype='step', label='AGN & SN')
-        axes[0, 3].hist(x[(agn_flag & ~snii_flag)], bins=density_edges, histtype='step', label='AGN')
-        axes[0, 3].hist(x[(~agn_flag & snii_flag)], bins=density_edges, histtype='step', label='SN')
-        axes[0, 3].hist(x[(~agn_flag & ~snii_flag)], bins=density_edges, histtype='step', label='Not heated')
+        axes[0, 3].hist(x, bins=bins, histtype='step', label='All')
+        axes[0, 3].hist(x[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+        axes[0, 3].hist(x[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+        axes[0, 3].hist(x[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+        axes[0, 3].hist(x[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[0, 3].set_xlabel(f"Density [$n_H$ cm$^{{-3}}$]")
         axes[0, 3].set_ylabel('Number of particles')
         axes[0, 3].legend()
 
+        bins = np.linspace(y.min(), y.max(), 51)
+
         axes[1, 3].clear()
         axes[1, 3].set_xscale('log')
         axes[1, 3].set_yscale('log')
-        axes[1, 3].hist(y, bins=temperature_edges, histtype='step', label='All')
-        axes[1, 3].hist(y[(agn_flag & snii_flag)], bins=temperature_edges, histtype='step', label='AGN & SN')
-        axes[1, 3].hist(y[(agn_flag & ~snii_flag)], bins=temperature_edges, histtype='step', label='AGN')
-        axes[1, 3].hist(y[(~agn_flag & snii_flag)], bins=temperature_edges, histtype='step', label='SN')
-        axes[1, 3].hist(y[(~agn_flag & ~snii_flag)], bins=temperature_edges, histtype='step', label='Not heated')
+        axes[1, 3].hist(y, bins=bins, histtype='step', label='All')
+        axes[1, 3].hist(y[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+        axes[1, 3].hist(y[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+        axes[1, 3].hist(y[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+        axes[1, 3].hist(y[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[1, 3].set_xlabel("Temperature [K]")
         axes[1, 3].set_ylabel('Number of particles')
         axes[2, 3].remove()
@@ -747,7 +754,7 @@ class CoolingTimes(HaloProperty):
             (
                 f"{os.path.basename(path_to_snap)}\n"
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
-                f"$z = {sw_data.metadata.z:.2f}$\tAge = {Cosmology().age(sw_data.metadata.z)}\n"
+                f"$z = {sw_data.metadata.z:.2f}$\tAge = {Cosmology().age(sw_data.metadata.z).value:.2f} Gyr\n"
                 f"{z_agn_recent_text:s}"
                 f"Central FoF group only"
             ),
