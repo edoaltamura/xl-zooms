@@ -189,7 +189,7 @@ for i, run_directory in enumerate(args.directories):
 
                 print(
                     make_stf_invoke(
-                        input_file=snapshot_files[split_batch_item][:-5],
+                        input_file=snapshot_files[split_batch_item],
                         output_file=os.path.join(
                             stf_subdirs[split_batch_item],
                             os.path.basename(stf_subdirs[split_batch_item])
