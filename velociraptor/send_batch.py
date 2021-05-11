@@ -85,8 +85,8 @@ def make_stf_invoke(input_file: str, output_file: str) -> str:
     return (
         f"{executable_path}"
         f" -I 2"
-        f" -i {input_file.rstrip('.hdf5')}"
-        f" -o {output_file.rstrip('.hdf5')}"
+        f" -i {input_file[:-5]}"
+        f" -o {output_file[:-5]}"
         f" -C {parameter_file}"
     )
 
