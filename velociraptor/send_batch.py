@@ -82,7 +82,6 @@ def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str =
 
 
 def make_stf_invoke(input_file: str, output_file: str) -> str:
-
     _input_file = input_file
     if input_file.endswith('.hdf5'):
         _input_file = input_file[:-5]
@@ -116,7 +115,7 @@ for i, run_directory in enumerate(args.directories):
         file_path = os.path.join(snaps_path, file)
         stf_subdir = os.path.join(catalogues_path, file[:-5])
 
-        if os.path.isfile(file_path) and file.endswith('.hdf5') and len(os.listdir(stf_subdir)) == 0:
+        if os.path.isfile(file_path) and file.endswith('.hdf5'):  # and len(os.listdir(stf_subdir)) == 0:
 
             if not args.no_snapid:
                 with h5file(file_path, 'r') as f:
@@ -182,8 +181,8 @@ for i, run_directory in enumerate(args.directories):
 
             print(
                 make_sbatch_params(
-                        run_name=f"VR_batch_{i:02d}_{os.path.basename(run_directory)}"
-                    ),
+                    run_name=f"VR_batch_{i:02d}_{os.path.basename(run_directory)}"
+                ),
                 file=submit_file
             )
             print(modules, file=submit_file)
