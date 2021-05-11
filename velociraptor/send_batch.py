@@ -141,8 +141,6 @@ for i, run_directory in enumerate(args.directories):
     snapshot_files = np.asarray(snapshot_files, dtype=np.str)[sort_key]
     stf_subdirs = np.asarray(stf_subdirs, dtype=np.str)[sort_key]
 
-    print(snapshot_files[0], stf_subdirs[0])
-
     if number_snapshots == 0:
         raise FileNotFoundError(f"No snapshot file found in {snaps_path}")
     else:
@@ -164,9 +162,8 @@ for i, run_directory in enumerate(args.directories):
     chunk_items = np.cumsum(chunk_items)
 
     split_indices = np.split(np.arange(number_snapshots), chunk_items)
-    print(split_indices)
     split_indices = [split_batch for split_batch in split_indices if len(split_batch) > 0]
-    print(split_indices)
+    number_batches = len(split_indices)
 
     for i, split_batch in enumerate(split_indices):
 
@@ -175,7 +172,7 @@ for i, run_directory in enumerate(args.directories):
             continue
 
         print((
-            f"Batch {i + 1:02d}/{number_splits + 1:02d} | "
+            f"Batch {i + 1:02d}/{number_batches:02d} | "
             f"Invoking VR on {len(split_batch)} snapshots. "
             f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}\n"
             "Snapshot numbers in this batch:"
