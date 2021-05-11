@@ -38,8 +38,10 @@ def int_ticks(cbar):
 
     for t, l in zip(ticks, labels):
 
-        if float(t) < 100:
+        if float(t) < 10:
             l.set_text(f'{int(float(t))}')
+        else:
+            l.set_text(f'$10^{{{int(np.log10(float(t)))}}}$')
 
     cbar.ax.set_yticks(ticks, minor=False)
     cbar.ax.set_yticklabels(labels, minor=False)
