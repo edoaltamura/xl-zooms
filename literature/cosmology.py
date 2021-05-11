@@ -165,7 +165,7 @@ class Cosmology(object):
 
         t = self.cosmo_model.age(*args, **kwargs)
         value = t.value
-        units = str(t.units)
+        units = str(t.unit)
         return unyt.unyt_quantity(value, units)
 
 
