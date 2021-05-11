@@ -205,7 +205,7 @@ for i, run_directory in enumerate(args.directories):
                         input_file=snapshot_files[split_batch_item],
                         output_file=os.path.join(
                             stf_subdirs[split_batch_item],
-                            os.path.basename(stf_subdirs[split_batch_item])
+                            os.path.basename(snapshot_files[split_batch_item])
                         )
                     ),
                     file=submit_file
