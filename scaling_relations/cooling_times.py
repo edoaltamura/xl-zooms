@@ -268,7 +268,7 @@ def calculate_mean_cooling_times(data):
     return cooling_times
 
 
-def draw_cooling_contours(axes, density_bins, temperature_bins, levels=[1.e4], color='green', prefix=''):
+def draw_cooling_contours(axes, density_bins, temperature_bins, levels=[1.e4], color='green', prefix='', use_labels=False):
     data_cooling = get_cooling_rates()
     data_heating = get_heating_rates()
 
@@ -310,46 +310,49 @@ def draw_cooling_contours(axes, density_bins, temperature_bins, levels=[1.e4], c
     cooling_time = cooling_time.reshape(_density_interps.shape)
 
     # Define entropy levels to plot
-    levels = np.log10(np.array(levels))
-    fmt = {value: f'{prefix}${latex_float(10 ** value)}$ Myr' for value in levels}
+    _levels = np.log10(np.array(levels))
+
     contours = axes.contour(
         _density_interps,
         _temperature_interps,
         cooling_time,
-        levels,
+        _levels,
         colors=color,
         linewidths=0.3,
         alpha=0.5
     )
 
-    # work with logarithms for loglog scale
-    # middle of the figure:
-    xmin, xmax, ymin, ymax = axes.axis()
-    logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
+    if use_labels:
+        fmt = {value: f'{prefix}${latex_float(10 ** value)}$ Myr' for value in levels}
 
-    label_pos = []
-    i = 0
-    for line in contours.collections:
-        for path in line.get_paths():
-            logvert = np.log10(path.vertices)
-            i += 1
+        # work with logarithms for loglog scale
+        # middle of the figure:
+        xmin, xmax, ymin, ymax = axes.axis()
+        logmid = (np.log10(xmin) + np.log10(xmax)) / 2, (np.log10(ymin) + np.log10(ymax)) / 2
 
-            # find closest point
-            logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
-            min_ind = np.argmin(logdist)
-            label_pos.append(10 ** logvert[min_ind, :])
+        label_pos = []
+        i = 0
+        for line in contours.collections:
+            for path in line.get_paths():
+                logvert = np.log10(path.vertices)
+                i += 1
 
-    # Draw contour labels
-    axes.clabel(
-        contours,
-        inline=True,
-        inline_spacing=3,
-        rightside_up=True,
-        colors=color,
-        fontsize=5,
-        fmt=fmt,
-        manual=label_pos,
-    )
+                # find closest point
+                logdist = np.linalg.norm(logvert - logmid, ord=2, axis=1)
+                min_ind = np.argmin(logdist)
+                label_pos.append(10 ** logvert[min_ind, :])
+
+        # Draw contour labels
+        axes.clabel(
+            contours,
+            inline=True,
+            inline_spacing=3,
+            rightside_up=True,
+            colors=color,
+            fontsize=5,
+            fmt=fmt,
+            manual=label_pos,
+        )
 
 
 class CoolingTimes(HaloProperty):
@@ -517,7 +520,8 @@ class CoolingTimes(HaloProperty):
             draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
                                   levels=[Cosmology().age(sw_data.metadata.z).to('Myr').value],
                                   prefix='$t_H(z)=$',
-                                  color='red')
+                                  color='red',
+                                  use_labels=False)
 
             # Star formation threshold
             ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
