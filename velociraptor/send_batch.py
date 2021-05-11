@@ -82,11 +82,20 @@ def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str =
 
 
 def make_stf_invoke(input_file: str, output_file: str) -> str:
+
+    _input_file = input_file
+    if input_file.endswith('.hdf5'):
+        _input_file = input_file[:-5]
+
+    _output_file = output_file
+    if input_file.endswith('.hdf5'):
+        _output_file = output_file[:-5]
+
     return (
         f"{executable_path}"
         f" -I 2"
-        f" -i {input_file[:-5]}"
-        f" -o {output_file[:-5]}"
+        f" -i {_input_file}"
+        f" -o {_output_file}"
         f" -C {parameter_file}"
     )
 
