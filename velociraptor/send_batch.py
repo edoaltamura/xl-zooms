@@ -158,16 +158,16 @@ for i, run_directory in enumerate(args.directories):
 
     for i, split_batch in enumerate(split_indices):
 
+        if len(split_batch) == 0:
+            print('Empty batch... continue to next.')
+            continue
+
         print((
             f"Batch {i + 1:02d}/{number_splits + 1:02d} | "
             f"Invoking VR on {len(split_batch)} snapshots. "
             f"Total batch size {sizeof_fmt(snapshot_sizes[split_batch].sum())}\n"
             "Snapshot numbers in this batch:"
         ))
-
-        if len(split_batch) == 0:
-            print('Empty batch... continue to next.')
-            continue
 
         slurm_file = os.path.join(
             run_directory,
