@@ -165,6 +165,10 @@ for i, run_directory in enumerate(args.directories):
             "Snapshot numbers in this batch:"
         ))
 
+        if len(split_batch) == 0:
+            print('Empty batch... continue to next.')
+            continue
+
         slurm_file = os.path.join(
             run_directory,
             f"vr_batch_{i + 1:02d}.slurm"
@@ -173,7 +177,7 @@ for i, run_directory in enumerate(args.directories):
 
             print(
                 make_sbatch_params(
-                        run_name=f"VR_batch_{i + 1:02d}_{os.path.basename(run_directory)}"
+                        run_name=f"VR_batch_{i:02d}_{os.path.basename(run_directory)}"
                     ),
                 file=submit_file
             )
