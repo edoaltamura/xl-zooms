@@ -51,7 +51,8 @@ def int_ticks(cbar):
     for t, l in zip(ticks, labels):
 
         if float(t) < 100 and num_majors < 2:
-            l.set_text(f'{int(float(t))}')
+            if float(t) < 1.01 or float(t) > 1.99:
+                l.set_text(f'{int(float(t))}')
 
     cbar.ax.set_yticks(ticks, minor=True)
     cbar.ax.set_yticklabels(labels, minor=True)
@@ -712,7 +713,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metallicity [Z$_\odot$])")
         axes[2, 2].set_ylabel('Number of particles')
 
-        bins = np.linspace(x.min(), x.max(), 51)
+        bins = np.logspace(np.log10(x.min()), np.log10(x.max()), 51)
 
         axes[0, 3].clear()
         axes[0, 3].set_xscale('log')
@@ -726,7 +727,7 @@ class CoolingTimes(HaloProperty):
         axes[0, 3].set_ylabel('Number of particles')
         axes[0, 3].legend()
 
-        bins = np.linspace(y.min(), y.max(), 51)
+        bins = np.logspace(np.log10(y.min()), np.log10(y.max()), 51)
 
         axes[1, 3].clear()
         axes[1, 3].set_xscale('log')
