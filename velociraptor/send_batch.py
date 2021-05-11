@@ -105,9 +105,9 @@ for i, run_directory in enumerate(args.directories):
     for file in tqdm(os.listdir(snaps_path), desc='Identify snapshots'):
 
         file_path = os.path.join(snaps_path, file)
-        stf_subdir = os.path.join(catalogues_path, file.replace('.hdf5', ''))
+        stf_subdir = os.path.join(catalogues_path, file[:-5])
 
-        if os.path.isfile(file_path) and file.endswith('.hdf5'):
+        if os.path.isfile(file_path) and file.endswith('.hdf5') and not os.path.isdir(stf_subdir):
 
             if not args.no_snapid:
                 with h5file(file_path, 'r') as f:
@@ -120,7 +120,7 @@ for i, run_directory in enumerate(args.directories):
                 snapshot_files.append(file_path)
                 snapshot_sizes.append(os.path.getsize(file_path))
                 stf_subdirs.append(stf_subdir)
-                snapshot_numbers_sort.append(int(file_path.replace('.hdf5', '').split('_')[-1]))
+                snapshot_numbers_sort.append(int(file_path[-9:-5]))
 
     number_snapshots = len(snapshot_files)
 
@@ -184,12 +184,12 @@ for i, run_directory in enumerate(args.directories):
                 if not os.path.isdir(stf_subdirs[split_batch_item]):
                     os.mkdir(stf_subdirs[split_batch_item])
 
-                snap_number = snapshot_files[split_batch_item].replace('.hdf5', '').split('_')[-1]
+                snap_number = snapshot_files[split_batch_item][-9:-5]
                 print(snap_number, end=' ')
 
                 print(
                     make_stf_invoke(
-                        input_file=snapshot_files[split_batch_item].replace('.hdf5', ''),
+                        input_file=snapshot_files[split_batch_item][:-5],
                         output_file=os.path.join(
                             stf_subdirs[split_batch_item],
                             os.path.basename(stf_subdirs[split_batch_item])
