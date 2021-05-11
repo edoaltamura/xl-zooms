@@ -152,8 +152,8 @@ for i, run_directory in enumerate(args.directories):
             f"Min/max file size = {sizeof_fmt(snapshot_sizes.min())}/{sizeof_fmt(snapshot_sizes.max())}\n"
         ))
 
-    # Split tasks in jobs for 800 GB of input data each
-    job_limit = 700 * 1024 * 1024 * 1024
+    # Split tasks in jobs for 500 GB of input data each
+    job_limit = 500 * 1024 * 1024 * 1024
     print(f"Input data limit: {sizeof_fmt(job_limit)} per batch.")
 
     number_splits = snapshot_sizes.sum() // job_limit + 1
@@ -166,10 +166,6 @@ for i, run_directory in enumerate(args.directories):
     number_batches = len(split_indices)
 
     for i, split_batch in enumerate(split_indices):
-
-        if len(split_batch) == 0:
-            print('Empty batch... continue to next.')
-            continue
 
         print((
             f"Batch {i + 1:02d}/{number_batches:02d} | "
