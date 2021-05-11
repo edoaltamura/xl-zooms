@@ -163,7 +163,9 @@ for i, run_directory in enumerate(args.directories):
     chunk_items[-1] = len(snapshot_sizes) % number_splits
     chunk_items = np.cumsum(chunk_items)
 
-    split_indices = np.split(np.arange(number_snapshots), chunk_items)#[:-1]
+    split_indices = np.split(np.arange(number_snapshots), chunk_items)
+    print(split_indices)
+    split_indices = [split_batch for split_batch in split_indices if len(split_batch) > 0]
     print(split_indices)
 
     for i, split_batch in enumerate(split_indices):
