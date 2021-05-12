@@ -8,6 +8,7 @@ from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from unyt import *
 from swiftsimio.visualisation.projection import project_pixel_grid
+import swiftsimio
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table, default_output_directory
@@ -744,19 +745,21 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].set_ylabel('Number of particles')
 
         # Density map
-        xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
-        yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
+        _xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
+        _yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
+        _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
+        sw_handle = swiftsimio.load(path_to_snap)
         region = [
-                xCen - 3 * r500,
-                xCen + 3 * r500,
-                yCen - 3 * r500,
-                yCen + 3 * r500
+                _xCen - 3 * _r500,
+                _xCen + 3 * _r500,
+                _yCen - 3 * _r500,
+                _yCen + 3 * _r500
             ]
         gas_mass = project_pixel_grid(
             # Note here that we pass in the dark matter dataset not the whole
             # data object, to specify what particle type we wish to visualise
-            data=sw_data.gas,
-            boxsize=sw_data.metadata.boxsize,
+            data=sw_handle.gas,
+            boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='densities',
             parallel=True,
@@ -766,7 +769,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
         axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
-        circle_r500 = plt.Circle((xCen, yCen), r500, color="red", fill=False, linestyle='-')
+        circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
 
         z_agn_recent_text = (
