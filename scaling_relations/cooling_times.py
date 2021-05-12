@@ -7,6 +7,7 @@ from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from unyt import *
+from swiftsimio.visualisation.projection import project_pixel_grid
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table, default_output_directory
@@ -741,7 +742,32 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].hist(y[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[1, 3].set_xlabel("Temperature [K]")
         axes[1, 3].set_ylabel('Number of particles')
-        axes[2, 3].remove()
+
+        # Density map
+        xCen = vr_data.positions.xcminpot[0].to('Mpc')
+        yCen = vr_data.positions.ycminpot[0].to('Mpc')
+        region = [
+                xCen - 3 * r500,
+                xCen + 3 * r500,
+                yCen - 3 * r500,
+                yCen + 3 * r500
+            ]
+        gas_mass = project_pixel_grid(
+            # Note here that we pass in the dark matter dataset not the whole
+            # data object, to specify what particle type we wish to visualise
+            data=sw_data.gas,
+            boxsize=sw_data.metadata.boxsize,
+            resolution=1024,
+            project='densities',
+            parallel=True,
+            region=region
+        )
+
+        axes[2, 3].axis("off")
+        axes[2, 3].set_aspect("equal")
+        axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
+        circle_r500 = plt.Circle((xCen, yCen), r500, color="red", fill=False, linestyle='-')
+        axes[2, 3].add_artist(circle_r500)
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
