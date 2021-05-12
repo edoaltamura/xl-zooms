@@ -744,8 +744,8 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].set_ylabel('Number of particles')
 
         # Density map
-        xCen = vr_data.positions.xcminpot[0].to('Mpc')
-        yCen = vr_data.positions.ycminpot[0].to('Mpc')
+        xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
+        yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
         region = [
                 xCen - 3 * r500,
                 xCen + 3 * r500,
