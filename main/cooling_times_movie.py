@@ -9,12 +9,22 @@ import sys
 sys.path.append("..")
 
 from scaling_relations import CoolingTimes
+from register import parser
+
+parser.add_argument(
+    '-s',
+    '--snapshot-number',
+    type=int,
+    default=0
+)
+
+args = parser.parse_args()
 
 dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
 
 
 # Data assignment can be done through independent operations
-for snap_number in range(2523):
+for snap_number in range(args.snapshot_number, 2523):
     if snap_number % num_processes == rank:
         print(f"Rank {rank:03d} processing snapshot {snap_number:03d}")
 
