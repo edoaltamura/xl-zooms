@@ -10,6 +10,7 @@ from unyt import *
 from swiftsimio.visualisation.projection import project_pixel_grid
 import swiftsimio
 import matplotlib
+from warnings import warn
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table, default_output_directory
@@ -243,22 +244,22 @@ def calculate_mean_cooling_times(data):
 
     # Values that go over the interpolation range are clipped to 0.5 Zsun
     if (log_gas_Z > 0.5).any():
-        print((
+        warn((
             f"[#] Found {(log_gas_Z > 0.5).sum()} particles above the upper "
             "metallicity bound in the interpolation tables. Values of "
             "log10(Z/Zsun) > 0.5 are capped to 0.5 for the calculation of "
             "net cooling times."
-        ))
+        ), RuntimeWarning)
         log_gas_Z[log_gas_Z > 0.5] = 0.5
 
     if (data.gas.metal_mass_fractions.value == 0).any():
-        print((
+        warn((
             f"[#] Found {(data.gas.metal_mass_fractions.value == 0).sum()} "
             "particles below the lower "
             "metallicity bound in the interpolation tables. Values of "
             "log10(Z/Zsun) < -50 are floored to -50 for the calculation of "
             "net cooling times."
-        ))
+        ), RuntimeWarning)
         log_gas_Z[data.gas.metal_mass_fractions.value == 0] = -50
 
     # construct the matrix that we input in the interpolator

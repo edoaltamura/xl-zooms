@@ -136,14 +136,14 @@ class HaloProperty(object):
                 "Check whether an appropriate aperture is selected and if "
                 "the physical/comoving units match."
             ))
-        else:
-            print((
-                "Loaded particles "
-                f"[{len(sw_handle.gas.coordinates):d} gas] "
-                f"[{len(sw_handle.dark_matter.coordinates):d} dark_matter] "
-                f"[{len(sw_handle.stars.coordinates):d} stars] "
-                f"[{len(sw_handle.black_holes.coordinates):d} black_holes] "
-            ))
+        # else:
+        #     print((
+        #         "Loaded particles "
+        #         f"[{len(sw_handle.gas.coordinates):d} gas] "
+        #         f"[{len(sw_handle.dark_matter.coordinates):d} dark_matter] "
+        #         f"[{len(sw_handle.stars.coordinates):d} stars] "
+        #         f"[{len(sw_handle.black_holes.coordinates):d} black_holes] "
+        #     ))
 
         # If the mask overlaps with the box boundaries, wrap coordinates.
         boxsize = sw_handle.metadata.boxsize
