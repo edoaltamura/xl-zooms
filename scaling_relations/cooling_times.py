@@ -765,6 +765,7 @@ class CoolingTimes(HaloProperty):
             parallel=True,
             region=region
         )
+        print(gas_mass)
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
