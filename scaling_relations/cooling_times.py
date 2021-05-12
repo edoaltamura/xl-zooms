@@ -579,7 +579,7 @@ class CoolingTimes(HaloProperty):
             int_ticks(cbar)
         else:
             axes[0, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=40, color='gray', alpha=0.5,
+                            fontsize=20, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
         # Heating temperatures
@@ -607,7 +607,7 @@ class CoolingTimes(HaloProperty):
             int_ticks(cbar)
         else:
             axes[0, 2].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=40, color='gray', alpha=0.5,
+                            fontsize=20, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
         txt = AnchoredText("Not heated by SN or AGN", loc="upper right", frameon=False, pad=0.4, borderpad=0,
@@ -633,7 +633,7 @@ class CoolingTimes(HaloProperty):
             int_ticks(cbar)
         else:
             axes[1, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=40, color='gray', alpha=0.5,
+                            fontsize=20, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
         txt = AnchoredText("AGN heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0,
@@ -661,7 +661,7 @@ class CoolingTimes(HaloProperty):
             int_ticks(cbar)
         else:
             axes[1, 0].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=40, color='gray', alpha=0.5,
+                            fontsize=20, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
         txt = AnchoredText("AGN and SNe heated", loc="upper right", frameon=False, pad=0.4, borderpad=0,
