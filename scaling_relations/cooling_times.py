@@ -9,6 +9,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from unyt import *
 from swiftsimio.visualisation.projection import project_pixel_grid
 import swiftsimio
+import matplotlib
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table, default_output_directory
@@ -761,14 +762,18 @@ class CoolingTimes(HaloProperty):
             resolution=1024,
             project='densities',
             parallel=True,
-            region=region
-        ) + 1e-7
+            region=region,
+            backend="subsampled_extreme"
+        )
+        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0))
+        cmap = matplotlib.cm.twilight
+        cmap.set_bad(color='k')
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
         axes[2, 3].set_xscale('linear')
         axes[2, 3].set_yscale('linear')
-        axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
+        axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap=cmap, origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
         axes[2, 3].text(
@@ -803,17 +808,20 @@ class CoolingTimes(HaloProperty):
             resolution=1024,
             project='masses',
             parallel=True,
-            region=region
+            region=region,
+            backend="subsampled_extreme"
         )
 
         gas_temp /= gas_mass
-        gas_temp += + 1e-7
+        gas_temp = np.ma.array(gas_temp, mask=((gas_temp <= 0) | (np.isnan(gas_temp))))
+        cmap = matplotlib.cm.twilight
+        cmap.set_bad(color='k')
 
         axes[1, 2].axis("off")
         axes[1, 2].set_aspect("equal")
         axes[1, 2].set_xscale('linear')
         axes[1, 2].set_yscale('linear')
-        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
+        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=10 ** 9.5), cmap=cmap, origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[1, 2].add_artist(circle_r500)
         axes[1, 2].text(
