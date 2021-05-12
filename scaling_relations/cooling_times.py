@@ -749,10 +749,10 @@ class CoolingTimes(HaloProperty):
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
         sw_handle = swiftsimio.load(path_to_snap)
         region = [
-            _xCen - 3 * _r500,
-            _xCen + 3 * _r500,
-            _yCen - 3 * _r500,
-            _yCen + 3 * _r500
+            _xCen - 1.5 * _r500,
+            _xCen + 1.5 * _r500,
+            _yCen - 1.5 * _r500,
+            _yCen + 1.5 * _r500
         ]
         gas_mass = project_pixel_grid(
             # Note here that we pass in the dark matter dataset not the whole
