@@ -3,6 +3,7 @@ import sys
 sys.path.append("..")
 
 from scaling_relations import CoolingTimes
+from register import parser
 from test_files import cat, snap
 
 gf = CoolingTimes()
@@ -55,27 +56,40 @@ gf = CoolingTimes()
 #         z_agn_end=3
 #     )
 
-dir = '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/'
+# dir = '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/'
 
-snaps = [dir + i for i in [
-    # "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036.hdf5",
-    # "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036.hdf5",
-    # "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth_0036.hdf5",
-    "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth_2749.hdf5",
-    "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_0036.hdf5",
-]
-         ]
+# snaps = [dir + i for i in [
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036.hdf5",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036.hdf5",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth_0036.hdf5",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth_2749.hdf5",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth/snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_0036.hdf5",
+# ]
+#          ]
+#
+# cats = [dir + i for i in [
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036.properties",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036.properties",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth_0036.properties",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth_2749/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth_2749.properties",
+#     "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_0036.properties",
+# ]
+#          ]
 
-cats = [dir + i for i in [
-    # "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT7.5_Nheat1_SNnobirth_0036.properties",
-    # "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_0036.properties",
-    # "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8_Nheat1_SNnobirth_0036.properties",
-    "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth_2749/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9.5_Nheat1_SNnobirth_2749.properties",
-    "L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth/stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_0036/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_0036.properties",
-]
-         ]
+parser.add_argument(
+    '-s',
+    '--snapshot-number',
+    type=int,
+    required=True
+)
 
-for s, c in zip(snaps, cats):
+args = parser.parse_args()
+
+dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
+s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.hdf5"
+c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.properties"
+
+try:
     gf.process_single_halo(
         path_to_snap=s,
         path_to_catalogue=c,
@@ -83,3 +97,5 @@ for s, c in zip(snaps, cats):
         z_agn_start=18,
         z_agn_end=0
     )
+except:
+    print(f"Snap number {args.snapshot_number:04d} could not be processed.")
