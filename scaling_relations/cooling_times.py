@@ -670,8 +670,6 @@ class CoolingTimes(HaloProperty):
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
-        axes[1, 2].remove()
-
         bins = np.linspace(w.min(), w.max(), 51)
 
         axes[2, 0].clear()
@@ -773,6 +771,61 @@ class CoolingTimes(HaloProperty):
         axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
+        axes[2, 3].text(
+            0.025,
+            0.025,
+            "Density",
+            color="k",
+            ha="left",
+            va="bottom",
+            alpha=0.8,
+            transform=axes[2, 3].transAxes,
+        )
+
+        # Temperature map
+        sw_handle.gas.mwtemps = sw_handle.gas.masses * sw_handle.gas.temperatures
+        gas_temp = project_pixel_grid(
+            # Note here that we pass in the dark matter dataset not the whole
+            # data object, to specify what particle type we wish to visualise
+            data=sw_handle.gas,
+            boxsize=sw_handle.metadata.boxsize,
+            resolution=1024,
+            project='mwtemps',
+            parallel=True,
+            region=region
+        )
+
+        gas_mass = project_pixel_grid(
+            # Note here that we pass in the dark matter dataset not the whole
+            # data object, to specify what particle type we wish to visualise
+            data=sw_handle.gas,
+            boxsize=sw_handle.metadata.boxsize,
+            resolution=1024,
+            project='masses',
+            parallel=True,
+            region=region
+        )
+
+        gas_temp /= gas_mass
+        gas_temp += + 1e-7
+
+        axes[1, 2].axis("off")
+        axes[1, 2].set_aspect("equal")
+        axes[1, 2].set_xscale('linear')
+        axes[1, 2].set_yscale('linear')
+        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
+        circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
+        axes[1, 2].add_artist(circle_r500)
+        axes[1, 2].text(
+            0.025,
+            0.025,
+            "Temperatur",
+            color="k",
+            ha="left",
+            va="bottom",
+            alpha=0.8,
+            transform=axes[1, 2].transAxes,
+        )
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
