@@ -819,8 +819,8 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].text(
             0.025,
             0.025,
-            "Temperatur",
-            color="k",
+            "Temperature",
+            color="w",
             ha="left",
             va="bottom",
             alpha=0.8,
