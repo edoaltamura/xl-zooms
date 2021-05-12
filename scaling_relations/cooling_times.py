@@ -768,8 +768,8 @@ class CoolingTimes(HaloProperty):
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
-        axes[1, 3].set_xscale('linear')
-        axes[1, 3].set_yscale('linear')
+        axes[2, 3].set_xscale('linear')
+        axes[2, 3].set_yscale('linear')
         axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap="twilight", origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
