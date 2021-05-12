@@ -551,7 +551,7 @@ class CoolingTimes(HaloProperty):
             cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
             int_ticks(cbar)
         else:
-            axes[0, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
+            axes[0, 0].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
@@ -605,7 +605,7 @@ class CoolingTimes(HaloProperty):
             cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax)
             int_ticks(cbar)
         else:
-            axes[0, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
+            axes[0, 2].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
@@ -631,7 +631,7 @@ class CoolingTimes(HaloProperty):
             cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
             int_ticks(cbar)
         else:
-            axes[0, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
+            axes[1, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
@@ -659,7 +659,7 @@ class CoolingTimes(HaloProperty):
             cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
             int_ticks(cbar)
         else:
-            axes[0, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
+            axes[1, 0].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
                             fontsize=40, color='gray', alpha=0.5,
                             ha='center', va='center', rotation='30')
 
@@ -684,7 +684,7 @@ class CoolingTimes(HaloProperty):
                            color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 0].set_xlabel(f"$\log_{{10}}$(Cooling time [Myr])")
         axes[2, 0].set_ylabel('Number of particles')
-        axes[2, 0].legend(loc = "upper left")
+        axes[2, 0].legend(loc="upper left")
 
         hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
         bins = np.linspace(hydrogen_fraction.min(), hydrogen_fraction.max(), 51)
@@ -748,11 +748,11 @@ class CoolingTimes(HaloProperty):
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
         sw_handle = swiftsimio.load(path_to_snap)
         region = [
-                _xCen - 3 * _r500,
-                _xCen + 3 * _r500,
-                _yCen - 3 * _r500,
-                _yCen + 3 * _r500
-            ]
+            _xCen - 3 * _r500,
+            _xCen + 3 * _r500,
+            _yCen - 3 * _r500,
+            _yCen + 3 * _r500
+        ]
         gas_mass = project_pixel_grid(
             # Note here that we pass in the dark matter dataset not the whole
             # data object, to specify what particle type we wish to visualise

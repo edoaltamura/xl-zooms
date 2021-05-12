@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#SBATCH --ntasks 56
+#SBATCH --ntasks 28
 #SBATCH -J cooling_times
 #SBATCH -o standard_output_file.%J.out
 #SBATCH -e standard_error_file.%J.err
@@ -15,7 +15,7 @@ module load openmpi
 module load python/3.6.5
 module load ffmpeg/4.0.2
 
-mpirun -np 56 python3 cooling_times_movie.py -a 15 -q
+mpirun -np 28 python3 cooling_times_movie.py -a 15 -q
 
 ffmpeg \
     -framerate 60 \
