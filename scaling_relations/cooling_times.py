@@ -837,6 +837,7 @@ class CoolingTimes(HaloProperty):
             transform=axes[1, 2].transAxes,
         )
 
+
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
             f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
