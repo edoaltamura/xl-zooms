@@ -712,6 +712,8 @@ class CoolingTimes(HaloProperty):
         cmap = deepcopy(plt.get_cmap('twilight'))
         cmap.set_under('black')
 
+        print(gas_mass.dtype)
+
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
         axes[2, 3].set_xscale('linear')
