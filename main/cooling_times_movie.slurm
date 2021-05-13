@@ -15,7 +15,7 @@ module load openmpi
 module load python/3.6.5
 module load ffmpeg/4.0.2
 
-mpirun -np 17 python3 cooling_times_movie.py -a 15 -q
+mpirun -np 12 python3 cooling_times_movie.py -a 15 -q
 
 #ffmpeg \
 #    -framerate 60 \

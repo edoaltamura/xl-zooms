@@ -3,7 +3,7 @@ from mpi4py import MPI
 comm = MPI.COMM_WORLD
 num_processes = comm.size
 rank = comm.rank
-
+import gc
 import sys
 
 sys.path.append("..")
@@ -20,19 +20,19 @@ parser.add_argument(
 
 args = parser.parse_args()
 
+name = 'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'
 dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
-
 
 # Data assignment can be done through independent operations
 for snap_number in range(args.snapshot_number, 2523):
     if snap_number % num_processes == rank:
         print(f"Rank {rank:03d} processing snapshot {snap_number:03d}")
 
-        s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snap_number:04d}.hdf5"
-        c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snap_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snap_number:04d}.properties"
+        s = dir + f"snapshots/{name}_{snap_number:04d}.hdf5"
+        c = dir + f"stf/{name}_{snap_number:04d}/{name}_{snap_number:04d}.properties"
+        gf = CoolingTimes()
 
         try:
-            gf = CoolingTimes()
             gf.process_single_halo(
                 path_to_snap=s,
                 path_to_catalogue=c,
@@ -42,3 +42,6 @@ for snap_number in range(args.snapshot_number, 2523):
             )
         except:
             print(f"[!!!] Snap number {snap_number:04d} could not be processed.")
+
+        del gf
+        gc.collect()
