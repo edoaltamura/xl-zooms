@@ -766,8 +766,8 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].imshow(
             gas_temp.T,
             norm=LogNorm(vmin=10, vmax=1e10),
-            cmap='twilight',
-            origin=cmap,
+            cmap=cmap,
+            origin="lower",
             extent=region
         )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
