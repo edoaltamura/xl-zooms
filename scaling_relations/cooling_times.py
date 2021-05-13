@@ -706,7 +706,7 @@ class CoolingTimes(HaloProperty):
             parallel=True,
             region=region,
             backend="fast"
-        )
+        ) + np.spacing(0.)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
         cmap = deepcopy(plt.get_cmap('twilight'))
         cmap.set_under('black')
@@ -744,14 +744,14 @@ class CoolingTimes(HaloProperty):
             resolution=1024,
             parallel=True,
             region=region,
-            backend="fast")
+            backend="fast")+ np.spacing(0.)
         mass_map = project_gas(
             project='masses',
             data=sw_handle,
             resolution=1024,
             parallel=True,
             region=region,
-            backend="fast")
+            backend="fast")+ np.spacing(0.)
 
         mass_weighted_temp_map = np.ma.array(mass_weighted_temp_map, mask=(mass_weighted_temp_map <= 0.),
                                              fill_value=np.nan, copy=True, dtype=np.float64)
