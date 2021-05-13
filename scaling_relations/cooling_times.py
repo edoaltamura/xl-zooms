@@ -762,7 +762,7 @@ class CoolingTimes(HaloProperty):
             boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='densities',
-            parallel=True,
+            parallel=False,
             region=region,
             backend="subsampled"
         )
@@ -797,8 +797,9 @@ class CoolingTimes(HaloProperty):
             boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='mwtemps',
-            parallel=True,
-            region=region
+            parallel=False,
+            region=region,
+            backend="subsampled"
         )
 
         gas_mass = project_pixel_grid(
@@ -808,14 +809,14 @@ class CoolingTimes(HaloProperty):
             boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='masses',
-            parallel=True,
+            parallel=False,
             region=region,
             backend="subsampled"
         )
-        gas_temp[gas_temp <= 0] = np.nan
-        gas_mass[gas_mass <= 0] = np.nan
+
+        gas_temp = np.ma.array(gas_temp, mask=(gas_temp <= 0))
+        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0))
         gas_temp /= gas_mass
-        gas_temp = np.ma.array(gas_temp, mask=np.isnan(gas_temp))
         cmap = matplotlib.cm.twilight
         cmap.set_bad(color='k')
 
@@ -836,7 +837,6 @@ class CoolingTimes(HaloProperty):
             alpha=0.8,
             transform=axes[1, 2].transAxes,
         )
-
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
