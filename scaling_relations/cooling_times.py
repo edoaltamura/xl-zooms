@@ -7,7 +7,7 @@ from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from unyt import *
-from swiftsimio.visualisation.projection import project_pixel_grid
+from swiftsimio.visualisation.projection import project_gas
 import swiftsimio
 import matplotlib
 from warnings import warn
@@ -364,6 +364,35 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
         )
 
 
+def draw_2d_hist(axes, x, y, z, cmap, label):
+    if (z > 0).any():
+        vmax = np.max(z) + 1
+        mappable = axes.pcolormesh(
+            x, y, z.T,
+            norm=LogNorm(vmin=1, vmax=vmax),
+            cmap=cmap,
+            alpha=1
+        )
+        divider = make_axes_locatable(axes)
+        cax = divider.append_axes("right", size="3%", pad=0.)
+        cbar = plt.colorbar(mappable, ax=axes, cax=cax)
+        int_ticks(cbar)
+    else:
+        axes.text(
+            0.5, 0.5, 'Nothing here',
+            transform=axes.transAxes,
+            fontsize=20, color='gray', alpha=0.5,
+            ha='center', va='center', rotation='30'
+        )
+
+    txt = AnchoredText(
+        label, loc="upper right",
+        frameon=False, pad=0.4, borderpad=0,
+        prop={"fontsize": 8}
+    )
+    axes.add_artist(txt)
+
+
 class CoolingTimes(HaloProperty):
 
     def __init__(self):
@@ -541,26 +570,7 @@ class CoolingTimes(HaloProperty):
         H, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[density_bins, temperature_bins]
         )
-        if (H > 0).any():
-            vmax = np.max(H) + 1
-            mappable = axes[0, 0].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1, vmax=vmax), cmap='Greys_r'
-            )
-            # create an axes on the right side of ax. The width of cax will be 5%
-            # of ax and the padding between cax and ax will be fixed at 0.05 inch.
-            divider = make_axes_locatable(axes[0, 0])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 0], cax=cax)
-            int_ticks(cbar)
-        else:
-            axes[0, 0].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=40, color='gray', alpha=0.5,
-                            ha='center', va='center', rotation='30')
-
-        txt = AnchoredText("All particles", loc="upper right", frameon=False, pad=0.4, borderpad=0,
-                           prop={"fontsize": 8})
-        axes[0, 0].add_artist(txt)
+        draw_2d_hist(axes[0, 0], density_edges, temperature_edges, H, 'Greys_r', "All particles")
 
         # PLOT SN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -568,27 +578,8 @@ class CoolingTimes(HaloProperty):
             y[(snii_flag & ~agn_flag)],
             bins=[density_bins, temperature_bins]
         )
-
-        if (H > 0).any():
-            vmax = np.max(H) + 1
-            mappable = axes[0, 1].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[0, 1])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 1], cax=cax)
-            int_ticks(cbar)
-        else:
-            axes[0, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=20, color='gray', alpha=0.5,
-                            ha='center', va='center', rotation='30')
-
-        # Heating temperatures
+        draw_2d_hist(axes[0, 1], density_edges, temperature_edges, H, 'Greens_r', "SNe heated only")
         axes[0, 1].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-        txt = AnchoredText("SNe heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0,
-                           prop={"fontsize": 8})
-        axes[0, 1].add_artist(txt)
 
         # PLOT NOT HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -596,25 +587,7 @@ class CoolingTimes(HaloProperty):
             y[(~snii_flag & ~agn_flag)],
             bins=[density_bins, temperature_bins]
         )
-
-        if (H > 0).any():
-            vmax = np.max(H) + 1
-            mappable = axes[0, 2].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1, vmax=vmax), cmap='Greens_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[0, 2])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[0, 2], cax=cax)
-            int_ticks(cbar)
-        else:
-            axes[0, 2].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=20, color='gray', alpha=0.5,
-                            ha='center', va='center', rotation='30')
-
-        txt = AnchoredText("Not heated by SN or AGN", loc="upper right", frameon=False, pad=0.4, borderpad=0,
-                           prop={"fontsize": 8})
-        axes[0, 2].add_artist(txt)
+        draw_2d_hist(axes[0, 2], density_edges, temperature_edges, H, 'Greens_r', "Not heated")
 
         # PLOT AGN HEATED PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -622,26 +595,7 @@ class CoolingTimes(HaloProperty):
             y[(agn_flag & ~snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-
-        if (H > 0).any():
-            vmax = np.max(H) + 1
-            mappable = axes[1, 1].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1, vmax=vmax), cmap='Reds_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[1, 1])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[1, 1], cax=cax)
-            int_ticks(cbar)
-        else:
-            axes[1, 1].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=20, color='gray', alpha=0.5,
-                            ha='center', va='center', rotation='30')
-
-        txt = AnchoredText("AGN heated only", loc="upper right", frameon=False, pad=0.4, borderpad=0,
-                           prop={"fontsize": 8})
-        axes[1, 1].add_artist(txt)
-        # Heating temperatures
+        draw_2d_hist(axes[1, 1], density_edges, temperature_edges, H, 'Reds_r', "AGN heated only")
         axes[1, 1].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
 
         # PLOT AGN+SN HEATED PARTICLES ===============================================
@@ -650,26 +604,7 @@ class CoolingTimes(HaloProperty):
             y[(agn_flag & snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-
-        if (H > 0).any():
-            vmax = np.max(H) + 1
-            mappable = axes[1, 0].pcolormesh(
-                density_edges, temperature_edges, H.T,
-                norm=LogNorm(vmin=1, vmax=vmax), cmap='Purples_r', alpha=0.6
-            )
-            divider = make_axes_locatable(axes[1, 0])
-            cax = divider.append_axes("right", size="3%", pad=0.)
-            cbar = plt.colorbar(mappable, ax=axes[1, 0], cax=cax)
-            int_ticks(cbar)
-        else:
-            axes[1, 0].text(0.5, 0.5, 'Nothing here', transform=axes[0, 1].transAxes,
-                            fontsize=20, color='gray', alpha=0.5,
-                            ha='center', va='center', rotation='30')
-
-        txt = AnchoredText("AGN and SNe heated", loc="upper right", frameon=False, pad=0.4, borderpad=0,
-                           prop={"fontsize": 8})
-        axes[1, 0].add_artist(txt)
-        # Heating temperatures
+        draw_2d_hist(axes[1, 1], density_edges, temperature_edges, H, 'Purples_r', "AGN and SNe heated")
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
@@ -756,17 +691,15 @@ class CoolingTimes(HaloProperty):
             _yCen - 1.5 * _r500,
             _yCen + 1.5 * _r500
         ]
-        gas_mass = project_pixel_grid(
-            # Note here that we pass in the dark matter dataset not the whole
-            # data object, to specify what particle type we wish to visualise
-            data=sw_handle.gas,
-            boxsize=sw_handle.metadata.boxsize,
+        map_kwargs = dict(
+            data=sw_handle,
             resolution=1024,
-            project='densities',
             parallel=True,
             region=region,
             backend="subsampled"
         )
+
+        gas_mass = project_gas(project='densities', **map_kwargs)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
         cmap = copy.copy(matplotlib.cm.twilight)
         cmap.set_bad(color='k')
@@ -791,34 +724,12 @@ class CoolingTimes(HaloProperty):
 
         # Temperature map
         sw_handle.gas.mwtemps = sw_handle.gas.masses * sw_handle.gas.temperatures
-        gas_temp = project_pixel_grid(
-            # Note here that we pass in the dark matter dataset not the whole
-            # data object, to specify what particle type we wish to visualise
-            data=sw_handle.gas,
-            boxsize=sw_handle.metadata.boxsize,
-            resolution=1024,
-            project='mwtemps',
-            parallel=True,
-            region=region,
-            backend="subsampled"
-        )
 
-        gas_mass = project_pixel_grid(
-            # Note here that we pass in the dark matter dataset not the whole
-            # data object, to specify what particle type we wish to visualise
-            data=sw_handle.gas,
-            boxsize=sw_handle.metadata.boxsize,
-            resolution=1024,
-            project='masses',
-            parallel=True,
-            region=region,
-            backend="subsampled"
-        )
+        mass_weighted_temp_map = project_gas(project='mwtemps', **map_kwargs)
+        mass_map = project_gas(project='masses', **map_kwargs)
 
-        gas_temp /= gas_mass
+        gas_temp = mass_weighted_temp_map / mass_map
         gas_temp = np.ma.array(gas_temp, mask=(gas_temp <= 0.))
-        cmap = copy.copy(matplotlib.cm.twilight)
-        cmap.set_bad(color='k')
 
         axes[1, 2].axis("off")
         axes[1, 2].set_aspect("equal")
