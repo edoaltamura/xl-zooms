@@ -381,6 +381,8 @@ def draw_2d_hist(axes, x, y, z, cmap, label):
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes, cax=cax)
         # int_ticks(cbar)
+        print(cbar.get_ticks())
+        print(cbar.get_ticklabels())
     else:
         axes.text(
             0.5, 0.5, 'Nothing here',
@@ -418,8 +420,17 @@ class CoolingTimes(HaloProperty):
             **kwargs
     ):
         aperture_fraction = args.aperture_percent / 100
+
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
                                                       mask_radius_r500=aperture_fraction, **kwargs)
+
+        z_agn_end = max(sw_data.metadata.z, z_agn_end)
+        if args.debug and sw_data.metadata.z > z_agn_end:
+            print((
+                f"Found z_agn_end = {z_agn_end:.2f}, while the redshift of snapshot {path_to_snap} "
+                f"is {sw_data.metadata.z:.2f}. The lowest search AGN redshift is set to snapshot redshift."
+            ))
+
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
@@ -808,12 +819,12 @@ class CoolingTimes(HaloProperty):
         )
 
         z_agn_recent_text = (
-            f"Selecting gas heated between {z_agn_start:.1f} < z < {z_agn_end:.1f} (relevant to AGN plot only)\n"
+            f"Selecting gas heated between {z_agn_start:.1f} > z > {z_agn_end:.1f} (relevant to AGN plot only)\n"
             f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
         )
         if agn_time is not None:
             z_agn_recent_text = (
-                f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} < z < {z_agn_end:.1f}\n"
+                f"Selecting gas {agn_time:s} heated between {z_agn_start:.1f} > z > {z_agn_end:.1f}\n"
                 f"({1 / (z_agn_start + 1):.2f} < a < {1 / (z_agn_end + 1):.2f})\n"
             )
 
