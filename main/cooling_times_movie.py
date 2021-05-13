@@ -26,10 +26,7 @@ analysis = '/cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis'
 
 # Data assignment can be done through independent operations
 for snap_number in range(args.snapshot_number, 2523):
-    if snap_number % num_processes == rank:
-
-        if os.path.isfile(analysis + f"cooling_times_{name}_{snap_number:04d}.png"):
-            continue
+    if snap_number % num_processes == rank and not os.path.isfile(analysis + f"cooling_times_{name}_{snap_number:04d}.png"):
 
         print(f"Rank {rank} processing snapshot {snap_number}")
 
