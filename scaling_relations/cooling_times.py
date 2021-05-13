@@ -718,7 +718,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 3].set_yscale('linear')
         axes[2, 3].imshow(
             gas_mass.T,
-            norm=LogNorm(vmin=np.spacing(0.), vmax=gas_mass.max()),
+            norm=LogNorm(),
             cmap=cmap,
             origin="lower",
             extent=region
