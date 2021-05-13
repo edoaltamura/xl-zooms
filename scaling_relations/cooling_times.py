@@ -719,7 +719,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 3].imshow(
             gas_mass.T,
             norm=LogNorm(),
-            cmap=cmap,
+            cmap='twilight',
             origin="lower",
             extent=region
         )
@@ -751,7 +751,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_aspect("equal")
         axes[1, 2].set_xscale('linear')
         axes[1, 2].set_yscale('linear')
-        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=1e10), cmap=cmap, origin="lower", extent=region)
+        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=1e10), cmap='twilight', origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[1, 2].add_artist(circle_r500)
         axes[1, 2].text(
