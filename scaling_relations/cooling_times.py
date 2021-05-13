@@ -708,9 +708,9 @@ class CoolingTimes(HaloProperty):
         )
 
         gas_mass = project_gas(project='densities', **map_kwargs)
-        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
-        # cmap = deepcopy(plt.get_cmap('twilight'))
-        # cmap.set_under('black')
+        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
+        cmap = deepcopy(plt.get_cmap('twilight'))
+        cmap.set_under('black')
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
@@ -719,9 +719,9 @@ class CoolingTimes(HaloProperty):
         axes[2, 3].imshow(
             gas_mass.T,
             norm=LogNorm(),
-            cmap='twilight',
+            cmap=cmap,
             origin="lower",
-            # extent=region
+            extent=region
         )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
@@ -745,7 +745,7 @@ class CoolingTimes(HaloProperty):
         mass_weighted_temp_map = np.ma.array(mass_weighted_temp_map, mask=(mass_weighted_temp_map <= 0.))
         mass_map = np.ma.array(mass_map, mask=(mass_map <= 0.))
         gas_temp = mass_weighted_temp_map / mass_map
-        gas_temp = np.ma.array(gas_temp, mask=np.isnan(gas_temp))
+        gas_temp = np.ma.array(gas_temp, mask=np.isnan(gas_temp), fill_value=np.nan, copy=True, dtype=np.float64)
 
         axes[1, 2].axis("off")
         axes[1, 2].set_aspect("equal")
@@ -755,8 +755,8 @@ class CoolingTimes(HaloProperty):
             gas_temp.T,
             norm=LogNorm(vmin=10, vmax=1e10),
             cmap='twilight',
-            origin="lower",
-            # extent=region
+            origin=cmap,
+            extent=region
         )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[1, 2].add_artist(circle_r500)
