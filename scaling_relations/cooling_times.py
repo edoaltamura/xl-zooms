@@ -376,7 +376,7 @@ def draw_2d_hist(axes, x, y, z, cmap, label):
         divider = make_axes_locatable(axes)
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes, cax=cax)
-        int_ticks(cbar)
+        # int_ticks(cbar)
     else:
         axes.text(
             0.5, 0.5, 'Nothing here',
