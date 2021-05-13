@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
+from matplotlib.ticker import MaxNLocator
 import swiftsimio
 from swiftsimio.visualisation.projection import project_gas
 
@@ -32,39 +33,6 @@ def latex_float(f):
         return r"{0} \times 10^{{{1}}}".format(base, int(exponent))
     else:
         return float_str
-
-
-def int_ticks(cbar):
-    # Major ticks
-    ticks = cbar.ax.get_yticks(minor=False)
-    labels = cbar.ax.get_yticklabels(minor=False)
-
-    num_majors = len(labels)
-
-    for t, l in zip(ticks, labels):
-
-        if float(t) < 10:
-            l.set_text(f'{int(float(t))}')
-        else:
-            l.set_text(f'$10^{{{int(np.log10(float(t)))}}}$')
-
-    cbar.set_ticks(ticks, minor=False)
-    cbar.set_ticklabels(labels, minor=False)
-
-    # Minor ticks
-    ticks = cbar.ax.get_yticks(minor=True)
-    labels = cbar.ax.get_yticklabels(minor=True)
-
-    for t, l in zip(ticks, labels):
-
-        if float(t) < 100 and num_majors < 2:
-            if float(t) < 1.01 or float(t) > 1.99:
-                l.set_text(f'{int(float(t))}')
-
-    cbar.set_ticks(ticks, minor=True)
-    cbar.set_ticklabels(labels, minor=True)
-
-    return cbar
 
 
 def draw_adiabats(axes, density_bins, temperature_bins):
@@ -366,6 +334,40 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
         )
 
 
+def int_ticks(cbar):
+    cbar.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    # # Major ticks
+    # ticks = cbar.ax.get_yticks(minor=False)
+    # labels = cbar.ax.get_yticklabels(minor=False)
+    #
+    # num_majors = len(labels)
+    #
+    # for t, l in zip(ticks, labels):
+    #
+    #     if float(t) < 10:
+    #         l.set_text(f'{int(float(t))}')
+    #     else:
+    #         l.set_text(f'$10^{{{int(np.log10(float(t)))}}}$')
+    #
+    # cbar.set_ticks(ticks, minor=False)
+    # cbar.set_ticklabels(labels, minor=False)
+    #
+    # # Minor ticks
+    # ticks = cbar.ax.get_yticks(minor=True)
+    # labels = cbar.ax.get_yticklabels(minor=True)
+    #
+    # for t, l in zip(ticks, labels):
+    #
+    #     if float(t) < 100 and num_majors < 2:
+    #         if float(t) < 1.01 or float(t) > 1.99:
+    #             l.set_text(f'{int(float(t))}')
+    #
+    # cbar.set_ticks(ticks, minor=True)
+    # cbar.set_ticklabels(labels, minor=True)
+    #
+    # return cbar
+
+
 def draw_2d_hist(axes, x, y, z, cmap, label):
 
     if (z > 0).any():
@@ -379,7 +381,7 @@ def draw_2d_hist(axes, x, y, z, cmap, label):
         divider = make_axes_locatable(axes)
         cax = divider.append_axes("right", size="3%", pad=0.)
         cbar = plt.colorbar(mappable, ax=axes, cax=cax)
-        # int_ticks(cbar)
+        int_ticks(cbar)
     else:
         axes.text(
             0.5, 0.5, 'Nothing here',
