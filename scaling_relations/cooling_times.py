@@ -423,14 +423,6 @@ class CoolingTimes(HaloProperty):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
                                                       mask_radius_r500=aperture_fraction, **kwargs)
 
-        z_agn_end = max(sw_data.metadata.z, z_agn_end)
-        if args.debug and sw_data.metadata.z > z_agn_end:
-            print((
-                f"Found z_agn_end = {z_agn_end:.2f}, while the redshift of snapshot {path_to_snap} "
-                f"is {sw_data.metadata.z:.2f}. The lowest search AGN redshift is set to snapshot redshift."
-            ))
-
-
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
 
@@ -527,7 +519,8 @@ class CoolingTimes(HaloProperty):
         y = temperature
         w = cooling_times[index]
 
-        print("Number of particles being plotted", len(x))
+        if args.debug:
+            print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
