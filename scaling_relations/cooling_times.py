@@ -537,36 +537,21 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
         )
 
+        T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
+        K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
+                2 / 3)).to('keV*cm**2')
+
+        # Make the norm object to define the image stretch
+        contour_density_bins = np.logspace(
+            np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
+        )
+        contour_temperature_bins = np.logspace(
+            np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
+        )
+
         fig = plt.figure(figsize=(10, 6))
         gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
         axes = gs.subplots()
-
-        for ax in axes.flat:
-            # Draw cross-hair marker
-            T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
-            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
-            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
-            K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
-                    2 / 3)).to('keV*cm**2')
-
-            # Make the norm object to define the image stretch
-            contour_density_bins = np.logspace(
-                np.log10(density_bounds[0]) - 0.5, np.log10(density_bounds[1]) + 0.5, bins * 4
-            )
-            contour_temperature_bins = np.logspace(
-                np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
-            )
-
-            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
-            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
-            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
-                                  levels=[1, 1e2, 1e3, 1e4, 1e5],
-                                  color='green')
-            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
-                                  levels=[Cosmology().age(sw_data.metadata.z).to('Myr').value],
-                                  prefix='$t_H(z)=$',
-                                  color='red',
-                                  use_labels=False)
 
         # PLOT ALL PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -609,6 +594,29 @@ class CoolingTimes(HaloProperty):
         draw_2d_hist(axes[1, 0], density_edges, temperature_edges, H, 'Purples_r', "AGN and SNe heated")
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
+
+        for ax in [
+            axes[0, 0],
+            axes[0, 1],
+            axes[0, 2],
+            axes[1, 1],
+            axes[1, 0]
+        ]:
+            # Draw cross-hair marker
+            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
+            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
+
+            # Draw contours
+            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
+            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
+                                  levels=[1, 1e2, 1e3, 1e4, 1e5],
+                                  color='green')
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
+                                  levels=[Cosmology().age(sw_data.metadata.z).to('Myr').value],
+                                  prefix='$t_H(z)=$',
+                                  color='red',
+                                  use_labels=False)
 
         bins = np.linspace(0., 4.5, 51)
 
@@ -707,7 +715,13 @@ class CoolingTimes(HaloProperty):
             region=region,
             backend="fast"
         ).value
-        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
+        gas_mass = np.ma.array(
+            gas_mass,
+            mask=(gas_mass <= 0.),
+            fill_value=np.nan,
+            copy=True,
+            dtype=np.float64
+        )
         cmap = deepcopy(plt.get_cmap('twilight'))
         cmap.set_under('black')
 
@@ -775,7 +789,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_yscale('linear')
         axes[1, 2].imshow(
             gas_temp.T,
-            norm=LogNorm(vmin=10, vmax=1e10),
+            norm=LogNorm(),
             cmap=cmap,
             origin="lower",
             extent=region
