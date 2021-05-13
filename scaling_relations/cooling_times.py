@@ -367,7 +367,6 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
 
 
 def draw_2d_hist(axes, x, y, z, cmap, label):
-    axes.loglog()
 
     if (z > 0).any():
         vmax = np.max(z) + 1
@@ -564,6 +563,30 @@ class CoolingTimes(HaloProperty):
         gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
         axes = gs.subplots()
 
+        for ax in [
+            axes[0, 0],
+            axes[0, 1],
+            axes[0, 2],
+            axes[1, 0],
+            axes[1, 1]
+        ]:
+            ax.loglog()
+            # Draw cross-hair marker
+            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=0.5)
+            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=0.5)
+
+            # Draw contours
+            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
+            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
+                                  levels=[1, 1e2, 1e3, 1e4, 1e5],
+                                  color='green')
+            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
+                                  levels=[Cosmology().age(sw_data.metadata.z).to('Myr').value],
+                                  prefix='$t_H(z)=$',
+                                  color='red',
+                                  use_labels=False)
+
         # PLOT ALL PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
             x, y, bins=[density_bins, temperature_bins]
@@ -605,29 +628,6 @@ class CoolingTimes(HaloProperty):
         draw_2d_hist(axes[1, 0], density_edges, temperature_edges, H, 'Purples_r', "AGN and SNe heated")
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
-
-        for ax in [
-            axes[0, 0],
-            axes[0, 1],
-            axes[0, 2],
-            axes[1, 1],
-            axes[1, 0]
-        ]:
-            # Draw cross-hair marker
-            ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
-            ax.vlines(x=nH_500, ymin=T500 / 5, ymax=T500 * 5, colors='k', linestyles='-', lw=1)
-
-            # Draw contours
-            draw_k500(ax, contour_density_bins, contour_temperature_bins, K500)
-            draw_adiabats(ax, contour_density_bins, contour_temperature_bins)
-            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
-                                  levels=[1, 1e2, 1e3, 1e4, 1e5],
-                                  color='green')
-            draw_cooling_contours(ax, contour_density_bins, contour_temperature_bins,
-                                  levels=[Cosmology().age(sw_data.metadata.z).to('Myr').value],
-                                  prefix='$t_H(z)=$',
-                                  color='red',
-                                  use_labels=False)
 
         bins = np.linspace(0., 4.5, 51)
 
