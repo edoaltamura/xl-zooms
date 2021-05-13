@@ -10,7 +10,7 @@ from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from matplotlib.ticker import MaxNLocator
+from matplotlib.ticker import MaxNLocator, ScalarFormatter
 import swiftsimio
 from swiftsimio.visualisation.projection import project_gas
 
@@ -335,7 +335,13 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
 
 
 def int_ticks(cbar):
+
+    cbar.ax.yaxis.set_major_formatter(ScalarFormatter())
+    cbar.ax.yaxis.set_minor_formatter(ScalarFormatter())
+
     cbar.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
+    cbar.ax.yaxis.set_minor_locator(MaxNLocator(integer=True))
+
     # # Major ticks
     # ticks = cbar.ax.get_yticks(minor=False)
     # labels = cbar.ax.get_yticklabels(minor=False)
