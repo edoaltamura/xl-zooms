@@ -766,7 +766,7 @@ class CoolingTimes(HaloProperty):
             region=region,
             backend="subsampled"
         )
-        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0))
+        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
         cmap = matplotlib.cm.twilight
         cmap.set_bad(color='k')
 
@@ -814,9 +814,8 @@ class CoolingTimes(HaloProperty):
             backend="subsampled"
         )
 
-        gas_temp = np.ma.array(gas_temp, mask=(gas_temp <= 0))
-        gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0))
         gas_temp /= gas_mass
+        gas_temp = np.ma.array(gas_temp, mask=(gas_temp <= 0.))
         cmap = matplotlib.cm.twilight
         cmap.set_bad(color='k')
 
