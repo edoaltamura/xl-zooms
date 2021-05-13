@@ -699,21 +699,17 @@ class CoolingTimes(HaloProperty):
             _yCen + 1.5 * _r500
         ]
 
-        map_kwargs = dict(
+        gas_mass = project_gas(
+            project='densities',
             data=sw_handle,
             resolution=1024,
             parallel=True,
             region=region,
             backend="fast"
         )
-
-        gas_mass = project_gas(project='densities', **map_kwargs)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
         cmap = deepcopy(plt.get_cmap('twilight'))
         cmap.set_under('black')
-
-        print(gas_mass, gas_mass.dtype)
-        print([type(i) for i in region])
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
@@ -742,10 +738,23 @@ class CoolingTimes(HaloProperty):
         # Temperature map
         sw_handle.gas.mwtemps = sw_handle.gas.masses * sw_handle.gas.temperatures
 
-        mass_weighted_temp_map = project_gas(project='mwtemps', **map_kwargs)
-        mass_map = project_gas(project='masses', **map_kwargs)
+        mass_weighted_temp_map = project_gas(
+            project='mwtemps',
+            data=sw_handle,
+            resolution=1024,
+            parallel=True,
+            region=region,
+            backend="fast")
+        mass_map = project_gas(
+            project='masses',
+            data=sw_handle,
+            resolution=1024,
+            parallel=True,
+            region=region,
+            backend="fast")
 
-        mass_weighted_temp_map = np.ma.array(mass_weighted_temp_map, mask=(mass_weighted_temp_map <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
+        mass_weighted_temp_map = np.ma.array(mass_weighted_temp_map, mask=(mass_weighted_temp_map <= 0.),
+                                             fill_value=np.nan, copy=True, dtype=np.float64)
         mass_map = np.ma.array(mass_map, mask=(mass_map <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
         gas_temp = mass_weighted_temp_map / mass_map
         gas_temp = np.ma.array(gas_temp, mask=np.isnan(gas_temp), fill_value=np.nan, copy=True, dtype=np.float64)
