@@ -610,7 +610,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
-        bins = np.linspace(w.min(), w.max(), 51)
+        bins = np.linspace(0., 4.5, 51)
 
         axes[2, 0].clear()
         axes[2, 0].set_xscale('linear')
@@ -624,10 +624,11 @@ class CoolingTimes(HaloProperty):
                            color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 0].set_xlabel(f"$\log_{{10}}$(Cooling time [Myr])")
         axes[2, 0].set_ylabel('Number of particles')
+        axes[2, 0].set_ylim(1, 10 ** 4.5)
         axes[2, 0].legend(loc="upper left")
 
         hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
-        bins = np.linspace(hydrogen_fraction.min(), hydrogen_fraction.max(), 51)
+        bins = np.linspace(0, 1, 51)
 
         axes[2, 1].clear()
         axes[2, 1].set_xscale('linear')
@@ -639,9 +640,10 @@ class CoolingTimes(HaloProperty):
         axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 1].set_xlabel("Hydrogen fraction")
         axes[2, 1].set_ylabel('Number of particles')
+        axes[2, 1].set_ylim(1, 10 ** 4.5)
 
         log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
-        bins = np.linspace(log_gas_Z.min(), log_gas_Z.max(), 51)
+        bins = np.linspace(-4, 1, 51)
 
         axes[2, 2].clear()
         axes[2, 2].set_xscale('linear')
@@ -654,8 +656,9 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metallicity [Z$_\odot$])")
         axes[2, 2].set_ylabel('Number of particles')
+        axes[2, 2].set_ylim(1, 10 ** 4.5)
 
-        bins = np.logspace(np.log10(x.min()), np.log10(x.max()), 51)
+        bins = np.logspace(np.log10(density_edges.min()), np.log10(density_edges.max()), 51)
 
         axes[0, 3].clear()
         axes[0, 3].set_xscale('log')
@@ -667,9 +670,10 @@ class CoolingTimes(HaloProperty):
         axes[0, 3].hist(x[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[0, 3].set_xlabel(f"Density [$n_H$ cm$^{{-3}}$]")
         axes[0, 3].set_ylabel('Number of particles')
+        axes[0, 3].set_ylim(1, 10 ** 4.5)
         axes[0, 3].legend()
 
-        bins = np.logspace(np.log10(y.min()), np.log10(y.max()), 51)
+        bins = np.logspace(np.log10(temperature_edges.min()), np.log10(temperature_edges.max()), 51)
 
         axes[1, 3].clear()
         axes[1, 3].set_xscale('log')
@@ -681,6 +685,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].hist(y[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[1, 3].set_xlabel("Temperature [K]")
         axes[1, 3].set_ylabel('Number of particles')
+        axes[1, 3].set_ylim(1, 10 ** 4.5)
 
         # Density map
         _xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
@@ -693,12 +698,7 @@ class CoolingTimes(HaloProperty):
             _yCen - 1.5 * _r500,
             _yCen + 1.5 * _r500
         ]
-        _region = [
-            (_xCen - 1.5 * _r500).value,
-            (_xCen + 1.5 * _r500).value,
-            (_yCen - 1.5 * _r500).value,
-            (_yCen + 1.5 * _r500).value
-        ]
+
         map_kwargs = dict(
             data=sw_handle,
             resolution=1024,
@@ -721,7 +721,7 @@ class CoolingTimes(HaloProperty):
             norm=LogNorm(vmin=np.spacing(0.), vmax=gas_mass.max()),
             cmap=cmap,
             origin="lower",
-            extent=_region
+            extent=region
         )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
@@ -751,13 +751,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_aspect("equal")
         axes[1, 2].set_xscale('linear')
         axes[1, 2].set_yscale('linear')
-        axes[1, 2].imshow(
-            gas_temp.T,
-            norm=LogNorm(vmin=10, vmax=1e10),
-            cmap=cmap,
-            origin="lower",
-            extent=_region
-        )
+        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=1e10), cmap=cmap, origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[1, 2].add_artist(circle_r500)
         axes[1, 2].text(
