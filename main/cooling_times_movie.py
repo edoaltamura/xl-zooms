@@ -51,4 +51,4 @@ for snap_number in range(args.snapshot_number, 2523):
 
         del gf
 
-comm.barrier()
+comm.Barrier()
