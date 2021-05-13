@@ -44,7 +44,7 @@ for snap_number in range(args.snapshot_number, 2523):
                 z_agn_end=0
             )
         except Exception as e:
-            print(f"\n[!!!] Snap number {snap_number:04d} could not be processed.")
-            raise e
+            print(e, f"\n[!!!] Snap number {snap_number:04d} could not be processed.")
+            # raise e
 
         del gf
