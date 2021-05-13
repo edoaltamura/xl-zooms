@@ -762,7 +762,7 @@ class CoolingTimes(HaloProperty):
             boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='densities',
-            parallel=False,
+            parallel=True,
             region=region,
             backend="subsampled"
         )
@@ -797,7 +797,7 @@ class CoolingTimes(HaloProperty):
             boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='mwtemps',
-            parallel=False,
+            parallel=True,
             region=region,
             backend="subsampled"
         )
@@ -809,7 +809,7 @@ class CoolingTimes(HaloProperty):
             boxsize=sw_handle.metadata.boxsize,
             resolution=1024,
             project='masses',
-            parallel=False,
+            parallel=True,
             region=region,
             backend="subsampled"
         )
