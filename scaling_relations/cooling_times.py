@@ -11,6 +11,7 @@ from swiftsimio.visualisation.projection import project_pixel_grid
 import swiftsimio
 import matplotlib
 from warnings import warn
+import copy
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table, default_output_directory
@@ -767,7 +768,7 @@ class CoolingTimes(HaloProperty):
             backend="subsampled"
         )
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
-        cmap = matplotlib.cm.twilight
+        cmap = copy.copy(matplotlib.cm.twilight)
         cmap.set_bad(color='k')
 
         axes[2, 3].axis("off")
@@ -816,7 +817,7 @@ class CoolingTimes(HaloProperty):
 
         gas_temp /= gas_mass
         gas_temp = np.ma.array(gas_temp, mask=(gas_temp <= 0.))
-        cmap = matplotlib.cm.twilight
+        cmap = copy.copy(matplotlib.cm.twilight)
         cmap.set_bad(color='k')
 
         axes[1, 2].axis("off")
