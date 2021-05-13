@@ -709,8 +709,8 @@ class CoolingTimes(HaloProperty):
 
         gas_mass = project_gas(project='densities', **map_kwargs)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
-        cmap = deepcopy(plt.get_cmap('twilight'))
-        cmap.set_under('black')
+        # cmap = deepcopy(plt.get_cmap('twilight'))
+        # cmap.set_under('black')
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
@@ -721,7 +721,7 @@ class CoolingTimes(HaloProperty):
             norm=LogNorm(),
             cmap='twilight',
             origin="lower",
-            extent=region
+            # extent=region
         )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
@@ -751,7 +751,13 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_aspect("equal")
         axes[1, 2].set_xscale('linear')
         axes[1, 2].set_yscale('linear')
-        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=1e10), cmap='twilight', origin="lower", extent=region)
+        axes[1, 2].imshow(
+            gas_temp.T,
+            norm=LogNorm(vmin=10, vmax=1e10),
+            cmap='twilight',
+            origin="lower",
+            # extent=region
+        )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[1, 2].add_artist(circle_r500)
         axes[1, 2].text(
