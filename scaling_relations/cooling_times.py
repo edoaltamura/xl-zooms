@@ -1,17 +1,16 @@
-import numpy as np
 import os
 import h5py as h5
+import numpy as np
+from unyt import *
+from warnings import warn
 import scipy.interpolate as sci
+import matplotlib
 from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
-from unyt import *
-from swiftsimio.visualisation.projection import project_gas
 import swiftsimio
-import matplotlib
-from warnings import warn
-import copy
+from swiftsimio.visualisation.projection import project_gas
 
 from literature import Cosmology
 from register import Zoom, args, cooling_table, default_output_directory
@@ -703,14 +702,20 @@ class CoolingTimes(HaloProperty):
 
         gas_mass = project_gas(project='densities', **map_kwargs)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
-        cmap = matplotlib.cm.get_cmap('twilight')
-        cmap.set_bad(color='k')
+        cmap = plt.get_cmap('twilight')
+        cmap.set_under('black')
 
         axes[2, 3].axis("off")
         axes[2, 3].set_aspect("equal")
         axes[2, 3].set_xscale('linear')
         axes[2, 3].set_yscale('linear')
-        axes[2, 3].imshow(gas_mass.T, norm=LogNorm(), cmap=cmap, origin="lower", extent=region)
+        axes[2, 3].imshow(
+            gas_mass.T,
+            norm=LogNorm(vmin=np.spacing(0.), vmax=gas_mass.max()),
+            cmap=cmap,
+            origin="lower",
+            extent=region
+        )
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[2, 3].add_artist(circle_r500)
         axes[2, 3].text(
