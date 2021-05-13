@@ -1,6 +1,7 @@
 import os
 import h5py as h5
 import numpy as np
+from copy import deepcopy
 from unyt import *
 from warnings import warn
 import scipy.interpolate as sci
@@ -692,6 +693,12 @@ class CoolingTimes(HaloProperty):
             _yCen - 1.5 * _r500,
             _yCen + 1.5 * _r500
         ]
+        _region = [
+            (_xCen - 1.5 * _r500).value,
+            (_xCen + 1.5 * _r500).value,
+            (_yCen - 1.5 * _r500).value,
+            (_yCen + 1.5 * _r500).value
+        ]
         map_kwargs = dict(
             data=sw_handle,
             resolution=1024,
@@ -702,7 +709,7 @@ class CoolingTimes(HaloProperty):
 
         gas_mass = project_gas(project='densities', **map_kwargs)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
-        cmap = plt.get_cmap('twilight')
+        cmap = deepcopy(plt.get_cmap('twilight'))
         cmap.set_under('black')
 
         axes[2, 3].axis("off")
