@@ -48,8 +48,8 @@ def int_ticks(cbar):
         else:
             l.set_text(f'$10^{{{int(np.log10(float(t)))}}}$')
 
-    cbar.ax.set_yticks(ticks, minor=False)
-    cbar.ax.set_yticklabels(labels, minor=False)
+    cbar.set_ticks(ticks, minor=False)
+    cbar.set_ticklabels(labels, minor=False)
 
     # Minor ticks
     ticks = cbar.ax.get_yticks(minor=True)
@@ -61,8 +61,8 @@ def int_ticks(cbar):
             if float(t) < 1.01 or float(t) > 1.99:
                 l.set_text(f'{int(float(t))}')
 
-    cbar.ax.set_yticks(ticks, minor=True)
-    cbar.ax.set_yticklabels(labels, minor=True)
+    cbar.set_ticks(ticks, minor=True)
+    cbar.set_ticklabels(labels, minor=True)
 
     return cbar
 
