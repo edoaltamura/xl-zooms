@@ -54,6 +54,14 @@ parser.add_argument(
 )
 
 parser.add_argument(
+    '-d',
+    '--debug',
+    default=False,
+    required=False,
+    action='store_true'
+)
+
+parser.add_argument(
     '-r',
     '--refresh',
     default=False,

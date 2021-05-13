@@ -245,22 +245,24 @@ def calculate_mean_cooling_times(data):
 
     # Values that go over the interpolation range are clipped to 0.5 Zsun
     if (log_gas_Z > 0.5).any():
-        warn((
-            f"[#] Found {(log_gas_Z > 0.5).sum()} particles above the upper "
-            "metallicity bound in the interpolation tables. Values of "
-            "log10(Z/Zsun) > 0.5 are capped to 0.5 for the calculation of "
-            "net cooling times."
-        ), RuntimeWarning)
+        if args.debug:
+            warn((
+                f"[#] Found {(log_gas_Z > 0.5).sum()} particles above the upper "
+                "metallicity bound in the interpolation tables. Values of "
+                "log10(Z/Zsun) > 0.5 are capped to 0.5 for the calculation of "
+                "net cooling times."
+            ), RuntimeWarning)
         log_gas_Z[log_gas_Z > 0.5] = 0.5
 
     if (data.gas.metal_mass_fractions.value == 0).any():
-        warn((
-            f"[#] Found {(data.gas.metal_mass_fractions.value == 0).sum()} "
-            "particles below the lower "
-            "metallicity bound in the interpolation tables. Values of "
-            "log10(Z/Zsun) < -50 are floored to -50 for the calculation of "
-            "net cooling times."
-        ), RuntimeWarning)
+        if args.debug:
+            warn((
+                f"[#] Found {(data.gas.metal_mass_fractions.value == 0).sum()} "
+                "particles below the lower "
+                "metallicity bound in the interpolation tables. Values of "
+                "log10(Z/Zsun) < -50 are floored to -50 for the calculation of "
+                "net cooling times."
+            ), RuntimeWarning)
         log_gas_Z[data.gas.metal_mass_fractions.value == 0] = -50
 
     # construct the matrix that we input in the interpolator
@@ -696,7 +698,7 @@ class CoolingTimes(HaloProperty):
             resolution=1024,
             parallel=True,
             region=region,
-            backend="subsampled"
+            backend="fast"
         )
 
         gas_mass = project_gas(project='densities', **map_kwargs)
@@ -735,7 +737,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_aspect("equal")
         axes[1, 2].set_xscale('linear')
         axes[1, 2].set_yscale('linear')
-        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=10 ** 9.5), cmap=cmap, origin="lower", extent=region)
+        axes[1, 2].imshow(gas_temp.T, norm=LogNorm(vmin=10, vmax=1e10), cmap=cmap, origin="lower", extent=region)
         circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
         axes[1, 2].add_artist(circle_r500)
         axes[1, 2].text(
