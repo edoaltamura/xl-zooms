@@ -730,8 +730,10 @@ class CoolingTimes(HaloProperty):
         mass_weighted_temp_map = project_gas(project='mwtemps', **map_kwargs)
         mass_map = project_gas(project='masses', **map_kwargs)
 
+        mass_weighted_temp_map = np.ma.array(mass_weighted_temp_map, mask=(mass_weighted_temp_map <= 0.))
+        mass_map = np.ma.array(mass_map, mask=(mass_map <= 0.))
         gas_temp = mass_weighted_temp_map / mass_map
-        gas_temp = np.ma.array(gas_temp, mask=(gas_temp <= 0.))
+        gas_temp = np.ma.array(gas_temp, mask=np.isnan(gas_temp))
 
         axes[1, 2].axis("off")
         axes[1, 2].set_aspect("equal")
