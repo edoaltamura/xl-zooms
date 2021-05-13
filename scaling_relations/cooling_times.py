@@ -367,6 +367,8 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
 
 
 def draw_2d_hist(axes, x, y, z, cmap, label):
+    axes.loglog()
+
     if (z > 0).any():
         vmax = np.max(z) + 1
         mappable = axes.pcolormesh(
@@ -393,6 +395,11 @@ def draw_2d_hist(axes, x, y, z, cmap, label):
         prop={"fontsize": 8}
     )
     axes.add_artist(txt)
+
+    # Star formation threshold
+    axes.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
+    axes.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
+    axes.set_ylabel(r"Temperature [K]")
 
 
 class CoolingTimes(HaloProperty):
@@ -535,8 +542,6 @@ class CoolingTimes(HaloProperty):
         axes = gs.subplots()
 
         for ax in axes.flat:
-            ax.loglog()
-
             # Draw cross-hair marker
             T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
             ax.hlines(y=T500, xmin=nH_500 / 3, xmax=nH_500 * 3, colors='k', linestyles='-', lw=1)
@@ -562,11 +567,6 @@ class CoolingTimes(HaloProperty):
                                   prefix='$t_H(z)=$',
                                   color='red',
                                   use_labels=False)
-
-            # Star formation threshold
-            ax.axvline(0.1, color='k', linestyle=':', lw=1, zorder=0)
-            ax.set_xlabel(r"Density [$n_H$ cm$^{-3}$]")
-            ax.set_ylabel(r"Temperature [K]")
 
         # PLOT ALL PARTICLES ===============================================
         H, density_edges, temperature_edges = np.histogram2d(
@@ -606,7 +606,7 @@ class CoolingTimes(HaloProperty):
             y[(agn_flag & snii_flag)],
             bins=[density_bins, temperature_bins]
         )
-        draw_2d_hist(axes[1, 1], density_edges, temperature_edges, H, 'Purples_r', "AGN and SNe heated")
+        draw_2d_hist(axes[1, 0], density_edges, temperature_edges, H, 'Purples_r', "AGN and SNe heated")
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
@@ -706,7 +706,7 @@ class CoolingTimes(HaloProperty):
             parallel=True,
             region=region,
             backend="fast"
-        ).value + np.spacing(0.)
+        ).value
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
         cmap = deepcopy(plt.get_cmap('twilight'))
         cmap.set_under('black')
@@ -744,20 +744,30 @@ class CoolingTimes(HaloProperty):
             resolution=1024,
             parallel=True,
             region=region,
-            backend="fast").value + np.spacing(0.)
+            backend="fast").value
         mass_map = project_gas(
             project='masses',
             data=sw_handle,
             resolution=1024,
             parallel=True,
             region=region,
-            backend="fast").value + np.spacing(0.)
+            backend="fast").value
 
-        mass_weighted_temp_map = np.ma.array(mass_weighted_temp_map, mask=(mass_weighted_temp_map <= 0.),
-                                             fill_value=np.nan, copy=True, dtype=np.float64)
-        mass_map = np.ma.array(mass_map, mask=(mass_map <= 0.), fill_value=np.nan, copy=True, dtype=np.float64)
+        mass_weighted_temp_map = np.ma.array(
+            mass_weighted_temp_map,
+            mask=(mass_weighted_temp_map <= 0.),
+            fill_value=np.nan,
+            copy=True,
+            dtype=np.float64
+        )
+        mass_map = np.ma.array(
+            mass_map,
+            mask=(mass_map <= 0.),
+            fill_value=np.nan,
+            copy=True,
+            dtype=np.float64
+        )
         gas_temp = mass_weighted_temp_map / mass_map
-        gas_temp = np.ma.array(gas_temp, mask=np.isnan(gas_temp), fill_value=np.nan, copy=True, dtype=np.float64)
 
         axes[1, 2].axis("off")
         axes[1, 2].set_aspect("equal")
