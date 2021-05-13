@@ -703,7 +703,7 @@ class CoolingTimes(HaloProperty):
 
         gas_mass = project_gas(project='densities', **map_kwargs)
         gas_mass = np.ma.array(gas_mass, mask=(gas_mass <= 0.))
-        cmap = copy.copy(matplotlib.cm.twilight)
+        cmap = copy.deepcopy(matplotlib.cm.twilight)
         cmap.set_bad(color='k')
 
         axes[2, 3].axis("off")
