@@ -12,9 +12,10 @@ field = 'entropies'
 
 gf = MapGas(field)
 map_gas, region = gf.process_single_halo(
-        path_to_snap=snap,
-        path_to_catalogue=cat
-    )
+    path_to_snap=snap,
+    path_to_catalogue=cat,
+    temperature_range=(1e5, 1e9)
+)
 print(map_gas, region)
 
 # Display
@@ -43,4 +44,3 @@ axes.text(
     transform=axes.transAxes,
 )
 plt.show()
-
