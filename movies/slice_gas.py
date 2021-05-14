@@ -1,6 +1,7 @@
 import sys
 import copy
 import os
+import numpy as np
 from matplotlib import pyplot as plt
 from matplotlib.colors import LogNorm
 
@@ -38,7 +39,7 @@ except Exception as e:
 # Display
 fig, axes = plt.subplots()
 
-print(slice_gas.min(), slice_gas.max())
+print(np.nanmin(slice_gas), np.nanmax(slice_gas))
 
 cmap = copy.copy(plt.get_cmap('twilight'))
 cmap.set_under('black')
