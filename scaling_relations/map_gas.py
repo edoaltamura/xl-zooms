@@ -2,7 +2,7 @@ import os.path
 import numpy as np
 from warnings import warn
 from typing import Union, Optional
-from unyt import kb, mh
+from unyt import kb, mh, Mpc
 from swiftsimio.visualisation.projection import project_gas
 
 from .halo_property import HaloProperty
@@ -119,7 +119,7 @@ class MapGas(HaloProperty):
 
         if depth is not None:
 
-            depth = min(depth, mask_radius_r500 * np.sqrt(2) * _r500)
+            depth = min(depth * Mpc, mask_radius_r500 * np.sqrt(2) * _r500)
 
             depth_filter = np.where(
                 (sw_data.gas.coordinates[:, -1] > _zCen - depth / 2) &
