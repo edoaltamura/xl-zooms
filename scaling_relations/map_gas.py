@@ -1,7 +1,7 @@
 import os.path
 import numpy as np
 from warnings import warn
-from typing import Union
+from typing import Union, Optional
 from unyt import kb, mh
 from swiftsimio.visualisation.projection import project_gas
 
@@ -43,14 +43,13 @@ class MapGas(HaloProperty):
             path_to_catalogue: str = None,
             mask_radius_r500: float = 6,
             map_centre: Union[str, list] = 'vr_centre_of_potential',
-            **kwargs
+            temperature_range: Optional[tuple] = None,
     ):
         sw_data, vr_data = self.get_handles_from_zoom(
             zoom_obj,
             path_to_snap,
             path_to_catalogue,
             mask_radius_r500=mask_radius_r500,
-            **kwargs
         )
 
         map_centres_allowed = [
@@ -85,6 +84,27 @@ class MapGas(HaloProperty):
             _yCen - mask_radius_r500 / np.sqrt(2) * _r500,
             _yCen + mask_radius_r500 / np.sqrt(2) * _r500
         ]
+
+        if temperature_range is not None:
+
+            temp_filter = np.where(
+                (sw_data.gas.temperatures > temperature_range[0]) &
+                (sw_data.gas.temperatures < temperature_range[1])
+            )[0]
+
+            if args.debug:
+                percent = f"{len(temp_filter) / len(sw_data.gas.temperatures) * 100:.1f}"
+                print((
+                    f"Filtering particles by temperature: {temperature_range} K.\n"
+                    f"Total particles: {len(sw_data.gas.temperatures)}\n"
+                    f"Particles within bounds: {len(temp_filter)} = {percent} %"
+                ))
+
+            sw_data.gas.coordinates = sw_data.gas.coordinates[temp_filter]
+            sw_data.gas.smoothing_lengths = sw_data.gas.smoothing_lengths[temp_filter]
+            sw_data.gas.masses = sw_data.gas.masses[temp_filter]
+            sw_data.gas.densities = sw_data.gas.densities[temp_filter]
+            sw_data.gas.temperatures = sw_data.gas.temperatures[temp_filter]
 
         if self.project_quantity == 'entropies':
             number_density = (sw_data.gas.densities / mh).to('cm**-3') / mean_molecular_weight
