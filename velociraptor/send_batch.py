@@ -122,7 +122,7 @@ for i, run_directory in enumerate(args.directories):
                 if filename.endswith('.properties'):
                     has_properties = True
 
-        if os.path.isfile(file_path) and file.endswith('.hdf5') and has_properties:
+        if os.path.isfile(file_path) and file.endswith('.hdf5') and not has_properties:
 
             if not args.no_snapid:
                 with h5file(file_path, 'r') as f:
