@@ -90,10 +90,10 @@ class MapGas(HaloProperty):
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
         region = [
-            _xCen - mask_radius_r500 / np.sqrt(2) * _r500,
-            _xCen + mask_radius_r500 / np.sqrt(2) * _r500,
-            _yCen - mask_radius_r500 / np.sqrt(2) * _r500,
-            _yCen + mask_radius_r500 / np.sqrt(2) * _r500
+            _xCen - mask_radius_r500 / np.sqrt(3) * _r500,
+            _xCen + mask_radius_r500 / np.sqrt(3) * _r500,
+            _yCen - mask_radius_r500 / np.sqrt(3) * _r500,
+            _yCen + mask_radius_r500 / np.sqrt(3) * _r500
         ]
 
         if temperature_range is not None:
@@ -119,7 +119,7 @@ class MapGas(HaloProperty):
 
         if depth is not None:
 
-            depth = min(depth * Mpc, mask_radius_r500 * np.sqrt(2) * _r500)
+            depth = min(depth * Mpc, mask_radius_r500 * np.sqrt(3) * _r500)
 
             depth_filter = np.where(
                 (sw_data.gas.coordinates[:, -1] > _zCen - depth / 2) &

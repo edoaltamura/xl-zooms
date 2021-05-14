@@ -94,10 +94,10 @@ class SliceGas(HaloProperty):
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
         region = [
-            _xCen - mask_radius_r500 / np.sqrt(2) * _r500,
-            _xCen + mask_radius_r500 / np.sqrt(2) * _r500,
-            _yCen - mask_radius_r500 / np.sqrt(2) * _r500,
-            _yCen + mask_radius_r500 / np.sqrt(2) * _r500
+            _xCen - mask_radius_r500 / np.sqrt(3) * _r500,
+            _xCen + mask_radius_r500 / np.sqrt(3) * _r500,
+            _yCen - mask_radius_r500 / np.sqrt(3) * _r500,
+            _yCen + mask_radius_r500 / np.sqrt(3) * _r500
         ]
 
         if temperature_range is not None:
