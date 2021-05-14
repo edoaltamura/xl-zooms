@@ -68,3 +68,7 @@ fig.savefig(
     ),
     dpi=300
 )
+
+if not args.quiet:
+    fig.set_tight_layout(False)
+    plt.show()
