@@ -38,13 +38,15 @@ except Exception as e:
 # Display
 fig, axes = plt.subplots()
 
+print(slice_gas.min(), slice_gas.max())
+
 cmap = copy.copy(plt.get_cmap('twilight'))
 cmap.set_under('black')
 axes.axis("off")
 axes.set_aspect("equal")
 axes.imshow(
     slice_gas.T,
-    norm=LogNorm(vmin=1.e5, vmax=1.e9),
+    norm=LogNorm(vmin=1E5, vmax=1E9),
     cmap=cmap,
     origin="lower",
     extent=region
