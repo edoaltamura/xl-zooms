@@ -44,6 +44,7 @@ class MapGas(HaloProperty):
             mask_radius_r500: float = 6,
             map_centre: Union[str, list] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
+            depth: Optional[float] = None
     ):
         sw_data, vr_data = self.get_handles_from_zoom(
             zoom_obj,
@@ -73,9 +74,19 @@ class MapGas(HaloProperty):
         if self.map_centre == 'vr_centre_of_potential':
             _xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
             _yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
-        elif type(self.map_centre) is list:
+            _zCen = vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
+
+        elif type(self.map_centre[1]) is list:
             _xCen = self.map_centre[0]
             _yCen = self.map_centre[1]
+
+            if depth is not None:
+                if len(self.map_centre) != 3:
+                    raise IndexError((
+                        "The `depth` parameter requires to specify "
+                        "the position of the map centre in 3-d."
+                    ))
+                _zCen = self.map_centre[2]
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
         region = [
@@ -105,6 +116,29 @@ class MapGas(HaloProperty):
             sw_data.gas.masses = sw_data.gas.masses[temp_filter]
             sw_data.gas.densities = sw_data.gas.densities[temp_filter]
             sw_data.gas.temperatures = sw_data.gas.temperatures[temp_filter]
+
+        if depth is not None:
+
+            depth = min(depth, mask_radius_r500 * np.sqrt(2) * _r500)
+
+            depth_filter = np.where(
+                (sw_data.gas.coordinates[:, -1] > _zCen - depth / 2) &
+                (sw_data.gas.coordinates[:, -1] < _zCen + depth / 2)
+            )[0]
+
+            if args.debug:
+                percent = f"{len(depth_filter) / len(sw_data.gas.temperatures) * 100:.1f}"
+                print((
+                    f"Filtering particles by depth: +/- {depth:.2f}/2  Mpc.\n"
+                    f"Total particles: {len(sw_data.gas.temperatures)}\n"
+                    f"Particles within bounds: {len(depth_filter)} = {percent} %"
+                ))
+
+            sw_data.gas.coordinates = sw_data.gas.coordinates[depth_filter]
+            sw_data.gas.smoothing_lengths = sw_data.gas.smoothing_lengths[depth_filter]
+            sw_data.gas.masses = sw_data.gas.masses[depth_filter]
+            sw_data.gas.densities = sw_data.gas.densities[depth_filter]
+            sw_data.gas.temperatures = sw_data.gas.temperatures[depth_filter]
 
         if self.project_quantity == 'entropies':
             number_density = (sw_data.gas.densities / mh).to('cm**-3') / mean_molecular_weight
