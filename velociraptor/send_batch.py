@@ -115,7 +115,7 @@ for i, run_directory in enumerate(args.directories):
         file_path = os.path.join(snaps_path, file)
         stf_subdir = os.path.join(catalogues_path, file[:-5])
 
-        if os.path.isfile(file_path) and file.endswith('.hdf5'):  # and len(os.listdir(stf_subdir)) == 0:
+        if os.path.isfile(file_path) and file.endswith('.hdf5') and len(os.listdir(stf_subdir)) == 0:
 
             if not args.no_snapid:
                 with h5file(file_path, 'r') as f:

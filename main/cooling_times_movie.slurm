@@ -26,7 +26,7 @@ mpirun -np 12 python3 cooling_times_movie.py -a 15 -q
 
 
 ffmpeg \
-    -framerate 10 \
+    -framerate 20 \
     -pattern_type glob \
     -i 'cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth_*.png' \
     -vf scale=-2:1080,format=yuv420p \
