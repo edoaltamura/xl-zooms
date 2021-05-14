@@ -115,7 +115,14 @@ for i, run_directory in enumerate(args.directories):
         file_path = os.path.join(snaps_path, file)
         stf_subdir = os.path.join(catalogues_path, file[:-5])
 
-        if os.path.isfile(file_path) and file.endswith('.hdf5') and len(os.listdir(stf_subdir)) == 0:
+        # Check if stf subdirectory has properties file
+        has_properties = False
+        if os.path.isdir(stf_subdir) and len(os.listdir(stf_subdir)) > 0:
+            for filename in os.listdir(stf_subdir):
+                if filename.endswith('.properties'):
+                    has_properties = True
+
+        if os.path.isfile(file_path) and file.endswith('.hdf5') and has_properties:
 
             if not args.no_snapid:
                 with h5file(file_path, 'r') as f:
@@ -133,7 +140,10 @@ for i, run_directory in enumerate(args.directories):
     number_snapshots = len(snapshot_files)
 
     # Sort snapshots by their output number
-    assert len(snapshot_numbers_sort) == len(set(snapshot_numbers_sort)), "Snapshot numbers have duplicates!"
+    assert len(snapshot_numbers_sort) == len(set(snapshot_numbers_sort)), (
+        "Snapshot numbers have duplicates!"
+    )
+
     snapshot_numbers_sort = np.asarray(snapshot_numbers_sort, dtype=np.int32)
     sort_key = np.argsort(snapshot_numbers_sort)
     snapshot_sizes = np.asarray(snapshot_sizes, dtype=np.int64)[sort_key]
