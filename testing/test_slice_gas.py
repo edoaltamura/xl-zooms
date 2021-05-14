@@ -15,7 +15,7 @@ slice_gas, region = gf.process_single_halo(
     path_to_snap=snap,
     path_to_catalogue=cat,
     temperature_range=(1e5, 1e9),
-    depth_offset=None
+    depth_offset=-2
 )
 print(slice_gas, region)
 
