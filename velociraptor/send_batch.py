@@ -141,7 +141,14 @@ for i, run_directory in enumerate(args.directories):
     stf_subdirs = np.asarray(stf_subdirs, dtype=np.str)[sort_key]
 
     if number_snapshots == 0:
-        raise FileNotFoundError(f"No snapshot file found in {snaps_path}")
+        if len(os.listdir(snaps_path)) == 0:
+            raise FileNotFoundError(f"No snapshots file found in {snaps_path}")
+        else:
+            raise RuntimeError((
+                f"Snapshot directory {snaps_path} contains "
+                f"{len(os.listdir(snaps_path)):d} elements, "
+                f"but none matched the search criteria."
+            ))
     else:
         print((
             f"\nFound {number_snapshots:d} snapshots in directory "
