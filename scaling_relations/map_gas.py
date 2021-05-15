@@ -71,10 +71,10 @@ class MapGas(HaloProperty):
                 f"String-commands for `map_centre` only support "
                 f"`vr_centre_of_potential`. Got {map_centre} instead."
             ))
-        elif type(map_centre) is list and len(map_centre) != 3:
+        elif type(map_centre) is list and len(map_centre) not in [2, 3]:
             raise AttributeError((
                 f"List-commands for `map_centre` only support "
-                f"length-3 lists. Got {map_centre} "
+                f"length-2 and length-3 lists. Got {map_centre} "
                 f"(length {len(map_centre)}) instead."
             ))
 
@@ -89,8 +89,6 @@ class MapGas(HaloProperty):
             _xCen = self.map_centre[0] * Mpc
             _yCen = self.map_centre[1] * Mpc
             _zCen = self.map_centre[2] * Mpc
-
-        self.depth = _zCen / sw_data.metadata.boxsize[0]
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
 
