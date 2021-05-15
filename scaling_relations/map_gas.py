@@ -1,7 +1,8 @@
 import os.path
 import numpy as np
 from typing import Union, Optional
-from unyt import kb, mh, Mpc, K
+from unyt import kb, mh, Mpc
+from collections import namedtuple
 from swiftsimio.visualisation.projection import project_gas
 
 from .halo_property import HaloProperty
@@ -43,7 +44,8 @@ class MapGas(HaloProperty):
             mask_radius_r500: float = 6,
             map_centre: Union[str, list] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
-            depth: Optional[float] = None
+            depth: Optional[float] = None,
+            return_type: Union[type, str] = tuple
     ):
         sw_data, vr_data = self.get_handles_from_zoom(
             zoom_obj,
@@ -151,7 +153,7 @@ class MapGas(HaloProperty):
                 parallel=self.parallel,
                 region=region,
                 backend=self.backend
-            ).to('keV*cm**2/Mpc**3').value
+            ).to('keV*cm**2/Mpc**3')
 
         elif self.project_quantity == 'temperatures':
             sw_data.gas.mwtemps = sw_data.gas.masses * sw_data.gas.temperatures
@@ -176,7 +178,7 @@ class MapGas(HaloProperty):
             with np.errstate(divide='ignore', invalid='ignore'):
                 gas_map = mass_weighted_temp_map / mass_map
 
-            gas_map = gas_map.to(K).value
+            gas_map = gas_map.to('K')
 
         else:
             gas_map = project_gas(
@@ -186,7 +188,10 @@ class MapGas(HaloProperty):
                 parallel=self.parallel,
                 region=region,
                 backend=self.backend
-            ).value
+            )
+
+        units = gas_map.units
+        gas_map = gas_map.value
 
         gas_map = np.ma.array(
             gas_map,
@@ -196,7 +201,35 @@ class MapGas(HaloProperty):
             dtype=np.float64
         )
 
-        return gas_map, region
+        extremes = (np.nanmin(gas_map), np.nanmax(gas_map))
+        _centre = [_xCen, _yCen, _zCen]
+
+        output = [
+            gas_map,
+            units,
+            extremes,
+            region,
+            _centre,
+            _r500
+        ]
+
+        output = tuple(output)
+
+        if return_type is dict or return_type == 'class':
+            output_dict = dict()
+            for variable in output:
+                # Loop over local variables to get the var's name as string
+                variable_name = [k for k, v in locals().items() if v == variable][0]
+                output_dict[variable_name] = variable
+
+            output = output_dict
+
+            if return_type == 'class':
+                OutputClass = namedtuple('OutputClass', ' '.join(output.keys()))
+                output_class = OutputClass(**output)
+                output = output_class
+
+        return output
 
     def process_catalogue(self):
 

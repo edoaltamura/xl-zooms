@@ -27,11 +27,12 @@ c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnob
 gf = SliceGas(field)
 
 try:
-    slice_gas, region = gf.process_single_halo(
+    slice = gf.process_single_halo(
         path_to_snap=s,
         path_to_catalogue=c,
         temperature_range=(1e5, 1e10),
-        depth_offset=None  # Goes through the centre of potential
+        depth_offset=None,  # Goes through the centre of potential
+        return_type='class'
     )
 except Exception as e:
     print(f"Snap number {args.snapshot_number:04d} could not be processed.", e, sep='\n')
@@ -39,18 +40,18 @@ except Exception as e:
 # Display
 fig, axes = plt.subplots()
 
-print(f"Min: {np.nanmin(slice_gas):.2E}\nMax: {np.nanmax(slice_gas):.2E}")
+print(f"Min: {np.nanmin(slice.extremes[0]):.2E}\nMax: {np.nanmax(slice.extremes[1]):.2E}")
 
 cmap = copy.copy(plt.get_cmap('twilight'))
 cmap.set_under('black')
 axes.axis("off")
 axes.set_aspect("equal")
 axes.imshow(
-    slice_gas.T,
+    slice.gas_map.T,
     norm=LogNorm(vmin=1E5, vmax=3E8),
     cmap=cmap,
     origin="lower",
-    extent=region
+    extent=slice.region
 )
 axes.text(
     0.025,

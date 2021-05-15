@@ -11,12 +11,13 @@ from test_files import cat, snap
 field = 'entropies'
 
 gf = SliceGas(field)
-slice_gas, region = gf.process_single_halo(
+slice = gf.process_single_halo(
     path_to_snap=snap,
     path_to_catalogue=cat,
     temperature_range=(1e5, 1e9),
-    depth_offset=-2
+    depth_offset=None
 )
+slice_gas, region = slice.gas_map, slice.region
 print(slice_gas, region)
 
 # Display
