@@ -10,7 +10,7 @@ sys.path.append("..")
 from scaling_relations import SliceGas
 from register import parser, default_output_directory
 
-field = 'temperatures'
+field = 'entropies'
 
 parser.add_argument(
     '-s',
