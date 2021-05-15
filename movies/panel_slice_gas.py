@@ -31,7 +31,7 @@ try:
     slice = gf.process_single_halo(
         path_to_snap=s,
         path_to_catalogue=c,
-        temperature_range=(1e1, 1e9),
+        temperature_range=(1e5, 1e9),
         depth_offset=None,  # Goes through the centre of potential
         return_type='class'
     )
@@ -55,7 +55,7 @@ axes.axis("off")
 axes.set_aspect("equal")
 axes.imshow(
     gas_map.T,
-    norm=LogNorm(vmin=1E5, vmax=1E9),
+    norm=LogNorm(vmin=1E5, vmax=3E8),
     cmap=cmap,
     origin="lower",
     extent=region
