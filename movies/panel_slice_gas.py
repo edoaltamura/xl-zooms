@@ -9,6 +9,7 @@ sys.path.append("..")
 
 from scaling_relations import SliceGas
 from register import parser, default_output_directory
+from literature import Cosmology
 
 field = 'entropies'
 
@@ -36,12 +37,17 @@ try:
     )
     gas_map, region = slice.map, slice.region
 except Exception as e:
-    print(f"Snap number {args.snapshot_number:04d} could not be processed.", e, sep='\n')
+    print(
+        f"Snap number {args.snapshot_number:04d} could not be processed.",
+        e,
+        sep='\n'
+    )
 
 # Display
 fig, axes = plt.subplots()
 
-print(f"Min: {np.nanmin(gas_map):.2E}\nMax: {np.nanmax(gas_map):.2E}")
+if args.debug:
+    print(f"Min: {np.nanmin(gas_map):.2E}\nMax: {np.nanmax(gas_map):.2E}")
 
 cmap = copy.copy(plt.get_cmap('twilight'))
 cmap.set_under('black')
@@ -57,7 +63,11 @@ axes.imshow(
 axes.text(
     0.025,
     0.025,
-    field.title(),
+    (
+        f'{field.title()}\n'
+        f'z = {slice.z:.2f}\n'
+        f't = {Cosmology().age(slice.z).value:.3f} Gyr'
+    ),
     color="w",
     ha="left",
     va="bottom",

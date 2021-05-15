@@ -53,7 +53,7 @@ class MapGas(HaloProperty):
             map_centre: Union[str, list] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
             depth: Optional[float] = None,
-            return_type: Union[type, str] = tuple
+            return_type: Union[type, str] = 'class'
     ):
         sw_data, vr_data = self.get_handles_from_zoom(
             zoom_obj,
@@ -98,6 +98,7 @@ class MapGas(HaloProperty):
                 _zCen = self.map_centre[2]
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
+
         region = [
             _xCen - mask_radius_r500 / np.sqrt(3) * _r500,
             _xCen + mask_radius_r500 / np.sqrt(3) * _r500,
@@ -209,31 +210,31 @@ class MapGas(HaloProperty):
             dtype=np.float64
         )
 
-        _centre = [_xCen, _yCen, _zCen]
-
         output_values = [
             gas_map,
             region,
             units,
-            _centre,
-            _r500
+            [_xCen, _yCen, _zCen],
+            _r500,
+            sw_data.metadata.z
         ]
         output_names = [
             'map',
             'region',
             'units',
             'centre',
-            'r500'
+            'r500',
+            'z'
         ]
         if return_type is tuple:
             output = tuple(output_values)
-
         elif return_type is dict:
             output = dict(zip(output_names, output_values))
-
         elif return_type == 'class':
             OutputClass = namedtuple('OutputClass', output_names)
             output = OutputClass(*output_values)
+        else:
+            raise TypeError(f"Return type {return_type} not recognised.")
 
         return output
 
