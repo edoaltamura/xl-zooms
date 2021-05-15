@@ -86,16 +86,11 @@ class MapGas(HaloProperty):
             _zCen = vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
 
         elif type(self.map_centre[1]) is list:
-            _xCen = self.map_centre[0]
-            _yCen = self.map_centre[1]
+            _xCen = self.map_centre[0] * Mpc
+            _yCen = self.map_centre[1] * Mpc
+            _zCen = self.map_centre[2] * Mpc
 
-            if depth is not None:
-                if len(self.map_centre) != 3:
-                    raise IndexError((
-                        "The `depth` parameter requires to specify "
-                        "the position of the map centre in 3-d."
-                    ))
-                _zCen = self.map_centre[2]
+        self.depth = _zCen / sw_data.metadata.boxsize[0]
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
 

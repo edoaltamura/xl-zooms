@@ -85,9 +85,9 @@ class SliceGas(HaloProperty):
             _zCen = vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
 
         elif type(self.map_centre[1]) is list:
-            _xCen = self.map_centre[0]
-            _yCen = self.map_centre[1]
-            _zCen = self.map_centre[2]
+            _xCen = self.map_centre[0] * Mpc
+            _yCen = self.map_centre[1] * Mpc
+            _zCen = self.map_centre[2] * Mpc
 
         self.depth = _zCen / sw_data.metadata.boxsize[0]
 
