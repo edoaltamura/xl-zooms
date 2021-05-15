@@ -52,7 +52,6 @@ class SliceGas(HaloProperty):
             map_centre: Union[str, list] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
             depth_offset: Optional[float] = None,
-            map_fill_value: Optional[float] = None,
             return_type: Union[type, str] = tuple
     ):
         sw_data, vr_data = self.get_handles_from_zoom(
@@ -183,21 +182,7 @@ class SliceGas(HaloProperty):
         units = gas_map.units
         gas_map = gas_map.value
 
-        gas_map = np.ma.array(
-            gas_map,
-            mask=(gas_map <= 0.),
-            fill_value=np.nan,
-            copy=True,
-            dtype=np.float64
-        )
-
-        # The masked array returns a tuple of
-        # (data, mask, fill_value). Call the `.filled()`
-        # method to return a filled numpy.ndarray.
-        if map_fill_value is None:
-            gas_map = gas_map.filled()
-        else:
-            gas_map = gas_map.filled(fill_value=map_fill_value)
+        gas_map[gas_map <= 0.] = np.nan
 
         limits = (np.nanmin(gas_map), np.nanmax(gas_map))
         _centre = [_xCen, _yCen, _zCen]
