@@ -192,27 +192,29 @@ class SliceGas(HaloProperty):
 
         _centre = [_xCen, _yCen, _zCen]
 
-        output = tuple(
+        output_values = [
             gas_map,
             region,
             units,
             _centre,
             _r500
-        )
+        ]
+        output_names = [
+            'map',
+            'region',
+            'units',
+            '_centre',
+            '_r500'
+        ]
+        if return_type is tuple:
+            output = tuple(output_values)
 
-        if return_type is dict or return_type == 'class':
-            output = {
-                'gas_map': gas_map,
-                'region': region,
-                'units': units,
-                '_centre': _centre,
-                '_r500': _r500
-            }
+        elif return_type is dict:
+            output = dict(zip(output_names, output_values))
 
-            if return_type == 'class':
-                OutputClass = namedtuple('OutputClass', ' '.join(output.keys()))
-                output_class = OutputClass(**output)
-                output = output_class
+        elif return_type == 'class':
+            OutputClass = namedtuple('OutputClass', output_names)
+            output = OutputClass(output_values)
 
         return output
 
