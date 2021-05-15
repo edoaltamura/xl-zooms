@@ -34,24 +34,25 @@ try:
         depth_offset=None,  # Goes through the centre of potential
         return_type='class'
     )
+    gas_map, region = slice.map, slice.region
 except Exception as e:
     print(f"Snap number {args.snapshot_number:04d} could not be processed.", e, sep='\n')
 
 # Display
 fig, axes = plt.subplots()
 
-print(f"Min: {np.nanmin(slice.gas_map):.2E}\nMax: {np.nanmax(slice.gas_map):.2E}")
+print(f"Min: {np.nanmin(gas_map):.2E}\nMax: {np.nanmax(gas_map):.2E}")
 
 cmap = copy.copy(plt.get_cmap('twilight'))
 cmap.set_under('black')
 axes.axis("off")
 axes.set_aspect("equal")
 axes.imshow(
-    slice.gas_map.T,
+    gas_map.T,
     norm=LogNorm(vmin=1E5, vmax=3E8),
     cmap=cmap,
     origin="lower",
-    extent=slice.region
+    extent=region
 )
 axes.text(
     0.025,
