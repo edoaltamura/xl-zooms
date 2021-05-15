@@ -1,6 +1,5 @@
 import os.path
 import numpy as np
-from warnings import warn
 from typing import Union, Optional
 from unyt import kb, mh, Mpc, K
 from swiftsimio.visualisation.slice import slice_gas
@@ -21,7 +20,7 @@ class SliceGas(HaloProperty):
     ):
         super().__init__()
 
-        self.labels = ['gas_map', 'region']
+        self.labels = ['gas_slice', 'region']
 
         self.project_quantity = project_quantity
         self.resolution = resolution
@@ -155,7 +154,9 @@ class SliceGas(HaloProperty):
                 slice=self.depth
             )
 
-            gas_map = mass_weighted_temp_map / mass_map
+            with np.errstate(divide='ignore'):
+                gas_map = mass_weighted_temp_map / mass_map
+
             gas_map = gas_map.to(K).value
 
         else:

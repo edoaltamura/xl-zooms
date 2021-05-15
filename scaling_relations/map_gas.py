@@ -1,8 +1,7 @@
 import os.path
 import numpy as np
-from warnings import warn
 from typing import Union, Optional
-from unyt import kb, mh, Mpc
+from unyt import kb, mh, Mpc, K
 from swiftsimio.visualisation.projection import project_gas
 
 from .halo_property import HaloProperty
@@ -164,7 +163,7 @@ class MapGas(HaloProperty):
                 parallel=self.parallel,
                 region=region,
                 backend=self.backend
-            ).value
+            )
             mass_map = project_gas(
                 project='masses',
                 data=sw_data,
@@ -172,23 +171,12 @@ class MapGas(HaloProperty):
                 parallel=self.parallel,
                 region=region,
                 backend=self.backend
-            ).value
+            )
 
-            mass_weighted_temp_map = np.ma.array(
-                mass_weighted_temp_map,
-                mask=(mass_weighted_temp_map <= 0.),
-                fill_value=np.nan,
-                copy=True,
-                dtype=np.float64
-            )
-            mass_map = np.ma.array(
-                mass_map,
-                mask=(mass_map <= 0.),
-                fill_value=np.nan,
-                copy=True,
-                dtype=np.float64
-            )
-            gas_map = mass_weighted_temp_map / mass_map
+            with np.errstate(divide='ignore'):
+                gas_map = mass_weighted_temp_map / mass_map
+
+            gas_map = gas_map.to(K).value
 
         else:
             gas_map = project_gas(
@@ -199,13 +187,14 @@ class MapGas(HaloProperty):
                 region=region,
                 backend=self.backend
             ).value
-            gas_map = np.ma.array(
-                gas_map,
-                mask=(gas_map <= 0.),
-                fill_value=np.nan,
-                copy=True,
-                dtype=np.float64
-            )
+
+        gas_map = np.ma.array(
+            gas_map,
+            mask=(gas_map <= 0.),
+            fill_value=np.nan,
+            copy=True,
+            dtype=np.float64
+        )
 
         return gas_map, region
 
