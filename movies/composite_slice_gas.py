@@ -24,7 +24,7 @@ s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1
 c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.properties"
 
 
-def draw_panel(axes, field, vmin=None, vmax=None):
+def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     gf = SliceGas(field)
 
     try:
@@ -43,16 +43,16 @@ def draw_panel(axes, field, vmin=None, vmax=None):
         )
 
     if args.debug:
-        print(f"Map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
+        print(f"{field.title()} map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
 
-    cmap = copy.copy(plt.get_cmap('twilight'))
-    cmap.set_under('black')
+    cmap_bkgr = copy.copy(plt.get_cmap(cmap))
+    cmap_bkgr.set_under('black')
     axes.axis("off")
     axes.set_aspect("equal")
     axes.imshow(
         slice.map.T,
         norm=LogNorm(vmin=vmin, vmax=vmax),
-        cmap=cmap,
+        cmap=cmap_bkgr,
         origin="lower",
         extent=slice.region
     )
@@ -75,9 +75,9 @@ fig = plt.figure(figsize=(9, 3))
 gs = fig.add_gridspec(1, 3, hspace=0.1, wspace=0.1)
 axes = gs.subplots()
 
-draw_panel(axes[0], 'densities', vmin=None, vmax=None)
-draw_panel(axes[1], 'temperatures', vmin=5E4, vmax=1E9)
-draw_panel(axes[2], 'entropies', vmin=None, vmax=None)
+draw_panel(axes[0], 'densities', vmin=1E4, vmax=1E15)
+draw_panel(axes[1], 'temperatures', vmin=1E5, vmax=5E8)
+draw_panel(axes[2], 'entropies', vmin=1E5, vmax=1E9)
 
 fig.savefig(
     os.path.join(
@@ -88,5 +88,5 @@ fig.savefig(
 )
 
 if not args.quiet:
-    fig.set_tight_layout(False)
+    fig.set_tight_layout()
     plt.show()
