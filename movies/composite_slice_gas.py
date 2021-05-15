@@ -84,7 +84,7 @@ draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E5, vmax=1E9)
 fig.savefig(
     os.path.join(
         default_output_directory,
-        f"map_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
+        f"slice_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
     ),
     dpi=300,
     bbox_inches='tight'
