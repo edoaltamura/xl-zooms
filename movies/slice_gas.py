@@ -39,7 +39,7 @@ except Exception as e:
 # Display
 fig, axes = plt.subplots()
 
-print(np.nanmin(slice_gas), np.nanmax(slice_gas))
+print(f"Min: {np.nanmin(slice_gas):.2E}, Max: {np.nanmax(slice_gas).2E}")
 
 cmap = copy.copy(plt.get_cmap('twilight'))
 cmap.set_under('black')
