@@ -55,7 +55,7 @@ axes.axis("off")
 axes.set_aspect("equal")
 axes.imshow(
     gas_map.T,
-    norm=LogNorm(vmin=1E5, vmax=3E8),
+    norm=LogNorm(vmin=1E5, vmax=1E9),
     cmap=cmap,
     origin="lower",
     extent=region
