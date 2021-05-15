@@ -11,7 +11,7 @@ from scaling_relations import SliceGas
 from register import parser, default_output_directory
 from literature import Cosmology
 
-field = 'entropies'
+field = 'temperatures'
 
 parser.add_argument(
     '-s',
