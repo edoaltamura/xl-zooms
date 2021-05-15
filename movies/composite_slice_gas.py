@@ -80,7 +80,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
 fig = plt.figure(figsize=(9, 3))
 gs = fig.add_gridspec(1, 3, hspace=0.01, wspace=0.01)
-axes = gs.subplots()
+axes = gs.subplots(constrained_layout=True)
 
 draw_panel(axes[0], 'densities', cmap='bone', vmin=1E5, vmax=1E15)
 draw_panel(axes[1], 'temperatures', cmap='twilight', vmin=1E4, vmax=2E8)
@@ -91,8 +91,7 @@ fig.savefig(
         default_output_directory,
         f"slice_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
     ),
-    dpi=300,
-    bbox_inches='tight'
+    dpi=300
 )
 
 if not args.quiet:
