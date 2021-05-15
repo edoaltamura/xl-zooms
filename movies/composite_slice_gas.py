@@ -74,7 +74,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
 
 fig = plt.figure(figsize=(9, 3))
-gs = fig.add_gridspec(1, 3, hspace=0.1, wspace=0.1)
+gs = fig.add_gridspec(1, 3, hspace=0.01, wspace=0.01)
 axes = gs.subplots()
 
 draw_panel(axes[0], 'densities', cmap='bone', vmin=1E5, vmax=1E15)
