@@ -204,6 +204,8 @@ class SliceGas(HaloProperty):
 
         output = tuple(output)
 
+        print(output)
+
         if return_type is dict or return_type == 'class':
             output_dict = dict()
             for variable in output:
