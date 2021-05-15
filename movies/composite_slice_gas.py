@@ -1,0 +1,92 @@
+import sys
+import copy
+import os
+import numpy as np
+from matplotlib import pyplot as plt
+from matplotlib.colors import LogNorm
+
+sys.path.append("..")
+
+from scaling_relations import SliceGas
+from register import parser, default_output_directory
+from literature import Cosmology
+
+parser.add_argument(
+    '-s',
+    '--snapshot-number',
+    type=int,
+    required=True
+)
+args = parser.parse_args()
+
+dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
+s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.hdf5"
+c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.properties"
+
+
+def draw_panel(axes, field, vmin=None, vmax=None):
+    gf = SliceGas(field)
+
+    try:
+        slice = gf.process_single_halo(
+            path_to_snap=s,
+            path_to_catalogue=c,
+            temperature_range=(1e5, 1e9),
+            depth_offset=None,  # Goes through the centre of potential
+        )
+
+    except Exception as e:
+        print(
+            f"Snap number {args.snapshot_number:04d} could not be processed.",
+            e,
+            sep='\n'
+        )
+
+    if args.debug:
+        print(f"Map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
+
+    cmap = copy.copy(plt.get_cmap('twilight'))
+    cmap.set_under('black')
+    axes.axis("off")
+    axes.set_aspect("equal")
+    axes.imshow(
+        slice.map.T,
+        norm=LogNorm(vmin=vmin, vmax=vmax),
+        cmap=cmap,
+        origin="lower",
+        extent=slice.region
+    )
+    axes.text(
+        0.025,
+        0.025,
+        (
+            f'{field.title()}\n'
+            f'z = {slice.z:.2f}\n'
+            f't = {Cosmology().age(slice.z).value:.3f} Gyr'
+        ),
+        color="w",
+        ha="left",
+        va="bottom",
+        alpha=0.8,
+        transform=axes.transAxes,
+    )
+
+fig = plt.figure(figsize=(10, 6))
+gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
+axes = gs.subplots()
+
+draw_panel(axes[0, 0], 'densities', vmin=None, vmax=None)
+draw_panel(axes[0, 1], 'temperatures', vmin=5E4, vmax=1E9)
+draw_panel(axes[0, 2], 'entropies', vmin=None, vmax=None)
+
+fig.savefig(
+    os.path.join(
+        default_output_directory,
+        f"map_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
+    ),
+    dpi=300
+)
+
+if not args.quiet:
+    fig.set_tight_layout(False)
+    plt.show()
