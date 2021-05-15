@@ -201,42 +201,39 @@ class MapGas(HaloProperty):
         units = gas_map.units
         gas_map = gas_map.value
 
-        gas_map[gas_map <= 0.] = np.nan
+        gas_map = np.ma.array(
+            gas_map,
+            mask=(gas_map <= 0.),
+            fill_value=np.nan,
+            copy=True,
+            dtype=np.float64
+        )
 
-        limits = (np.nanmin(gas_map), np.nanmax(gas_map))
         _centre = [_xCen, _yCen, _zCen]
 
-        output = [
+        output_values = [
             gas_map,
             region,
             units,
-            limits,
             _centre,
             _r500
         ]
+        output_names = [
+            'map',
+            'region',
+            'units',
+            'centre',
+            'r500'
+        ]
+        if return_type is tuple:
+            output = tuple(output_values)
 
-        output = tuple(output)
+        elif return_type is dict:
+            output = dict(zip(output_names, output_values))
 
-        if return_type is dict or return_type == 'class':
-            output_dict = dict()
-            for variable in output:
-                # Loop over local variables to get the var's name as string
-                variable_name = [k for k, v in locals().items() if v == variable][0]
-
-                if args.debug:
-                    print((
-                        f"Setting attribute {variable_name} to method output "
-                        f"in {self.__class__.__name__}"
-                    ))
-
-                output_dict[variable_name] = variable
-
-            output = output_dict
-
-            if return_type == 'class':
-                OutputClass = namedtuple('OutputClass', ' '.join(output.keys()))
-                output_class = OutputClass(**output)
-                output = output_class
+        elif return_type == 'class':
+            OutputClass = namedtuple('OutputClass', output_names)
+            output = OutputClass(*output_values)
 
         return output
 
