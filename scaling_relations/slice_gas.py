@@ -214,7 +214,7 @@ class SliceGas(HaloProperty):
 
         elif return_type == 'class':
             OutputClass = namedtuple('OutputClass', output_names)
-            output = OutputClass(output_values)
+            output = OutputClass(*output_values)
 
         return output
 
