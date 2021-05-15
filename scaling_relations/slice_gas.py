@@ -203,8 +203,8 @@ class SliceGas(HaloProperty):
             'map',
             'region',
             'units',
-            '_centre',
-            '_r500'
+            'centre',
+            'r500'
         ]
         if return_type is tuple:
             output = tuple(output_values)
