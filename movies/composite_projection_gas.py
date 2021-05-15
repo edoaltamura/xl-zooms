@@ -12,7 +12,7 @@ from matplotlib.colors import LogNorm
 
 sys.path.append("..")
 
-from scaling_relations import SliceGas
+from scaling_relations import MapGas
 from register import parser, default_output_directory
 from literature import Cosmology
 
@@ -30,14 +30,13 @@ c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnob
 
 
 def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
-    gf = SliceGas(field)
+    gf = MapGas(field)
 
     try:
         slice = gf.process_single_halo(
             path_to_snap=s,
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
-            depth_offset=None,  # Goes through the centre of potential
         )
 
     except Exception as e:
@@ -89,7 +88,7 @@ draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E5, vmax=1E9)
 fig.savefig(
     os.path.join(
         default_output_directory,
-        f"slice_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
+        f"projection_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
     ),
     dpi=300,
     bbox_inches='tight'
