@@ -44,6 +44,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
     if args.debug:
         print(f"{field.title()} map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
+        print(f"Map centre: {[f'{i.v:.3f}' for i in slice.centre]} Mpc")
 
     cmap_bkgr = copy.copy(plt.get_cmap(cmap))
     cmap_bkgr.set_under('black')
