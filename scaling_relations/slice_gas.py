@@ -192,33 +192,22 @@ class SliceGas(HaloProperty):
 
         _centre = [_xCen, _yCen, _zCen]
 
-        output = [
+        output = tuple(
             gas_map,
             region,
             units,
             _centre,
             _r500
-        ]
-
-        output = tuple(output)
-
-        print(output)
+        )
 
         if return_type is dict or return_type == 'class':
-            output_dict = dict()
-            for variable in output:
-                # Loop over local variables to get the var's name as string
-                variable_name = [k for k, v in locals().items() if v == variable][0]
-
-                if args.debug:
-                    print((
-                        f"Setting attribute {variable_name} to method output "
-                        f"in {self.__class__.__name__}"
-                    ))
-
-                output_dict[variable_name] = variable
-
-            output = output_dict
+            output = {
+                'gas_map': gas_map,
+                'region': region,
+                'units': units,
+                '_centre': _centre,
+                '_r500': _r500
+            }
 
             if return_type == 'class':
                 OutputClass = namedtuple('OutputClass', ' '.join(output.keys()))
