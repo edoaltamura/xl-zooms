@@ -71,8 +71,8 @@ def draw_panel(axes, field, vmin=None, vmax=None):
         transform=axes.transAxes,
     )
 
-fig = plt.figure(figsize=(10, 6))
-gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
+fig = plt.figure(figsize=(9, 3))
+gs = fig.add_gridspec(1, 3, hspace=0.1, wspace=0.1)
 axes = gs.subplots()
 
 draw_panel(axes[0, 0], 'densities', vmin=None, vmax=None)
