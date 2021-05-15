@@ -132,7 +132,7 @@ class SliceGas(HaloProperty):
                 parallel=self.parallel,
                 region=region,
                 slice=self.depth
-            ).to('keV*cm**2').value
+            ).to('keV*cm**2/Mpc**3').value
 
         elif self.project_quantity == 'temperatures':
             sw_data.gas.mwtemps = sw_data.gas.masses * sw_data.gas.temperatures
