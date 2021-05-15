@@ -79,9 +79,9 @@ fig.savefig(
         default_output_directory,
         f"{field}_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
     ),
-    dpi=300
+    dpi=300,
+    bbox_inches='tight'
 )
 
 if not args.quiet:
-    fig.set_tight_layout(False)
     plt.show()

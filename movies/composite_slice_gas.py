@@ -72,20 +72,22 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         transform=axes.transAxes,
     )
 
+
 fig = plt.figure(figsize=(9, 3))
 gs = fig.add_gridspec(1, 3, hspace=0.1, wspace=0.1)
 axes = gs.subplots()
 
 draw_panel(axes[0], 'densities', cmap='bone', vmin=1E5, vmax=1E15)
-draw_panel(axes[1], 'temperatures', cmap='twilight', vmin=1E4, vmax=5E8)
-draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E5, vmax=1E8)
+draw_panel(axes[1], 'temperatures', cmap='twilight', vmin=1E4, vmax=2E8)
+draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E5, vmax=1E9)
 
 fig.savefig(
     os.path.join(
         default_output_directory,
         f"map_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
     ),
-    dpi=300
+    dpi=300,
+    bbox_inches='tight'
 )
 
 if not args.quiet:
