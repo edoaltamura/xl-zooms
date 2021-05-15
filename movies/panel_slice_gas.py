@@ -31,7 +31,7 @@ try:
     slice = gf.process_single_halo(
         path_to_snap=s,
         path_to_catalogue=c,
-        temperature_range=(1e6, 1e9),
+        temperature_range=(1e1, 1e9),
         depth_offset=None,  # Goes through the centre of potential
         return_type='class'
     )
