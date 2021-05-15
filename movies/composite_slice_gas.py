@@ -75,9 +75,9 @@ fig = plt.figure(figsize=(9, 3))
 gs = fig.add_gridspec(1, 3, hspace=0.1, wspace=0.1)
 axes = gs.subplots()
 
-draw_panel(axes[0, 0], 'densities', vmin=None, vmax=None)
-draw_panel(axes[0, 1], 'temperatures', vmin=5E4, vmax=1E9)
-draw_panel(axes[0, 2], 'entropies', vmin=None, vmax=None)
+draw_panel(axes[0], 'densities', vmin=None, vmax=None)
+draw_panel(axes[1], 'temperatures', vmin=5E4, vmax=1E9)
+draw_panel(axes[2], 'entropies', vmin=None, vmax=None)
 
 fig.savefig(
     os.path.join(
