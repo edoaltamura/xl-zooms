@@ -190,13 +190,13 @@ class SliceGas(HaloProperty):
             dtype=np.float64
         )
 
-        extremes = (np.nanmin(gas_map), np.nanmax(gas_map))
+        limits = (np.nanmin(gas_map), np.nanmax(gas_map))
         _centre = [_xCen, _yCen, _zCen]
 
         output = [
             gas_map,
             units,
-            extremes,
+            limits,
             region,
             _centre,
             _r500
