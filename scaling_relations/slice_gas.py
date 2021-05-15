@@ -182,16 +182,20 @@ class SliceGas(HaloProperty):
         units = gas_map.units
         gas_map = gas_map.value
 
-        gas_map[gas_map <= 0.] = np.nan
+        gas_map = np.ma.array(
+            gas_map,
+            mask=(gas_map <= 0.),
+            fill_value=np.nan,
+            copy=True,
+            dtype=np.float64
+        )
 
-        limits = (np.nanmin(gas_map), np.nanmax(gas_map))
         _centre = [_xCen, _yCen, _zCen]
 
         output = [
             gas_map,
             region,
             units,
-            limits,
             _centre,
             _r500
         ]
