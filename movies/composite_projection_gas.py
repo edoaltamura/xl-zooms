@@ -83,7 +83,7 @@ axes = gs.subplots()
 
 draw_panel(axes[0], 'densities', cmap='bone', vmin=1E5, vmax=1E15)
 draw_panel(axes[1], 'temperatures', cmap='twilight', vmin=1E5, vmax=2E8)
-draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E6, vmax=1E9)
+draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E7, vmax=1E9)
 
 fig.savefig(
     os.path.join(
