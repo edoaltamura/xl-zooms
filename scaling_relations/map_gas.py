@@ -155,7 +155,7 @@ class MapGas(HaloProperty):
                 parallel=self.parallel,
                 region=region,
                 backend=self.backend
-            ).to('keV*cm**2/Mpc**3')
+            ).to('keV*cm**2/Mpc**2')
 
         elif self._project_quantity == 'temperatures':
             sw_data.gas.mwtemps = sw_data.gas.masses * sw_data.gas.temperatures
