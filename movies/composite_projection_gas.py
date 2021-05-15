@@ -77,9 +77,9 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     )
 
 
-fig = plt.figure(figsize=(9, 3))
+fig = plt.figure(figsize=(9, 3), constrained_layout=True)
 gs = fig.add_gridspec(1, 3, hspace=0.01, wspace=0.01)
-axes = gs.subplots(constrained_layout=True)
+axes = gs.subplots()
 
 draw_panel(axes[0], 'densities', cmap='bone', vmin=1E5, vmax=1E15)
 draw_panel(axes[1], 'temperatures', cmap='twilight', vmin=1E4, vmax=2E8)
