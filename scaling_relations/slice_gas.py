@@ -1,8 +1,8 @@
 import os.path
 import numpy as np
 from typing import Union, Optional
-from collections import namedtuple
 from unyt import kb, mh, Mpc
+from collections import namedtuple
 from swiftsimio.visualisation.slice import slice_gas
 
 from .halo_property import HaloProperty
