@@ -173,7 +173,7 @@ class MapGas(HaloProperty):
                 backend=self.backend
             )
 
-            with np.errstate(divide='ignore'):
+            with np.errstate(divide='ignore', invalid='ignore'):
                 gas_map = mass_weighted_temp_map / mass_map
 
             gas_map = gas_map.to(K).value

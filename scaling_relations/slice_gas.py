@@ -154,7 +154,7 @@ class SliceGas(HaloProperty):
                 slice=self.depth
             )
 
-            with np.errstate(divide='ignore'):
+            with np.errstate(divide='ignore', invalid='ignore'):
                 gas_map = mass_weighted_temp_map / mass_map
 
             gas_map = gas_map.to(K).value
