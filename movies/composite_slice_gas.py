@@ -88,5 +88,4 @@ fig.savefig(
 )
 
 if not args.quiet:
-    fig.set_tight_layout()
     plt.show()
