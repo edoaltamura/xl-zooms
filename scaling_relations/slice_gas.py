@@ -23,7 +23,7 @@ class SliceGas(HaloProperty):
 
         self.labels = ['gas_slice', 'region']
 
-        self.project_quantity = project_quantity
+        self._project_quantity = project_quantity
         self.resolution = resolution
         self.parallel = parallel
         self.depth = 0
@@ -37,11 +37,11 @@ class SliceGas(HaloProperty):
 
     @property
     def project_quantity(self) -> str:
-        return self.project_quantity
+        return self._project_quantity
 
     @project_quantity.setter
     def project_quantity(self, new_project_quantity: str) -> None:
-        self.project_quantity = new_project_quantity
+        self._project_quantity = new_project_quantity
 
     def process_single_halo(
             self,
@@ -130,7 +130,7 @@ class SliceGas(HaloProperty):
             sw_data.gas.densities = sw_data.gas.densities[temp_filter]
             sw_data.gas.temperatures = sw_data.gas.temperatures[temp_filter]
 
-        if self.project_quantity == 'entropies':
+        if self._project_quantity == 'entropies':
             number_density = (sw_data.gas.densities / mh).to('cm**-3') / mean_molecular_weight
             entropy = kb * sw_data.gas.temperatures / number_density ** (2 / 3)
             sw_data.gas.entropies_physical = entropy.to('keV*cm**2')
@@ -144,7 +144,7 @@ class SliceGas(HaloProperty):
                 slice=self.depth
             ).to('keV*cm**2/Mpc**3')
 
-        elif self.project_quantity == 'temperatures':
+        elif self._project_quantity == 'temperatures':
             sw_data.gas.mwtemps = sw_data.gas.masses * sw_data.gas.temperatures
 
             mass_weighted_temp_map = slice_gas(
@@ -171,7 +171,7 @@ class SliceGas(HaloProperty):
 
         else:
             gas_map = slice_gas(
-                project=self.project_quantity,
+                project=self._project_quantity,
                 data=sw_data,
                 resolution=self.resolution,
                 parallel=self.parallel,
