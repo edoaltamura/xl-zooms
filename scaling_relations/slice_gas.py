@@ -195,9 +195,9 @@ class SliceGas(HaloProperty):
 
         output = [
             gas_map,
+            region,
             units,
             limits,
-            region,
             _centre,
             _r500
         ]
@@ -209,6 +209,13 @@ class SliceGas(HaloProperty):
             for variable in output:
                 # Loop over local variables to get the var's name as string
                 variable_name = [k for k, v in locals().items() if v == variable][0]
+
+                if args.debug:
+                    print((
+                        f"Setting attribute {variable_name} to method output "
+                        f"in {self.__class__.__name__}"
+                    ))
+
                 output_dict[variable_name] = variable
 
             output = output_dict
