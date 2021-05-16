@@ -782,7 +782,7 @@ class CoolingTimes(HaloProperty):
                 ec='none'
             )
         )
-        Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2')
+        Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2', markersize=1)
         bin_median, bin_perc16, bin_perc84 = Pratt2010().combine_entropy_profiles(
             m500_limits=(
                     1e14 * Solar_Mass,

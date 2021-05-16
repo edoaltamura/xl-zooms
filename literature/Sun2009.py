@@ -210,7 +210,8 @@ class Sun2009(Article):
             k_units: str = 'K500adi',
             vkb05_line: bool = True,
             color: str = 'k',
-            alpha: float = 1.
+            alpha: float = 1.,
+            markersize: float = 1
     ) -> None:
 
         stand_alone = False
@@ -296,12 +297,12 @@ class Sun2009(Article):
             num_objects = f"{r_stat['num' + suffix]}, {K_stat['num' + suffix]}"
             point_label = f"r{suffix:.<17s} Num(x,y) = {num_objects}"
             if stand_alone:
-                axes.scatter(x, y, label=point_label)
-                axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none')
+                axes.scatter(x, y, label=point_label, ms=markersize)
+                axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none', ms=markersize)
             else:
-                axes.scatter(x, y, color=color, alpha=alpha)
+                axes.scatter(x, y, color=color, alpha=alpha, ms=markersize)
                 axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none',
-                              ecolor=color, alpha=alpha)
+                              ecolor=color, alpha=alpha, ms=markersize)
 
         if vkb05_line:
             if r_units == 'r500' and k_units == 'K500adi':
