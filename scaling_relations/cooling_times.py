@@ -729,7 +729,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.temperatures = sw_data.gas.temperatures[index]
 
         # Define radial bins and shell volumes
-        lbins = np.logspace(-3, 2, 40) * radial_distance.units
+        lbins = np.logspace(-3, np.log10(2), 40) * radial_distance.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
         volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
@@ -765,10 +765,12 @@ class CoolingTimes(HaloProperty):
         K500 = (
                 kBT500 / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)
         ).to('keV*cm**2')
-
+        axes[1, 2].set_xscale('log')
+        axes[1, 2].set_yscale('log')
         axes[1, 2].axhline(y=K500, color='k', linestyle='--')
         axes[1, 2].set_ylabel(r'$K$ [keV cm$^2$]')
-        # axes[1, 2].set_ylim([30, 1e4])
+        axes[1, 2].set_xlabel(r'$r/r_{500}$')
+        axes[1, 2].set_ylim([30, 1e4])
         axes[1, 2].text(
             axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
             horizontalalignment='left',
