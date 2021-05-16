@@ -28,5 +28,5 @@ try:
         z_agn_start=18,
         z_agn_end=0
     )
-except:
-    print(f"Snap number {args.snapshot_number:04d} could not be processed.")
+except Exception as e:
+    print(f"Snap number {args.snapshot_number:04d} could not be processed.", e, sep='\n')
