@@ -5,7 +5,7 @@ import numpy as np
 from unyt import (
     unyt_array,
     unyt_quantity,
-    mh, G, mp, K, kb, cm
+    mh, G, mp, K, kb, cm, Solar_Mass
 )
 from warnings import warn
 import scipy.interpolate as sci
@@ -16,7 +16,7 @@ from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MaxNLocator, ScalarFormatter
 
-from literature import Cosmology, Sun2009
+from literature import Cosmology, Sun2009, Pratt2010
 from register import Zoom, args, cooling_table, default_output_directory
 from .halo_property import HaloProperty
 
@@ -770,7 +770,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].axhline(y=K500, color='k', linestyle='--')
         axes[1, 2].set_ylabel(r'$K$ [keV cm$^2$]')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
-        axes[1, 2].set_ylim([0.1, 1e4])
+        axes[1, 2].set_ylim([1, 1e4])
         axes[1, 2].text(
             axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
             horizontalalignment='left',
@@ -783,6 +783,20 @@ class CoolingTimes(HaloProperty):
             )
         )
         Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2')
+        bin_median, bin_perc16, bin_perc84 = Pratt2010().combine_entropy_profiles(
+            m500_limits=(
+                    1e14 * Solar_Mass,
+                    5e14 * Solar_Mass
+            ),
+            k500_rescale=False
+        )
+        axes[1, 2].fill_between(
+            Pratt2010().radial_bins,
+            bin_perc16,
+            bin_perc84,
+            color='aqua', alpha=0.85, linewidth=0
+        )
+        axes[1, 2].plot(Pratt2010().radial_bins, bin_median, c='k')
 
 
         z_agn_recent_text = (
