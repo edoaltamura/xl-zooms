@@ -297,10 +297,10 @@ class Sun2009(Article):
             num_objects = f"{r_stat['num' + suffix]}, {K_stat['num' + suffix]}"
             point_label = f"r{suffix:.<17s} Num(x,y) = {num_objects}"
             if stand_alone:
-                axes.scatter(x, y, label=point_label, ms=markersize)
+                axes.scatter(x, y, label=point_label, s=markersize)
                 axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none', ms=markersize)
             else:
-                axes.scatter(x, y, color=color, alpha=alpha, ms=markersize)
+                axes.scatter(x, y, color=color, alpha=alpha, s=markersize)
                 axes.errorbar(x, y, yerr=[[y_hi - y], [y - y_low]], xerr=[[x_hi - x], [x - x_low]], ls='none',
                               ecolor=color, alpha=alpha, ms=markersize)
 
