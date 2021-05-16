@@ -11,6 +11,6 @@ parallel python3 my_script.py --arguments argvalues --sequence-number ::: {1..10
 ```
 or using the `seq` command
 ```shell script
-x=100
+export x=100
 parallel python3 my_script.py --arguments argvalues --sequence-number ::: $(seq 1 $x)
 ```

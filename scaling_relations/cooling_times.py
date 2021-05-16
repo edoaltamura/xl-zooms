@@ -1,8 +1,12 @@
 import os
 import h5py as h5
+from typing import Tuple
 import numpy as np
-from copy import deepcopy
-from unyt import *
+from unyt import (
+    unyt_array,
+    unyt_quantity,
+    mh, G, mp, K, kb, cm
+)
 from warnings import warn
 import scipy.interpolate as sci
 import matplotlib
@@ -11,10 +15,8 @@ from matplotlib.colors import LogNorm
 from matplotlib.offsetbox import AnchoredText
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MaxNLocator, ScalarFormatter
-import swiftsimio
-from swiftsimio.visualisation.projection import project_gas
 
-from literature import Cosmology
+from literature import Cosmology, Sun2009
 from register import Zoom, args, cooling_table, default_output_directory
 from .halo_property import HaloProperty
 
@@ -35,9 +37,32 @@ def latex_float(f):
         return float_str
 
 
+def histogram_unyt(
+        data: unyt_array,
+        bins: unyt_array = None,
+        weights: unyt_array = None,
+        **kwargs,
+) -> Tuple[unyt_array]:
+    assert data.shape == weights.shape, (
+        "Data and weights arrays must have the same shape. "
+        f"Detected data {data.shape}, weights {weights.shape}."
+    )
+
+    assert data.units == bins.units, (
+        "Data and bins must have the same units. "
+        f"Detected data {data.units}, bins {bins.units}."
+    )
+
+    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value, **kwargs)
+    hist *= weights.units
+    bin_edges *= data.units
+
+    return hist, bin_edges
+
+
 def draw_adiabats(axes, density_bins, temperature_bins):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
+    entropy_interps = temperature_interps * K * kb / (density_interps / cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
@@ -93,7 +118,7 @@ def draw_adiabats(axes, density_bins, temperature_bins):
 
 def draw_k500(axes, density_bins, temperature_bins, k500):
     density_interps, temperature_interps = np.meshgrid(density_bins, temperature_bins)
-    entropy_interps = temperature_interps * K * boltzmann_constant / (density_interps / cm ** 3) ** (2 / 3)
+    entropy_interps = temperature_interps * K * kb / (density_interps / cm ** 3) ** (2 / 3)
     entropy_interps = entropy_interps.to('keV*cm**2').value
 
     # Define entropy levels to plot
@@ -342,37 +367,6 @@ def int_ticks(cbar):
     cbar.ax.yaxis.set_major_locator(MaxNLocator(integer=True))
     cbar.ax.yaxis.set_minor_locator(MaxNLocator(integer=True))
 
-    # # Major ticks
-    # ticks = cbar.ax.get_yticks(minor=False)
-    # labels = cbar.ax.get_yticklabels(minor=False)
-    #
-    # num_majors = len(labels)
-    #
-    # for t, l in zip(ticks, labels):
-    #
-    #     if float(t) < 10:
-    #         l.set_text(f'{int(float(t))}')
-    #     else:
-    #         l.set_text(f'$10^{{{int(np.log10(float(t)))}}}$')
-    #
-    # cbar.set_ticks(ticks, minor=False)
-    # cbar.set_ticklabels(labels, minor=False)
-    #
-    # # Minor ticks
-    # ticks = cbar.ax.get_yticks(minor=True)
-    # labels = cbar.ax.get_yticklabels(minor=True)
-    #
-    # for t, l in zip(ticks, labels):
-    #
-    #     if float(t) < 100 and num_majors < 2:
-    #         if float(t) < 1.01 or float(t) > 1.99:
-    #             l.set_text(f'{int(float(t))}')
-    #
-    # cbar.set_ticks(ticks, minor=True)
-    # cbar.set_ticklabels(labels, minor=True)
-    #
-    # return cbar
-
 
 def draw_2d_hist(axes, x, y, z, cmap, label):
 
@@ -490,7 +484,7 @@ class CoolingTimes(HaloProperty):
             number_density = (density / mh).to('cm**-3').value * sw_data.gas.element_mass_fractions.hydrogen[index]
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
-                    gamma - 1) * mh / boltzmann_constant
+                    gamma - 1) * mh / kb
             temperature = temperature.to('K').value
 
         elif agn_time == 'after':
@@ -507,7 +501,7 @@ class CoolingTimes(HaloProperty):
             number_density = (density / mh).to('cm**-3').value * sw_data.gas.element_mass_fractions.hydrogen[index]
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
-                    gamma - 1) * mh / boltzmann_constant
+                    gamma - 1) * mh / kb
             temperature = temperature.to('K').value
 
         agn_flag = sw_data.gas.heated_by_agnfeedback[index]
@@ -520,6 +514,11 @@ class CoolingTimes(HaloProperty):
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
         nH_500 = (primordial_hydrogen_mass_fraction * Cosmology().fb * rho_crit * 500 / mh).to('cm**-3')
+
+        # Entropy
+        electron_number_density = (sw_data.gas.densities[index] / mh).to('cm**-3') / mean_molecular_weight
+        entropy = kb * sw_data.gas.temperatures[index] / electron_number_density ** (2 / 3)
+        entropy = entropy.to('keV*cm**2')
 
         x = number_density
         y = temperature
@@ -546,8 +545,8 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]), np.log10(temperature_bounds[1]), bins
         )
 
-        T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / boltzmann_constant).to('K').value
-        K500 = (T500 * K * boltzmann_constant / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
+        T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / kb).to('K').value
+        K500 = (T500 * K * kb / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
                 2 / 3)).to('keV*cm**2')
 
         # Make the norm object to define the image stretch
@@ -560,7 +559,7 @@ class CoolingTimes(HaloProperty):
 
         fig = plt.figure(figsize=(10, 6))
         gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
-        axes = gs.subplots()
+        axes = gs.subplots(constrained_layout=True)
 
         for ax in [
             axes[0, 0],
@@ -705,117 +704,84 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].set_ylabel('Number of particles')
         axes[1, 3].set_ylim(1, 10 ** 4.5)
 
-        # Density map
-        _xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
-        _yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
-        _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
-        sw_handle = swiftsimio.load(path_to_snap)
-        region = [
-            _xCen - 1.5 * _r500,
-            _xCen + 1.5 * _r500,
-            _yCen - 1.5 * _r500,
-            _yCen + 1.5 * _r500
-        ]
+        bins = np.logspace(50, 1.e4, 51)
 
-        gas_mass = project_gas(
-            project='densities',
-            data=sw_handle,
-            resolution=1024,
-            parallel=True,
-            region=region,
-            backend="fast"
-        ).value
-        gas_mass = np.ma.array(
-            gas_mass,
-            mask=(gas_mass <= 0.),
-            fill_value=np.nan,
-            copy=True,
-            dtype=np.float64
-        )
-        cmap = deepcopy(plt.get_cmap('twilight'))
-        cmap.set_under('black')
+        axes[2, 3].clear()
+        axes[2, 3].set_xscale('log')
+        axes[2, 3].set_yscale('log')
+        axes[2, 3].hist(entropy, bins=bins, histtype='step', label='All')
+        axes[2, 3].hist(entropy[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+        axes[2, 3].hist(entropy[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+        axes[2, 3].hist(entropy[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+        axes[2, 3].hist(entropy[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
+        axes[2, 3].set_xlabel("Entropy [keV cm$^2$]")
+        axes[2, 3].set_ylabel('Number of particles')
+        axes[2, 3].set_ylim(1, 10 ** 4.5)
 
-        axes[2, 3].axis("off")
-        axes[2, 3].set_aspect("equal")
-        axes[2, 3].set_xscale('linear')
-        axes[2, 3].set_yscale('linear')
-        axes[2, 3].imshow(
-            gas_mass.T,
-            norm=LogNorm(),
-            cmap=cmap,
-            origin="lower",
-            extent=region
-        )
-        circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
-        axes[2, 3].add_artist(circle_r500)
-        axes[2, 3].text(
-            0.025,
-            0.025,
-            "Density",
-            color="k",
-            ha="left",
-            va="bottom",
-            alpha=0.8,
-            transform=axes[2, 3].transAxes,
+        # Entropy profile
+        index = np.where(
+            (sw_data.gas.radial_distances < 2 * r500) &
+            (sw_data.gas.fofgroup_ids == 1) &
+            (sw_data.gas.temperatures > 1e5)
+        )[0]
+        radial_distance = sw_data.gas.radial_distances[index] / r500
+        sw_data.gas.masses = sw_data.gas.masses[index]
+        sw_data.gas.temperatures = sw_data.gas.temperatures[index]
+
+        # Define radial bins and shell volumes
+        lbins = np.logspace(-3, 2, 40) * radial_distance.units
+        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
+        volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
+
+        mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=sw_data.gas.masses)
+        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+        density_profile = mass_weights / volume_shell
+        number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
+
+        mass_weighted_temperatures = (sw_data.gas.temperatures * kb).to('keV') * sw_data.gas.masses
+        temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+        temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
+        temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+
+        entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
+
+        rho_crit = unyt_quantity(
+            sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
+        ).to('Msun/Mpc**3')
+        density_profile /= rho_crit
+
+        axes[1, 2].plot(
+            radial_bin_centres,
+            entropy_profile,
+            linestyle='-',
+            color='k',
+            linewidth=1,
+            alpha=1,
         )
 
-        # Temperature map
-        sw_handle.gas.mwtemps = sw_handle.gas.masses * sw_handle.gas.temperatures
+        kBT500 = (
+                G * mean_molecular_weight * m500 * mp / r500 / 2
+        ).to('keV')
+        K500 = (
+                kBT500 / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)
+        ).to('keV*cm**2')
 
-        mass_weighted_temp_map = project_gas(
-            project='mwtemps',
-            data=sw_handle,
-            resolution=1024,
-            parallel=True,
-            region=region,
-            backend="fast").value
-        mass_map = project_gas(
-            project='masses',
-            data=sw_handle,
-            resolution=1024,
-            parallel=True,
-            region=region,
-            backend="fast").value
-
-        mass_weighted_temp_map = np.ma.array(
-            mass_weighted_temp_map,
-            mask=(mass_weighted_temp_map <= 0.),
-            fill_value=np.nan,
-            copy=True,
-            dtype=np.float64
-        )
-        mass_map = np.ma.array(
-            mass_map,
-            mask=(mass_map <= 0.),
-            fill_value=np.nan,
-            copy=True,
-            dtype=np.float64
-        )
-        gas_temp = mass_weighted_temp_map / mass_map
-
-        axes[1, 2].axis("off")
-        axes[1, 2].set_aspect("equal")
-        axes[1, 2].set_xscale('linear')
-        axes[1, 2].set_yscale('linear')
-        axes[1, 2].imshow(
-            gas_temp.T,
-            norm=LogNorm(),
-            cmap=cmap,
-            origin="lower",
-            extent=region
-        )
-        circle_r500 = plt.Circle((_xCen, _yCen), _r500, color="red", fill=False, linestyle='-')
-        axes[1, 2].add_artist(circle_r500)
+        axes[1, 2].axhline(y=K500, color='k', linestyle='--')
+        axes[1, 2].set_ylabel(r'$K$ [keV cm$^2$]')
+        axes[1, 2].set_ylim([30, 1e4])
         axes[1, 2].text(
-            0.025,
-            0.025,
-            "Temperature",
-            color="w",
-            ha="left",
-            va="bottom",
-            alpha=0.8,
-            transform=axes[1, 2].transAxes,
+            axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
+            horizontalalignment='left',
+            verticalalignment='bottom',
+            color='k',
+            bbox=dict(
+                boxstyle='square,pad=10',
+                fc='none',
+                ec='none'
+            )
         )
+        Sun2009.overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2')
+
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} > z > {z_agn_end:.1f} (relevant to AGN plot only)\n"
@@ -839,7 +805,6 @@ class CoolingTimes(HaloProperty):
         )
 
         if not args.quiet:
-            fig.set_tight_layout(False)
             plt.show()
 
         fig.savefig(
