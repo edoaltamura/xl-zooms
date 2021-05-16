@@ -768,7 +768,7 @@ class CoolingTimes(HaloProperty):
 
         axes[1, 2].axhline(y=K500, color='k', linestyle='--')
         axes[1, 2].set_ylabel(r'$K$ [keV cm$^2$]')
-        axes[1, 2].set_ylim([30, 1e4])
+        # axes[1, 2].set_ylim([30, 1e4])
         axes[1, 2].text(
             axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
             horizontalalignment='left',
