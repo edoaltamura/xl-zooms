@@ -780,7 +780,7 @@ class CoolingTimes(HaloProperty):
                 ec='none'
             )
         )
-        Sun2009.overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2')
+        Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2')
 
 
         z_agn_recent_text = (
