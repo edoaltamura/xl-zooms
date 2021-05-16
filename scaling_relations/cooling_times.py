@@ -525,7 +525,7 @@ class CoolingTimes(HaloProperty):
         w = cooling_times[index]
 
         if args.debug:
-            print("Number of particles being plotted", len(x), entropy)
+            print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
         assert (x > 0).all(), f"Found negative value(s) in x: {x[x <= 0]}"
@@ -704,7 +704,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].set_ylabel('Number of particles')
         axes[1, 3].set_ylim(1, 10 ** 4.5)
 
-        bins = np.logspace(50, 1.e4, 51)
+        bins = np.logspace(0, 4, 51)
 
         axes[2, 3].clear()
         axes[2, 3].set_xscale('log')
