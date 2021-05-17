@@ -79,10 +79,16 @@ class SliceGas(HaloProperty):
 
         self.map_centre = map_centre
 
+        centre_of_potential = [
+            vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a,
+            vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a,
+            vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
+        ]
+
         if self.map_centre == 'vr_centre_of_potential':
-            _xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
-            _yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
-            _zCen = vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
+            _xCen = centre_of_potential[0]
+            _yCen = centre_of_potential[1]
+            _zCen = centre_of_potential[2]
 
         elif type(self.map_centre) is list or type(self.map_centre) is np.ndarray:
             _xCen = self.map_centre[0] * Mpc / vr_data.a
@@ -90,7 +96,8 @@ class SliceGas(HaloProperty):
             _zCen = self.map_centre[2] * Mpc / vr_data.a
 
         if args.debug:
-            print("Map centre:", _xCen, _yCen, _zCen)
+            print(f"Centre of potential: {[float(f'{i.v:.3f}') for i in centre_of_potential]} Mpc")
+            print(f"Map centre: {[float(f'{i.v:.3f}') for i in [_xCen, _yCen, _zCen]]} Mpc")
 
         self.depth = _zCen / sw_data.metadata.boxsize[0]
 
