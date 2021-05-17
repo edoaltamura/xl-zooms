@@ -64,7 +64,7 @@ xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
 
-print(len(steps[window // 2:-window // 2]), xcminpot_smoothed)
+print(len(steps[window // 2:-window // 2]), len(xcminpot_smoothed))
 f_i = interp1d(steps[window // 2:-window // 2], xcminpot_smoothed)
 f_x = extrap1d(f_i)
 
