@@ -416,12 +416,15 @@ class CoolingTimes(HaloProperty):
             agn_time: str = None,
             z_agn_start: float = 18,
             z_agn_end: float = 0.,
-            **kwargs
     ):
         aperture_fraction = args.aperture_percent / 100
 
-        sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
-                                                      mask_radius_r500=4, **kwargs)
+        sw_data, vr_data = self.get_handles_from_zoom(
+            zoom_obj,
+            path_to_snap,
+            path_to_catalogue,
+            mask_radius_r500=5
+        )
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
@@ -438,6 +441,9 @@ class CoolingTimes(HaloProperty):
         cooling_times = calculate_mean_cooling_times(sw_data)
 
         if args.debug:
+            print("m500 = ", m500)
+            print("r500 = ", r500)
+            print("aperture_fraction = ", aperture_fraction)
             print("Number of particles being imported", len(sw_data.gas.densities))
 
         gamma = 5 / 3
@@ -447,7 +453,7 @@ class CoolingTimes(HaloProperty):
         except AttributeError as e:
             print(e)
             print('Setting `last_agnfeedback_scale_factors` with 0.1.')
-            a_heat = np.ones_like(cooling_times) / 10
+            a_heat = np.ones_like(cooling_times) * 0.1
 
         if agn_time is None:
             index = np.where(
