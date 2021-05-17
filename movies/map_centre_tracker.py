@@ -27,12 +27,13 @@ def read(snapshot_number):
 
 dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
 
-
 with Pool() as pool:
-    results = list(tqdm(
-        pool.imap(read, range(2523)),
-        total=2523
-    ))
+    results = list(
+        tqdm(
+            pool.imap(read, range(2523)),
+            total=2523
+        )
+    )
     r500 = np.asarray(list(results)).T[0]
     xcminpot = np.asarray(list(results)).T[1]
     ycminpot = np.asarray(list(results)).T[2]
@@ -43,10 +44,12 @@ xcminpot_smoothed = smooth(xcminpot - np.mean(xcminpot), 150)
 ycminpot_smoothed = smooth(ycminpot - np.mean(ycminpot), 150)
 zcminpot_smoothed = smooth(zcminpot - np.mean(zcminpot), 150)
 
-plt.plot(r500 - r500_smoothed, label='r500')
-plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
-plt.plot(ycminpot - ycminpot_smoothed, label='ycminpot')
-plt.plot(zcminpot - zcminpot_smoothed, label='zcminpot')
+l = len(r500_smoothed)
+
+plt.plot(r500[:l] - r500_smoothed, label='r500')
+plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
+plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
+plt.plot(zcminpot[:l] - zcminpot_smoothed, label='zcminpot')
 
 plt.legend()
 plt.show()
