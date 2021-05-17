@@ -11,6 +11,7 @@ def smooth(data, window_width, order: int = 4):
     ma_vec = (cumsum_vec[window_width:] - cumsum_vec[:-window_width]) / window_width
 
     # Make polynomial fit
+    steps = np.arange(len(data))
     coefs = poly.polyfit(steps[window_width // 2:-window_width // 2], ma_vec[:-1], order)
     ma_vec = poly.polyval(steps, coefs)
 
@@ -46,7 +47,7 @@ with Pool() as pool:
     zcminpot = np.asarray(list(results)).T[3]
 
 window = 150
-steps = np.arange(2523)
+
 r500_smoothed = smooth(r500, window)
 xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
