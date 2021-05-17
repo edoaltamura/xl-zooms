@@ -721,7 +721,7 @@ class CoolingTimes(HaloProperty):
 
         # Entropy profile
         index = np.where(
-            (sw_data.gas.radial_distances < 3 * r500) &
+            (sw_data.gas.radial_distances < 4 * r500) &
             (sw_data.gas.fofgroup_ids == 1) &
             (sw_data.gas.temperatures > 1e5)
         )[0]
@@ -730,7 +730,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.temperatures = sw_data.gas.temperatures[index]
 
         # Define radial bins and shell volumes
-        lbins = np.logspace(-2, np.log10(3), 51) * radial_distance.units
+        lbins = np.logspace(-2, np.log10(4), 51) * radial_distance.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
         volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
@@ -768,7 +768,8 @@ class CoolingTimes(HaloProperty):
         )
         axes[1, 2].set_xscale('log')
         axes[1, 2].set_yscale('log')
-        axes[1, 2].axhline(y=K500 / K500, color='k', linestyle=':', linewidth=0.5)
+        # axes[1, 2].axhline(y=K500 / K500, color='k', linestyle=':', linewidth=0.5)
+        axes[1, 2].axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
         axes[1, 2].set_ylabel(r'$K/K_{500}$')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
         axes[1, 2].set_ylim([0.01, 10])
