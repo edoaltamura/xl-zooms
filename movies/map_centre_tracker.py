@@ -6,9 +6,14 @@ from tqdm import tqdm
 from multiprocessing import Pool
 
 
-def smooth(data, window_width):
+def smooth(data, window_width, order: int = 4):
     cumsum_vec = np.cumsum(np.insert(data, 0, 0))
     ma_vec = (cumsum_vec[window_width:] - cumsum_vec[:-window_width]) / window_width
+
+    # Make polynomial fit
+    coefs = poly.polyfit(steps[window_width // 2:-window_width // 2], ma_vec[:-1], order)
+    ma_vec = poly.polyval(steps, coefs)
+
     return ma_vec
 
 
@@ -42,19 +47,14 @@ with Pool() as pool:
 
 window = 150
 steps = np.arange(2523)
-r500_smoothed = smooth(r500 - np.mean(r500), window)
+r500_smoothed = smooth(r500, window)
 xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
 
-print(len(steps[window // 2:-window // 2]), len(zcminpot_smoothed[:-1]))
-coefs = poly.polyfit(steps[window // 2:-window // 2], zcminpot_smoothed[:-1], 4)
-zcminpot_smoothed = poly.polyval(steps, coefs)
-
-# plt.plot(r500[:l] - r500_smoothed, label='r500')
-# plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
-# plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
-# plt.plot(zcminpot_smoothed, label='zcminpot_smoothed')
+plt.plot(r500 - r500_smoothed, label='r500')
+plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
+plt.plot(ycminpot - ycminpot_smoothed, label='ycminpot')
 plt.plot(zcminpot - zcminpot_smoothed, label='zcminpot')
 
 plt.legend()
