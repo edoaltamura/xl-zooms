@@ -47,7 +47,7 @@ xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
 
-print(len(steps[window // 2:-window // 2]), len(zcminpot_smoothed[-1]))
+print(len(steps[window // 2:-window // 2]), len(zcminpot_smoothed[:-1]))
 coefs = poly.polyfit(steps[window // 2:-window // 2], zcminpot_smoothed[:-1], 4)
 ffit = poly.polyval(steps, coefs)
 
