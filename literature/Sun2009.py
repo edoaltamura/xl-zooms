@@ -231,13 +231,13 @@ class Sun2009(Article):
             axes.axhline(1, linestyle=':', color=color, alpha=alpha)
         elif k_units == 'keVcm^2':
             K_conv = np.ones_like(getattr(self, 'K_500_adi'))
-            axes.fill_between(
-                np.array(axes.get_xlim()),
-                y1=np.nanmin(self.K_500_adi),
-                y2=np.nanmax(self.K_500_adi),
-                facecolor='k',
-                alpha=0.3
-            )
+            # axes.fill_between(
+            #     np.log10(np.array(axes.get_xlim())),
+            #     y1=np.nanmin(self.K_500_adi),
+            #     y2=np.nanmax(self.K_500_adi),
+            #     facecolor='k',
+            #     alpha=0.3
+            # )
         else:
             raise ValueError("Conversion unit unknown.")
         for field in fields:
