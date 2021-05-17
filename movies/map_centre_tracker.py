@@ -54,7 +54,7 @@ ffit = poly.polyval(steps, coefs)
 # plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
 # plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
 plt.plot(zcminpot_smoothed, label='zcminpot_smoothed')
-plt.plot(zcminpot[window // 2:-window // 2], label='zcminpot')
+plt.plot(zcminpot[window // 2 + 1:-window // 2], label='zcminpot')
 
 plt.legend()
 plt.show()
