@@ -39,17 +39,20 @@ with Pool() as pool:
     ycminpot = np.asarray(list(results)).T[2]
     zcminpot = np.asarray(list(results)).T[3]
 
-r500_smoothed = smooth(r500 - np.mean(r500), 150)
-xcminpot_smoothed = smooth(xcminpot, 150)
-ycminpot_smoothed = smooth(ycminpot, 150)
-zcminpot_smoothed = smooth(zcminpot, 150)
+window = 150
+
+r500_smoothed = smooth(r500 - np.mean(r500), window)
+xcminpot_smoothed = smooth(xcminpot, window)
+ycminpot_smoothed = smooth(ycminpot, window)
+zcminpot_smoothed = smooth(zcminpot, window)
 
 l = len(r500_smoothed)
 
-plt.plot(r500[:l] - r500_smoothed, label='r500')
-plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
-plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
-plt.plot(zcminpot[:l] - zcminpot_smoothed, label='zcminpot')
+# plt.plot(r500[:l] - r500_smoothed, label='r500')
+# plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
+# plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
+plt.plot(zcminpot_smoothed, label='zcminpot_smoothed')
+plt.plot(zcminpot[:l], label='zcminpot')
 
 plt.legend()
 plt.show()
