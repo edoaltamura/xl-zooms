@@ -232,7 +232,7 @@ class Sun2009(Article):
         elif k_units == 'keVcm^2':
             K_conv = np.ones_like(getattr(self, 'K_500_adi'))
             axes.fill_between(
-                np.log10(np.array(axes.get_xlim())),
+                np.array(axes.get_xlim()),
                 y1=np.nanmin(self.K_500_adi),
                 y2=np.nanmax(self.K_500_adi),
                 facecolor='k',
