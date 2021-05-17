@@ -535,6 +535,7 @@ class CoolingTimes(HaloProperty):
         # temperature_bounds = [1e3, 1e10]  # in K
         density_bounds = [1e-4, 1]  # in nh/cm^3
         temperature_bounds = [1e6, 1e9]  # in K
+        pdf_ybounds = [1, 10 ** 4.5]
         bins = 256
 
         # Make the norm object to define the image stretch
@@ -641,7 +642,7 @@ class CoolingTimes(HaloProperty):
                            color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 0].set_xlabel(f"$\log_{{10}}$(Cooling time [Myr])")
         axes[2, 0].set_ylabel('Number of particles')
-        axes[2, 0].set_ylim(1, 10 ** 4.5)
+        axes[2, 0].set_ylim(pdf_ybounds)
         axes[2, 0].legend(loc="upper left")
 
         hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
@@ -657,7 +658,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 1].set_xlabel("Hydrogen fraction")
         axes[2, 1].set_ylabel('Number of particles')
-        axes[2, 1].set_ylim(1, 10 ** 4.5)
+        axes[2, 1].set_ylim(pdf_ybounds)
 
         log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
         bins = np.linspace(-4, 1, 51)
@@ -673,7 +674,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metallicity [Z$_\odot$])")
         axes[2, 2].set_ylabel('Number of particles')
-        axes[2, 2].set_ylim(1, 10 ** 4.5)
+        axes[2, 2].set_ylim(pdf_ybounds)
 
         bins = np.logspace(np.log10(density_edges.min()), np.log10(density_edges.max()), 51)
 
@@ -687,7 +688,7 @@ class CoolingTimes(HaloProperty):
         axes[0, 3].hist(x[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[0, 3].set_xlabel(f"Density [$n_H$ cm$^{{-3}}$]")
         axes[0, 3].set_ylabel('Number of particles')
-        axes[0, 3].set_ylim(1, 10 ** 4.5)
+        axes[0, 3].set_ylim(pdf_ybounds)
         axes[0, 3].legend()
 
         bins = np.logspace(np.log10(temperature_edges.min()), np.log10(temperature_edges.max()), 51)
@@ -702,7 +703,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 3].hist(y[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[1, 3].set_xlabel("Temperature [K]")
         axes[1, 3].set_ylabel('Number of particles')
-        axes[1, 3].set_ylim(1, 10 ** 4.5)
+        axes[1, 3].set_ylim(pdf_ybounds)
 
         bins = np.logspace(0, 4, 51)
 
@@ -716,7 +717,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 3].hist(entropy[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 3].set_xlabel("Entropy [keV cm$^2$]")
         axes[2, 3].set_ylabel('Number of particles')
-        axes[2, 3].set_ylim(1, 10 ** 4.5)
+        axes[2, 3].set_ylim(pdf_ybounds)
 
         # Entropy profile
         index = np.where(
