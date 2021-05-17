@@ -33,7 +33,7 @@ with Pool() as pool:
         pool.imap(read, range(2523)),
         total=2523
     ))
-    r500, xcminpot, ycminpot, zcminpot = list(results)
+    r500, xcminpot, ycminpot, zcminpot = np.asarray(list(results))
 
 print(r500)
 
