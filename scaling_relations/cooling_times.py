@@ -421,7 +421,7 @@ class CoolingTimes(HaloProperty):
         aperture_fraction = args.aperture_percent / 100
 
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
-                                                      mask_radius_r500=aperture_fraction, **kwargs)
+                                                      mask_radius_r500=4, **kwargs)
 
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
@@ -535,7 +535,7 @@ class CoolingTimes(HaloProperty):
         # temperature_bounds = [1e3, 1e10]  # in K
         density_bounds = [1e-5, 1]  # in nh/cm^3
         temperature_bounds = [1e6, 1e9]  # in K
-        pdf_ybounds = [1, 10 ** 5.5]
+        pdf_ybounds = [1, 10 ** 6]
         bins = 256
 
         # Make the norm object to define the image stretch
@@ -628,7 +628,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 0].axhline(10 ** 8.5, color='k', linestyle='--', lw=1, zorder=0)
         axes[1, 0].axhline(10 ** 7.5, color='k', linestyle='--', lw=1, zorder=0)
 
-        bins = np.linspace(0., 4.5, 51)
+        bins = np.linspace(0., 5.5, 51)
 
         axes[2, 0].clear()
         axes[2, 0].set_xscale('linear')
@@ -721,7 +721,7 @@ class CoolingTimes(HaloProperty):
 
         # Entropy profile
         index = np.where(
-            (sw_data.gas.radial_distances < 2 * r500) &
+            (sw_data.gas.radial_distances < 3 * r500) &
             (sw_data.gas.fofgroup_ids == 1) &
             (sw_data.gas.temperatures > 1e5)
         )[0]
