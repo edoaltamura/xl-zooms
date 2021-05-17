@@ -447,24 +447,11 @@ class CoolingTimes(HaloProperty):
             a_heat = np.ones_like(cooling_times) / 10
 
         if agn_time is None:
-
-            if z_agn_start < 7.2 or z_agn_end > 0:
-
-                index = np.where(
-                    (sw_data.gas.radial_distances < aperture_fraction) &
-                    (sw_data.gas.fofgroup_ids == 1) &
-                    (a_heat > (1 / (z_agn_start + 1))) &
-                    (a_heat < (1 / (z_agn_end + 1))) &
-                    (sw_data.gas.temperatures > 1e5) &
-                    (cooling_times > 0)
-                )[0]
-            else:
-                index = np.where(
-                    (sw_data.gas.radial_distances < aperture_fraction) &
-                    (sw_data.gas.fofgroup_ids == 1) &
-                    (sw_data.gas.temperatures > 1e5) &
-                    (cooling_times > 0)
-                )[0]
+            index = np.where(
+                (sw_data.gas.radial_distances < aperture_fraction) &
+                (sw_data.gas.fofgroup_ids == 1) &
+                (sw_data.gas.temperatures > 1e5)
+            )[0]
 
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * \
                              sw_data.gas.element_mass_fractions.hydrogen[index]
@@ -775,17 +762,17 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
         axes[1, 2].set_ylim([1, 1e4])
         axes[1, 2].set_xlim([0.01, max_radius_r500])
-        # axes[1, 2].text(
-        #     axes[1, 2].get_xlim()[0], K500 / K500, r'$K_{500}$',
-        #     horizontalalignment='left',
-        #     verticalalignment='bottom',
-        #     color='k',
-        #     bbox=dict(
-        #         boxstyle='square,pad=10',
-        #         fc='none',
-        #         ec='none'
-        #     )
-        # )
+        axes[1, 2].text(
+            axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
+            horizontalalignment='left',
+            verticalalignment='bottom',
+            color='k',
+            bbox=dict(
+                boxstyle='square,pad=10',
+                fc='none',
+                ec='none'
+            )
+        )
         sun_observations = Sun2009()
         sun_observations.filter_by('M_500', 8e13, 3e14)
         sun_observations.overlay_entropy_profiles(
