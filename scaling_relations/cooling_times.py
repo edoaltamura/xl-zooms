@@ -751,30 +751,30 @@ class CoolingTimes(HaloProperty):
         ).to('Msun/Mpc**3')
         density_profile /= rho_crit
 
-        axes[1, 2].plot(
-            radial_bin_centres,
-            entropy_profile,
-            linestyle='-',
-            color='k',
-            linewidth=1,
-            alpha=1,
-        )
-
         kBT500 = (
                 G * mean_molecular_weight * m500 * mp / r500 / 2
         ).to('keV')
         K500 = (
                 kBT500 / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)
         ).to('keV*cm**2')
+
+        axes[1, 2].plot(
+            radial_bin_centres,
+            entropy_profile / K500,
+            linestyle='-',
+            color='k',
+            linewidth=1,
+            alpha=1,
+        )
         axes[1, 2].set_xscale('log')
         axes[1, 2].set_yscale('log')
-        axes[1, 2].axhline(y=K500, color='k', linestyle='--')
-        axes[1, 2].set_ylabel(r'$K$ [keV cm$^2$]')
+        axes[1, 2].axhline(y=K500 / K500, color='k', linestyle='--')
+        axes[1, 2].set_ylabel(r'$K/K_{500}$')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
-        axes[1, 2].set_ylim([1, 1e4])
-        axes[1, 2].set_xlim([0.01, 2])
+        axes[1, 2].set_ylim([0.01, 10])
+        axes[1, 2].set_xlim([0.01, 3])
         axes[1, 2].text(
-            axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
+            axes[1, 2].get_xlim()[0], K500 / K500, r'$K_{500}$',
             horizontalalignment='left',
             verticalalignment='bottom',
             color='k',
@@ -784,21 +784,22 @@ class CoolingTimes(HaloProperty):
                 ec='none'
             )
         )
-        Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='keVcm^2', markersize=1)
-        bin_median, bin_perc16, bin_perc84 = Pratt2010().combine_entropy_profiles(
+        Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='K500adi', markersize=1)
+        rexcess = Pratt2010()
+        bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
             m500_limits=(
                     1e14 * Solar_Mass,
                     5e14 * Solar_Mass
             ),
-            k500_rescale=False
+            k500_rescale=True
         )
         axes[1, 2].fill_between(
-            Pratt2010().radial_bins,
+            rexcess.radial_bins,
             bin_perc16,
             bin_perc84,
             color='aqua', alpha=0.85, linewidth=0
         )
-        axes[1, 2].plot(Pratt2010().radial_bins, bin_median, c='k')
+        axes[1, 2].plot(rexcess.radial_bins, bin_median, c='k')
 
 
         z_agn_recent_text = (
