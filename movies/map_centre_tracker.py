@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from multiprocessing import Pool
 from scipy.interpolate import interp1d
-from scipy import arange, array, exp
 
 
 def smooth(data, window_width):
@@ -19,6 +18,13 @@ def read(snapshot_number):
         f"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}.properties"
     )
 
+    vr_handle = velociraptor.load(path_to_catalogue)
+    r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc').value
+    xcminpot = vr_handle.positions.xcminpot[0].to('Mpc').value
+    ycminpot = vr_handle.positions.ycminpot[0].to('Mpc').value
+    zcminpot = vr_handle.positions.zcminpot[0].to('Mpc').value
+    return r500, xcminpot, ycminpot, zcminpot
+
 def extrap1d(interpolator):
     xs = interpolator.x
     ys = interpolator.y
@@ -32,16 +38,9 @@ def extrap1d(interpolator):
             return interpolator(x)
 
     def ufunclike(xs):
-        return array(list(map(pointwise, array(xs))))
+        return np.array(list(map(pointwise, np.array(xs))))
 
     return ufunclike
-
-    vr_handle = velociraptor.load(path_to_catalogue)
-    r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc').value
-    xcminpot = vr_handle.positions.xcminpot[0].to('Mpc').value
-    ycminpot = vr_handle.positions.ycminpot[0].to('Mpc').value
-    zcminpot = vr_handle.positions.zcminpot[0].to('Mpc').value
-    return r500, xcminpot, ycminpot, zcminpot
 
 
 dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
