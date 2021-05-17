@@ -17,12 +17,9 @@ module load ffmpeg/4.0.2
 
 mpirun -np 12 python3 cooling_times_movie.py -a 15 -q
 
-#ffmpeg \
-#    -framerate 60 \
-#    -start_number 0 \
-#    -i /cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis/cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth_%04d.png \
-#    -vf scale=-2:1080,format=yuv420p \
-#    /cosma/home/dp004/dc-alta2/data7/xl-zooms/analysis/cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth.mp4
-
-
-ffmpeg     -framerate 20     -pattern_type glob     -i 'slice_composite_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth_*.png'     -vf scale=-2:1080,format=yuv420p     slice_composite_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth.mp4
+ffmpeg \
+  -framerate 20 \
+  -pattern_type glob \
+  -i 'slice_composite_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth_*.png' \
+  -vf scale=-2:1080,format=yuv420p \
+  slice_composite_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth.mp4
