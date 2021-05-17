@@ -3,7 +3,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from multiprocessing import Pool
-from scipy.interpolate import interp1d
 
 
 def smooth(data, window_width):
@@ -24,23 +23,6 @@ def read(snapshot_number):
     ycminpot = vr_handle.positions.ycminpot[0].to('Mpc').value
     zcminpot = vr_handle.positions.zcminpot[0].to('Mpc').value
     return r500, xcminpot, ycminpot, zcminpot
-
-def extrap1d(interpolator):
-    xs = interpolator.x
-    ys = interpolator.y
-
-    def pointwise(x):
-        if x < xs[0]:
-            return ys[0] + (x - xs[0]) * (ys[1] - ys[0]) / (xs[1] - xs[0])
-        elif x > xs[-1]:
-            return ys[-1] + (x - xs[-1]) * (ys[-1] - ys[-2]) / (xs[-1] - xs[-2])
-        else:
-            return interpolator(x)
-
-    def ufunclike(xs):
-        return np.array(list(map(pointwise, np.array(xs))))
-
-    return ufunclike
 
 
 dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
@@ -64,21 +46,11 @@ xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
 
-print(len(steps[window // 2:-window // 2]), len(xcminpot_smoothed))
-f_i = interp1d(steps[window // 2:-window // 2], xcminpot_smoothed)
-f_x = extrap1d(f_i)
-
-zcminpot_smoothed = np.r_[
-    f_x(steps[:window // 2]),
-    zcminpot_smoothed,
-    f_x(steps[-window // 2:]),
-]
-
 # plt.plot(r500[:l] - r500_smoothed, label='r500')
 # plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
 # plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
 plt.plot(zcminpot_smoothed, label='zcminpot_smoothed')
-plt.plot(zcminpot, label='zcminpot')
+plt.plot(zcminpot[window // 2:-window // 2], label='zcminpot')
 
 plt.legend()
 plt.show()
