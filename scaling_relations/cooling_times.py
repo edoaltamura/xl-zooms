@@ -437,6 +437,9 @@ class CoolingTimes(HaloProperty):
 
         cooling_times = calculate_mean_cooling_times(sw_data)
 
+        if args.debug:
+            print("Number of particles being imported", len(sw_data.gas.densities))
+
         gamma = 5 / 3
 
         try:
