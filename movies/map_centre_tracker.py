@@ -6,7 +6,7 @@ from tqdm import tqdm
 from multiprocessing import Pool
 
 
-def smooth(data, window_width, order: int = 4):
+def smooth(data, window_width, order: int = 6):
     cumsum_vec = np.cumsum(np.insert(data, 0, 0))
     ma_vec = (cumsum_vec[window_width:] - cumsum_vec[:-window_width]) / window_width
 
