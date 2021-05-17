@@ -49,7 +49,7 @@ class SliceGas(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None,
             mask_radius_r500: float = 6,
-            map_centre: Union[str, list] = 'vr_centre_of_potential',
+            map_centre: Union[str, list, np.ndarray] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
             depth_offset: Optional[float] = None,
             return_type: Union[type, str] = 'class'
@@ -70,7 +70,7 @@ class SliceGas(HaloProperty):
                 f"String-commands for `map_centre` only support "
                 f"`vr_centre_of_potential`. Got {map_centre} instead."
             ))
-        elif type(map_centre) is list and len(map_centre) != 3:
+        elif (type(map_centre) is list or type(map_centre) is np.ndarray) and len(map_centre) != 3:
             raise AttributeError((
                 f"List-commands for `map_centre` only support "
                 f"length-3 lists. Got {map_centre} "

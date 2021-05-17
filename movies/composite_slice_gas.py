@@ -39,7 +39,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
-            map_centre=[centres[args.snapshot_number, :-1]]
+            map_centre=centres[args.snapshot_number, :-1]
         )
 
     except Exception as e:
