@@ -773,7 +773,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
         axes[1, 2].set_ylabel(r'Entropy [keV cm$^2$]')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
-        axes[1, 2].set_ylim([0.01, 10])
+        axes[1, 2].set_ylim([1, 1e4])
         axes[1, 2].set_xlim([0.01, max_radius_r500])
         # axes[1, 2].text(
         #     axes[1, 2].get_xlim()[0], K500 / K500, r'$K_{500}$',
