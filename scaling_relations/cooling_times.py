@@ -559,7 +559,7 @@ class CoolingTimes(HaloProperty):
         )
 
         fig = plt.figure(figsize=(8, 6), constrained_layout=True)
-        gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.5)
+        gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.7)
         axes = gs.subplots()
 
         for ax in [
