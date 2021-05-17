@@ -58,7 +58,7 @@ output = np.c_[
     ycminpot_smoothed,
     zcminpot_smoothed,
     r500_smoothed
-].T
+]
 
 print(output)
 
