@@ -33,7 +33,7 @@ with Pool() as pool:
         pool.imap(read, range(2523)),
         total=2523
     ))
-    print(np.asarray(list(results)).T)
+    print(np.asarray(list(results)).T[0])
 
 
 # r500 = np.asarray(r500)
