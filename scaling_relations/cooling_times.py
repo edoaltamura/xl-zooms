@@ -533,9 +533,9 @@ class CoolingTimes(HaloProperty):
 
         # density_bounds = [1e-6, 1e4]  # in nh/cm^3
         # temperature_bounds = [1e3, 1e10]  # in K
-        density_bounds = [1e-4, 1]  # in nh/cm^3
+        density_bounds = [1e-5, 1]  # in nh/cm^3
         temperature_bounds = [1e6, 1e9]  # in K
-        pdf_ybounds = [1, 10 ** 4.5]
+        pdf_ybounds = [1, 10 ** 5.5]
         bins = 256
 
         # Make the norm object to define the image stretch
