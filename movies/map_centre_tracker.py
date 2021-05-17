@@ -11,6 +11,7 @@ ycminpot = []
 zcminpot = []
 
 for snapshot_number in range(2523):
+    print(snapshot_number, end=' ')
     path_to_catalogue = dir + (
         f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}/"
         f"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}.properties"
