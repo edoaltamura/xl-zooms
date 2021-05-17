@@ -33,30 +33,28 @@ with Pool() as pool:
         pool.imap(read, range(2523)),
         total=2523
     ))
-    print(np.asarray(list(results)).T[0])
+    r500 = np.asarray(list(results)).T[0]
+    xcminpot = np.asarray(list(results)).T[1]
+    ycminpot = np.asarray(list(results)).T[2]
+    zcminpot = np.asarray(list(results)).T[3]
 
 
-# r500 = np.asarray(r500)
-# xcminpot = np.asarray(xcminpot)
-# ycminpot = np.asarray(ycminpot)
-# zcminpot = np.asarray(zcminpot)
-#
-# plt.plot(r500 - np.mean(r500), label='r500')
-# plt.plot(xcminpot - np.mean(xcminpot), label='xcminpot')
-# plt.plot(ycminpot - np.mean(ycminpot), label='ycminpot')
-# plt.plot(zcminpot - np.mean(zcminpot), label='zcminpot')
-#
-# plt.plot(smooth(xcminpot - np.mean(xcminpot), 3), label='xcminpot_smooth3')
-# plt.plot(smooth(ycminpot - np.mean(ycminpot), 3), label='ycminpot_smooth3')
-# plt.plot(smooth(zcminpot - np.mean(zcminpot), 3), label='zcminpot_smooth3')
-#
-# plt.plot(smooth(xcminpot - np.mean(xcminpot), 7), label='xcminpot_smooth7')
-# plt.plot(smooth(ycminpot - np.mean(ycminpot), 7), label='ycminpot_smooth7')
-# plt.plot(smooth(zcminpot - np.mean(zcminpot), 7), label='zcminpot_smooth7')
-#
-# plt.plot(smooth(xcminpot - np.mean(xcminpot), 15), label='xcminpot_smooth15')
-# plt.plot(smooth(ycminpot - np.mean(ycminpot), 15), label='ycminpot_smooth15')
-# plt.plot(smooth(zcminpot - np.mean(zcminpot), 15), label='zcminpot_smooth15')
-#
-# plt.legend()
-# plt.show()
+plt.plot(r500 - np.mean(r500), label='r500')
+plt.plot(xcminpot - np.mean(xcminpot), label='xcminpot')
+plt.plot(ycminpot - np.mean(ycminpot), label='ycminpot')
+plt.plot(zcminpot - np.mean(zcminpot), label='zcminpot')
+
+plt.plot(smooth(xcminpot - np.mean(xcminpot), 3), label='xcminpot_smooth3')
+plt.plot(smooth(ycminpot - np.mean(ycminpot), 3), label='ycminpot_smooth3')
+plt.plot(smooth(zcminpot - np.mean(zcminpot), 3), label='zcminpot_smooth3')
+
+plt.plot(smooth(xcminpot - np.mean(xcminpot), 7), label='xcminpot_smooth7')
+plt.plot(smooth(ycminpot - np.mean(ycminpot), 7), label='ycminpot_smooth7')
+plt.plot(smooth(zcminpot - np.mean(zcminpot), 7), label='zcminpot_smooth7')
+
+plt.plot(smooth(xcminpot - np.mean(xcminpot), 15), label='xcminpot_smooth15')
+plt.plot(smooth(ycminpot - np.mean(ycminpot), 15), label='ycminpot_smooth15')
+plt.plot(smooth(zcminpot - np.mean(zcminpot), 15), label='zcminpot_smooth15')
+
+plt.legend()
+plt.show()
