@@ -769,9 +769,9 @@ class CoolingTimes(HaloProperty):
         )
         axes[1, 2].set_xscale('log')
         axes[1, 2].set_yscale('log')
-        # axes[1, 2].axhline(y=K500 / K500, color='k', linestyle=':', linewidth=0.5)
+        axes[1, 2].axhline(y=K500, color='k', linestyle=':', linewidth=0.5)
         axes[1, 2].axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
-        axes[1, 2].set_ylabel(r'$K/K_{500}$')
+        axes[1, 2].set_ylabel(r'Entropy [keV cm$^2$]')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
         axes[1, 2].set_ylim([0.01, 10])
         axes[1, 2].set_xlim([0.01, max_radius_r500])
@@ -790,7 +790,7 @@ class CoolingTimes(HaloProperty):
         sun_observations.filter_by('M_500', 8e13, 3e14)
         sun_observations.overlay_entropy_profiles(
             axes=axes[1, 2],
-            k_units='K500adi',
+            k_units='keVcm^2',
             markersize=1
         )
         rexcess = Pratt2010()
@@ -799,7 +799,7 @@ class CoolingTimes(HaloProperty):
                     1e14 * Solar_Mass,
                     5e14 * Solar_Mass
             ),
-            k500_rescale=True
+            k500_rescale=False
         )
         axes[1, 2].fill_between(
             rexcess.radial_bins,
