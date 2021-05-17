@@ -730,7 +730,7 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.temperatures = sw_data.gas.temperatures[index]
 
         # Define radial bins and shell volumes
-        lbins = np.logspace(-2, np.log10(2), 51) * radial_distance.units
+        lbins = np.logspace(-2, np.log10(3), 51) * radial_distance.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
         volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
@@ -762,13 +762,13 @@ class CoolingTimes(HaloProperty):
             radial_bin_centres,
             entropy_profile / K500,
             linestyle='-',
-            color='k',
+            color='r',
             linewidth=1,
             alpha=1,
         )
         axes[1, 2].set_xscale('log')
         axes[1, 2].set_yscale('log')
-        axes[1, 2].axhline(y=K500 / K500, color='k', linestyle='--')
+        axes[1, 2].axhline(y=K500 / K500, color='k', linestyle=':', linewidth=0.5)
         axes[1, 2].set_ylabel(r'$K/K_{500}$')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
         axes[1, 2].set_ylim([0.01, 10])
@@ -784,7 +784,13 @@ class CoolingTimes(HaloProperty):
                 ec='none'
             )
         )
-        Sun2009().overlay_entropy_profiles(axes=axes[1, 2], k_units='K500adi', markersize=1)
+        sun_observations = Sun2009()
+        sun_observations.filter_by('M_500', 8e13, 3e14)
+        sun_observations.overlay_entropy_profiles(
+            axes=axes[1, 2],
+            k_units='K500adi',
+            markersize=1
+        )
         rexcess = Pratt2010()
         bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
             m500_limits=(
