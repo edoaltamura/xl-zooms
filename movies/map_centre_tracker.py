@@ -1,5 +1,6 @@
 import velociraptor
 import numpy as np
+import numpy.polynomial.polynomial as poly
 import matplotlib.pyplot as plt
 from tqdm import tqdm
 from multiprocessing import Pool
@@ -45,6 +46,9 @@ r500_smoothed = smooth(r500 - np.mean(r500), window)
 xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
+
+coefs = poly.polyfit(steps[window // 2:-window // 2], zcminpot_smoothed, 4)
+ffit = poly.polyval(steps, coefs)
 
 # plt.plot(r500[:l] - r500_smoothed, label='r500')
 # plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
