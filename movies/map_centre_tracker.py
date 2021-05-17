@@ -40,9 +40,9 @@ with Pool() as pool:
     zcminpot = np.asarray(list(results)).T[3]
 
 r500_smoothed = smooth(r500 - np.mean(r500), 150)
-xcminpot_smoothed = smooth(xcminpot - np.mean(xcminpot), 150)
-ycminpot_smoothed = smooth(ycminpot - np.mean(ycminpot), 150)
-zcminpot_smoothed = smooth(zcminpot - np.mean(zcminpot), 150)
+xcminpot_smoothed = smooth(xcminpot, 150)
+ycminpot_smoothed = smooth(ycminpot, 150)
+zcminpot_smoothed = smooth(zcminpot, 150)
 
 l = len(r500_smoothed)
 
