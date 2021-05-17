@@ -446,7 +446,7 @@ class CoolingTimes(HaloProperty):
             print("aperture_fraction = ", aperture_fraction)
             print("Number of particles being imported", len(sw_data.gas.densities))
             print(sw_data.gas.fofgroup_ids)
-            print((sw_data.gas.fofgroup_ids == 1))
+            print((sw_data.gas.fofgroup_ids == 1).any())
 
         gamma = 5 / 3
 
@@ -460,7 +460,7 @@ class CoolingTimes(HaloProperty):
         if agn_time is None:
             index = np.where(
                 (sw_data.gas.radial_distances < aperture_fraction) &
-                # (sw_data.gas.fofgroup_ids == 1) &
+                (sw_data.gas.fofgroup_ids == 1) &
                 (sw_data.gas.temperatures > 1e5)
             )[0]
 
