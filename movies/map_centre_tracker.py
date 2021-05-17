@@ -52,7 +52,7 @@ l = len(r500_smoothed)
 # plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
 # plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
 plt.plot(zcminpot_smoothed, label='zcminpot_smoothed')
-plt.plot(zcminpot[:l], label='zcminpot')
+plt.plot(zcminpot[l:], label='zcminpot')
 
 plt.legend()
 plt.show()
