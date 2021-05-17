@@ -1,6 +1,7 @@
 import velociraptor
 import numpy as np
 import matplotlib.pyplot as plt
+from tqdm import tqdm
 
 
 dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
@@ -10,8 +11,7 @@ xcminpot = []
 ycminpot = []
 zcminpot = []
 
-for snapshot_number in range(2523):
-    print(snapshot_number, end=' ')
+for snapshot_number in tqdm(range(2523)):
     path_to_catalogue = dir + (
         f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}/"
         f"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}.properties"
