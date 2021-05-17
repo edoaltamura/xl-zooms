@@ -32,7 +32,7 @@ def read(snapshot_number):
     return r500, xcminpot, ycminpot, zcminpot
 
 
-dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
+dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0/'
 
 with Pool() as pool:
     results = list(
@@ -59,7 +59,7 @@ output = np.c_[
     zcminpot_smoothed,
     r500_smoothed
 ]
-np.save('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy', output)
+np.save('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0.npy', output)
 
 plt.plot(r500 - r500_smoothed, label='r500')
 plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
