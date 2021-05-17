@@ -84,7 +84,7 @@ class SliceGas(HaloProperty):
             _yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
             _zCen = vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
 
-        elif type(self.map_centre) is list:
+        elif type(self.map_centre) is list or type(self.map_centre) is np.ndarray:
             _xCen = self.map_centre[0] * Mpc / vr_data.a
             _yCen = self.map_centre[1] * Mpc / vr_data.a
             _zCen = self.map_centre[2] * Mpc / vr_data.a
