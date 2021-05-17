@@ -53,6 +53,15 @@ xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
 
+output = np.c_[
+    xcminpot_smoothed,
+    ycminpot_smoothed,
+    zcminpot_smoothed,
+    r500_smoothed
+].T
+
+print(output)
+
 plt.plot(r500 - r500_smoothed, label='r500')
 plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
 plt.plot(ycminpot - ycminpot_smoothed, label='ycminpot')
