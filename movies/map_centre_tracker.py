@@ -59,8 +59,7 @@ output = np.c_[
     zcminpot_smoothed,
     r500_smoothed
 ]
-
-print(output)
+np.save('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy', output)
 
 plt.plot(r500 - r500_smoothed, label='r500')
 plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
