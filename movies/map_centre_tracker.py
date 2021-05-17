@@ -49,13 +49,13 @@ zcminpot_smoothed = smooth(zcminpot, window)
 
 print(len(steps[window // 2:-window // 2]), len(zcminpot_smoothed[:-1]))
 coefs = poly.polyfit(steps[window // 2:-window // 2], zcminpot_smoothed[:-1], 4)
-ffit = poly.polyval(steps, coefs)
+zcminpot_smoothed = poly.polyval(steps, coefs)
 
 # plt.plot(r500[:l] - r500_smoothed, label='r500')
 # plt.plot(xcminpot[:l] - xcminpot_smoothed, label='xcminpot')
 # plt.plot(ycminpot[:l] - ycminpot_smoothed, label='ycminpot')
 plt.plot(zcminpot_smoothed, label='zcminpot_smoothed')
-plt.plot(zcminpot[window // 2 + 1:-window // 2], label='zcminpot')
+plt.plot(zcminpot, label='zcminpot')
 
 plt.legend()
 plt.show()
