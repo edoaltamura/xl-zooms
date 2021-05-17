@@ -557,7 +557,7 @@ class CoolingTimes(HaloProperty):
             np.log10(temperature_bounds[0]) - 0.5, np.log10(temperature_bounds[1]) + 0.5, bins * 4
         )
 
-        fig = plt.figure(figsize=(8.5, 6), constrained_layout=True)
+        fig = plt.figure(figsize=(8, 6), constrained_layout=True)
         gs = fig.add_gridspec(3, 4, hspace=0.35, wspace=0.4)
         axes = gs.subplots()
 
@@ -771,7 +771,7 @@ class CoolingTimes(HaloProperty):
         axes[1, 2].set_ylabel(r'$K$ [keV cm$^2$]')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
         axes[1, 2].set_ylim([1, 1e4])
-        axes[1, 2].set_ylim([1e-2, 2])
+        axes[1, 2].set_ylim([0.01, 2])
         axes[1, 2].text(
             axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
             horizontalalignment='left',
