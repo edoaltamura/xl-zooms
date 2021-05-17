@@ -761,7 +761,7 @@ class CoolingTimes(HaloProperty):
 
         axes[1, 2].plot(
             radial_bin_centres,
-            entropy_profile / K500,
+            entropy_profile,
             linestyle='-',
             color='r',
             linewidth=1,
@@ -791,7 +791,8 @@ class CoolingTimes(HaloProperty):
         sun_observations.overlay_entropy_profiles(
             axes=axes[1, 2],
             k_units='keVcm^2',
-            markersize=1
+            markersize=1,
+            linewidth=0.5
         )
         rexcess = Pratt2010()
         bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
@@ -805,7 +806,9 @@ class CoolingTimes(HaloProperty):
             rexcess.radial_bins,
             bin_perc16,
             bin_perc84,
-            color='aqua', alpha=0.85, linewidth=0
+            color='aqua',
+            alpha=0.85,
+            linewidth=0
         )
         axes[1, 2].plot(rexcess.radial_bins, bin_median, c='k')
 
@@ -826,7 +829,7 @@ class CoolingTimes(HaloProperty):
                 f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {sw_data.metadata.z:.2f}$\tAge = {Cosmology().age(sw_data.metadata.z).value:.2f} Gyr\n"
                 f"{z_agn_recent_text:s}"
-                f"Central FoF group only"
+                f"Central FoF group only\t$M_{{500}}={latex_float(m500.value)} {m500.units.latex_repr}$"
             ),
             fontsize=7
         )
