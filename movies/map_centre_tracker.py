@@ -47,8 +47,8 @@ xcminpot_smoothed = smooth(xcminpot, window)
 ycminpot_smoothed = smooth(ycminpot, window)
 zcminpot_smoothed = smooth(zcminpot, window)
 
-print(len(steps[window // 2:-window // 2]), len(zcminpot_smoothed))
-coefs = poly.polyfit(steps[window // 2 + 1:-window // 2], zcminpot_smoothed[:-1], 4)
+print(len(steps[window // 2:-window // 2]), len(zcminpot_smoothed[-1]))
+coefs = poly.polyfit(steps[window // 2:-window // 2], zcminpot_smoothed[:-1], 4)
 ffit = poly.polyval(steps, coefs)
 
 # plt.plot(r500[:l] - r500_smoothed, label='r500')
