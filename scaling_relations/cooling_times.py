@@ -445,6 +445,8 @@ class CoolingTimes(HaloProperty):
             print("r500 = ", r500)
             print("aperture_fraction = ", aperture_fraction)
             print("Number of particles being imported", len(sw_data.gas.densities))
+            print(sw_data.gas.fofgroup_ids)
+            print((sw_data.gas.fofgroup_ids == 1))
 
         gamma = 5 / 3
 
