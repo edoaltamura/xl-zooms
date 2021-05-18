@@ -98,7 +98,6 @@ def make_stf_invoke(input_file: str, output_file: str) -> str:
         f" -C {parameter_file}"
     )
 
-
 for i, run_directory in enumerate(args.directories):
     snaps_path = os.path.join(run_directory, 'snapshots')
     catalogues_path = os.path.join(run_directory, 'stf')
