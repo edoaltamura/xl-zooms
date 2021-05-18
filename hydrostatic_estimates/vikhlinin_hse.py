@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize, least_squares
 from scipy.interpolate import interp1d
 
-from register import zooms_register, Zoom, Tcut_halogas
+from register import zooms_register, Zoom, Tcut_halogas, Redshift
 from .convergence_radius import convergence_radius
 from literature import Cosmology
 
@@ -60,14 +60,14 @@ def cumsum_unyt(data: unyt.unyt_array, **kwargs) -> unyt.unyt_array:
 class HydrostaticDiagnostic:
     # This class is to be used for debugging purposes
 
-    def __init__(self, zoom: Zoom):
+    def __init__(self, zoom: Redshift):
         self.zoom = zoom
         self.total_mass_profiles()
 
     def total_mass_profiles(self):
 
         # Read in halo properties from catalog
-        vr_catalogue_handle = vr.load(self.zoom.catalog_file)
+        vr_catalogue_handle = vr.load(self.zoom.catalogue_properties_path)
         a = vr_catalogue_handle.a
         self.R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         self.R2500c = vr_catalogue_handle.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
@@ -76,7 +76,7 @@ class HydrostaticDiagnostic:
         ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
         # Read in gas particles and parse densities and temperatures
-        mask = sw.mask(self.zoom.snapshot_file, spatial_only=False)
+        mask = sw.mask(self.zoom.snapshot_path, spatial_only=False)
         region = [
             [(XPotMin - 1.5 * self.R500c) * a, (XPotMin + 1.5 * self.R500c) * a],
             [(YPotMin - 1.5 * self.R500c) * a, (YPotMin + 1.5 * self.R500c) * a],
@@ -89,7 +89,7 @@ class HydrostaticDiagnostic:
             Tcut_halogas * mask.units.temperature,
             1.e12 * mask.units.temperature
         )
-        data = sw.load(self.zoom.snapshot_file, mask=mask)
+        data = sw.load(self.zoom.snapshot_path, mask=mask)
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
@@ -232,7 +232,7 @@ class HydrostaticDiagnostic:
 
 class HydrostaticEstimator:
 
-    def __init__(self, zoom: Zoom, excise_core: bool = True, profile_type: str = 'true',
+    def __init__(self, zoom: Zoom = None, excise_core: bool = True, profile_type: str = 'true',
                  using_mcmc: bool = False, spec_fit_data: dict = None, diagnostics_on: bool = False):
         self.zoom = zoom
         self.using_mcmc = using_mcmc
@@ -264,30 +264,30 @@ class HydrostaticEstimator:
                         excise_core: bool = True, profile_type: str = 'true',
                         using_mcmc: bool = False, spec_fit_data: dict = None,
                         diagnostics_on: bool = False):
-        """
-        If you wish not to parse a Zoom object, but the absolute
-        paths for the snapshot and VR catalogue, you may use this
-        class method, which reconstructs the Zoom object from the
-        known zooms register and returns an HydrostaticEstimator
-        instance as normal.
-        """
-        zoom_found = None
-        for zoom in zooms_register:
-            if zoom.catalog_file == catalog_file and zoom.snapshot_file == snapshot_file:
-                zoom_found = zoom
-                break
+        # """
+        # If you wish not to parse a Zoom object, but the absolute
+        # paths for the snapshot and VR catalogue, you may use this
+        # class method, which reconstructs the Zoom object from the
+        # known zooms register and returns an HydrostaticEstimator
+        # instance as normal.
+        # """
+        # zoom_found = None
+        # for zoom in zooms_register:
+        #     if zoom.catalog_file == catalog_file and zoom.snapshot_file == snapshot_file:
+        #         zoom_found = zoom
+        #         break
+        #
+        # assert zoom_found, (
+        #     f"The catalogue ({catalog_file}) and snapshot ({snapshot_file}) "
+        #     "paths cannot be found in registered zooms."
+        # )
 
-        assert zoom_found, (
-            f"The catalogue ({catalog_file}) and snapshot ({snapshot_file}) "
-            "paths cannot be found in registered zooms."
-        )
-
-        return cls(zoom_found, excise_core=excise_core, profile_type=profile_type,
+        return cls(excise_core=excise_core, profile_type=profile_type,
                    using_mcmc=using_mcmc, spec_fit_data=spec_fit_data, diagnostics_on=diagnostics_on)
 
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
-        vr_catalogue_handle = vr.load(self.zoom.catalog_file)
+        vr_catalogue_handle = vr.load(self.zoom.catalogue_properties_path)
         a = vr_catalogue_handle.a
         self.M200c = vr_catalogue_handle.masses.mass_200crit[0].to('Msun')
 
@@ -299,7 +299,7 @@ class HydrostaticEstimator:
         ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
         # Read in gas particles and parse densities and temperatures
-        mask = sw.mask(self.zoom.snapshot_file, spatial_only=False)
+        mask = sw.mask(self.zoom.snapshot_path, spatial_only=False)
         region = [
             [(XPotMin - 1.5 * self.R500c) * a, (XPotMin + 1.5 * self.R500c) * a],
             [(YPotMin - 1.5 * self.R500c) * a, (YPotMin + 1.5 * self.R500c) * a],
@@ -311,7 +311,7 @@ class HydrostaticEstimator:
             Tcut_halogas * mask.units.temperature,
             1.e12 * mask.units.temperature
         )
-        data = sw.load(self.zoom.snapshot_file, mask=mask)
+        data = sw.load(self.zoom.snapshot_path, mask=mask)
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
@@ -381,10 +381,10 @@ class HydrostaticEstimator:
     def load_xray_profiles(self, spec_fit_data: dict):
 
         # Read in halo properties from catalog
-        vr_catalogue_handle = vr.load(self.zoom.catalog_file)
+        vr_catalogue_handle = vr.load(self.zoom.catalogue_properties_path)
         a = vr_catalogue_handle.a
 
-        with h5.File(self.zoom.catalog_file, 'r') as h5file:
+        with h5.File(self.zoom.catalogue_properties_path, 'r') as h5file:
             self.R2500c = unyt.unyt_quantity(h5file['/SO_R_2500_rhocrit'][0], unyt.Mpc)
             self.R500c = unyt.unyt_quantity(h5file['/SO_R_500_rhocrit'][0], unyt.Mpc)
             XPotMin = unyt.unyt_quantity(h5file['/Xcminpot'][0], unyt.Mpc)
@@ -392,7 +392,7 @@ class HydrostaticEstimator:
             ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc)
 
         # Read in gas particles and parse densities and temperatures
-        mask = sw.mask(self.zoom.snapshot_file, spatial_only=False)
+        mask = sw.mask(self.zoom.snapshot_path, spatial_only=False)
         region = [
             [(XPotMin - 1.5 * self.R500c) * a, (XPotMin + 1.5 * self.R500c) * a],
             [(YPotMin - 1.5 * self.R500c) * a, (YPotMin + 1.5 * self.R500c) * a],
@@ -404,7 +404,7 @@ class HydrostaticEstimator:
             Tcut_halogas * mask.units.temperature,
             1.e12 * mask.units.temperature
         )
-        data = sw.load(self.zoom.snapshot_file, mask=mask)
+        data = sw.load(self.zoom.snapshot_path, mask=mask)
 
         # Convert datasets to physical quantities
         # R500c is already in physical units
