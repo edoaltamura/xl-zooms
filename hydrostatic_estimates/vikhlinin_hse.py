@@ -10,13 +10,10 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize, least_squares
 from scipy.interpolate import interp1d
 
-# Make the register backend visible to the script
-sys.path.append("../zooms")
-sys.path.append("../observational_data")
-
-from register import zooms_register, Zoom, Tcut_halogas, name_list
+from register import zooms_register, Zoom, Tcut_halogas
 from convergence_radius import convergence_radius
-import observational_data as obs
+from literature import Cosmology
+
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -26,8 +23,7 @@ except:
 np.seterr(divide='ignore')
 np.seterr(invalid='ignore')
 
-cosmology = obs.Observations().cosmo_model
-fbary = cosmology.Ob0 / cosmology.Om0  # Cosmic baryon fraction
+fbary = Cosmology().fb
 mean_molecular_weight = 0.5954
 true_data_nbins = 51
 
