@@ -103,6 +103,9 @@ for i, run_directory in enumerate(args.directories):
     snaps_path = os.path.join(run_directory, 'snapshots')
     catalogues_path = os.path.join(run_directory, 'stf')
 
+    if not os.path.isdir(catalogues_path):
+        os.mkdir(catalogues_path)
+
     if not os.path.isdir(snaps_path):
         raise NotADirectoryError(f"Snapshot directory {snaps_path} not found.")
 
