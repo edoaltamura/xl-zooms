@@ -11,7 +11,7 @@ from scipy.optimize import minimize, least_squares
 from scipy.interpolate import interp1d
 
 from register import zooms_register, Zoom, Tcut_halogas
-from convergence_radius import convergence_radius
+from .convergence_radius import convergence_radius
 from literature import Cosmology
 
 
