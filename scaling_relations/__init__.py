@@ -14,5 +14,5 @@ from .temperature_density import TemperatureDensity
 from .entropy_heat_vs_snap import EntropyComparison
 from .cooling_times import CoolingTimes
 
-from .map_gas import MapGas
+from .projection_gas import MapGas
 from .slice_gas import SliceGas

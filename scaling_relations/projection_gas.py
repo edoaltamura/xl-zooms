@@ -50,7 +50,7 @@ class MapGas(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None,
             mask_radius_r500: float = 6,
-            map_centre: Union[str, list] = 'vr_centre_of_potential',
+            map_centre: Union[str, list, np.ndarray] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
             depth: Optional[float] = None,
             return_type: Union[type, str] = 'class'
@@ -71,24 +71,34 @@ class MapGas(HaloProperty):
                 f"String-commands for `map_centre` only support "
                 f"`vr_centre_of_potential`. Got {map_centre} instead."
             ))
-        elif type(map_centre) is list and len(map_centre) not in [2, 3]:
+        elif (type(map_centre) is list or type(map_centre) is np.ndarray) and len(map_centre) != 3:
             raise AttributeError((
                 f"List-commands for `map_centre` only support "
-                f"length-2 and length-3 lists. Got {map_centre} "
+                f"length-3 lists. Got {map_centre} "
                 f"(length {len(map_centre)}) instead."
             ))
 
         self.map_centre = map_centre
+
+        centre_of_potential = [
+            vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a,
+            vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a,
+            vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
+        ]
 
         if self.map_centre == 'vr_centre_of_potential':
             _xCen = vr_data.positions.xcminpot[0].to('Mpc') / vr_data.a
             _yCen = vr_data.positions.ycminpot[0].to('Mpc') / vr_data.a
             _zCen = vr_data.positions.zcminpot[0].to('Mpc') / vr_data.a
 
-        elif type(self.map_centre) is list:
-            _xCen = self.map_centre[0] * Mpc
-            _yCen = self.map_centre[1] * Mpc
-            _zCen = self.map_centre[2] * Mpc
+        elif type(self.map_centre) is list or type(self.map_centre) is np.ndarray:
+            _xCen = self.map_centre[0] * Mpc / vr_data.a
+            _yCen = self.map_centre[1] * Mpc / vr_data.a
+            _zCen = self.map_centre[2] * Mpc / vr_data.a
+
+        if args.debug:
+            print(f"Centre of potential: {[float(f'{i.v:.3f}') for i in centre_of_potential]} Mpc")
+            print(f"Map centre: {[float(f'{i.v:.3f}') for i in [_xCen, _yCen, _zCen]]} Mpc")
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
 

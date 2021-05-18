@@ -19,6 +19,7 @@ from matplotlib.ticker import MaxNLocator, ScalarFormatter
 from literature import Cosmology, Sun2009, Pratt2010
 from register import Zoom, args, cooling_table, default_output_directory
 from .halo_property import HaloProperty
+from hydrostatic_estimates import HydrostaticEstimator
 
 mean_molecular_weight = 0.59
 mean_atomic_weight_per_free_electron = 1.14
@@ -429,6 +430,16 @@ class CoolingTimes(HaloProperty):
         m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
 
+        if args.mass_estimator == 'hse':
+            true_hse = HydrostaticEstimator.from_data_paths(
+                catalog_file=path_to_catalogue,
+                snapshot_file=path_to_snap,
+                profile_type='true',
+                diagnostics_on=False
+            )
+            r500 = true_hse.R500hse
+            m500 = true_hse.M500hse
+
         aperture_fraction = aperture_fraction * r500
 
         # Convert datasets to physical quantities
@@ -829,7 +840,7 @@ class CoolingTimes(HaloProperty):
                 f"Age = {Cosmology().age(sw_data.metadata.z).value:.2f} Gyr\t\t"
                 f"\t$M_{{500}}={latex_float(m500.value)}\\ {m500.units.latex_repr}$\n"
                 f"{z_agn_recent_text:s}"
-                f"Central FoF group only"
+                f"Central FoF group only\t\tEstimator: {args.mass_estimator}"
             ),
             fontsize=7
         )
