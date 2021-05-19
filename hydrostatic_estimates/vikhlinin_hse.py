@@ -305,6 +305,7 @@ class HydrostaticEstimator:
         self.M500c = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         self.R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         self.R2500c = vr_catalogue_handle.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
+        self.M2500c = vr_catalogue_handle.spherical_overdensities.mass_2500_rhocrit[0].to('Msun')
         XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
         YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
         ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
