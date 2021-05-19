@@ -77,9 +77,9 @@ class HydrostaticDiagnostic:
         # Read in gas particles and parse densities and temperatures
         mask = sw.mask(self.zoom.snapshot_path, spatial_only=False)
         region = [
-            [(XPotMin - 1.5 * self.R500c) * a, (XPotMin + 1.5 * self.R500c) * a],
-            [(YPotMin - 1.5 * self.R500c) * a, (YPotMin + 1.5 * self.R500c) * a],
-            [(ZPotMin - 1.5 * self.R500c) * a, (ZPotMin + 1.5 * self.R500c) * a]
+            [(XPotMin - 1.5 * self.R500c) / a, (XPotMin + 1.5 * self.R500c) / a],
+            [(YPotMin - 1.5 * self.R500c) / a, (YPotMin + 1.5 * self.R500c) / a],
+            [(ZPotMin - 1.5 * self.R500c) / a, (ZPotMin + 1.5 * self.R500c) / a]
         ]
 
         mask.constrain_spatial(region)
@@ -301,8 +301,8 @@ class HydrostaticEstimator:
         vr_catalogue_handle = vr.load(self.catalog_file)
         a = vr_catalogue_handle.a
         self.M200c = vr_catalogue_handle.masses.mass_200crit[0].to('Msun')
-
         self.R200c = vr_catalogue_handle.radii.r_200crit[0].to('Mpc')
+        self.M500c = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         self.R500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         self.R2500c = vr_catalogue_handle.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
         XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
@@ -312,9 +312,9 @@ class HydrostaticEstimator:
         # Read in gas particles and parse densities and temperatures
         mask = sw.mask(self.snapshot_file, spatial_only=False)
         region = [
-            [(XPotMin - 1.5 * self.R500c) * a, (XPotMin + 1.5 * self.R500c) * a],
-            [(YPotMin - 1.5 * self.R500c) * a, (YPotMin + 1.5 * self.R500c) * a],
-            [(ZPotMin - 1.5 * self.R500c) * a, (ZPotMin + 1.5 * self.R500c) * a]
+            [(XPotMin - 1.5 * self.R500c) / a, (XPotMin + 1.5 * self.R500c) / a],
+            [(YPotMin - 1.5 * self.R500c) / a, (YPotMin + 1.5 * self.R500c) / a],
+            [(ZPotMin - 1.5 * self.R500c) / a, (ZPotMin + 1.5 * self.R500c) / a]
         ]
         mask.constrain_spatial(region)
         mask.constrain_mask(
