@@ -431,9 +431,9 @@ class CoolingTimes(HaloProperty):
         r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
 
         if args.mass_estimator == 'hse':
-            true_hse = HydrostaticEstimator.from_data_paths(
-                catalog_file=path_to_catalogue,
-                snapshot_file=path_to_snap,
+            true_hse = HydrostaticEstimator(
+                path_to_catalogue=path_to_catalogue,
+                path_to_snap=path_to_snap,
                 profile_type='true',
                 diagnostics_on=False
             )
