@@ -274,28 +274,6 @@ class HydrostaticEstimator:
 
         self.interpolate_hse()
 
-    # @classmethod
-    # def from_data_paths(cls, *args, **kwargs):
-    #     # """
-    #     # If you wish not to parse a Zoom object, but the absolute
-    #     # paths for the snapshot and VR catalogue, you may use this
-    #     # class method, which reconstructs the Zoom object from the
-    #     # known zooms register and returns an HydrostaticEstimator
-    #     # instance as normal.
-    #     # """
-    #     # zoom_found = None
-    #     # for zoom in zooms_register:
-    #     #     if zoom.catalog_file == catalog_file and zoom.snapshot_file == snapshot_file:
-    #     #         zoom_found = zoom
-    #     #         break
-    #     #
-    #     # assert zoom_found, (
-    #     #     f"The catalogue ({catalog_file}) and snapshot ({snapshot_file}) "
-    #     #     "paths cannot be found in registered zooms."
-    #     # )
-    #
-    #     return cls(*args, **kwargs)
-
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
         vr_catalogue_handle = vr.load(self.catalog_file)
