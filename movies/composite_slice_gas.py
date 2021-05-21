@@ -30,6 +30,7 @@ c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnob
 
 centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy')
 
+
 def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     gf = SliceGas(field)
 

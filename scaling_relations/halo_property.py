@@ -139,10 +139,10 @@ class HaloProperty(object):
         elif args.debug:
             print((
                 "Loaded particles "
-                f"[{len(sw_handle.gas.coordinates):d} gas] "
-                f"[{len(sw_handle.dark_matter.coordinates):d} dark_matter] "
-                f"[{len(sw_handle.stars.coordinates):d} stars] "
-                f"[{len(sw_handle.black_holes.coordinates):d} black_holes] "
+                f"[{sw_handle.metadata.n_gas:d} gas] "
+                f"[{sw_handle.metadata.n_dark_matter:d} dark_matter] "
+                f"[{sw_handle.metadata.n_stars:d} stars] "
+                f"[{sw_handle.metadata.n_black_holes:d} black_holes] "
             ))
 
         # If the mask overlaps with the box boundaries, wrap coordinates.
@@ -161,17 +161,19 @@ class HaloProperty(object):
             boxsize
         )
 
-        sw_handle.stars.coordinates = self.wrap_coordinates(
-            sw_handle.stars.coordinates,
-            centre_coordinates,
-            boxsize
-        )
+        if sw_handle.metadata.n_stars > 0:
+            sw_handle.stars.coordinates = self.wrap_coordinates(
+                sw_handle.stars.coordinates,
+                centre_coordinates,
+                boxsize
+            )
 
-        sw_handle.black_holes.coordinates = self.wrap_coordinates(
-            sw_handle.black_holes.coordinates,
-            centre_coordinates,
-            boxsize
-        )
+        if sw_handle.metadata.n_black_holes > 0:
+            sw_handle.black_holes.coordinates = self.wrap_coordinates(
+                sw_handle.black_holes.coordinates,
+                centre_coordinates,
+                boxsize
+            )
 
         # Compute radial distances
         sw_handle.gas.radial_distances = self.get_radial_distance(
@@ -184,15 +186,17 @@ class HaloProperty(object):
             centre_coordinates
         )
 
-        sw_handle.stars.radial_distances = self.get_radial_distance(
-            sw_handle.stars.coordinates,
-            centre_coordinates
-        )
+        if sw_handle.metadata.n_stars > 0:
+            sw_handle.stars.radial_distances = self.get_radial_distance(
+                sw_handle.stars.coordinates,
+                centre_coordinates
+            )
 
-        sw_handle.black_holes.radial_distances = self.get_radial_distance(
-            sw_handle.black_holes.coordinates,
-            centre_coordinates
-        )
+        if sw_handle.metadata.n_black_holes > 0:
+            sw_handle.black_holes.radial_distances = self.get_radial_distance(
+                sw_handle.black_holes.coordinates,
+                centre_coordinates
+            )
 
         return sw_handle, vr_handle
 
