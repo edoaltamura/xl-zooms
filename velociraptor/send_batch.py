@@ -31,6 +31,14 @@ parser.add_argument(
     action='store_true'
 )
 
+parser.add_argument(
+    '-l',
+    '--limit-batch-gb',
+    type=int,
+    default=500,
+    required=False,
+)
+
 args = parser.parse_args()
 
 # Velociraptor invokes
@@ -172,7 +180,7 @@ for i, run_directory in enumerate(args.directories):
         ))
 
     # Split tasks in jobs for 500 GB of input data each
-    job_limit = 500 * 1024 * 1024 * 1024
+    job_limit = args.limit_batch_gb * 1024 * 1024 * 1024
     print(f"Input data limit: {sizeof_fmt(job_limit)} per batch.")
 
     number_splits = snapshot_sizes.sum() // job_limit + 1
