@@ -100,6 +100,13 @@ try:
 except (FileNotFoundError, OSError):
     print('Could not find the mnras.mplstyle style-sheet.')
 
+from .revision import get_git_full
+
 if not args.quiet:
+
+    print("eagle-xl project ~ zoom-assisted calibration program".upper())
+
+    print('Git revision:', *get_git_full(), sep='\n', end='\n\n')
+
     for parsed_argument in vars(args):
         print(f"[parser] {parsed_argument} = {getattr(args, parsed_argument)}")
