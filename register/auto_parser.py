@@ -104,7 +104,7 @@ from .revision import get_git_full
 
 if not args.quiet:
 
-    print("eagle-xl project ~ zoom-assisted calibration program".upper())
+    print("eagle-xl project ~ zoom-assisted calibration program".upper(), end='\n\n')
 
     print('Git revision:', *get_git_full(), sep='\n', end='\n\n')
 

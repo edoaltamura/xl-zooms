@@ -487,15 +487,15 @@ class Zoom(object):
                 )
             )
 
-        assert len(self.redshifts) == len(self.scale_factors), (
-            f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.scale_factors)}"
-        )
-        assert len(self.redshifts[self.index_snaps]) == len(self.snapshot_paths), (
-            f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.snapshot_paths)}"
-        )
-        assert len(self.redshifts[self.index_snaps]) == len(self.catalogue_properties_paths), (
-            f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.catalogue_properties_paths)}"
-        )
+        # assert len(self.redshifts) == len(self.scale_factors), (
+        #     f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.scale_factors)}"
+        # )
+        # assert len(self.redshifts[self.index_snaps]) == len(self.snapshot_paths), (
+        #     f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.snapshot_paths)}"
+        # )
+        # assert len(self.redshifts[self.index_snaps]) == len(self.catalogue_properties_paths), (
+        #     f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.catalogue_properties_paths)}"
+        # )
 
     def filter_snaps_by_redshift(self, z_min: float = 0., z_max: float = 5., hard_check: bool = False):
 
