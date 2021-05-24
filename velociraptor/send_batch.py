@@ -17,7 +17,7 @@ parser.add_argument(
 
 parser.add_argument(
     '-i',
-    '--no-snapid',
+    '--check-snipshots',
     default=False,
     required=False,
     action='store_true'
@@ -39,6 +39,42 @@ parser.add_argument(
     required=False,
 )
 
+parser.add_argument(
+    '--with-gnu-parallel',
+    default=False,
+    required=False,
+    action='store_true'
+)
+
+parser.add_argument(
+    '--with-mpi',
+    default=False,
+    required=False,
+    action='store_true'
+)
+
+parser.add_argument(
+    '--stf-executable',
+    type=str,
+    default="/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf",
+    required=False,
+)
+
+parser.add_argument(
+    '-C',
+    '--config',
+    type=str,
+    default="/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf",
+    required=False,
+)
+
+parser.add_argument(
+    '-p',
+    '--slurm-queue',
+    type=str,
+    default="cosma7-prince",
+    required=False,
+)
 args = parser.parse_args()
 
 # Velociraptor invokes
@@ -53,7 +89,7 @@ modules = (
     "module load parallel_hdf5/1.10.6\n"
     "module load fftw/3.3.8cosma7\n"
     "module load gsl/2.5\n"
-    # "module load gnu-parallel/20181122\n"
+    "module load gnu-parallel/20181122\n"
 )
 
 # parameter_file = "../vrconfig_3dfofbound_subhalos_SO_hydro.cfg"
@@ -77,7 +113,7 @@ def sizeof_fmt(num, suffix='B') -> str:
 
 
 def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str = 'VR-analysis') -> str:
-    return (
+    sbatch_params = (
         f"#!/bin/bash -l\n"
         f"#SBATCH --ntasks={ntasks}\n"
         f"#SBATCH --cpus-per-task={cpus_per_task}\n"
@@ -88,8 +124,12 @@ def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str =
         f"#SBATCH -p {slurm_queue}\n"
         f"#SBATCH -A dp004\n"
         f"#SBATCH -t 72:00:00\n"
-        f"export OMP_NUM_THREADS={cpus_per_task}\n"
     )
+
+    if not args.with_gnu_parallel and not args.with_mpi:
+        sbatch_params += f"export OMP_NUM_THREADS={cpus_per_task}\n"
+
+    return sbatch_params
 
 
 def make_stf_invoke(input_file: str, output_file: str) -> str:
@@ -101,13 +141,30 @@ def make_stf_invoke(input_file: str, output_file: str) -> str:
     if input_file.endswith('.hdf5'):
         _output_file = output_file[:-5]
 
-    return (
+    stf_invoke = (
         f"{executable_path}"
         f" -I 2"
         f" -i {_input_file}"
         f" -o {_output_file}"
         f" -C {parameter_file}"
     )
+
+    if args.with_mpi:
+        stf_invoke = "mpirun -np $SLURM_NTASKS " + stf_invoke
+
+    return stf_invoke
+
+
+def gnu_parallel_wrap(input_commands: list, options: str = ''):
+    command_array = "commands=(\n"
+    for cmd in input_commands:
+        command_array += f"\"{cmd}\" \n"
+    command_array += ")\n\n"
+
+    gnu_invoke = "printf \'%s\\n\' \"${commands[@]}\" | parallel --jobs $SLURM_NTASKS "
+    gnu_invoke += f"{options:s}\n\n"
+
+    return command_array + gnu_invoke
 
 
 for i, run_directory in enumerate(args.directories):
@@ -138,7 +195,7 @@ for i, run_directory in enumerate(args.directories):
 
         if os.path.isfile(file_path) and file.endswith('.hdf5') and not has_properties:
 
-            if not args.no_snapid:
+            if args.check_snipshots:
                 with h5file(file_path, 'r') as f:
                     output_type = f['Header'].attrs['SelectOutput'].decode('ascii')
             else:
@@ -218,6 +275,10 @@ for i, run_directory in enumerate(args.directories):
             )
             print(modules, file=submit_file)
 
+            # If using GNU parallel, wrap commands into a bash array first
+            if args.with_gnu_parallel:
+                commands_to_gnu_parallel = list()
+
             for split_batch_item in split_batch:
 
                 if not os.path.isdir(stf_subdirs[split_batch_item]):
@@ -226,14 +287,22 @@ for i, run_directory in enumerate(args.directories):
                 snap_number = snapshot_files[split_batch_item][-9:-5]
                 print(snap_number, end=' ')
 
+                stf_invoke = make_stf_invoke(
+                    input_file=snapshot_files[split_batch_item],
+                    output_file=os.path.join(
+                        stf_subdirs[split_batch_item],
+                        os.path.basename(snapshot_files[split_batch_item])
+                    )
+                )
+
+                if args.with_gnu_parallel:
+                    commands_to_gnu_parallel.append(stf_invoke)
+                else:
+                    print(stf_invoke, file=submit_file)
+
+            if args.with_gnu_parallel:
                 print(
-                    make_stf_invoke(
-                        input_file=snapshot_files[split_batch_item],
-                        output_file=os.path.join(
-                            stf_subdirs[split_batch_item],
-                            os.path.basename(snapshot_files[split_batch_item])
-                        )
-                    ),
+                    gnu_parallel_wrap(commands_to_gnu_parallel),
                     file=submit_file
                 )
 
