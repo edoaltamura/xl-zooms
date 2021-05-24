@@ -53,10 +53,13 @@ modules = (
     "module load parallel_hdf5/1.10.6\n"
     "module load fftw/3.3.8cosma7\n"
     "module load gsl/2.5\n"
+    # "module load gnu-parallel/20181122\n"
 )
 
-parameter_file = "../vrconfig_3dfofbound_subhalos_SO_hydro.cfg"
-executable_path = "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf"
+# parameter_file = "../vrconfig_3dfofbound_subhalos_SO_hydro.cfg"
+parameter_file = "/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/adiabatic_vr_test/vrconfig_swift_.cfg"
+# executable_path = "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf"
+executable_path = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/VELOCIraptor-STF/stf"
 slurm_queue = "cosma7-prince"
 
 epilog = (

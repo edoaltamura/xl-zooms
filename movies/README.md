@@ -60,9 +60,9 @@ module load ffmpeg/4.0.2
 parallel python3 my_script.py --arguments argvalues --sequence-number ::: {1..100}
 
 ffmpeg \
-    -framerate 20 \
+    -framerate 3 \
     -pattern_type glob \
-    -i 'cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth_*.png' \
+    -i 'cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth_*.png' \
     -vf scale=-2:1080,format=yuv420p \
-    cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8p5_Nheat1_SNnobirth.mp4
+    cooling_times_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT9_Nheat1_SNnobirth.mp4
 ```
