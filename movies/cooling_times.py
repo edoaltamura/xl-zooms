@@ -18,7 +18,7 @@ parser.add_argument(
 parser.add_argument(
     '-b',
     '--run-directory',
-    type=int,
+    type=str,
     required=True
 )
 
