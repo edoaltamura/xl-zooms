@@ -817,8 +817,8 @@ export OMP_NUM_THREADS=28
     -o vr_partial_outputs/alpha1p0_adi
 
 cmake . \
-    -DVR_USE_HYDRO=ON \
-    -DVR_USE_GAS=ON \
+    -DVR_USE_HYDRO=OFF \
+    -DVR_USE_GAS=OFF \
     -DVR_USE_STAR=OFF \
     -DVR_USE_BH=OFF \
     -DVR_USE_SWIFT_INTERFACE=OFF \

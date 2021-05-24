@@ -1,4 +1,5 @@
 import sys
+import os
 
 sys.path.append("..")
 
@@ -14,11 +15,30 @@ parser.add_argument(
     required=True
 )
 
+parser.add_argument(
+    '-b',
+    '--run-directory',
+    type=int,
+    required=True
+)
+
 args = parser.parse_args()
 
-dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_birthprops/'
-s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.hdf5"
-c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.properties"
+s = ''
+for file in os.listdir(os.path.join(args.run_directory, 'snapshots')):
+    if file.endswith(f"_{args.snapshot_number:04d}.hdf5"):
+        s = os.path.join(args.run_directory, 'snapshots', file)
+        break
+
+c = ''
+for subdir in os.listdir(os.path.join(args.run_directory, 'stf')):
+    if subdir.endswith(f"_{args.snapshot_number:04d}"):
+        for file in os.listdir(os.path.join(args.run_directory, 'stf', subdir)):
+            if file.endswith(f"_{args.snapshot_number:04d}.properties"):
+                c = os.path.join(args.run_directory, 'stf', subdir, file)
+                break
+
+assert s and c
 
 try:
     gf.process_single_halo(
