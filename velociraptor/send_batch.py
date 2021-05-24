@@ -12,7 +12,11 @@ parser.add_argument(
     '--directories',
     type=str,
     nargs='+',
-    required=True
+    required=True,
+    help=(
+        "Directories of SWIFT runs to target. "
+        "They must contain a non-empty ./snapshots directory."
+    )
 )
 
 parser.add_argument(
@@ -20,7 +24,11 @@ parser.add_argument(
     '--check-snipshots',
     default=False,
     required=False,
-    action='store_true'
+    action='store_true',
+    help=(
+        "Checks whether output files in ./snapshots are snapshots or snipshots. "
+        "Snipshots are discarded from the VR invokes."
+    )
 )
 
 parser.add_argument(
@@ -28,7 +36,12 @@ parser.add_argument(
     '--submit',
     default=False,
     required=False,
-    action='store_true'
+    action='store_true',
+    help=(
+        "Submit the VR jobs to the queue after they are written. "
+        "This assumes the SLURM batch system and #SBATCH option "
+        "values used in COSMA systems."
+    )
 )
 
 parser.add_argument(
@@ -37,20 +50,36 @@ parser.add_argument(
     type=int,
     default=500,
     required=False,
+    help=(
+        "Maximum size (GB) of a batch in terms of inputs data volume. "
+        "The SWIFT output files to process by each batch will not exceed "
+        "this value. Smaller values will generate more batches."
+    )
 )
 
 parser.add_argument(
     '--with-gnu-parallel',
     default=False,
     required=False,
-    action='store_true'
+    action='store_true',
+    help=(
+        "Run VR jobs on single cores in parallel using the GNU parallel library. "
+        "This is useful if you have many small jobs to run. For large jobs, "
+        "ensure the node has enough memory per core, however, the pure Open-MP "
+        "mode is recommended, or the MPI mode (see the --with-mpi option)."
+    )
 )
 
 parser.add_argument(
     '--with-mpi',
     default=False,
     required=False,
-    action='store_true'
+    action='store_true',
+    help=(
+        "Run VR using MPI and calls the mpirun command in front of the "
+        "stf executable. Ensure you are using an stf executable compiled "
+        "with MPI and do not use --with-gnu-parallel with this option."
+    )
 )
 
 parser.add_argument(
@@ -58,6 +87,10 @@ parser.add_argument(
     type=str,
     default="/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf",
     required=False,
+    help=(
+        "The location of the VR compiled executable. "
+        "Make sure the directory has exec privileges."
+    )
 )
 
 parser.add_argument(
@@ -66,6 +99,9 @@ parser.add_argument(
     type=str,
     default="/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/VELOCIraptor-STF_hotgas_2020/stf",
     required=False,
+    help=(
+        "The location of the VR parameter (configuration) file. "
+    )
 )
 
 parser.add_argument(
@@ -74,6 +110,9 @@ parser.add_argument(
     type=str,
     default="cosma7-prince",
     required=False,
+    help=(
+        "The queue to submit to as should appear in the #SBATCH -p option. "
+    )
 )
 args = parser.parse_args()
 
