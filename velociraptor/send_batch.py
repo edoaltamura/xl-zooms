@@ -112,7 +112,7 @@ def sizeof_fmt(num, suffix='B') -> str:
     return "%.1f%s%s" % (num, 'Yi', suffix)
 
 
-def make_sbatch_params(ntasks: int = 1, cpus_per_task: int = 28, run_name: str = 'VR-analysis') -> str:
+def make_sbatch_params(ntasks: int = 28, cpus_per_task: int = 1, run_name: str = 'VR-analysis') -> str:
     sbatch_params = (
         f"#!/bin/bash -l\n"
         f"#SBATCH --ntasks={ntasks}\n"
