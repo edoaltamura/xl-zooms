@@ -5,7 +5,7 @@ import argparse
 import os.path
 import subprocess
 
-parser = argparse.ArgumentParser(prog='python3')
+parser = argparse.ArgumentParser(prog=f'python3 {__file__}')
 
 parser.add_argument(
     '-d',
