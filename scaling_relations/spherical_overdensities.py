@@ -54,12 +54,9 @@ class SphericalOverdensities(HaloProperty):
         try:
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         except AttributeError as err:
+            r500 = unyt_quantity(1, 'Mpc')
             if args.debug:
                 print(err, f"[{self.__class__.__name__}] Setting r500 = 1. Mpc.", sep='\n')
-            else:
-                pass
-        else:
-            r500 = unyt_quantity(1, 'Mpc')
 
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.dark_matter.radial_distances.convert_to_physical()
@@ -107,27 +104,35 @@ class SphericalOverdensities(HaloProperty):
 
         masses = np.r_[[*masses_collect]]
 
-        fof_ids_collect = [
-            sw_data.gas.fofgroup_ids,
-            sw_data.dark_matter.fofgroup_ids,
-        ]
-        if sw_data.metadata.n_stars > 0:
-            fof_ids_collect.append(sw_data.stars.fofgroup_ids)
-        elif args.debug:
-            print(f"[{self.__class__.__name__}] stars not detected.")
+        try:
+            fof_ids_collect = [
+                sw_data.gas.fofgroup_ids,
+                sw_data.dark_matter.fofgroup_ids,
+            ]
+            if sw_data.metadata.n_stars > 0:
+                fof_ids_collect.append(sw_data.stars.fofgroup_ids)
+            elif args.debug:
+                print(f"[{self.__class__.__name__}] stars not detected.")
 
-        if sw_data.metadata.n_black_holes > 0:
-            fof_ids_collect.append(sw_data.black_holes.fofgroup_ids)
-        elif args.debug:
-            print(f"[{self.__class__.__name__}] black_holes not detected.")
+            if sw_data.metadata.n_black_holes > 0:
+                fof_ids_collect.append(sw_data.black_holes.fofgroup_ids)
+            elif args.debug:
+                print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        fof_ids = np.r_[[*fof_ids_collect]]
+            fof_ids = np.r_[[*fof_ids_collect]]
 
-        # Select all particles within sphere
-        mask = np.where(
-            (radial_distances <= 2.5 * r500) &
-            (fof_ids == 1)
-        )[0]
+            # Select all particles within sphere
+            mask = np.where(
+                (radial_distances <= 2.5 * r500) &
+                (fof_ids == 1)
+            )[0]
+        except AttributeError as err:
+            print(
+                err,
+                f"[{self.__class__.__name__}] Select particles only by radial distance.",
+                sep='\n'
+            )
+            mask = np.where((radial_distances <= 2.5 * r500))[0]
 
         radial_distances = radial_distances[mask] * Mpc / r500
         masses = masses[mask] * 1e10 * Solar_Mass
