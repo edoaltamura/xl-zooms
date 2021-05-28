@@ -162,6 +162,8 @@ class SphericalOverdensities(HaloProperty):
         # For better stability, clip the initial 5% of the profile
         clip = int((len(lbins) - 1) / 20)
 
+        print(density_profile)
+
         density_interpolate = interp1d(
             np.log10(density_profile[clip:].value),
             np.log10(radial_bin_centres[clip:].value),
