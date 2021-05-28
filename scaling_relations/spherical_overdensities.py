@@ -138,6 +138,7 @@ class SphericalOverdensities(HaloProperty):
             mask = np.where(radial_distances <= aperture_search)[0]
 
         radial_distances = unyt_array(radial_distances, Mpc)[mask] / aperture_search
+        assert (radial_distances > 0).all()
         masses = unyt_array(masses, sw_data.units.mass)[mask]
         print(radial_distances, masses)
 
