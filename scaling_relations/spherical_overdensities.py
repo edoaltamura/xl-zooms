@@ -133,11 +133,8 @@ class SphericalOverdensities(HaloProperty):
             del fof_ids
 
         except AttributeError as err:
-            print(
-                err,
-                f"[{self.__class__.__name__}] Select particles only by radial distance.",
-                sep='\n'
-            )
+            print(err)
+            print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
             mask = np.where(radial_distances <= aperture_search)[0]
 
         radial_distances = unyt_array(radial_distances, Mpc)[mask]
@@ -151,7 +148,8 @@ class SphericalOverdensities(HaloProperty):
             np.log10(radial_distances.min()) - 1e-6,
             np.log10(radial_distances.max()) + 1e-6,
             500
-        ) * radial_distances.units
+        ) * Mpc
+        print(lbins[::50])
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
         volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
 
