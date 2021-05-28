@@ -695,32 +695,36 @@ class CoolingTimes(HaloProperty):
         axes[2, 0].set_ylim(pdf_ybounds)
         axes[2, 0].legend(loc="upper left")
 
-        hydrogen_fraction = hydrogen_fractions[index]
+        if activate_cooling_times:
+            hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
         bins = np.linspace(0, 1, 51)
 
         axes[2, 1].clear()
         axes[2, 1].set_xscale('linear')
         axes[2, 1].set_yscale('log')
-        axes[2, 1].hist(hydrogen_fraction, bins=bins, histtype='step', label='All')
-        axes[2, 1].hist(hydrogen_fraction[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
-        axes[2, 1].hist(hydrogen_fraction[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
-        axes[2, 1].hist(hydrogen_fraction[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
-        axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
+        if activate_cooling_times:
+            axes[2, 1].hist(hydrogen_fraction, bins=bins, histtype='step', label='All')
+            axes[2, 1].hist(hydrogen_fraction[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+            axes[2, 1].hist(hydrogen_fraction[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+            axes[2, 1].hist(hydrogen_fraction[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+            axes[2, 1].hist(hydrogen_fraction[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 1].set_xlabel("Hydrogen fraction")
         axes[2, 1].set_ylabel('Number of particles')
         axes[2, 1].set_ylim(pdf_ybounds)
 
-        log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
+        if activate_cooling_times:
+            log_gas_Z = np.log10(sw_data.gas.metal_mass_fractions.value[index] / 0.0133714)
         bins = np.linspace(-4, 1, 51)
 
         axes[2, 2].clear()
         axes[2, 2].set_xscale('linear')
         axes[2, 2].set_yscale('log')
-        axes[2, 2].hist(log_gas_Z, bins=bins, histtype='step', label='All')
-        axes[2, 2].hist(log_gas_Z[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
-        axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
-        axes[2, 2].hist(log_gas_Z[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
-        axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
+        if activate_cooling_times:
+            axes[2, 2].hist(log_gas_Z, bins=bins, histtype='step', label='All')
+            axes[2, 2].hist(log_gas_Z[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+            axes[2, 2].hist(log_gas_Z[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+            axes[2, 2].hist(log_gas_Z[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+            axes[2, 2].hist(log_gas_Z[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 2].axvline(0.5, color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 2].set_xlabel(f"$\log_{{10}}$(Metallicity [Z$_\odot$])")
         axes[2, 2].set_ylabel('Number of particles')
