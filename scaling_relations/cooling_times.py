@@ -513,8 +513,7 @@ class CoolingTimes(HaloProperty):
                 (temperature > 1e5)
             )[0]
 
-            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * \
-                             sw_data.gas.element_mass_fractions.hydrogen[index]
+            number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * hydrogen_fractions[index]
             temperature = sw_data.gas.temperatures.to('K').value[index]
 
         elif agn_time == 'before':
