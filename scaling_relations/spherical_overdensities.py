@@ -137,7 +137,7 @@ class SphericalOverdensities(HaloProperty):
             )
             mask = np.where(radial_distances <= 2.5 * r500)[0]
 
-        radial_distances = radial_distances[mask] * Mpc / r500
+        radial_distances = radial_distances[mask] / r500
         masses = masses[mask] * 1e10 * Solar_Mass
 
         del mask
