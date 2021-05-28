@@ -505,6 +505,20 @@ class CoolingTimes(HaloProperty):
             print(f"[{self.__class__.__name__}] Setting H fractions to primordial values.")
             hydrogen_fractions = np.ones_like(sw_data.gas.densities) * primordial_hydrogen_mass_fraction
 
+        try:
+            agn_flag = sw_data.gas.heated_by_agnfeedback
+        except AttributeError as err:
+            print(err)
+            print(f"[{self.__class__.__name__}] Setting all agn_flag to zero.")
+            agn_flag = np.zeros_like(sw_data.gas.densities)
+
+        try:
+            snii_flag = sw_data.gas.heated_by_sniifeedback
+        except AttributeError as err:
+            print(err)
+            print(f"[{self.__class__.__name__}] Setting all snii_flag to zero.")
+            snii_flag = np.zeros_like(sw_data.gas.densities)
+
 
         if agn_time is None:
             index = np.where(
@@ -550,8 +564,8 @@ class CoolingTimes(HaloProperty):
                     gamma - 1) * mh / kb
             temperature = temperature.to('K').value
 
-        agn_flag = sw_data.gas.heated_by_agnfeedback[index]
-        snii_flag = sw_data.gas.heated_by_sniifeedback[index]
+        agn_flag = agn_flag[index]
+        snii_flag = snii_flag[index]
         agn_flag = agn_flag > 0
         snii_flag = snii_flag > 0
 
