@@ -55,11 +55,11 @@ class SphericalOverdensities(HaloProperty):
         # Try to import r500 from the catalogue.
         # If not there (and needs to be computed), assume 1 Mpc for the spatial mask.
         try:
-            r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+            aperture_search = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') * 3
         except AttributeError as err:
-            r500 = unyt_quantity(1, Mpc)
+            aperture_search = unyt_quantity(1, Mpc) * 3
             if args.debug:
-                print(err, f"[{self.__class__.__name__}] Setting r500 = 1. Mpc.", sep='\n')
+                print(err, f"[{self.__class__.__name__}] Setting aperture_search = 3. Mpc.", sep='\n')
 
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.dark_matter.radial_distances.convert_to_physical()
@@ -127,7 +127,7 @@ class SphericalOverdensities(HaloProperty):
 
             # Select all particles within sphere
             mask = np.where(
-                (radial_distances <= 2.5 * r500) &
+                (radial_distances <= aperture_search) &
                 (fof_ids == 1)
             )[0]
 
@@ -139,12 +139,10 @@ class SphericalOverdensities(HaloProperty):
                 f"[{self.__class__.__name__}] Select particles only by radial distance.",
                 sep='\n'
             )
-            mask = np.where(radial_distances <= 2.5 * r500)[0]
+            mask = np.where(radial_distances <= aperture_search)[0]
 
-        radial_distances = unyt_array(radial_distances.value, radial_distances.units)
-        masses = unyt_array(masses.value, masses.units)
-        radial_distances = radial_distances[mask] / r500
-        masses = masses[mask]
+        radial_distances = unyt_array(radial_distances.value, radial_distances.units)[mask]
+        masses = unyt_array(masses.value, masses.units)[mask]
 
         del mask
 
@@ -153,9 +151,9 @@ class SphericalOverdensities(HaloProperty):
             radial_distances.min().value / 1.1,
             radial_distances.max().value * 1.1,
             500
-        ) * radial_distances.units
-        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
-        volume_sphere = (4. * np.pi / 3.) * r500 ** 3 * lbins[1:] ** 3
+        ) * Mpc
+        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * Mpc
+        volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
@@ -165,10 +163,10 @@ class SphericalOverdensities(HaloProperty):
         # For better stability, clip the initial 5% of the profile
         clip = int((len(lbins) - 1) / 20)
 
-        density_interpolate = interp1d(density_profile[clip:], radial_bin_centres[clip:] * r500, kind='linear')
-        mass_interpolate = interp1d(radial_bin_centres[clip:] * r500, cumulative_mass_profile[clip:], kind='linear')
+        density_interpolate = interp1d(density_profile[clip:], radial_bin_centres[clip:], kind='linear')
+        mass_interpolate = interp1d(radial_bin_centres[clip:], cumulative_mass_profile[clip:], kind='linear')
 
-        r_delta = density_interpolate(self.density_contrast) * r500.units
+        r_delta = density_interpolate(self.density_contrast) * * Mpc
         m_delta = mass_interpolate(r_delta) * mass_weights.units
 
         if args.debug:
