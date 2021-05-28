@@ -147,7 +147,6 @@ class SphericalOverdensities(HaloProperty):
         del mask
 
         # Define radial bins and shell volumes
-        print(radial_distances.min(), radial_distances.max())
         lbins = np.logspace(
             np.log10(radial_distances.min()) - 1e-6,
             np.log10(radial_distances.max()) + 1e-6,
@@ -155,6 +154,10 @@ class SphericalOverdensities(HaloProperty):
         ) * radial_distances.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
         volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3 * aperture_search ** 3
+
+        print(lbins)
+        print(radial_bin_centres)
+        print(volume_sphere)
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
