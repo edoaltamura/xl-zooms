@@ -116,9 +116,9 @@ class HaloProperty(object):
         try:
             r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / a
         except Exception as err:
-            r500 = unyt_quantity(1, 'Mpc') / a
+            r500 = unyt_quantity(3, 'Mpc') / a
             if args.debug:
-                print(err, "Setting r500 = 1. Mpc. / scale_factor", sep='\n')
+                print(err, "Setting r500 = 3. Mpc. / scale_factor", sep='\n')
 
         xcminpot = vr_handle.positions.xcminpot[0].to('Mpc') / a
         ycminpot = vr_handle.positions.ycminpot[0].to('Mpc') / a

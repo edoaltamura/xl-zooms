@@ -105,9 +105,8 @@ class SphericalOverdensities(HaloProperty):
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
         print(masses_collect)
-        masses = np.r_[[*tuple(masses_collect)]][0]
+        masses = np.r_[[*masses_collect]][0]
         print(masses)
-
 
         try:
             fof_ids_collect = [
