@@ -583,7 +583,7 @@ class CoolingTimes(HaloProperty):
 
         # Entropy
         electron_number_density = (sw_data.gas.densities[index] / mh).to('cm**-3') / mean_molecular_weight
-        entropy = kb * sw_data.gas.temperatures[index] / electron_number_density ** (2 / 3)
+        entropy = kb * temperature[index] / electron_number_density ** (2 / 3)
         entropy = entropy.to('keV*cm**2')
 
         x = number_density
