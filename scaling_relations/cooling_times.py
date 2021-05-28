@@ -458,7 +458,15 @@ class CoolingTimes(HaloProperty):
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
 
-        cooling_times = calculate_mean_cooling_times(sw_data)
+        activate_cooling_times = True
+        try:
+            cooling_times = calculate_mean_cooling_times(sw_data)
+        except AttributeError as err:
+            print(err)
+            if args.debug:
+                print(f'[{self.__class__.__name__}] Setting activate_cooling_times = False')
+            activate_cooling_times = False
+
 
         if args.debug:
             print(f"[{self.__class__.__name__}] m500 = ", m500)
@@ -550,7 +558,9 @@ class CoolingTimes(HaloProperty):
 
         x = number_density
         y = temperature
-        w = cooling_times[index]
+
+        if activate_cooling_times:
+            w = cooling_times[index]
 
         if args.debug:
             print("Number of particles being plotted", len(x))
@@ -661,11 +671,12 @@ class CoolingTimes(HaloProperty):
         axes[2, 0].clear()
         axes[2, 0].set_xscale('linear')
         axes[2, 0].set_yscale('log')
-        axes[2, 0].hist(w, bins=bins, histtype='step', label='All')
-        axes[2, 0].hist(w[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
-        axes[2, 0].hist(w[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
-        axes[2, 0].hist(w[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
-        axes[2, 0].hist(w[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
+        if activate_cooling_times:
+            axes[2, 0].hist(w, bins=bins, histtype='step', label='All')
+            axes[2, 0].hist(w[(agn_flag & snii_flag)], bins=bins, histtype='step', label='AGN & SN')
+            axes[2, 0].hist(w[(agn_flag & ~snii_flag)], bins=bins, histtype='step', label='AGN')
+            axes[2, 0].hist(w[(~agn_flag & snii_flag)], bins=bins, histtype='step', label='SN')
+            axes[2, 0].hist(w[(~agn_flag & ~snii_flag)], bins=bins, histtype='step', label='Not heated')
         axes[2, 0].axvline(np.log10(Cosmology().age(sw_data.metadata.z).to('Myr').value),
                            color='k', linestyle='--', lw=0.5, zorder=0)
         axes[2, 0].set_xlabel(f"$\log_{{10}}$(Cooling time [Myr])")
@@ -751,7 +762,7 @@ class CoolingTimes(HaloProperty):
         max_radius_r500 = 4
         index = np.where(
             (sw_data.gas.radial_distances < max_radius_r500 * r500) &
-            (sw_data.gas.fofgroup_ids == 1) &
+            (fof_ids == 1) &
             (sw_data.gas.temperatures > 1e5)
         )[0]
         radial_distance = sw_data.gas.radial_distances[index] / r500
