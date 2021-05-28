@@ -115,13 +115,10 @@ class HaloProperty(object):
         # If not there (and needs to be computed), assume 1 Mpc for the spatial mask.
         try:
             r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / a
-        except AttributeError as err:
+        except Exception as err:
+            r500 = unyt_quantity(1, 'Mpc') / a
             if args.debug:
                 print(err, "Setting r500 = 1. Mpc. / scale_factor", sep='\n')
-            else:
-                pass
-        else:
-            r500 = unyt_quantity(1, 'Mpc') / a
 
         xcminpot = vr_handle.positions.xcminpot[0].to('Mpc') / a
         ycminpot = vr_handle.positions.ycminpot[0].to('Mpc') / a
