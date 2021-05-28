@@ -428,7 +428,7 @@ class CoolingTimes(HaloProperty):
         try:
             m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
-
+            raise AttributeError
         except AttributeError as err:
             print(err)
             print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')

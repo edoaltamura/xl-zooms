@@ -864,7 +864,9 @@ done
 
 
 
-
+h5dump -d Xcminpot -s 0 -c 1  stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522.properties | grep : | head -n 1
+h5dump -d Ycminpot -s 0 -c 1  stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522.properties | grep : | head -n 1
+h5dump -d Zcminpot -s 0 -c 1  stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_2522.properties | grep : | head -n 1
 
 
 
