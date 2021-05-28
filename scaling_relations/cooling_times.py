@@ -479,21 +479,24 @@ class CoolingTimes(HaloProperty):
             a_heat = sw_data.gas.last_agnfeedback_scale_factors
         except AttributeError as err:
             print(err)
-            print('Setting `last_agnfeedback_scale_factors` with 0.1.')
+            if args.debug:
+                print('Setting `last_agnfeedback_scale_factors` with 0.1.')
             a_heat = np.ones_like(sw_data.gas.masses) * 0.1
 
         try:
             fof_ids = sw_data.gas.fofgroup_ids
         except AttributeError as err:
             print(err)
-            print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
+            if args.debug:
+                print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
             fof_ids = np.ones_like(sw_data.gas.densities)
 
         try:
             temperature = sw_data.gas.temperatures
         except AttributeError as err:
             print(err)
-            print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
+            if args.debug:
+                print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
             A = sw_data.gas.entropies * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / kb
@@ -502,21 +505,24 @@ class CoolingTimes(HaloProperty):
             hydrogen_fractions = sw_data.gas.element_mass_fractions.hydrogen
         except AttributeError as err:
             print(err)
-            print(f"[{self.__class__.__name__}] Setting H fractions to primordial values.")
+            if args.debug:
+                print(f"[{self.__class__.__name__}] Setting H fractions to primordial values.")
             hydrogen_fractions = np.ones_like(sw_data.gas.densities) * primordial_hydrogen_mass_fraction
 
         try:
             agn_flag = sw_data.gas.heated_by_agnfeedback
         except AttributeError as err:
             print(err)
-            print(f"[{self.__class__.__name__}] Setting all agn_flag to zero.")
+            if args.debug:
+                print(f"[{self.__class__.__name__}] Setting all agn_flag to zero.")
             agn_flag = np.zeros_like(sw_data.gas.densities)
 
         try:
             snii_flag = sw_data.gas.heated_by_sniifeedback
         except AttributeError as err:
             print(err)
-            print(f"[{self.__class__.__name__}] Setting all snii_flag to zero.")
+            if args.debug:
+                print(f"[{self.__class__.__name__}] Setting all snii_flag to zero.")
             snii_flag = np.zeros_like(sw_data.gas.densities)
 
 
