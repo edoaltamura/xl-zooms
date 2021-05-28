@@ -166,7 +166,7 @@ class SphericalOverdensities(HaloProperty):
         density_interpolate = interp1d(density_profile[clip:], radial_bin_centres[clip:], kind='linear')
         mass_interpolate = interp1d(radial_bin_centres[clip:], cumulative_mass_profile[clip:], kind='linear')
 
-        r_delta = density_interpolate(self.density_contrast) * * Mpc
+        r_delta = density_interpolate(self.density_contrast) * Mpc
         m_delta = mass_interpolate(r_delta) * mass_weights.units
 
         if args.debug:
