@@ -104,9 +104,8 @@ class SphericalOverdensities(HaloProperty):
             masses_collect.append(sw_data.black_holes.subgrid_masses)
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
-        print(masses_collect)
+
         masses = np.r_[[*masses_collect]][0]
-        print(masses)
 
         try:
             fof_ids_collect = [
@@ -159,7 +158,7 @@ class SphericalOverdensities(HaloProperty):
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_mass_profile = cumsum_unyt(mass_weights)
         density_profile = cumulative_mass_profile / volume_sphere / rho_crit
-
+        print(density_profile)
         # For better stability, clip the initial 5% of the profile
         clip = int((len(lbins) - 1) / 20)
 
