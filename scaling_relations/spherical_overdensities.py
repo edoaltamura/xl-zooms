@@ -85,7 +85,7 @@ class SphericalOverdensities(HaloProperty):
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        radial_distances = np.r_[[*radial_distances_collect]]
+        radial_distances = np.vstack(radial_distances_collect)
 
         sw_data.gas.masses.convert_to_physical()
         sw_data.dark_matter.masses.convert_to_physical()
@@ -105,7 +105,7 @@ class SphericalOverdensities(HaloProperty):
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        masses = np.r_[[*masses_collect]]
+        masses = np.vstack(masses_collect)
 
         try:
             fof_ids_collect = [
@@ -122,7 +122,7 @@ class SphericalOverdensities(HaloProperty):
             elif args.debug:
                 print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-            fof_ids = np.r_[[*fof_ids_collect]]
+            fof_ids = np.vstack(fof_ids_collect)
 
             # Select all particles within sphere
             mask = np.where(
