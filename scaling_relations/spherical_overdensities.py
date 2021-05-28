@@ -151,7 +151,7 @@ class SphericalOverdensities(HaloProperty):
             radial_distances.max().value,
             500
         ) * Mpc
-        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * Mpc
+        radial_bin_centres = lbins[1:] - lbins[:-1]
         volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
