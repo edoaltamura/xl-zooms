@@ -54,7 +54,7 @@ class SphericalOverdensities(HaloProperty):
         try:
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         except AttributeError as err:
-            r500 = unyt_quantity(1, 'Mpc')
+            r500 = unyt_quantity(1, Mpc)
             if args.debug:
                 print(err, f"[{self.__class__.__name__}] Setting r500 = 1. Mpc.", sep='\n')
 
@@ -82,7 +82,7 @@ class SphericalOverdensities(HaloProperty):
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        radial_distances = np.r_[[*radial_distances_collect]]
+        radial_distances = np.r_[[*radial_distances_collect]][0]
 
         sw_data.gas.masses.convert_to_physical()
         sw_data.dark_matter.masses.convert_to_physical()
@@ -102,7 +102,7 @@ class SphericalOverdensities(HaloProperty):
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        masses = np.r_[[*masses_collect]]
+        masses = np.r_[[*masses_collect]][0]
 
         try:
             fof_ids_collect = [
@@ -119,7 +119,7 @@ class SphericalOverdensities(HaloProperty):
             elif args.debug:
                 print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-            fof_ids = np.r_[[*fof_ids_collect]]
+            fof_ids = np.r_[[*fof_ids_collect]][0]
 
             # Select all particles within sphere
             mask = np.where(
