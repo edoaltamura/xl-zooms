@@ -55,7 +55,7 @@ class SphericalOverdensities(HaloProperty):
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         except AttributeError as err:
             if args.debug:
-                print(err, "Setting r500 = 1. Mpc.", sep='\n')
+                print(err, f"[{self.__name__}] Setting r500 = 1. Mpc.", sep='\n')
             else:
                 pass
         else:
@@ -82,12 +82,12 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             radial_distances_collect.append(sw_data.stars.radial_distances)
         elif args.debug:
-            print(f"[overdensity] stars not detected.")
+            print(f"[{self.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             radial_distances_collect.append(sw_data.black_holes.radial_distances)
         elif args.debug:
-            print(f"[overdensity] black_holes not detected.")
+            print(f"[{self.__name__}] black_holes not detected.")
 
         radial_distances = np.r_[[*radial_distances_collect]]
 
@@ -98,12 +98,12 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             masses_collect.append(sw_data.stars.masses)
         elif args.debug:
-            print(f"[overdensity] stars not detected.")
+            print(f"[{self.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             masses_collect.append(sw_data.black_holes.subgrid_masses)
         elif args.debug:
-            print(f"[overdensity] black_holes not detected.")
+            print(f"[{self.__name__}] black_holes not detected.")
 
         masses = np.r_[[*masses_collect]]
 
@@ -114,12 +114,12 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             fof_ids_collect.append(sw_data.stars.fofgroup_ids)
         elif args.debug:
-            print(f"[overdensity] stars not detected.")
+            print(f"[{self.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             fof_ids_collect.append(sw_data.black_holes.fofgroup_ids)
         elif args.debug:
-            print(f"[overdensity] black_holes not detected.")
+            print(f"[{self.__name__}] black_holes not detected.")
 
         fof_ids = np.r_[[*fof_ids_collect]]
 
