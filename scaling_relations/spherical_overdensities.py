@@ -39,6 +39,14 @@ class SphericalOverdensities(HaloProperty):
             path_to_catalogue: str = None,
             **kwargs
     ):
+
+        if args.debug:
+            print((
+                f"[{self.__name__}] Density contrast: {self.density_contrast:.2f}\n"
+                f"[{self.__name__}] Snap: {os.path.basename(path_to_snap)}\n"
+                f"[{self.__name__}] Catalog: {os.path.basename(path_to_catalogue)}"
+            ))
+
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
         # Try to import r500 from the catalogue.
@@ -148,6 +156,12 @@ class SphericalOverdensities(HaloProperty):
 
         r_delta = density_interpolate(self.density_contrast) * r500.units
         m_delta = mass_interpolate(r_delta) * mass_weights.units
+
+        if args.debug:
+            print((
+                f"[{self.__name__}] r_delta: {r_delta:.2f}\n"
+                f"[{self.__name__}] m_delta: {m_delta:.2f}"
+            ))
 
         return r_delta, m_delta
 
