@@ -18,7 +18,7 @@ from matplotlib.ticker import MaxNLocator, ScalarFormatter
 
 from literature import Cosmology, Sun2009, Pratt2010
 from register import Zoom, args, cooling_table, default_output_directory
-from .halo_property import HaloProperty
+from scaling_relations import HaloProperty, SODelta500
 from hydrostatic_estimates import HydrostaticEstimator
 
 mean_molecular_weight = 0.59
@@ -361,7 +361,6 @@ def draw_cooling_contours(axes, density_bins, temperature_bins,
 
 
 def int_ticks(cbar):
-
     cbar.ax.yaxis.set_major_formatter(ScalarFormatter())
     cbar.ax.yaxis.set_minor_formatter(ScalarFormatter())
 
@@ -370,7 +369,6 @@ def int_ticks(cbar):
 
 
 def draw_2d_hist(axes, x, y, z, cmap, label):
-
     if (z > 0).any():
         vmax = np.max(z) + 1
         mappable = axes.pcolormesh(
@@ -427,8 +425,17 @@ class CoolingTimes(HaloProperty):
             mask_radius_r500=5
         )
 
-        m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
-        r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+        try:
+            m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
+            r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+
+        except:
+            spherical_overdensity = SODelta500(
+                path_to_snap=path_to_snap,
+                path_to_catalogue=path_to_catalogue,
+            )
+            m500 = spherical_overdensity.get_m500()
+            r500 = spherical_overdensity.get_r500()
 
         if args.mass_estimator == 'hse':
             true_hse = HydrostaticEstimator(
@@ -806,8 +813,8 @@ class CoolingTimes(HaloProperty):
         rexcess = Pratt2010()
         bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
             m500_limits=(
-                    1e14 * Solar_Mass,
-                    5e14 * Solar_Mass
+                1e14 * Solar_Mass,
+                5e14 * Solar_Mass
             ),
             k500_rescale=False
         )
@@ -820,7 +827,6 @@ class CoolingTimes(HaloProperty):
             linewidth=0
         )
         axes[1, 2].plot(rexcess.radial_bins, bin_median, c='k')
-
 
         z_agn_recent_text = (
             f"Selecting gas heated between {z_agn_start:.1f} > z > {z_agn_end:.1f} (relevant to AGN plot only)\n"

@@ -41,7 +41,17 @@ class SphericalOverdensities(HaloProperty):
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
-        r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+        # Try to import r500 from the catalogue.
+        # If not there (and needs to be computed), assume 1 Mpc for the spatial mask.
+        try:
+            r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+        except AttributeError as err:
+            if args.debug:
+                print(err, "Setting r500 = 1. Mpc.", sep='\n')
+            else:
+                pass
+        else:
+            r500 = unyt_quantity(1, 'Mpc')
 
         sw_data.gas.radial_distances.convert_to_physical()
         # sw_data.gas.masses.convert_to_physical()
@@ -57,30 +67,57 @@ class SphericalOverdensities(HaloProperty):
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
 
-        radial_distances = np.r_[
+        radial_distances_collect = [
             sw_data.gas.radial_distances,
             sw_data.dark_matter.radial_distances,
-            sw_data.stars.radial_distances,
-            sw_data.black_holes.radial_distances
         ]
+        if sw_data.metadata.n_stars > 0:
+            radial_distances_collect.append(sw_data.stars.radial_distances)
+        elif args.debug:
+            print(f"[overdensity] stars not detected.")
 
-        masses = np.r_[
+        if sw_data.metadata.n_black_holes > 0:
+            radial_distances_collect.append(sw_data.black_holes.radial_distances)
+        elif args.debug:
+            print(f"[overdensity] black_holes not detected.")
+
+        radial_distances = np.r_[[*radial_distances_collect]]
+
+        masses_collect = [
             sw_data.gas.masses,
             sw_data.dark_matter.masses,
-            sw_data.stars.masses,
-            sw_data.black_holes.subgrid_masses
         ]
+        if sw_data.metadata.n_stars > 0:
+            masses_collect.append(sw_data.stars.masses)
+        elif args.debug:
+            print(f"[overdensity] stars not detected.")
 
-        fof_ids = np.r_[
+        if sw_data.metadata.n_black_holes > 0:
+            masses_collect.append(sw_data.black_holes.subgrid_masses)
+        elif args.debug:
+            print(f"[overdensity] black_holes not detected.")
+
+        masses = np.r_[[*masses_collect]]
+
+        fof_ids_collect = [
             sw_data.gas.fofgroup_ids,
             sw_data.dark_matter.fofgroup_ids,
-            sw_data.stars.fofgroup_ids,
-            sw_data.black_holes.fofgroup_ids
         ]
+        if sw_data.metadata.n_stars > 0:
+            fof_ids_collect.append(sw_data.stars.fofgroup_ids)
+        elif args.debug:
+            print(f"[overdensity] stars not detected.")
+
+        if sw_data.metadata.n_black_holes > 0:
+            fof_ids_collect.append(sw_data.black_holes.fofgroup_ids)
+        elif args.debug:
+            print(f"[overdensity] black_holes not detected.")
+
+        fof_ids = np.r_[[*fof_ids_collect]]
 
         # Select all particles within sphere
         mask = np.where(
-            (radial_distances <= 1.5 * r500) &
+            (radial_distances <= 2.5 * r500) &
             (fof_ids == 1)
         )[0]
 
@@ -122,3 +159,76 @@ class SphericalOverdensities(HaloProperty):
     def read_catalogue(self):
 
         return self._read_catalogue(self.filename)
+
+
+class SODelta2500(SphericalOverdensities):
+    def __init__(self,
+                 zoom_obj: Zoom = None,
+                 path_to_snap: str = None,
+                 path_to_catalogue: str = None,
+                 **kwargs):
+        super().__init__(density_contrast=2500.)
+
+        r_delta, m_delta = self.process_single_halo(
+            zoom_obj=zoom_obj,
+            path_to_snap=path_to_snap,
+            path_to_catalogue=path_to_catalogue,
+            **kwargs
+        )
+        self.r2500 = r_delta
+        self.m2500 = m_delta
+
+    def get_r2500(self):
+        return self.r2500
+
+    def get_m2500(self):
+        return self.m2500
+
+
+class SODelta500(SphericalOverdensities):
+    def __init__(self,
+                 zoom_obj: Zoom = None,
+                 path_to_snap: str = None,
+                 path_to_catalogue: str = None,
+                 **kwargs):
+
+        super().__init__(density_contrast=500.)
+
+        r_delta, m_delta = self.process_single_halo(
+            zoom_obj=zoom_obj,
+            path_to_snap=path_to_snap,
+            path_to_catalogue=path_to_catalogue,
+            **kwargs
+        )
+        self.r500 = r_delta
+        self.m500 = m_delta
+
+    def get_r500(self):
+        return self.r500
+
+    def get_m500(self):
+        return self.m500
+
+
+class SODelta200(SphericalOverdensities):
+    def __init__(self,
+                 zoom_obj: Zoom = None,
+                 path_to_snap: str = None,
+                 path_to_catalogue: str = None,
+                 **kwargs):
+        super().__init__(density_contrast=200.)
+
+        r_delta, m_delta = self.process_single_halo(
+            zoom_obj=zoom_obj,
+            path_to_snap=path_to_snap,
+            path_to_catalogue=path_to_catalogue,
+            **kwargs
+        )
+        self.r200 = r_delta
+        self.m200 = m_delta
+
+    def get_r200(self):
+        return self.r200
+
+    def get_m200(self):
+        return self.m200

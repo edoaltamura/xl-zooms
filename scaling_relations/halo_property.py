@@ -5,7 +5,7 @@ import velociraptor
 from scipy.spatial import distance
 import pandas as pd
 from tqdm import tqdm
-from unyt import unyt_array
+from unyt import unyt_array, unyt_quantity
 from typing import Tuple, List
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
@@ -110,7 +110,19 @@ class HaloProperty(object):
         # Read in halo properties
         vr_handle = velociraptor.load(path_to_catalogue)
         a = vr_handle.a
-        r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / a
+
+        # Try to import r500 from the catalogue.
+        # If not there (and needs to be computed), assume 1 Mpc for the spatial mask.
+        try:
+            r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / a
+        except AttributeError as err:
+            if args.debug:
+                print(err, "Setting r500 = 1. Mpc. / scale_factor", sep='\n')
+            else:
+                pass
+        else:
+            r500 = unyt_quantity(1, 'Mpc') / a
+
         xcminpot = vr_handle.positions.xcminpot[0].to('Mpc') / a
         ycminpot = vr_handle.positions.ycminpot[0].to('Mpc') / a
         zcminpot = vr_handle.positions.zcminpot[0].to('Mpc') / a

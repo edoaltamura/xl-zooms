@@ -7,7 +7,12 @@ from .mw_temperatures import MWTemperatures
 from .relaxation import Relaxation
 from .xray_luminosities import XrayLuminosities
 from .entropies import Entropies
-from .spherical_overdensities import SphericalOverdensities
+from .spherical_overdensities import (
+    SphericalOverdensities,
+    SODelta2500,
+    SODelta500,
+    SODelta200,
+)
 
 from .central_bh import CentralBH
 from .temperature_density import TemperatureDensity
