@@ -156,9 +156,10 @@ class SphericalOverdensities(HaloProperty):
         volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3 * aperture_search ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
-        print(mass_weights)
+
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_mass_profile = cumsum_unyt(mass_weights)
+        print(cumulative_mass_profile)
         density_profile = cumulative_mass_profile / volume_sphere / rho_crit
         print(density_profile)
         # For better stability, clip the initial 5% of the profile
