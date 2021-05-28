@@ -143,8 +143,6 @@ class SphericalOverdensities(HaloProperty):
         radial_distances = unyt_array(radial_distances, Mpc)[mask]
         radial_distances /= aperture_search
         masses = unyt_array(masses, sw_data.units.mass)[mask]
-        print(radial_distances)
-        print(masses)
 
         del mask
 
@@ -161,9 +159,7 @@ class SphericalOverdensities(HaloProperty):
 
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_mass_profile = np.nancumsum(mass_weights.value) * masses.units
-        print(cumulative_mass_profile)
         density_profile = cumulative_mass_profile / volume_sphere / rho_crit
-        print(density_profile)
         # For better stability, clip the initial 5% of the profile
         clip = int((len(lbins) - 1) / 20)
 
