@@ -140,17 +140,15 @@ class SphericalOverdensities(HaloProperty):
         radial_distances = unyt_array(radial_distances, Mpc)[mask]
         assert (radial_distances >= 0).all()
         masses = unyt_array(masses, sw_data.units.mass)[mask]
-        print(radial_distances, masses)
-
+        assert (masses >= 0).all()
         del mask
 
         # Define radial bins and shell volumes
         lbins = np.logspace(
-            -6,
+            -7,
             np.log10(radial_distances.max()) + 1e-6,
             500
         ) * Mpc
-        print(lbins[::50])
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
         volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
 
@@ -161,11 +159,6 @@ class SphericalOverdensities(HaloProperty):
         density_profile = cumulative_mass_profile / volume_sphere / rho_crit
         # For better stability, clip the initial 5% of the profile
         clip = int((len(lbins) - 1) / 20)
-
-        print(mass_weights[::50])
-        print(cumulative_mass_profile[::50])
-        print(density_profile[::50])
-        print(radial_bin_centres[::50])
 
         density_interpolate = interp1d(
             np.log10(density_profile[clip:].value),
