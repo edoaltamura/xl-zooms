@@ -583,7 +583,6 @@ class CoolingTimes(HaloProperty):
 
         # Entropy
         electron_number_density = (sw_data.gas.densities[index] / mh).to('cm**-3') / mean_molecular_weight
-        print(temperature)
         entropy = kb * temperature * K / electron_number_density ** (2 / 3)
         entropy = entropy.to('keV*cm**2')
 
@@ -795,14 +794,25 @@ class CoolingTimes(HaloProperty):
 
         # Entropy profile
         max_radius_r500 = 4
+
+        try:
+            temperature = sw_data.gas.temperatures
+        except AttributeError as err:
+            print(err)
+            if args.debug:
+                print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
+            A = sw_data.gas.entropies * sw_data.units.mass
+            temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
+                    gamma - 1) * mh / kb
+
         index = np.where(
             (sw_data.gas.radial_distances < max_radius_r500 * r500) &
             (fof_ids == 1) &
-            (sw_data.gas.temperatures > 1e5)
+            (temperature > 1e5)
         )[0]
         radial_distance = sw_data.gas.radial_distances[index] / r500
         sw_data.gas.masses = sw_data.gas.masses[index]
-        sw_data.gas.temperatures = sw_data.gas.temperatures[index]
+        temperature = temperature[index]
 
         # Define radial bins and shell volumes
         lbins = np.logspace(-2, np.log10(max_radius_r500), 51) * radial_distance.units
@@ -814,7 +824,7 @@ class CoolingTimes(HaloProperty):
         density_profile = mass_weights / volume_shell
         number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
 
-        mass_weighted_temperatures = (sw_data.gas.temperatures * kb).to('keV') * sw_data.gas.masses
+        mass_weighted_temperatures = (temperature * kb).to('keV') * sw_data.gas.masses
         temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
         temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
         temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
