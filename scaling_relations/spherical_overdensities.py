@@ -142,6 +142,7 @@ class SphericalOverdensities(HaloProperty):
 
         radial_distances = unyt_array(radial_distances, Mpc)[mask]
         masses = unyt_array(masses, sw_data.units.mass)[mask]
+        print(radial_distances, masses)
 
         del mask
 
