@@ -141,18 +141,19 @@ class SphericalOverdensities(HaloProperty):
             mask = np.where(radial_distances <= aperture_search)[0]
 
         radial_distances = unyt_array(radial_distances.value, radial_distances.units)[mask]
+        radial_distances /= aperture_search
         masses = unyt_array(masses.value, masses.units)[mask]
 
         del mask
 
         # Define radial bins and shell volumes
         lbins = np.logspace(
-            np.log10(radial_distances.min().value - np.spacing(radial_distances.min().value)),
-            np.log10(radial_distances.max().value + np.spacing(radial_distances.max().value)),
+            np.log10(radial_distances.min().value - np.spacing(1)),
+            np.log10(1 + np.spacing(1)),
             500
-        ) * Mpc
-        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * Mpc
-        volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
+        ) * radial_distances.units
+        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
+        volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3 * aperture_search ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
@@ -181,6 +182,8 @@ class SphericalOverdensities(HaloProperty):
                 f"[{self.__class__.__name__}] r_delta: {r_delta:.2f}\n"
                 f"[{self.__class__.__name__}] m_delta: {m_delta.to(Solar_Mass):.2E}"
             ))
+            assert r_delta > 0
+            assert m_delta > 0
 
         return r_delta, m_delta
 
