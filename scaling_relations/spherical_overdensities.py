@@ -141,7 +141,6 @@ class SphericalOverdensities(HaloProperty):
             mask = np.where(radial_distances <= aperture_search)[0]
 
         radial_distances = unyt_array(radial_distances, Mpc)[mask]
-        radial_distances /= aperture_search
         masses = unyt_array(masses, sw_data.units.mass)[mask]
 
         del mask
@@ -153,7 +152,7 @@ class SphericalOverdensities(HaloProperty):
             500
         ) * radial_distances.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances.units
-        volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3 * aperture_search ** 3
+        volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
 
