@@ -62,15 +62,9 @@ class SphericalOverdensities(HaloProperty):
             r500 = unyt_quantity(1, 'Mpc')
 
         sw_data.gas.radial_distances.convert_to_physical()
-        # sw_data.gas.masses.convert_to_physical()
         sw_data.dark_matter.radial_distances.convert_to_physical()
-        # sw_data.dark_matter.masses.convert_to_physical()
-        sw_data.stars.radial_distances.convert_to_physical()
-        # sw_data.stars.masses.convert_to_physical()
-        sw_data.black_holes.radial_distances.convert_to_physical()
-        # sw_data.black_holes.subgrid_masses.convert_to_physical()
 
-        # Calculate the critical density for the cross-hair marker
+        # Calculate the critical density
         rho_crit = unyt_quantity(
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
@@ -80,27 +74,33 @@ class SphericalOverdensities(HaloProperty):
             sw_data.dark_matter.radial_distances,
         ]
         if sw_data.metadata.n_stars > 0:
+            sw_data.stars.radial_distances.convert_to_physical()
             radial_distances_collect.append(sw_data.stars.radial_distances)
         elif args.debug:
             print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
+            sw_data.black_holes.radial_distances.convert_to_physical()
             radial_distances_collect.append(sw_data.black_holes.radial_distances)
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
         radial_distances = np.r_[[*radial_distances_collect]]
 
+        sw_data.gas.masses.convert_to_physical()
+        sw_data.dark_matter.masses.convert_to_physical()
         masses_collect = [
             sw_data.gas.masses,
             sw_data.dark_matter.masses,
         ]
         if sw_data.metadata.n_stars > 0:
+            sw_data.stars.masses.convert_to_physical()
             masses_collect.append(sw_data.stars.masses)
         elif args.debug:
             print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
+            sw_data.black_holes.subgrid_masses.convert_to_physical()
             masses_collect.append(sw_data.black_holes.subgrid_masses)
         elif args.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
@@ -205,7 +205,6 @@ class SODelta500(SphericalOverdensities):
                  path_to_snap: str = None,
                  path_to_catalogue: str = None,
                  **kwargs):
-
         super().__init__(density_contrast=500.)
 
         r_delta, m_delta = self.process_single_halo(
