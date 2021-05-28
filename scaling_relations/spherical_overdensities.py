@@ -2,7 +2,10 @@ import os.path
 import numpy as np
 from warnings import warn
 from scipy.interpolate import interp1d
-from unyt import kb, mp, Mpc, Solar_Mass, unyt_quantity
+from unyt import (
+    kb, mp, Mpc, Solar_Mass,
+    unyt_quantity, unyt_array
+)
 
 from .halo_property import HaloProperty, histogram_unyt, cumsum_unyt
 from register import Zoom, default_output_directory, args
@@ -137,6 +140,8 @@ class SphericalOverdensities(HaloProperty):
             )
             mask = np.where(radial_distances <= 2.5 * r500)[0]
 
+        radial_distances = unyt_array(radial_distances.value, radial_distances.units)
+        masses = unyt_array(masses.value, masses.units)
         radial_distances = radial_distances[mask] / r500
         masses = masses[mask] #* 1e10 * Solar_Mass
         print(radial_distances, masses)
