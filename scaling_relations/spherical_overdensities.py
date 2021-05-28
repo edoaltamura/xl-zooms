@@ -143,8 +143,7 @@ class SphericalOverdensities(HaloProperty):
         radial_distances = unyt_array(radial_distances.value, radial_distances.units)
         masses = unyt_array(masses.value, masses.units)
         radial_distances = radial_distances[mask] / r500
-        masses = masses[mask] #* 1e10 * Solar_Mass
-        print(radial_distances, masses)
+        masses = masses[mask]
 
         del mask
 
@@ -174,7 +173,7 @@ class SphericalOverdensities(HaloProperty):
         if args.debug:
             print((
                 f"[{self.__class__.__name__}] r_delta: {r_delta:.2f}\n"
-                f"[{self.__class__.__name__}] m_delta: {m_delta:.2f}"
+                f"[{self.__class__.__name__}] m_delta: {m_delta.to(Solar_Mass):.2E}"
             ))
 
         return r_delta, m_delta

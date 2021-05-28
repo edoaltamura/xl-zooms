@@ -6,7 +6,7 @@ from scipy.spatial import distance
 import pandas as pd
 from tqdm import tqdm
 from unyt import unyt_array, unyt_quantity
-from typing import Tuple, List
+from typing import Tuple, List, Optional
 from multiprocessing import Pool, cpu_count
 from concurrent.futures import ProcessPoolExecutor
 
@@ -22,8 +22,8 @@ from register import (
 
 
 def histogram_unyt(data: unyt_array,
-                   bins: unyt_array = None,
-                   weights: unyt_array = None) -> Tuple[unyt_array]:
+                   bins: Optional[unyt_array] = None,
+                   weights: Optional[unyt_array] = None) -> Tuple[unyt_array]:
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
         f"Detected data {data.shape}, weights {weights.shape}."
