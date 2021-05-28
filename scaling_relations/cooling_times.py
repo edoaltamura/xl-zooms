@@ -498,6 +498,14 @@ class CoolingTimes(HaloProperty):
             temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / kb
 
+        try:
+            hydrogen_fractions = sw_data.gas.element_mass_fractions.hydrogen
+        except AttributeError as err:
+            print(err)
+            print(f"[{self.__class__.__name__}] Setting H fractions to primordial values.")
+            hydrogen_fractions = np.ones_like(sw_data.gas.densities) * primordial_hydrogen_mass_fraction
+
+
         if agn_time is None:
             index = np.where(
                 (sw_data.gas.radial_distances < aperture_fraction) &
@@ -520,7 +528,7 @@ class CoolingTimes(HaloProperty):
             )[0]
 
             density = sw_data.gas.densities_before_last_agnevent[index]
-            number_density = (density / mh).to('cm**-3').value * sw_data.gas.element_mass_fractions.hydrogen[index]
+            number_density = (density / mh).to('cm**-3').value * hydrogen_fractions[index]
             A = sw_data.gas.entropies_before_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / kb
@@ -537,7 +545,7 @@ class CoolingTimes(HaloProperty):
             )[0]
 
             density = sw_data.gas.densities_at_last_agnevent[index]
-            number_density = (density / mh).to('cm**-3').value * sw_data.gas.element_mass_fractions.hydrogen[index]
+            number_density = (density / mh).to('cm**-3').value * hydrogen_fractions[index]
             A = sw_data.gas.entropies_at_last_agnevent[index] * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * density ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / kb
@@ -687,7 +695,7 @@ class CoolingTimes(HaloProperty):
         axes[2, 0].set_ylim(pdf_ybounds)
         axes[2, 0].legend(loc="upper left")
 
-        hydrogen_fraction = sw_data.gas.element_mass_fractions.hydrogen[index]
+        hydrogen_fraction = hydrogen_fractions[index]
         bins = np.linspace(0, 1, 51)
 
         axes[2, 1].clear()
