@@ -1,5 +1,6 @@
 import sys
 import os
+import traceback
 
 sys.path.append("..")
 
@@ -48,3 +49,4 @@ try:
     )
 except Exception as e:
     print(f"Snap number {args.snapshot_number:04d} could not be processed.", e, sep='\n')
+    traceback.print_exc()
