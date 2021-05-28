@@ -467,7 +467,6 @@ class CoolingTimes(HaloProperty):
                 print(f'[{self.__class__.__name__}] Setting activate_cooling_times = False')
             activate_cooling_times = False
 
-
         if args.debug:
             print(f"[{self.__class__.__name__}] m500 = ", m500)
             print(f"[{self.__class__.__name__}] r500 = ", r500)
@@ -478,26 +477,32 @@ class CoolingTimes(HaloProperty):
 
         try:
             a_heat = sw_data.gas.last_agnfeedback_scale_factors
-        except AttributeError as e:
-            print(e)
+        except AttributeError as err:
+            print(err)
             print('Setting `last_agnfeedback_scale_factors` with 0.1.')
-            a_heat = np.ones_like(cooling_times) * 0.1
+            a_heat = np.ones_like(sw_data.gas.masses) * 0.1
 
         try:
             fof_ids = sw_data.gas.fofgroup_ids
         except AttributeError as err:
+            print(err)
+            print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
             fof_ids = np.ones_like(sw_data.gas.densities)
-            print(
-                err,
-                f"[{self.__class__.__name__}] Select particles only by radial distance.",
-                sep='\n'
-            )
+
+        try:
+            temperature = sw_data.gas.temperatures
+        except AttributeError as err:
+            print(err)
+            print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
+            A = sw_data.gas.entropies * sw_data.units.mass
+            temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
+                    gamma - 1) * mh / kb
 
         if agn_time is None:
             index = np.where(
                 (sw_data.gas.radial_distances < aperture_fraction) &
                 (fof_ids == 1) &
-                (sw_data.gas.temperatures > 1e5)
+                (temperature > 1e5)
             )[0]
 
             number_density = (sw_data.gas.densities / mh).to('cm**-3').value[index] * \
