@@ -42,9 +42,9 @@ class SphericalOverdensities(HaloProperty):
 
         if args.debug:
             print((
-                f"[{self.__name__}] Density contrast: {self.density_contrast:.2f}\n"
-                f"[{self.__name__}] Snap: {os.path.basename(path_to_snap)}\n"
-                f"[{self.__name__}] Catalog: {os.path.basename(path_to_catalogue)}"
+                f"[{self.__class__.__name__}] Density contrast: {self.density_contrast:.2f}\n"
+                f"[{self.__class__.__name__}] Snap: {os.path.basename(path_to_snap)}\n"
+                f"[{self.__class__.__name__}] Catalog: {os.path.basename(path_to_catalogue)}"
             ))
 
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
@@ -55,7 +55,7 @@ class SphericalOverdensities(HaloProperty):
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
         except AttributeError as err:
             if args.debug:
-                print(err, f"[{self.__name__}] Setting r500 = 1. Mpc.", sep='\n')
+                print(err, f"[{self.__class__.__name__}] Setting r500 = 1. Mpc.", sep='\n')
             else:
                 pass
         else:
@@ -82,12 +82,12 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             radial_distances_collect.append(sw_data.stars.radial_distances)
         elif args.debug:
-            print(f"[{self.__name__}] stars not detected.")
+            print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             radial_distances_collect.append(sw_data.black_holes.radial_distances)
         elif args.debug:
-            print(f"[{self.__name__}] black_holes not detected.")
+            print(f"[{self.__class__.__name__}] black_holes not detected.")
 
         radial_distances = np.r_[[*radial_distances_collect]]
 
@@ -98,12 +98,12 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             masses_collect.append(sw_data.stars.masses)
         elif args.debug:
-            print(f"[{self.__name__}] stars not detected.")
+            print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             masses_collect.append(sw_data.black_holes.subgrid_masses)
         elif args.debug:
-            print(f"[{self.__name__}] black_holes not detected.")
+            print(f"[{self.__class__.__name__}] black_holes not detected.")
 
         masses = np.r_[[*masses_collect]]
 
@@ -114,12 +114,12 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             fof_ids_collect.append(sw_data.stars.fofgroup_ids)
         elif args.debug:
-            print(f"[{self.__name__}] stars not detected.")
+            print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             fof_ids_collect.append(sw_data.black_holes.fofgroup_ids)
         elif args.debug:
-            print(f"[{self.__name__}] black_holes not detected.")
+            print(f"[{self.__class__.__name__}] black_holes not detected.")
 
         fof_ids = np.r_[[*fof_ids_collect]]
 
@@ -159,8 +159,8 @@ class SphericalOverdensities(HaloProperty):
 
         if args.debug:
             print((
-                f"[{self.__name__}] r_delta: {r_delta:.2f}\n"
-                f"[{self.__name__}] m_delta: {m_delta:.2f}"
+                f"[{self.__class__.__name__}] r_delta: {r_delta:.2f}\n"
+                f"[{self.__class__.__name__}] m_delta: {m_delta:.2f}"
             ))
 
         return r_delta, m_delta
