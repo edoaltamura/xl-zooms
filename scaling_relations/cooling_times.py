@@ -459,10 +459,10 @@ class CoolingTimes(HaloProperty):
         cooling_times = calculate_mean_cooling_times(sw_data)
 
         if args.debug:
-            print("m500 = ", m500)
-            print("r500 = ", r500)
-            print("aperture_fraction = ", aperture_fraction)
-            print("Number of particles being imported", len(sw_data.gas.densities))
+            print(f"[{self.__class__.__name__}] m500 = ", m500)
+            print(f"[{self.__class__.__name__}] r500 = ", r500)
+            print(f"[{self.__class__.__name__}] aperture_fraction = ", aperture_fraction)
+            print(f"[{self.__class__.__name__}] Number of particles being imported", len(sw_data.gas.densities))
             print(sw_data.gas.fofgroup_ids)
             print((sw_data.gas.fofgroup_ids == 1).any())
 
@@ -474,6 +474,9 @@ class CoolingTimes(HaloProperty):
             print(e)
             print('Setting `last_agnfeedback_scale_factors` with 0.1.')
             a_heat = np.ones_like(cooling_times) * 0.1
+
+        try:
+
 
         if agn_time is None:
             index = np.where(
