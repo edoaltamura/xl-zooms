@@ -476,12 +476,19 @@ class CoolingTimes(HaloProperty):
             a_heat = np.ones_like(cooling_times) * 0.1
 
         try:
-
+            fof_ids = sw_data.gas.fofgroup_ids
+        except AttributeError as err:
+            fof_ids = np.ones_like(sw_data.gas.densities)
+            print(
+                err,
+                f"[{self.__class__.__name__}] Select particles only by radial distance.",
+                sep='\n'
+            )
 
         if agn_time is None:
             index = np.where(
                 (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
+                (fof_ids == 1) &
                 (sw_data.gas.temperatures > 1e5)
             )[0]
 
@@ -493,7 +500,7 @@ class CoolingTimes(HaloProperty):
 
             index = np.where(
                 (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
+                (fof_ids == 1) &
                 (a_heat > (1 / (z_agn_start + 1))) &
                 (a_heat < (1 / (z_agn_end + 1))) &
                 (sw_data.gas.densities_before_last_agnevent > 0)
@@ -510,7 +517,7 @@ class CoolingTimes(HaloProperty):
 
             index = np.where(
                 (sw_data.gas.radial_distances < aperture_fraction) &
-                (sw_data.gas.fofgroup_ids == 1) &
+                (fof_ids == 1) &
                 (a_heat > (1 / (z_agn_start + 1))) &
                 (a_heat < (1 / (z_agn_end + 1))) &
                 (sw_data.gas.densities_at_last_agnevent > 0)
