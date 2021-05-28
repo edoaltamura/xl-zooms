@@ -146,12 +146,12 @@ class SphericalOverdensities(HaloProperty):
         del mask
 
         # Define radial bins and shell volumes
-        lbins = np.linspace(
-            radial_distances.min().value - np.spacing(radial_distances.min().value),
-            radial_distances.max().value + np.spacing(radial_distances.max().value),
+        lbins = np.logspace(
+            np.log10(radial_distances.min().value - np.spacing(radial_distances.min().value)),
+            np.log10(radial_distances.max().value + np.spacing(radial_distances.max().value)),
             500
         ) * Mpc
-        radial_bin_centres = lbins[1:] - lbins[:-1]
+        radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * Mpc
         volume_sphere = (4. * np.pi / 3.) * lbins[1:] ** 3
 
         mass_weights, _ = histogram_unyt(radial_distances, bins=lbins, weights=masses)
@@ -163,18 +163,18 @@ class SphericalOverdensities(HaloProperty):
         clip = int((len(lbins) - 1) / 20)
 
         density_interpolate = interp1d(
-            density_profile[clip:].value,
-            radial_bin_centres[clip:].value,
+            np.log10(density_profile[clip:].value),
+            np.log10(radial_bin_centres[clip:].value),
             kind='linear'
         )
         mass_interpolate = interp1d(
-            radial_bin_centres[clip:].value,
-            cumulative_mass_profile[clip:].value,
+            np.log10(radial_bin_centres[clip:].value),
+            np.log10(cumulative_mass_profile[clip:].value),
             kind='linear'
         )
 
-        r_delta = density_interpolate(self.density_contrast) * Mpc
-        m_delta = mass_interpolate(r_delta) * mass_weights.units
+        r_delta = 10 ** density_interpolate(np.log10(self.density_contrast)) * Mpc
+        m_delta = 10 ** mass_interpolate(np.log10(r_delta)) * mass_weights.units
 
         if args.debug:
             print((
