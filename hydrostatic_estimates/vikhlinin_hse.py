@@ -275,6 +275,8 @@ class HydrostaticEstimator:
             setattr(self.diagnostics, 'output_directory', self.zoom.output_directory)
             setattr(self.diagnostics, 'temperature_profile_input', self.temperature_profile)
 
+        _, _, self.masses_hse = self.run_hse_fit()
+
     def load_zoom_profiles(self):
         # Read in halo properties from catalog
         vr_catalogue_handle = vr.load(self.catalog_file)
@@ -625,14 +627,13 @@ class HydrostaticEstimator:
                 f"density_contrast = {int(density_contrast):d}..."
             ))
 
-        _, _, masses_hse = self.run_hse_fit()
         mass_interpolate = interp1d(
             self.radial_bin_centres * self.r500c,
-            masses_hse,
+            self.masses_hse,
             kind='linear',
             fill_value='extrapolate'
         )
-        densities_hse = (3 * masses_hse) / (4 * np.pi * (self.radial_bin_centres * self.r500c) ** 3) / self.rho_crit
+        densities_hse = (3 * self.masses_hse) / (4 * np.pi * (self.radial_bin_centres * self.r500c) ** 3) / self.rho_crit
         density_interpolate = interp1d(
             densities_hse,
             self.radial_bin_centres * self.r500c,
