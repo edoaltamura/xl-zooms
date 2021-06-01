@@ -16,7 +16,7 @@ from scipy.interpolate import interp1d
 from register import zooms_register, Zoom, Tcut_halogas, Redshift, args
 from .convergence_radius import convergence_radius
 from literature import Cosmology
-from scaling_relations import SphericalOverdensities
+from scaling_relations.spherical_overdensities import SphericalOverdensities
 
 try:
     plt.style.use("../mnras.mplstyle")
