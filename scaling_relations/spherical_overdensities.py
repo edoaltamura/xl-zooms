@@ -7,7 +7,7 @@ from unyt import (
     unyt_quantity, unyt_array
 )
 
-from .halo_property import HaloProperty, histogram_unyt, cumsum_unyt
+from .halo_property import HaloProperty, histogram_unyt
 from register import Zoom, default_output_directory, args
 
 
