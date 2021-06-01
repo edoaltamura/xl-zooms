@@ -13,6 +13,6 @@ print(
     )
 )
 
-print(
-    gf.process_catalogue()
-)
+# print(
+#     gf.process_catalogue()
+# )
