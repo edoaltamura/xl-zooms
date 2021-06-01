@@ -444,8 +444,8 @@ class CoolingTimes(HaloProperty):
                 path_to_snap=path_to_snap,
                 profile_type='true',
                 diagnostics_on=False
-            )
-            r500 = true_hse.R500hse
+            ).interpolate_hse()
+            r500 = true_hse.r500hse
             m500 = true_hse.M500hse
 
         aperture_fraction = aperture_fraction * r500
@@ -844,7 +844,7 @@ class CoolingTimes(HaloProperty):
 
         axes[1, 2].plot(
             radial_bin_centres,
-            entropy_profile,
+            entropy_profile / K500,
             linestyle='-',
             color='r',
             linewidth=1,
@@ -852,14 +852,15 @@ class CoolingTimes(HaloProperty):
         )
         axes[1, 2].set_xscale('log')
         axes[1, 2].set_yscale('log')
-        axes[1, 2].axhline(y=K500, color='k', linestyle=':', linewidth=0.5)
+        # axes[1, 2].axhline(y=K500, color='k', linestyle=':', linewidth=0.5)
         axes[1, 2].axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
         axes[1, 2].set_ylabel(r'Entropy [keV cm$^2$]')
         axes[1, 2].set_xlabel(r'$r/r_{500}$')
-        axes[1, 2].set_ylim([1, 1e4])
+        # axes[1, 2].set_ylim([1, 1e4])
+        axes[1, 2].set_ylim([1e-4, 5])
         axes[1, 2].set_xlim([0.01, max_radius_r500])
         axes[1, 2].text(
-            axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
+            axes[1, 2].get_xlim()[0], K500 / K500, r'$K_{500}$',
             horizontalalignment='left',
             verticalalignment='bottom',
             color='k',
@@ -869,21 +870,21 @@ class CoolingTimes(HaloProperty):
                 ec='none'
             )
         )
-        sun_observations = Sun2009()
-        sun_observations.filter_by('M_500', 8e13, 3e14)
-        sun_observations.overlay_entropy_profiles(
-            axes=axes[1, 2],
-            k_units='keVcm^2',
-            markersize=1,
-            linewidth=0.5
-        )
+        # sun_observations = Sun2009()
+        # sun_observations.filter_by('M_500', 8e13, 3e14)
+        # sun_observations.overlay_entropy_profiles(
+        #     axes=axes[1, 2],
+        #     k_units='keVcm^2',
+        #     markersize=1,
+        #     linewidth=0.5
+        # )
         rexcess = Pratt2010()
         bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
             m500_limits=(
                 1e14 * Solar_Mass,
                 5e14 * Solar_Mass
             ),
-            k500_rescale=False
+            k500_rescale=True
         )
         axes[1, 2].fill_between(
             rexcess.radial_bins,
