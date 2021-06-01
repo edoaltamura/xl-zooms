@@ -44,7 +44,7 @@ out_to_radius = 5
 
 print("Loading halos selected...")
 lines = np.loadtxt(f"outfiles/halo_selected_{author}.txt", comments="#", delimiter=",", unpack=False).T
-print("log10(M200c / Msun): ", np.log10(lines[1] * 1e13))
+print("log10(m200c / Msun): ", np.log10(lines[1] * 1e13))
 print("r200c: ", lines[2])
 print("Centre of potential coordinates: (xC, yC, zC)")
 for i in range(3):

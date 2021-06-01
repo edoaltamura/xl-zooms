@@ -16,7 +16,7 @@ selection_filename_repo:  selection_repo       # Output file name for the reposi
 
 # SELECTION PARAMETERS
 random_seed:           3000        # Random seed for the halo random selection
-mass_choice:              1        # Choice of mass to use (0 for M200c, 1 for M500c) - call this MDeltac
+mass_choice:              1        # Choice of mass to use (0 for m200c, 1 for m500c) - call this MDeltac
 min_mass_select_log10:   13.0      # Minimum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)
 max_mass_select_log10:   14.5      # Maximum mass of the sample selection. Entering e.g. 13.0 means you indicate 10**(13.)
 num_halos_per_bin:        6        # Number of halos to be randomly sampled in each log-mass bin

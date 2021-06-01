@@ -46,7 +46,7 @@ def profile_3d_single_halo(
     YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
     ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
-    # If no custom aperture, select R500c as default
+    # If no custom aperture, select r500c as default
     if hse_dataset is not None:
         assert R500.units == hse_dataset["R500hse"].units
         assert M500.units == hse_dataset["M500hse"].units
@@ -67,7 +67,7 @@ def profile_3d_single_halo(
     data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
-    # R500c is already in physical units
+    # r500c is already in physical units
     data.gas.coordinates.convert_to_physical()
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()
@@ -140,8 +140,8 @@ def _process_single_halo(zoom: Zoom):
 
 
 def plot_radial_profiles_median(object_database: pd.DataFrame, highmass_only: bool = False) -> None:
-    # kBT200 = (unyt.G * mean_molecular_weight * M200c * unyt.mass_proton / 2 / R200c).to('keV')
-    # K200 = (kBT200 / (3 * M200c * obs.cosmic_fbary / (4 * np.pi * R200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
+    # kBT200 = (unyt.G * mean_molecular_weight * m200c * unyt.mass_proton / 2 / r200c).to('keV')
+    # K200 = (kBT200 / (3 * m200c * obs.cosmic_fbary / (4 * np.pi * r200c ** 3 * unyt.mass_proton)) ** (2 / 3)).to(
     #     'keV*cm**2')
     # print('Virial temperature = ', kBT200)
     #

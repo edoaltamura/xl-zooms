@@ -56,8 +56,8 @@ def dm_map_parent(
         velociraptor_properties_parent: str,
         snap_filepath_parent: str,
         velociraptor_properties_zoom: str,
-        out_to_radius: Tuple[int, str] = (5, 'R200c'),
-        highres_radius: Tuple[int, str] = (6, 'R500c'),
+        out_to_radius: Tuple[int, str] = (5, 'r200c'),
+        highres_radius: Tuple[int, str] = (6, 'r500c'),
         output_directory: str = '.'
 ) -> None:
     print(f"Rendering {snap_filepath_parent}...")
@@ -81,16 +81,16 @@ def dm_map_parent(
     yCen = unyt.unyt_quantity(Ycminpot, unyt.Mpc)
     zCen = unyt.unyt_quantity(Zcminpot, unyt.Mpc)
 
-    if out_to_radius[1] == 'R200c':
+    if out_to_radius[1] == 'r200c':
         size = out_to_radius[0] * R200c
-    elif out_to_radius[1] == 'R500c':
+    elif out_to_radius[1] == 'r500c':
         size = out_to_radius[0] * R500c
     elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
         size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
 
-    if highres_radius[1] == 'R200c':
+    if highres_radius[1] == 'r200c':
         _highres_radius = highres_radius[0] * R200c
-    elif highres_radius[1] == 'R500c':
+    elif highres_radius[1] == 'r500c':
         _highres_radius = highres_radius[0] * R500c
     elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
         _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
@@ -194,8 +194,8 @@ def dm_map_zoom(
         run_name: str,
         snap_filepath_zoom: str,
         velociraptor_properties_zoom: str,
-        out_to_radius: Tuple[int, str] = (5, 'R200c'),
-        highres_radius: Tuple[int, str] = (6, 'R500c'),
+        out_to_radius: Tuple[int, str] = (5, 'r200c'),
+        highres_radius: Tuple[int, str] = (6, 'r500c'),
         output_directory: str = '.'
 ) -> None:
     print(f"Rendering {snap_filepath_zoom}...")
@@ -210,16 +210,16 @@ def dm_map_zoom(
         yCen = unyt.unyt_quantity(vr_file['/Ycminpot'][0], unyt.Mpc)
         zCen = unyt.unyt_quantity(vr_file['/Zcminpot'][0], unyt.Mpc)
 
-    if out_to_radius[1] == 'R200c':
+    if out_to_radius[1] == 'r200c':
         size = out_to_radius[0] * R200c
-    elif out_to_radius[1] == 'R500c':
+    elif out_to_radius[1] == 'r500c':
         size = out_to_radius[0] * R500c
     elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
         size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
 
-    if highres_radius[1] == 'R200c':
+    if highres_radius[1] == 'r200c':
         _highres_radius = highres_radius[0] * R200c
-    elif highres_radius[1] == 'R500c':
+    elif highres_radius[1] == 'r500c':
         _highres_radius = highres_radius[0] * R500c
     elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
         _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
@@ -337,8 +337,8 @@ if __name__ == "__main__":
     velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
 
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
-    out_to_radius = (5, 'R200c')
-    highres_radius = (6, 'R500c')
+    out_to_radius = (5, 'r200c')
+    highres_radius = (6, 'r500c')
 
     dm_map_parent(
         run_name=run_name,

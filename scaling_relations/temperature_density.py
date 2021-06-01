@@ -284,7 +284,7 @@ class TemperatureDensity(HaloProperty):
         aperture_fraction = aperture_fraction * r500
 
         # Convert datasets to physical quantities
-        # R500c is already in physical units
+        # r500c is already in physical units
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.coordinates.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()

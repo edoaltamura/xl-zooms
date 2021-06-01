@@ -53,11 +53,11 @@ def process_single_halo(
     # true_hse.plot_diagnostics()
 
     output = (
-        true_hse.R500c,
+        true_hse.r500c,
         true_hse.R200hse,
         true_hse.R500hse,
         true_hse.R2500hse,
-        true_hse.M500c,
+        true_hse.m500c,
         true_hse.M200hse,
         true_hse.M500hse,
         true_hse.M2500hse,
@@ -84,11 +84,11 @@ def process_single_halo(
 
 @utils.set_scaling_relation_name(os.path.splitext(os.path.basename(__file__))[0])
 @utils.set_output_names([
-    'R500c',
+    'r500c',
     'R200hse',
     'R500hse',
     'R2500hse',
-    'M500c',
+    'm500c',
     'M200hse',
     'M500hse',
     'M2500hse',
@@ -124,8 +124,8 @@ def true_mass_bias(results: pd.DataFrame):
             legend_handles.append(run_style['Legend handle'])
 
         ax.scatter(
-            results.loc[i, "M500c"],
-            results.loc[i, "M500hse"] / results.loc[i, "M500c"],
+            results.loc[i, "m500c"],
+            results.loc[i, "M500hse"] / results.loc[i, "m500c"],
             marker=run_style['Marker style'],
             s=run_style['Marker size'],
             edgecolors=run_style['Color'] if results.loc[i, "Ekin/Eth"].value > 0.1 else 'none',

@@ -53,8 +53,8 @@ def contamination_map(
         run_name: str,
         velociraptor_properties_zoom: str,
         snap_filepath_zoom: str,
-        out_to_radius: Tuple[int, str] = (5, 'R200c'),
-        highres_radius: Tuple[int, str] = (6, 'R500c'),
+        out_to_radius: Tuple[int, str] = (5, 'r200c'),
+        highres_radius: Tuple[int, str] = (6, 'r500c'),
         traceback: bool = False,
         output_directory: str = '.'
 ) -> None:
@@ -70,18 +70,18 @@ def contamination_map(
     # EAGLE-XL data path
     print(f"Rendering {snap_filepath_zoom}...")
 
-    if out_to_radius[1] == 'R200c':
+    if out_to_radius[1] == 'r200c':
         size = out_to_radius[0] * R200c
-    elif out_to_radius[1] == 'R500c':
+    elif out_to_radius[1] == 'r500c':
         size = out_to_radius[0] * R500c
     elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
         size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
     else:
         raise ValueError("The `out_to_radius` input is not in the correct format or not recognised.")
 
-    if highres_radius[1] == 'R200c':
+    if highres_radius[1] == 'r200c':
         _highres_radius = highres_radius[0] * R200c
-    elif highres_radius[1] == 'R500c':
+    elif highres_radius[1] == 'r500c':
         _highres_radius = highres_radius[0] * R500c
     elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
         _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
@@ -126,7 +126,7 @@ def contamination_map(
     contaminated_r200_idx = np.where(lowres_coordinates['r'] < 1. * R200c)[0]
     print(f"Total low-res DM: {len(lowres_coordinates['r'])} particles detected")
     print(f"Contaminating low-res DM (< R_clean): {len(contaminated_idx)} particles detected")
-    print(f"Contaminating low-res DM (< R200c): {len(contaminated_r200_idx)} particles detected")
+    print(f"Contaminating low-res DM (< r200c): {len(contaminated_r200_idx)} particles detected")
     
     # If want traceback of the particles, use Peano-Hilbert indices from Stu's code
     if traceback:
@@ -290,8 +290,8 @@ def contamination_radial_histogram(
         run_name: str,
         velociraptor_properties_zoom: str,
         snap_filepath_zoom: str,
-        out_to_radius: Tuple[int, str] = (5, 'R200c'),
-        highres_radius: Tuple[int, str] = (6, 'R500c'),
+        out_to_radius: Tuple[int, str] = (5, 'r200c'),
+        highres_radius: Tuple[int, str] = (6, 'r500c'),
         output_directory: str = '.'
 ) -> None:
     # Rendezvous over parent VR catalogue using zoom information
@@ -306,16 +306,16 @@ def contamination_radial_histogram(
     # EAGLE-XL data path
     print(f"Rendering {snap_filepath_zoom}...")
 
-    if out_to_radius[1] == 'R200c':
+    if out_to_radius[1] == 'r200c':
         size = out_to_radius[0] * R200c
-    elif out_to_radius[1] == 'R500c':
+    elif out_to_radius[1] == 'r500c':
         size = out_to_radius[0] * R500c
     elif out_to_radius[1] == 'Mpc' or out_to_radius[1] is None:
         size = unyt.unyt_quantity(out_to_radius[0], unyt.Mpc)
 
-    if highres_radius[1] == 'R200c':
+    if highres_radius[1] == 'r200c':
         _highres_radius = highres_radius[0] * R200c
-    elif highres_radius[1] == 'R500c':
+    elif highres_radius[1] == 'r500c':
         _highres_radius = highres_radius[0] * R500c
     elif highres_radius[1] == 'Mpc' or highres_radius[1] is None:
         _highres_radius = unyt.unyt_quantity(highres_radius[0], unyt.Mpc)
@@ -427,8 +427,8 @@ if __name__ == "__main__":
     velociraptor_properties_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/properties"
     snap_filepath_zoom = "/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/L0300N0564_VR93/snapshots/L0300N0564_VR93_0199.hdf5"
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
-    out_to_radius = (5, 'R200c')
-    highres_radius = (6, 'R500c')
+    out_to_radius = (5, 'r200c')
+    highres_radius = (6, 'r500c')
 
     contamination_map(
         run_name,

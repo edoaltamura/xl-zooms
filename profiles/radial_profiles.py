@@ -101,7 +101,7 @@ def profile_3d_single_halo(
         YPotMin = unyt.unyt_quantity(h5file['/Ycminpot'][0], unyt.Mpc) / scale_factor
         ZPotMin = unyt.unyt_quantity(h5file['/Zcminpot'][0], unyt.Mpc) / scale_factor
 
-        # If no custom aperture, select R500c as default
+        # If no custom aperture, select r500c as default
         if hse_dataset is not None:
             assert R500c.units == hse_dataset["R500hse"].units
             assert M500c.units == hse_dataset["M500hse"].units
@@ -151,7 +151,7 @@ def profile_3d_single_halo(
     # Since useful for different applications, attach datasets
     data.gas.mass_weighted_temperatures = data.gas.masses * data.gas.temperatures
 
-    # Rescale profiles to R500c
+    # Rescale profiles to r500c
     radial_distance = deltaR / R500c
     assert radial_distance.units == unyt.dimensionless
 

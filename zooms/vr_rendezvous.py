@@ -59,7 +59,7 @@ def find_object(
             f"`sample_mass_lower_lim` currently set to {sample_mass_lower_lim:.2f}."
         )
         _M200c_tuple = find_nearest(M200c[index], sample_M200c)
-        finder_result['name'].append('M200c')
+        finder_result['name'].append('m200c')
         finder_result['value'].append(_M200c_tuple[0])
         finder_result['index'].append(_M200c_tuple[1])
         finder_result['error'].append(np.abs((_M200c_tuple[1] - sample_M200c) / sample_M200c))
@@ -190,13 +190,13 @@ if __name__ == "__main__":
             print(e)
 
     # with open("/cosma7/data/dp004/dc-alta2/xl-zooms/analysis/halo_selected_SK.txt", "w") as text_file:
-    #     print("# Halo counter, M200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
+    #     print("# Halo counter, m200c/1.e13 [Msun], r200c [Mpc], xPotMin [Mpc], yPotMin [Mpc], zPotMin [Mpc]",
     #           file=text_file)
     #
     # for i in range(3):
     #     print(f"Finding properties of halo {i:d}...")
-    #     find_M200c = find_nearest(M200c, sample_M200c[i])
-    #     find_R200c = find_nearest(R200c, sample_R200c[i])
+    #     find_M200c = find_nearest(m200c, sample_M200c[i])
+    #     find_R200c = find_nearest(r200c, sample_R200c[i])
     #     find_x = find_nearest(xPotMin, sample_x[i])
     #     find_y = find_nearest(yPotMin, sample_y[i])
     #     find_z = find_nearest(zPotMin, sample_z[i])

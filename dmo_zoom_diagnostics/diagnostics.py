@@ -36,8 +36,8 @@ def dmo_diagnostics(run_name: str) -> None:
         f"/cosma/home/dp004/dc-alta2/data7/xl-zooms/dmo/{run_name}/stf/{run_name}_0036/{run_name}_0036.properties"
     ]
 
-    out_to_radius = (5, 'R200c')
-    highres_radius = (6, 'R500c')
+    out_to_radius = (5, 'r200c')
+    highres_radius = (6, 'r500c')
 
     output_directory = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 

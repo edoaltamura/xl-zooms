@@ -78,7 +78,7 @@ hotgas = np.array([
     [12785.215476010579, 1493.7310791015625]
 ]).T * 1e10
 
-# Data structure: M500c | M_hotgas500c
+# Data structure: m500c | M_hotgas500c
 master = np.array([
     [10470.778938888074, 1208.31606784],
     [1927.8469759419206, 129.6077684736],

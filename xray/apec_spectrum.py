@@ -518,8 +518,8 @@ def process_single_halo(
         spec_fit_data=spec_fit_data
     )
 
-    print(f'R500c = {hse_spec.R500c:.3E}')
-    print(f'M500c = {hse_spec.M500c:.3E}')
+    print(f'r500c = {hse_spec.r500c:.3E}')
+    print(f'M500c = {hse_spec.m500c:.3E}')
     print()
     print(f'R500,true,hse = {hse_true.R500hse:.3E}')
     print(f'M500,true,hse = {hse_true.M500hse:.3E}')
@@ -533,8 +533,8 @@ def process_single_halo(
     print(f'kBT500,spec,hse = {hse_spec.kBT500hse:.3E}')
     print(f'K500,spec,hse = {hse_spec.K500hse:.3E}')
     print()
-    print(f"[Bias] M500 (hse/true) = {hse_true.M500hse / hse_spec.M500c:.3f}")
-    print(f"[Bias] M500 (spec/true) = {hse_spec.M500hse / hse_spec.M500c:.3f}")
+    print(f"[Bias] M500 (hse/true) = {hse_true.M500hse / hse_spec.m500c:.3f}")
+    print(f"[Bias] M500 (spec/true) = {hse_spec.M500hse / hse_spec.m500c:.3f}")
 
     return hse_spec
 

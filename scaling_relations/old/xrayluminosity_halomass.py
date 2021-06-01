@@ -71,7 +71,7 @@ def process_single_halo(
     YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
     ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
-    # If no custom aperture, select R500c as default
+    # If no custom aperture, select r500c as default
     if hse_dataset is not None:
         assert R500.units == hse_dataset["R500hse"].units
         assert M500.units == hse_dataset["M500hse"].units
@@ -92,7 +92,7 @@ def process_single_halo(
     data = sw.load(path_to_snap, mask=mask)
 
     # Convert datasets to physical quantities
-    # R500c is already in physical units
+    # r500c is already in physical units
     data.gas.coordinates.convert_to_physical()
     data.gas.masses.convert_to_physical()
     data.gas.temperatures.convert_to_physical()

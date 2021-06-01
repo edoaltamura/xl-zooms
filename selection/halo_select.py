@@ -64,11 +64,11 @@ del snap
 # Read in halo properties
 with h5.File(params['vr_file'], 'r') as h5file:
     if massChoice == 0:
-        print('Using M200c/R200c')
+        print('Using m200c/r200c')
         MDeltac = h5file['/Mass_200crit'][:] * 1.e10  # Msun units
         RDeltac = h5file['/R_200crit'][:]
     else:
-        print('Using M500c/R500c')
+        print('Using m500c/r500c')
         MDeltac = h5file['/SO_Mass_500_rhocrit'][:] * 1.e10  # Msun units
         RDeltac = h5file['/SO_R_500_rhocrit'][:]
 

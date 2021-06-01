@@ -5,8 +5,9 @@ from unyt import kb, mp, Mpc
 from scipy.interpolate import interp1d
 
 from .halo_property import HaloProperty, histogram_unyt
-from .spherical_overdensities import SphericalOverdensities
+from .spherical_overdensities import SphericalOverdensities, SODelta200, SODelta500, SODelta2500
 from register import Zoom, Tcut_halogas, default_output_directory, args
+from hydrostatic_estimates import HydrostaticEstimator
 
 # Constants
 mean_molecular_weight = 0.59
@@ -45,22 +46,79 @@ class Entropies(HaloProperty):
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
-        r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
-        r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
+        if args.mass_estimator == 'true':
 
-        kwarg_parser = dict(zoom_obj=zoom_obj, path_to_snap=path_to_snap, path_to_catalogue=path_to_catalogue)
+            kwarg_parser = dict(zoom_obj=zoom_obj, path_to_snap=path_to_snap, path_to_catalogue=path_to_catalogue)
 
-        try:
-            r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
-        except:
-            r1000 = SphericalOverdensities(density_contrast=1000).process_single_halo(**kwarg_parser)[0]
+            try:
+                r200 = vr_data.radii.r_200crit[0].to('Mpc')
+            except AttributeError as err:
+                print(err)
+                if args.debug:
+                    print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
+                spherical_overdensity = SODelta200(
+                    path_to_snap=path_to_snap,
+                    path_to_catalogue=path_to_catalogue,
+                )
+                r200 = spherical_overdensity.get_r200()
 
-        try:
-            r1500 = vr_data.spherical_overdensities.r_1500_rhocrit[0].to('Mpc')
-        except:
-            r1500 = SphericalOverdensities(density_contrast=1500).process_single_halo(**kwarg_parser)[0]
+            try:
+                r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+            except AttributeError as err:
+                print(err)
+                if args.debug:
+                    print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
+                spherical_overdensity = SODelta500(
+                    path_to_snap=path_to_snap,
+                    path_to_catalogue=path_to_catalogue,
+                )
+                r500 = spherical_overdensity.get_r500()
 
-        r200 = vr_data.radii.r_200crit[0].to('Mpc')
+            try:
+                r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
+            except AttributeError as err:
+                print(err)
+                if args.debug:
+                    print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
+                r1000 = SphericalOverdensities(density_contrast=1000).process_single_halo(**kwarg_parser)[0]
+
+            try:
+                r1500 = vr_data.spherical_overdensities.r_1500_rhocrit[0].to('Mpc')
+            except AttributeError as err:
+                print(err)
+                if args.debug:
+                    print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
+                r1500 = SphericalOverdensities(density_contrast=1500).process_single_halo(**kwarg_parser)[0]
+
+            try:
+                r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
+            except AttributeError as err:
+                print(err)
+                if args.debug:
+                    print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
+                spherical_overdensity = SODelta2500(
+                    path_to_snap=path_to_snap,
+                    path_to_catalogue=path_to_catalogue,
+                )
+                r2500 = spherical_overdensity.get_r2500()
+
+        elif args.mass_estimator == 'hse':
+
+            true_hse = HydrostaticEstimator(
+                path_to_catalogue=path_to_catalogue,
+                path_to_snap=path_to_snap,
+                profile_type='true',
+                diagnostics_on=False
+            )
+
+            for density_contrast in [200, 500, 1000, 1500, 2500]:
+                true_hse.interpolate_hse(density_contrast=density_contrast)
+
+            r200 = true_hse.r200hse
+            r500 = true_hse.r500hse
+            r1000 = true_hse.r1000hse
+            r1500 = true_hse.r1500hse
+            r2500 = true_hse.r2500hse
 
         sw_data.gas.radial_distances.convert_to_physical()
 
