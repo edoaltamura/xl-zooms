@@ -11,9 +11,9 @@ catalogue_starters = [
     VRProperties(),
     GasFractions(),
     StarFractions(),
-    MWTemperatures(),
-    Relaxation(),
-    XrayLuminosities(),
+    # MWTemperatures(),
+    # Relaxation(),
+    # XrayLuminosities(),
     Entropies(),
     SphericalOverdensities(density_contrast=1500.),
 ]
