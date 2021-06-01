@@ -176,8 +176,8 @@ class SphericalOverdensities(HaloProperty):
 
         if args.debug:
             print((
-                f"[{self.__class__.__name__}] r_delta: {r_delta:.2f}\n"
-                f"[{self.__class__.__name__}] m_delta: {m_delta.to(Solar_Mass):.2E}"
+                f"[{self.__class__.__name__}] r_({int(self.density_contrast):d}): {r_delta:.2f}\n"
+                f"[{self.__class__.__name__}] m_({int(self.density_contrast):d}): {m_delta.to(Solar_Mass):.2E}"
             ))
             assert r_delta > 0
             assert m_delta > 0
