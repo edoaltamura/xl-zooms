@@ -28,6 +28,7 @@ np.seterr(invalid='ignore')
 
 fbary = Cosmology().fb
 mean_molecular_weight = 0.5954
+mean_atomic_weight_per_free_electron = 1.14
 true_data_nbins = 51
 
 
@@ -633,7 +634,8 @@ class HydrostaticEstimator:
             kind='linear',
             fill_value='extrapolate'
         )
-        densities_hse = (3 * self.masses_hse) / (4 * np.pi * (self.radial_bin_centres * self.r500c) ** 3) / self.rho_crit
+        densities_hse = (3 * self.masses_hse) / (
+                    4 * np.pi * (self.radial_bin_centres * self.r500c) ** 3) / self.rho_crit
         density_interpolate = interp1d(
             densities_hse,
             self.radial_bin_centres * self.r500c,
@@ -647,11 +649,9 @@ class HydrostaticEstimator:
         m_delta_hse = mass_interpolate(r_delta_hse) * Solar_Mass
         setattr(self, f"m{int(density_contrast):d}hse", m_delta_hse)
 
-        setattr(
-            self,
-            f"ne{int(density_contrast):d}hse",
-            (3 * m_delta_hse * fbary / (4 * np.pi * r_delta_hse ** 3 * mp * mean_molecular_weight)).to('1/cm**3')
-        )
+        ne_delta_hse = (density_contrast * fbary * self.rho_crit / (mp * mean_atomic_weight_per_free_electron)).to(
+            '1/cm**3')
+        setattr(self, f"ne{int(density_contrast):d}hse", ne_delta_hse)
 
         kBT_delta_hse = (G * mean_molecular_weight * m_delta_hse * mp / r_delta_hse / 2).to('keV')
         setattr(self, f"kBT{int(density_contrast):d}hse", kBT_delta_hse)
@@ -659,14 +659,13 @@ class HydrostaticEstimator:
         setattr(
             self,
             f"P{int(density_contrast):d}hse",
-            (density_contrast * fbary * self.rho_crit * G * m_delta_hse / r_delta_hse / 2).to('keV/cm**3')
+            (density_contrast * fbary * kBT_delta_hse * self.rho_crit / (mp * mean_molecular_weight)).to('keV/cm**3')
         )
 
         setattr(
             self,
             f"K{int(density_contrast):d}hse",
-            (kBT_delta_hse / (3 * m_delta_hse * fbary / (4 * np.pi * r_delta_hse ** 3 * mp)) ** (2 / 3)).to(
-                'keV*cm**2')
+            (kBT_delta_hse / ne_delta_hse ** (2 / 3)).to('keV*cm**2')
         )
 
         # Hydrostatic bias

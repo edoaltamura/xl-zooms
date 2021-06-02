@@ -21,9 +21,12 @@ from register import (
 )
 
 
-def histogram_unyt(data: unyt_array,
-                   bins: Optional[unyt_array] = None,
-                   weights: Optional[unyt_array] = None) -> Tuple[unyt_array]:
+def histogram_unyt(
+        data: unyt_array,
+        bins: Optional[unyt_array],
+        weights: Optional[unyt_array]
+) -> Tuple[unyt_array]:
+
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
         f"Detected data {data.shape}, weights {weights.shape}."

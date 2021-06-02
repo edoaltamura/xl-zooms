@@ -17,10 +17,10 @@ class Pratt2010(Article):
 
     def __init__(self, **cosmo_kwargs):
         super().__init__(
-            citation="Pratt et al. (2009)",
+            citation="Pratt et al. (2010)",
             comment=comment,
-            bibcode="2009A&A...498..361P",
-            hyperlink='https://ui.adsabs.harvard.edu/abs/2009A%26A...498..361P/abstract',
+            bibcode="2010A&A...511A..85P",
+            hyperlink='https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..85P/abstract',
             **cosmo_kwargs
         )
 

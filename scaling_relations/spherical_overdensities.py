@@ -16,6 +16,9 @@ class SphericalOverdensities(HaloProperty):
     def __init__(self, density_contrast: float):
         super().__init__()
 
+        if args.debug:
+            print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
+
         self.density_contrast = density_contrast
         self.labels = [f'r_{density_contrast:.0f}', f'm_{density_contrast:.0f}']
 

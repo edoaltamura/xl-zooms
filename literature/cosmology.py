@@ -4,7 +4,6 @@ from typing import Union, List
 from astropy import cosmology
 import unyt
 
-
 # Check back-compatibility with old versions of Astropy
 try:
     from astropy.cosmology import Planck18
@@ -121,8 +120,12 @@ class Cosmology(object):
         self.h = self.cosmo_model.h
         self.Ob0 = self.cosmo_model.Ob0
         self.Om0 = self.cosmo_model.Om0
-        self.fb = self.Ob0 / self.Om0
+        self.fb0 = self.Ob0 / self.Om0
 
+    def get_baryon_fraction(self, z: float = 0.) -> float:
+        omega_baryon = self.cosmo_model.Ob(z)
+        omega_matter = self.cosmo_model.Om(z)
+        return omega_baryon / omega_matter
 
     def time_from_redshift(self, z: Union[float, List[float], np.ndarray]):
         """
@@ -167,7 +170,6 @@ class Cosmology(object):
         value = t.value
         units = str(t.unit)
         return unyt.unyt_quantity(value, units)
-
 
 
 class Article(Cosmology):
