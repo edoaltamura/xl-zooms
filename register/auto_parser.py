@@ -123,6 +123,7 @@ def find_files():
 
     return s, c
 
+
 if not args.quiet:
 
     print("eagle-xl project ~ zoom-assisted calibration program".upper(), end='\n\n')
