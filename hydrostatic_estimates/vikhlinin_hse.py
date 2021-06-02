@@ -26,7 +26,6 @@ except:
 np.seterr(divide='ignore')
 np.seterr(invalid='ignore')
 
-fbary = Cosmology().fb
 mean_molecular_weight = 0.5954
 mean_atomic_weight_per_free_electron = 1.14
 true_data_nbins = 51
@@ -93,6 +92,7 @@ class HydrostaticDiagnostic:
             1.e12 * mask.units.temperature
         )
         data = sw.load(self.zoom.snapshot_path, mask=mask)
+        self.fbary = Cosmology().get_baryon_fraction(data.metadata.z)
 
         # Convert datasets to physical quantities
         # r500c is already in physical units
@@ -306,6 +306,7 @@ class HydrostaticEstimator:
             1.e12 * mask.units.temperature
         )
         data = sw.load(self.snapshot_file, mask=mask)
+        self.fbary = Cosmology().get_baryon_fraction(data.metadata.z)
 
         # Convert datasets to physical quantities
         # r500c is already in physical units
@@ -649,7 +650,7 @@ class HydrostaticEstimator:
         m_delta_hse = mass_interpolate(r_delta_hse) * Solar_Mass
         setattr(self, f"m{int(density_contrast):d}hse", m_delta_hse)
 
-        ne_delta_hse = (density_contrast * fbary * self.rho_crit / (mp * mean_atomic_weight_per_free_electron)).to(
+        ne_delta_hse = (density_contrast * self.fbary * self.rho_crit / (mp * mean_atomic_weight_per_free_electron)).to(
             '1/cm**3')
         setattr(self, f"ne{int(density_contrast):d}hse", ne_delta_hse)
 
@@ -659,7 +660,7 @@ class HydrostaticEstimator:
         setattr(
             self,
             f"P{int(density_contrast):d}hse",
-            (density_contrast * fbary * kBT_delta_hse * self.rho_crit / (mp * mean_molecular_weight)).to('keV/cm**3')
+            (density_contrast * self.fbary * kBT_delta_hse * self.rho_crit / (mp * mean_molecular_weight)).to('keV/cm**3')
         )
 
         setattr(
