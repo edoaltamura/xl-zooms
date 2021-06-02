@@ -94,7 +94,7 @@ parser.add_argument(
     type=str,
     default=(
         '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/'
-        'L0300N0564_VR18_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'
+        'L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'
     )
 )
 
