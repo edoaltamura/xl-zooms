@@ -10,15 +10,15 @@ from unyt import (
 from .halo_property import HaloProperty, histogram_unyt
 from .spherical_overdensities import SODelta500
 from hydrostatic_estimates import HydrostaticEstimator
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import (
+    Zoom, Tcut_halogas, default_output_directory, args,
+    mean_molecular_weight,
+    mean_atomic_weight_per_free_electron,
+    primordial_hydrogen_mass_fraction,
+    solar_metallicity,
+    gamma,
+)
 from literature import Cosmology, Sun2009, Pratt2010
-
-
-mean_molecular_weight = 0.59
-mean_atomic_weight_per_free_electron = 1.14
-primordial_hydrogen_mass_fraction = 0.76
-solar_metallicity = 0.0133714
-gamma = 5 / 3
 
 
 class EntropyProfiles(HaloProperty):

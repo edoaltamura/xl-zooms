@@ -8,6 +8,9 @@ of the analysis pipeline.
 import argparse
 import os.path
 
+from .revision import get_git_full
+from .plotstyle import set_mpl_backend
+
 parser = argparse.ArgumentParser(add_help=False)
 
 parser.add_argument(
@@ -75,7 +78,26 @@ parser.add_argument(
     type=int,
     default=100,
     required=False,
-    choices=list(range(3, 300))
+    choices=list(range(1, 400))
+)
+
+parser.add_argument(
+    '-s',
+    '--snapshot-number',
+    type=int,
+    required=True,
+    default=36
+)
+
+parser.add_argument(
+    '-b',
+    '--run-directory',
+    type=str,
+    required=True,
+    default=(
+        '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/'
+        'L0300N0564_VR18_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'
+    )
 )
 
 # Note: you can still add routine-specific arguments after calling this
@@ -83,24 +105,25 @@ parser.add_argument(
 # `args = parser.parse_args()`
 args = parser.parse_known_args()[0]
 
-# Set matplotlib backend depending on use
-import matplotlib
 
-mpl_backend = 'Agg' if args.quiet else 'TkAgg'
-matplotlib.use(mpl_backend)
+def find_files():
+    s = ''
+    for file in os.listdir(os.path.join(args.run_directory, 'snapshots')):
+        if file.endswith(f"_{args.snapshot_number:04d}.hdf5"):
+            s = os.path.join(args.run_directory, 'snapshots', file)
+            break
 
-# Apply the matplotlib stylesheet
-import matplotlib.pyplot as plt
-matplotlib_stylesheet = os.path.join(
-    os.path.dirname(__file__),
-    'mnras.mplstyle'
-)
-try:
-    plt.style.use(matplotlib_stylesheet)
-except (FileNotFoundError, OSError):
-    print('Could not find the mnras.mplstyle style-sheet.')
+    c = ''
+    for subdir in os.listdir(os.path.join(args.run_directory, 'stf')):
+        if subdir.endswith(f"_{args.snapshot_number:04d}"):
+            for file in os.listdir(os.path.join(args.run_directory, 'stf', subdir)):
+                if file.endswith(f"_{args.snapshot_number:04d}.properties"):
+                    c = os.path.join(args.run_directory, 'stf', subdir, file)
+                    break
 
-from .revision import get_git_full
+    assert s and c
+
+    return s, c
 
 if not args.quiet:
 
@@ -110,3 +133,6 @@ if not args.quiet:
 
     for parsed_argument in vars(args):
         print(f"[parser] {parsed_argument} = {getattr(args, parsed_argument)}")
+
+# Set matplotlib backend depending on use
+set_mpl_backend(args.quiet)

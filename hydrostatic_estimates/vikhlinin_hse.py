@@ -13,7 +13,11 @@ import matplotlib.pyplot as plt
 from scipy.optimize import minimize, least_squares
 from scipy.interpolate import interp1d
 
-from register import zooms_register, Zoom, Tcut_halogas, Redshift, args
+from register import (
+    zooms_register, Zoom, Tcut_halogas, Redshift, args,
+    mean_molecular_weight,
+    mean_atomic_weight_per_free_electron,
+)
 from .convergence_radius import convergence_radius
 from literature import Cosmology
 from scaling_relations.spherical_overdensities import SphericalOverdensities
@@ -26,8 +30,6 @@ except:
 np.seterr(divide='ignore')
 np.seterr(invalid='ignore')
 
-mean_molecular_weight = 0.5954
-mean_atomic_weight_per_free_electron = 1.14
 true_data_nbins = 51
 
 
@@ -636,7 +638,7 @@ class HydrostaticEstimator:
             fill_value='extrapolate'
         )
         densities_hse = (3 * self.masses_hse) / (
-                    4 * np.pi * (self.radial_bin_centres * self.r500c) ** 3) / self.rho_crit
+                4 * np.pi * (self.radial_bin_centres * self.r500c) ** 3) / self.rho_crit
         density_interpolate = interp1d(
             densities_hse,
             self.radial_bin_centres * self.r500c,
@@ -660,7 +662,8 @@ class HydrostaticEstimator:
         setattr(
             self,
             f"P{int(density_contrast):d}hse",
-            (density_contrast * self.fbary * kBT_delta_hse * self.rho_crit / (mp * mean_molecular_weight)).to('keV/cm**3')
+            (density_contrast * self.fbary * kBT_delta_hse * self.rho_crit / (mp * mean_molecular_weight)).to(
+                'keV/cm**3')
         )
 
         setattr(

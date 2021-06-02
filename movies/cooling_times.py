@@ -5,41 +5,12 @@ import traceback
 sys.path.append("..")
 
 from scaling_relations import CoolingTimes
-from register import parser
+from register import find_files, args
 
 gf = CoolingTimes()
 
-parser.add_argument(
-    '-s',
-    '--snapshot-number',
-    type=int,
-    required=True
-)
+s, c = find_files()
 
-parser.add_argument(
-    '-b',
-    '--run-directory',
-    type=str,
-    required=True
-)
-
-args = parser.parse_args()
-
-s = ''
-for file in os.listdir(os.path.join(args.run_directory, 'snapshots')):
-    if file.endswith(f"_{args.snapshot_number:04d}.hdf5"):
-        s = os.path.join(args.run_directory, 'snapshots', file)
-        break
-
-c = ''
-for subdir in os.listdir(os.path.join(args.run_directory, 'stf')):
-    if subdir.endswith(f"_{args.snapshot_number:04d}"):
-        for file in os.listdir(os.path.join(args.run_directory, 'stf', subdir)):
-            if file.endswith(f"_{args.snapshot_number:04d}.properties"):
-                c = os.path.join(args.run_directory, 'stf', subdir, file)
-                break
-
-assert s and c
 
 try:
     gf.process_single_halo(

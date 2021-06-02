@@ -1,7 +1,7 @@
 from .auto_parser import (
     args,
     parser,
-    mpl_backend
+    find_files
 )
 
 from .static_parameters import *
@@ -22,3 +22,5 @@ from .intermediate_io import (
     MultiObjPickler,
     DataframePickler
 )
+
+from .plotstyle import set_mnras_stylesheet
