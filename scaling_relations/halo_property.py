@@ -150,7 +150,7 @@ class HaloProperty(object):
             ))
         elif args.debug:
             print((
-                "Loaded particles "
+                f"[{self.__class__.__name__}] Loaded particles\n\t"
                 f"[{sw_handle.metadata.n_gas:d} gas] "
                 f"[{sw_handle.metadata.n_dark_matter:d} dark_matter] "
                 f"[{sw_handle.metadata.n_stars:d} stars] "
