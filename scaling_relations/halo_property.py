@@ -150,11 +150,11 @@ class HaloProperty(object):
             ))
         elif args.debug:
             print((
-                f"[{self.__class__.__name__}] Loaded particles\n\t"
-                f"[{sw_handle.metadata.n_gas:d} gas] "
-                f"[{sw_handle.metadata.n_dark_matter:d} dark_matter] "
-                f"[{sw_handle.metadata.n_stars:d} stars] "
-                f"[{sw_handle.metadata.n_black_holes:d} black_holes] "
+                f"[{self.__class__.__name__}] Particles in snap file:\n\t"
+                f"{sw_handle.metadata.n_gas:d} gas | "
+                f"{sw_handle.metadata.n_dark_matter:d} dark_matter | "
+                f"{sw_handle.metadata.n_stars:d} stars | "
+                f"{sw_handle.metadata.n_black_holes:d} black_holes | "
             ))
 
         # If the mask overlaps with the box boundaries, wrap coordinates.
