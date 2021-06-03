@@ -197,7 +197,7 @@ class EntropyProfiles(HaloProperty):
             temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
             temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
 
-            emissivity_weights = histogram_unyt(radial_distance, bins=lbins, weights=emissivities)
+            emissivity_weights = histogram_unyt(radial_distance, bins=lbins, weights=emissivities[index])
             emissivity_weights[emissivity_weights == 0] = np.nan  # Replace zeros with Nans
 
         if self.simple_electron_number_density:
