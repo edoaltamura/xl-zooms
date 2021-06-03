@@ -4,7 +4,7 @@ sys.path.append("..")
 
 from literature import *
 from register import set_mnras_stylesheet
-
+set_mnras_stylesheet()
 
 
 lit = Sun2009()
