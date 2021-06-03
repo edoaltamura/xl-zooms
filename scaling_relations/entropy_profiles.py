@@ -195,7 +195,7 @@ class EntropyProfiles(HaloProperty):
         else:
             emissivities = None
 
-        n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500)
+        n_e = get_electron_number_density(sw_data)
         n_e.convert_to_units('cm**-3')
         print(n_e)
 
