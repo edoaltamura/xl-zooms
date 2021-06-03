@@ -100,6 +100,7 @@ class EntropyProfiles(HaloProperty):
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
         sw_data.gas.densities.convert_to_physical()
+        sw_data.gas.entropies.convert_to_physical()
 
         try:
             m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
@@ -141,8 +142,6 @@ class EntropyProfiles(HaloProperty):
             if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
             fof_ids = np.ones_like(sw_data.gas.densities)
-
-
 
         index = np.where(
             (sw_data.gas.radial_distances < self.max_radius_r500 * r500) &
