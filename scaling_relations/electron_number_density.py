@@ -1,6 +1,6 @@
 from swiftsimio import SWIFTDataset, cosmo_array
 import numpy as np
-from unyt import mp, unyt_array
+from unyt import mp, unyt_array, Msun
 from typing import Optional
 
 from .halo_property import histogram_unyt
@@ -132,8 +132,8 @@ def get_electron_number_density_shell_average(
         print(f"[Electron number fractions] normalise_flag: {normalise_flag}")
 
     Xe, Xi, mu = get_molecular_weights(sw_data)
-    log_mass_ratio = np.log10(sw_data.gas.masses.to('kg')) - np.log10(mp.to('kg'))
-    electron_number = (Xe / (Xe + Xi)) * 10 ** log_mass_ratio / mu
+    mass = sw_data.gas.masses.value.astype(np.float64) * 1e10 * Msun
+    electron_number = (Xe / (Xe + Xi)) * mass / (mu * mp)
     volume_shell = (4. * np.pi / 3.) * (bins[1:] ** 3 - bins[:-1] ** 3)
     print(electron_number)
 
