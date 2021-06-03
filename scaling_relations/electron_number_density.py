@@ -135,6 +135,7 @@ def get_electron_number_density_shell_average(
 
     electron_number = (Xe / (Xe + Xi)) * sw_data.gas.masses.to('kg') / (mu * mp)
     volume_shell = (4. * np.pi / 3.) * (bins[1:] ** 3 - bins[:-1] ** 3)
+    print(electron_number)
 
     if normalise_flag:
         electron_number *= weights
