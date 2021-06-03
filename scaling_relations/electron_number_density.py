@@ -2,6 +2,17 @@ from swiftsimio import SWIFTDataset
 import numpy as np
 from unyt import mp
 
+element_names = {
+    'H': 'hydrogen',
+    'He': 'helium',
+    'C': 'carbon',
+    'N': 'nitrogen',
+    'O': 'oxygen',
+    'Ne': 'neon',
+    'Mg': 'magnesium',
+    'Si': 'silicon',
+    'Fe': 'iron',
+}
 
 atomic_mass = {
     'H': 1.00794,
@@ -49,8 +60,8 @@ solar_abundances = {
 }
 
 
-def get_metal_fractions(sw_data: SWIFTDataset, element_name: str, normalise_to_hydrogen: bool = True):
-    metal_fraction = getattr(sw_data.gas.element_mass_fractions, element_name).value
+def get_metal_fractions(sw_data: SWIFTDataset, element_symbol: str, normalise_to_hydrogen: bool = True):
+    metal_fraction = getattr(sw_data.gas.element_mass_fractions, element_names[element_symbol]).value
 
     if normalise_to_hydrogen:
         return metal_fraction / sw_data.gas.element_mass_fractions.hydrogen.value
