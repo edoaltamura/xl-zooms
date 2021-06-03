@@ -130,7 +130,7 @@ def get_electron_number_density_shell_average(
     electron_number = (Xe / (Xe + Xi)) * sw_data.gas.masses / (mu * mp)
     volume_shell = (4. * np.pi / 3.) * ((bins[1:]) ** 3 - (bins[:-1]) ** 3)
 
-    if weights:
+    if weights is not None and weights.astype(int).all() != 1:
         electron_number *= weights
         normalisation = histogram_unyt(
             sw_data.gas.radial_distances, bins=bins, weights=weights
@@ -140,7 +140,7 @@ def get_electron_number_density_shell_average(
         sw_data.gas.radial_distances, bins=bins, weights=electron_number
     )
 
-    if weights:
+    if weights is not None and weights.astype(int).all() != 1:
         electron_number_weights /= normalisation
 
     electron_number_density = electron_number_weights / volume_shell
