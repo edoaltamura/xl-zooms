@@ -149,7 +149,7 @@ class EntropyProfiles(HaloProperty):
             (temperature > 1e5)
         )[0]
         radial_distance = sw_data.gas.radial_distances[index] / r500
-        sw_data.gas.masses = sw_data.gas.masses[index]
+        masses = sw_data.gas.masses[index]
         temperature = temperature[index]
 
         if self.simple_electron_number_density:
@@ -198,12 +198,12 @@ class EntropyProfiles(HaloProperty):
         else:
             volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
-            mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=sw_data.gas.masses)
+            mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=masses)
             mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
             density_profile = mass_weights / volume_shell
             number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
 
-            mass_weighted_temperatures = (temperature * kb).to('keV') * sw_data.gas.masses
+            mass_weighted_temperatures = (temperature * kb).to('keV') * masses
             temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
             temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
             temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
