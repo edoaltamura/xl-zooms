@@ -50,7 +50,7 @@ solar_abundances = {
 
 
 def get_metal_fractions(sw_data: SWIFTDataset, element_name: str, normalise_to_hydrogen: bool = True):
-    metal_fraction = sw_data.gas.element_mass_fractions[element_name].value
+    metal_fraction = getattr(sw_data.gas.element_mass_fractions, element_name).value
 
     if normalise_to_hydrogen:
         return metal_fraction / sw_data.gas.element_mass_fractions.hydrogen.value
