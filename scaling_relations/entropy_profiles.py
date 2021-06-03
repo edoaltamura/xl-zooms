@@ -171,7 +171,6 @@ class EntropyProfiles(HaloProperty):
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
         radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
 
-        emissivities = np.ones_like(sw_data.gas.masses)
         if self.xray_weighting:
             # Compute hydrogen number density and the log10
             # of the temperature to provide to the xray interpolator.
@@ -190,6 +189,8 @@ class EntropyProfiles(HaloProperty):
 
             emissivity_weights = histogram_unyt(radial_distance, bins=lbins, weights=emissivities[index])
             emissivity_weights[emissivity_weights == 0] = np.nan  # Replace zeros with Nans
+        else:
+            emissivities = None
 
         if self.shell_average:
             mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
