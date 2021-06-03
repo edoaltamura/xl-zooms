@@ -132,8 +132,8 @@ def get_electron_number_density_shell_average(
         print(f"[Electron number fractions] normalise_flag: {normalise_flag}")
 
     Xe, Xi, mu = get_molecular_weights(sw_data)
-
-    electron_number = (Xe / (Xe + Xi)) * sw_data.gas.masses.to('kg') / (mu * mp)
+    log_mass_ratio = np.log10(sw_data.gas.masses.to('kg')) - np.log10(mp.to('kg'))
+    electron_number = (Xe / (Xe + Xi)) * 10 ** log_mass_ratio / mu
     volume_shell = (4. * np.pi / 3.) * (bins[1:] ** 3 - bins[:-1] ** 3)
     print(electron_number)
 
