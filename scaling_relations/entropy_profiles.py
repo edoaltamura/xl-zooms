@@ -197,6 +197,7 @@ class EntropyProfiles(HaloProperty):
 
         n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500)
         n_e.convert_to_units('cm**-3')
+        print(n_e)
 
         mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
