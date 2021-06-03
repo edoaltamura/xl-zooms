@@ -212,7 +212,7 @@ class HaloProperty(object):
 
         if xlargs.debug:
             print((
-                f"[{self.__class__.__name__}] Particles imported:\n\t| "
+                f"[{self.__class__.__name__}] Particles in mask:\n\t| "
                 f"{sw_handle.gas.coordinates.shape[0]:11d} gas | "
                 f"{sw_handle.dark_matter.coordinates.shape[0]:11d} dark_matter | "
                 f"{sw_handle.stars.coordinates.shape[0]:11d} stars | "

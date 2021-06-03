@@ -1,4 +1,4 @@
-from swiftsimio import SWIFTDataset
+from swiftsimio import SWIFTDataset, cosmo_array
 import numpy as np
 from unyt import mp
 
@@ -101,7 +101,14 @@ def get_electron_number_density(sw_data: SWIFTDataset):
 
     Xe = ne_nH  # = ne / nH
     Xi = ni_nH  # = ni / nH
-    electron_number_density = (Xe / (Xe + Xi)) * sw_data.gas.densities / (mu * mp)
+    electron_number_density = (Xe / (Xe + Xi)) * sw_data.gas.densities.to('g*cm**-3') / (mu * mp)
+
+    electron_number_density.convert_to_units('cm**-3')
+    electron_number_density = cosmo_array(
+        electron_number_density.value,
+        units='cm**-3',
+        cosmo_factor=sw_data.gas.densities.cosmo_factor
+    )
 
     return electron_number_density
 
