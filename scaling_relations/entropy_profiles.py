@@ -205,6 +205,7 @@ class EntropyProfiles(HaloProperty):
         temperature_weights = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
         temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
         temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+        temperature_profile.convert_to_units('keV')
 
         entropy_profile = kb * temperature_profile / (n_e ** (2 / 3))
 
