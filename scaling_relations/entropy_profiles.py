@@ -207,7 +207,7 @@ class EntropyProfiles(HaloProperty):
         temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
         temperature_profile.convert_to_units('keV')
 
-        entropy_profile = kb * temperature_profile / (n_e ** (2 / 3))
+        entropy_profile = temperature_profile / (n_e ** (2 / 3))
 
         # if self.simple_electron_number_density:
         #     if self.shell_average:
