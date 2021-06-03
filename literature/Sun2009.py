@@ -21,6 +21,7 @@ class Sun2009(Article):
         os.path.join(repository_dir, 'Sun2009_table1.dat'),
         os.path.join(repository_dir, 'Sun2009_table3.dat'),
         os.path.join(repository_dir, 'Sun2009_table4.dat'),
+        os.path.join(repository_dir, 'Sun09_entropy_profiles.txt'),
     ]
 
     def __init__(self, reduced_table: bool = False, **cosmo_kwargs):
@@ -191,6 +192,11 @@ class Sun2009(Article):
                     dataset[i] = np.nan
                     setattr(self, field, dataset)
 
+    def get_shortcut(self):
+        raw = np.loadtxt(self.data_files[4])
+        r_r500, S_S500_50, S_S500_10, S_S500_90 = raw.T
+        return r_r500, S_S500_50, S_S500_10, S_S500_90
+
     def overlay_points(self, axes: plt.Axes, x: str, y: str, **kwargs) -> None:
         if axes is None:
             fig, axes = plt.subplots()
@@ -322,6 +328,17 @@ class Sun2009(Article):
                     "profile with self-similar halos with an average concentration of "
                     "c_500 ~ 4.2 for the objects in the Sun et al. (2009) sample."
                 ))
+
+        if k_units == 'K500adi':
+            r_r500, S_S500_50, S_S500_10, S_S500_90 = self.get_shortcut()
+
+            plt.fill_between(
+                r_r500,
+                S_S500_10,
+                S_S500_90,
+                color='grey', alpha=0.5, linewidth=0
+            )
+            plt.plot(r_r500, S_S500_50, c='k')
 
         if stand_alone:
             plt.legend()
