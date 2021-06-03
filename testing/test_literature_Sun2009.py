@@ -3,6 +3,7 @@ import sys
 sys.path.append("..")
 
 from literature import *
+from register import set_mnras_stylesheet
 
 
 
