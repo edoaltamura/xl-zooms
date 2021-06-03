@@ -194,23 +194,27 @@ class EntropyProfiles(HaloProperty):
             emissivity_weights = histogram_unyt(radial_distance, bins=lbins, weights=emissivities[index])
             emissivity_weights[emissivity_weights == 0] = np.nan  # Replace zeros with Nans
         else:
-            emissivities = None
+            emissivities = np.ones_like(radial_distance)
+            emissivity_weights = 1
 
-        n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500, mask=index)
-        n_e.convert_to_units('cm**-3')
-        mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
-        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
-        mass_weighted_temperatures = (temperature * kb).to('keV') * masses
-        temperature_weights = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
-        temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
-        temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
-        temperature_profile.convert_to_units('keV')
-        entropy_profile = temperature_profile / (n_e ** (2 / 3))
+        if not self.simple_electron_number_density and self.shell_average:
+            n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500, mask=index, weights=emissivities)
+            n_e.convert_to_units('cm**-3')
+            mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
+            mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+            mass_weighted_temperatures = (temperature * kb).to('keV') * masses
+            temperature_weights = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+            temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
+            temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+            temperature_profile.convert_to_units('keV')
+            entropy_profile = temperature_profile / (n_e ** (2 / 3))
 
-        # n_e = get_electron_number_density(sw_data)[index]
-        # n_e.convert_to_units('cm**-3')
-        # entropy = kb * temperature / (n_e ** (2 / 3))
-        # entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy)
+        elif not self.simple_electron_number_density and not self.shell_average:
+            n_e = get_electron_number_density(sw_data)[index]
+            n_e.convert_to_units('cm**-3')
+            entropy = kb * temperature / (n_e ** (2 / 3))
+            entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * emissivities[index])
+            entropy_profile /= emissivity_weights
 
 
         # volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
