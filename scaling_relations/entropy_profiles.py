@@ -4,6 +4,10 @@ import numpy as np
 from warnings import warn
 from matplotlib import pyplot as plt
 import scipy.stats as stat
+import numba
+from multiprocessing import cpu_count
+
+numba.config.NUMBA_NUM_THREADS = cpu_count()
 
 from unyt import (
     unyt_array,
@@ -11,9 +15,6 @@ from unyt import (
     mh, G, mp, K, kb, cm, Solar_Mass, Mpc
 )
 
-from .halo_property import HaloProperty, histogram_unyt
-from .spherical_overdensities import SODelta500
-from hydrostatic_estimates import HydrostaticEstimator
 from register import (
     Zoom, Tcut_halogas, default_output_directory, xlargs,
     set_mnras_stylesheet,
@@ -23,11 +24,12 @@ from register import (
     solar_metallicity,
     gamma,
 )
+from .halo_property import HaloProperty, histogram_unyt
+from .spherical_overdensities import SODelta500
+from hydrostatic_estimates import HydrostaticEstimator
+from .electron_number_density import get_electron_number_density
 from literature import Cosmology, Sun2009, Pratt2010
-import numba
-from multiprocessing import cpu_count
 
-numba.config.NUMBA_NUM_THREADS = cpu_count()
 sys.path.append("../xray")
 import cloudy_softband as cloudy
 
@@ -52,7 +54,7 @@ class EntropyProfiles(HaloProperty):
             self,
             max_radius_r500: float = 4,
             xray_weighting: bool = True,
-            simple_electron_number_density: bool = True,
+            simple_electron_number_density: bool = False,
     ):
         super().__init__()
 
@@ -150,9 +152,14 @@ class EntropyProfiles(HaloProperty):
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
         radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
 
+        if self.simple_electron_number_density:
+            n_e = (density.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
+        else:
+            n_e = get_electron_number_density(sw_data)[index].to('cm**-3')
+
         if self.xray_weighting:
 
-            entropy = kb * temperature / ((density / mp) ** (2 / 3))
+            entropy = kb * temperature / (n_e ** (2 / 3))
             entropy.convert_to_units('keV*cm**2')
 
             # Compute hydrogen number density and the log10
