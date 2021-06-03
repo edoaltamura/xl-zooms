@@ -187,18 +187,19 @@ class EntropyProfiles(HaloProperty):
                 10 ** cloudy.interpolate_X_Ray(
                     data_nH,
                     data_T,
-                    sw_data.gas.element_mass_fractions
-                ), 'erg/s'
+                    sw_data.gas.element_mass_fractions,
+                    fill_value=-50.
+                ), 'erg/s/cm**3'
             )
-
-            emissivity_weights = histogram_unyt(radial_distance, bins=lbins, weights=emissivities[index])
-            emissivity_weights[emissivity_weights == 0] = np.nan  # Replace zeros with Nans
+            xray_luminosities = emissivities * sw_data.gas.masses / sw_data.gas.densities
+            xray_luminosities_weights = histogram_unyt(radial_distance, bins=lbins, weights=xray_luminosities[index])
+            xray_luminosities_weights[xray_luminosities_weights == 0] = np.nan  # Replace zeros with Nans
         else:
-            emissivities = np.ones_like(radial_distance)
-            emissivity_weights = 1
+            xray_luminosities = np.ones_like(radial_distance)
+            xray_luminosities_weights = 1
 
         if not self.simple_electron_number_density and self.shell_average:
-            n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500, mask=index, weights=emissivities)
+            n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500, mask=index, weights=xray_luminosities)
             n_e.convert_to_units('cm**-3')
             mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
             mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
@@ -213,8 +214,8 @@ class EntropyProfiles(HaloProperty):
             n_e = get_electron_number_density(sw_data)[index]
             n_e.convert_to_units('cm**-3')
             entropy = kb * temperature / (n_e ** (2 / 3))
-            entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * emissivities[index])
-            entropy_profile /= emissivity_weights
+            entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * xray_luminosities[index])
+            entropy_profile /= xray_luminosities_weights
 
 
         # volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
