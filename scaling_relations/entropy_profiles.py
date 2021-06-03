@@ -139,7 +139,8 @@ class EntropyProfiles(HaloProperty):
                 path_to_snap=path_to_snap,
                 profile_type='true',
                 diagnostics_on=False
-            ).interpolate_hse()
+            )
+            true_hse.interpolate_hse(density_contrast=500.)
             r500 = true_hse.r500hse
             m500 = true_hse.m500hse
 
