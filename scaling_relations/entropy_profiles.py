@@ -188,11 +188,13 @@ class EntropyProfiles(HaloProperty):
             data_T = np.log10(sw_data.gas.temperatures.value)
 
             # Interpolate the Cloudy table to get emissivities
-            emissivities = 10 ** cloudy.interpolate_X_Ray(
-                data_nH,
-                data_T,
-                sw_data.gas.element_mass_fractions
-            )[index]
+            emissivities = unyt_array(
+                10 ** cloudy.interpolate_X_Ray(
+                    data_nH,
+                    data_T,
+                    sw_data.gas.element_mass_fractions
+                )[index], 'erg/s'
+            )
 
             if xlargs.debug:
                 print(f'emissivities.shape: {emissivities.shape}\n{emissivities}')
