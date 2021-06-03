@@ -167,7 +167,7 @@ class EntropyProfiles(HaloProperty):
         masses = sw_data.gas.masses[index]
         temperature = temperature[index]
 
-        emissivities = np.ones_like(masses)
+        emissivities = np.ones_like(sw_data.gas.masses)
         if self.xray_weighting:
             # Compute hydrogen number density and the log10
             # of the temperature to provide to the xray interpolator.
@@ -181,7 +181,7 @@ class EntropyProfiles(HaloProperty):
                     data_nH,
                     data_T,
                     sw_data.gas.element_mass_fractions
-                )[index], 'erg/s'
+                ), 'erg/s'
             )
 
         # Define radial bins and shell volumes
