@@ -59,7 +59,7 @@ from tqdm import tqdm
 from typing import List
 import subprocess as sp
 
-from .auto_parser import args
+from .auto_parser import xlargs
 from .static_parameters import *
 from .intermediate_io import MultiObjPickler
 
@@ -531,7 +531,7 @@ class Zoom(object):
         with zipfile.ZipFile(os.path.join(snip_path, 'snipshots.zip'), 'r') as archive:
             all_snips = archive.namelist()
             all_snips.sort(key=lambda x: int(x[-9:-5]))
-            for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=args.quiet):
+            for snip_name in tqdm(all_snips, desc=f"Fetching snipshots", disable=xlargs.quiet):
                 snip_handle = io.BytesIO(archive.open(snip_name).read())
                 with h5py.File(snip_handle, 'r') as f:
                     z = f['Header'].attrs['Redshift'][0]
@@ -635,7 +635,7 @@ def load_exlzooms() -> list:
         )
 
 
-if args.refresh:
+if xlargs.refresh:
     dump_exlzooms()
 
 calibration_zooms, completed_runs, zooms_register, name_list = load_exlzooms()

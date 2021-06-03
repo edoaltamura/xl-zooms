@@ -7,9 +7,9 @@ sys.path.append("..")
 from register import (
     default_output_directory,
     zooms_register,
-    args,
+    xlargs,
     DataframePickler,
-name_list
+    name_list
 )
 
 catalogues_dir = os.path.join(default_output_directory, 'intermediate')
@@ -19,7 +19,7 @@ files = []
 for f in os.listdir(catalogues_dir):
     if (
             f.endswith('.pkl') and
-            f'{args.redshift_index:04d}' in f and
+            f'{xlargs.redshift_index:04d}' in f and
             'register' not in f
     ):
         files.append(os.path.join(catalogues_dir, f))
@@ -45,7 +45,7 @@ print(catalogue.info())
 
 def select_runs():
     _zooms_register = []
-    for keyword in args.keywords:
+    for keyword in xlargs.keywords:
         for zoom in zooms_register:
             if keyword in zoom.run_name and zoom not in _zooms_register:
                 _zooms_register.append(zoom)

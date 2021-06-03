@@ -3,7 +3,7 @@ import numpy as np
 from warnings import warn
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import Zoom, Tcut_halogas, default_output_directory, xlargs
 
 
 class GasFractions(HaloProperty):
@@ -16,7 +16,7 @@ class GasFractions(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'gas_fractions_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
+            f'gas_fractions_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):

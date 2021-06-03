@@ -6,7 +6,7 @@ from collections import namedtuple
 from swiftsimio.visualisation.slice import slice_gas
 
 from .halo_property import HaloProperty
-from register import Zoom, default_output_directory, args
+from register import Zoom, default_output_directory, xlargs
 
 mean_molecular_weight = 0.59
 
@@ -32,7 +32,7 @@ class SliceGas(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'gas_map_{project_quantity:s}_{args.redshift_index:04d}.pkl'
+            f'gas_map_{project_quantity:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     @property
@@ -95,7 +95,7 @@ class SliceGas(HaloProperty):
             _yCen = self.map_centre[1] * Mpc / vr_data.a
             _zCen = self.map_centre[2] * Mpc / vr_data.a
 
-        if args.debug:
+        if xlargs.debug:
             print(f"Centre of potential: {[float(f'{i.v:.3f}') for i in centre_of_potential]} Mpc")
             print(f"Map centre: {[float(f'{i.v:.3f}') for i in [_xCen, _yCen, _zCen]]} Mpc")
 
@@ -104,7 +104,7 @@ class SliceGas(HaloProperty):
         if depth_offset is not None:
             self.depth += depth_offset * Mpc / sw_data.metadata.boxsize[0]
 
-            if args.debug:
+            if xlargs.debug:
                 percent = f"{depth_offset * Mpc / _zCen * 100:.1f}"
                 print((
                     f"Imposing offset in slicing depth: {depth_offset:.2f} Mpc.\n"
@@ -126,7 +126,7 @@ class SliceGas(HaloProperty):
                 (sw_data.gas.temperatures < temperature_range[1])
             )[0]
 
-            if args.debug:
+            if xlargs.debug:
                 percent = f"{len(temp_filter) / len(sw_data.gas.temperatures) * 100:.1f}"
                 print((
                     f"Filtering particles by temperature: {temperature_range} K.\n"

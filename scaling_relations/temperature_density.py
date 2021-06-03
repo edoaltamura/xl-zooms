@@ -10,7 +10,7 @@ import scipy.interpolate as sci
 import h5py as h5
 
 from .halo_property import HaloProperty
-from register import Zoom, calibration_zooms, args, cooling_table
+from register import Zoom, calibration_zooms, xlargs, cooling_table
 from literature import Cosmology
 
 mean_molecular_weight = 0.59
@@ -274,7 +274,7 @@ class TemperatureDensity(HaloProperty):
             z_agn_end: float = 0.,
             **kwargs
     ):
-        aperture_fraction = args.aperture_percent / 100
+        aperture_fraction = xlargs.aperture_percent / 100
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue,
                                                       mask_radius_r500=aperture_fraction, **kwargs)
 
@@ -538,18 +538,18 @@ class TemperatureDensity(HaloProperty):
 
         fig.suptitle(
             (
-                f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
-                f"$z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}$\n"
+                f"Aperture = {xlargs.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
+                f"$z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}$\n"
                 f"{z_agn_recent_text:s}"
                 f"Central FoF group only"
             ),
             fontsize=7
         )
 
-        if not args.quiet:
+        if not xlargs.quiet:
             plt.show()
         # fig.savefig(
-        #     f'{calibration_zooms.output_directory}/density_temperature_{args.redshift_index:04d}.png',
+        #     f'{calibration_zooms.output_directory}/density_temperature_{xlargs.redshift_index:04d}.png',
         #     dpi=300
         # )
 

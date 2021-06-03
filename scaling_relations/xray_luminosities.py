@@ -5,7 +5,7 @@ from warnings import warn
 from unyt import mp, cm, Mpc, unyt_quantity
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import Zoom, Tcut_halogas, default_output_directory, xlargs
 
 sys.path.append("../xray")
 
@@ -27,7 +27,7 @@ class XrayLuminosities(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'xray_luminosities_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
+            f'xray_luminosities_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):

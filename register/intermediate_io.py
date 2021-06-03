@@ -26,7 +26,7 @@ try:
 except ModuleNotFoundError:
     import pickle
 
-from .auto_parser import args
+from .auto_parser import xlargs
 from .static_parameters import default_output_directory
 
 # Make sure the `intermediate` directory exists in the output directory
@@ -56,7 +56,7 @@ class CustomPickler:
 
     def large_file_warning(self) -> None:
         file_size_b = os.path.getsize(self.filename)
-        if not args.quiet and file_size_b > 524288000:
+        if not xlargs.quiet and file_size_b > 524288000:
             warn(
                 (
                     '[io] Detected file larger than 500 MB! '
@@ -78,7 +78,7 @@ class SingleObjPickler(CustomPickler):
         with open(self.filename, 'wb') as output:  # Overwrites any existing file.
             pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
-        if not args.quiet:
+        if not xlargs.quiet:
             file_size = sizeof_fmt(
                 os.path.getsize(
                     self.filename
@@ -101,7 +101,7 @@ class MultiObjPickler(CustomPickler):
             for obj in obj_collection:
                 pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
 
-        if not args.quiet:
+        if not xlargs.quiet:
             file_size = sizeof_fmt(
                 os.path.getsize(
                     self.filename
@@ -114,7 +114,7 @@ class MultiObjPickler(CustomPickler):
         if not os.path.isfile(self.filename):
             raise FileNotFoundError(f"File {self.filename} not found.")
 
-        if not args.quiet:
+        if not xlargs.quiet:
             file_size = sizeof_fmt(
                 os.path.getsize(
                     self.filename
@@ -148,7 +148,7 @@ class DataframePickler(CustomPickler):
         # Save data in text format (useful for consulting)
         obj.to_csv(self.filename.replace('pkl', 'txt'), header=True, index=False, sep=',', mode='w')
 
-        if not args.quiet:
+        if not xlargs.quiet:
             file_size = sizeof_fmt(
                 os.path.getsize(
                     self.filename

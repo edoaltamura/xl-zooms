@@ -8,7 +8,7 @@ import sys
 sys.path.append("..")
 
 from literature import Sun2009
-from register import args, calibration_zooms
+from register import xlargs, calibration_zooms
 
 try:
     plt.style.use("../register/mnras.mplstyle")
@@ -80,7 +80,7 @@ counter = 0
 handles = []
 for model in models:
 
-    for keyword in args.keywords:
+    for keyword in xlargs.keywords:
 
         if keyword in model:
             df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
@@ -106,7 +106,7 @@ axes[0, 0].legend(handles=handles, frameon=True, facecolor='w', edgecolor='none'
 
 # fig.suptitle(
 #     (
-#         f"z = {calibration_zooms.redshift_from_index(args.redshift_index):.2f}\t\t (snap {args.redshift_index:04d})"
+#         f"z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}\t\t (snap {xlargs.redshift_index:04d})"
 #     ),
 #     fontsize=7
 # )

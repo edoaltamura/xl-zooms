@@ -3,7 +3,7 @@ import numpy as np
 from unyt import kb, hydrogen_mass
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import Zoom, Tcut_halogas, default_output_directory, xlargs
 
 
 class Relaxation(HaloProperty):
@@ -16,7 +16,7 @@ class Relaxation(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'relaxation_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
+            f'relaxation_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     @staticmethod

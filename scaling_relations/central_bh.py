@@ -7,7 +7,7 @@ import matplotlib.colors as colors
 from matplotlib.widgets import Slider
 
 from .halo_property import HaloProperty
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import Zoom, Tcut_halogas, default_output_directory, xlargs
 
 
 class CentralBH(HaloProperty):

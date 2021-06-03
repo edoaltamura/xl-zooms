@@ -14,7 +14,7 @@ from scipy.optimize import minimize, least_squares
 from scipy.interpolate import interp1d
 
 from register import (
-    zooms_register, Zoom, Tcut_halogas, Redshift, args,
+    zooms_register, Zoom, Tcut_halogas, Redshift, xlargs,
     mean_molecular_weight,
     mean_atomic_weight_per_free_electron,
 )
@@ -257,7 +257,7 @@ class HydrostaticEstimator:
         self.diagnostics_on = diagnostics_on
 
         if zoom is not None:
-            zoom_at_redshift = zoom.get_redshift(args.redshift_index)
+            zoom_at_redshift = zoom.get_redshift(xlargs.redshift_index)
             self.snapshot_file = zoom_at_redshift.snapshot_path
             self.catalog_file = zoom_at_redshift.catalogue_properties_path
 
@@ -625,7 +625,7 @@ class HydrostaticEstimator:
 
     def interpolate_hse(self, density_contrast: float = 500.):
 
-        if args.debug:
+        if xlargs.debug:
             print((
                 f"[{self.__class__.__name__}] Interpolating profiles for "
                 f"density_contrast = {int(density_contrast):d}..."

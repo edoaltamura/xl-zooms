@@ -9,7 +9,7 @@ snap, cat = find_files()
 
 gf = EntropyProfiles()
 print(
-    gf.process_single_halo(
+    gf.display_single_halo(
         path_to_snap=snap,
         path_to_catalogue=cat
     )

@@ -6,7 +6,7 @@ from scipy.interpolate import interp1d
 
 from .halo_property import HaloProperty, histogram_unyt
 from .spherical_overdensities import SphericalOverdensities, SODelta200, SODelta500, SODelta2500
-from register import Zoom, Tcut_halogas, default_output_directory, args
+from register import Zoom, Tcut_halogas, default_output_directory, xlargs
 from hydrostatic_estimates import HydrostaticEstimator
 
 # Constants
@@ -24,7 +24,7 @@ class Entropies(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'entropies_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
+            f'entropies_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):
@@ -46,7 +46,7 @@ class Entropies(HaloProperty):
     ):
         sw_data, vr_data = self.get_handles_from_zoom(zoom_obj, path_to_snap, path_to_catalogue, **kwargs)
 
-        if args.mass_estimator == 'true':
+        if xlargs.mass_estimator == 'true':
 
             kwarg_parser = dict(zoom_obj=zoom_obj, path_to_snap=path_to_snap, path_to_catalogue=path_to_catalogue)
 
@@ -54,7 +54,7 @@ class Entropies(HaloProperty):
                 r200 = vr_data.radii.r_200crit[0].to('Mpc')
             except AttributeError as err:
                 print(err)
-                if args.debug:
+                if xlargs.debug:
                     print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
                 spherical_overdensity = SODelta200(
                     path_to_snap=path_to_snap,
@@ -66,7 +66,7 @@ class Entropies(HaloProperty):
                 r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
             except AttributeError as err:
                 print(err)
-                if args.debug:
+                if xlargs.debug:
                     print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
                 spherical_overdensity = SODelta500(
                     path_to_snap=path_to_snap,
@@ -78,7 +78,7 @@ class Entropies(HaloProperty):
                 r1000 = vr_data.spherical_overdensities.r_1000_rhocrit[0].to('Mpc')
             except AttributeError as err:
                 print(err)
-                if args.debug:
+                if xlargs.debug:
                     print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
                 r1000 = SphericalOverdensities(density_contrast=1000).process_single_halo(**kwarg_parser)[0]
 
@@ -86,7 +86,7 @@ class Entropies(HaloProperty):
                 r1500 = vr_data.spherical_overdensities.r_1500_rhocrit[0].to('Mpc')
             except AttributeError as err:
                 print(err)
-                if args.debug:
+                if xlargs.debug:
                     print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
                 r1500 = SphericalOverdensities(density_contrast=1500).process_single_halo(**kwarg_parser)[0]
 
@@ -94,7 +94,7 @@ class Entropies(HaloProperty):
                 r2500 = vr_data.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
             except AttributeError as err:
                 print(err)
-                if args.debug:
+                if xlargs.debug:
                     print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
                 spherical_overdensity = SODelta2500(
                     path_to_snap=path_to_snap,
@@ -102,7 +102,7 @@ class Entropies(HaloProperty):
                 )
                 r2500 = spherical_overdensity.get_r2500()
 
-        elif args.mass_estimator == 'hse':
+        elif xlargs.mass_estimator == 'hse':
 
             true_hse = HydrostaticEstimator(
                 path_to_catalogue=path_to_catalogue,

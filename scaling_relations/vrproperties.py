@@ -1,7 +1,7 @@
 import os.path
 
 from .halo_property import HaloProperty
-from register import Zoom, default_output_directory, args
+from register import Zoom, default_output_directory, xlargs
 
 
 class VRProperties(HaloProperty):
@@ -14,7 +14,7 @@ class VRProperties(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'vrproperties_{args.redshift_index:04d}.pkl'
+            f'vrproperties_{xlargs.redshift_index:04d}.pkl'
         )
 
     def process_single_halo(

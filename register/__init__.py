@@ -1,5 +1,5 @@
 from .auto_parser import (
-    args,
+    xlargs,
     parser,
     find_files
 )

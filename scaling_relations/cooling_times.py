@@ -17,7 +17,7 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 from matplotlib.ticker import MaxNLocator, ScalarFormatter
 
 from literature import Cosmology, Sun2009, Pratt2010
-from register import Zoom, args, cooling_table, default_output_directory
+from register import Zoom, xlargs, cooling_table, default_output_directory
 from scaling_relations import HaloProperty, SODelta500
 from hydrostatic_estimates import HydrostaticEstimator
 
@@ -239,7 +239,7 @@ def calculate_mean_cooling_times(data):
 
     # Values that go over the interpolation range are clipped to 0.5 Zsun
     if (log_gas_Z > 0.5).any():
-        if args.debug:
+        if xlargs.debug:
             warn((
                 f"[#] Found {(log_gas_Z > 0.5).sum()} particles above the upper "
                 "metallicity bound in the interpolation tables. Values of "
@@ -249,7 +249,7 @@ def calculate_mean_cooling_times(data):
         log_gas_Z[log_gas_Z > 0.5] = 0.5
 
     if (data.gas.metal_mass_fractions.value == 0).any():
-        if args.debug:
+        if xlargs.debug:
             warn((
                 f"[#] Found {(data.gas.metal_mass_fractions.value == 0).sum()} "
                 "particles below the lower "
@@ -416,7 +416,7 @@ class CoolingTimes(HaloProperty):
             z_agn_start: float = 18,
             z_agn_end: float = 0.,
     ):
-        aperture_fraction = args.aperture_percent / 100
+        aperture_fraction = xlargs.aperture_percent / 100
 
         sw_data, vr_data = self.get_handles_from_zoom(
             zoom_obj,
@@ -438,7 +438,7 @@ class CoolingTimes(HaloProperty):
             m500 = spherical_overdensity.get_m500()
             r500 = spherical_overdensity.get_r500()
 
-        if args.mass_estimator == 'hse':
+        if xlargs.mass_estimator == 'hse':
             true_hse = HydrostaticEstimator(
                 path_to_catalogue=path_to_catalogue,
                 path_to_snap=path_to_snap,
@@ -462,11 +462,11 @@ class CoolingTimes(HaloProperty):
             cooling_times = calculate_mean_cooling_times(sw_data)
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f'[{self.__class__.__name__}] Setting activate_cooling_times = False')
             activate_cooling_times = False
 
-        if args.debug:
+        if xlargs.debug:
             print(f"[{self.__class__.__name__}] m500 = ", m500)
             print(f"[{self.__class__.__name__}] r500 = ", r500)
             print(f"[{self.__class__.__name__}] aperture_fraction = ", aperture_fraction)
@@ -478,7 +478,7 @@ class CoolingTimes(HaloProperty):
             a_heat = sw_data.gas.last_agnfeedback_scale_factors
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print('Setting `last_agnfeedback_scale_factors` with 0.1.')
             a_heat = np.ones_like(sw_data.gas.masses) * 0.1
 
@@ -486,7 +486,7 @@ class CoolingTimes(HaloProperty):
             fof_ids = sw_data.gas.fofgroup_ids
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
             fof_ids = np.ones_like(sw_data.gas.densities)
 
@@ -494,7 +494,7 @@ class CoolingTimes(HaloProperty):
             temperature = sw_data.gas.temperatures
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
             A = sw_data.gas.entropies * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
@@ -504,7 +504,7 @@ class CoolingTimes(HaloProperty):
             hydrogen_fractions = sw_data.gas.element_mass_fractions.hydrogen
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Setting H fractions to primordial values.")
             hydrogen_fractions = np.ones_like(sw_data.gas.densities) * primordial_hydrogen_mass_fraction
 
@@ -512,7 +512,7 @@ class CoolingTimes(HaloProperty):
             agn_flag = sw_data.gas.heated_by_agnfeedback
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Setting all agn_flag to zero.")
             agn_flag = np.zeros_like(sw_data.gas.densities)
 
@@ -520,7 +520,7 @@ class CoolingTimes(HaloProperty):
             snii_flag = sw_data.gas.heated_by_sniifeedback
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Setting all snii_flag to zero.")
             snii_flag = np.zeros_like(sw_data.gas.densities)
 
@@ -591,7 +591,7 @@ class CoolingTimes(HaloProperty):
         if activate_cooling_times:
             w = cooling_times[index]
 
-        if args.debug:
+        if xlargs.debug:
             print("Number of particles being plotted", len(x))
 
         # Set the limits of the figure.
@@ -798,7 +798,7 @@ class CoolingTimes(HaloProperty):
             temperature = sw_data.gas.temperatures
         except AttributeError as err:
             print(err)
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
             A = sw_data.gas.entropies * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
@@ -911,17 +911,17 @@ class CoolingTimes(HaloProperty):
         fig.suptitle(
             (
                 f"{os.path.basename(path_to_snap)}\n"
-                f"Aperture = {args.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
+                f"Aperture = {xlargs.aperture_percent / 100:.2f} $R_{{500}}$\t\t"
                 f"$z = {sw_data.metadata.z:.2f}$\t\t"
                 f"Age = {Cosmology().age(sw_data.metadata.z).value:.2f} Gyr\t\t"
                 f"\t$M_{{500}}={latex_float(m500.value)}\\ {m500.units.latex_repr}$\n"
                 f"{z_agn_recent_text:s}"
-                f"Central FoF group only\t\tEstimator: {args.mass_estimator}"
+                f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
             ),
             fontsize=7
         )
 
-        if not args.quiet:
+        if not xlargs.quiet:
             plt.show()
 
         fig.savefig(

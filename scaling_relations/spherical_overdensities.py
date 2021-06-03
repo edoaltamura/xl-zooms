@@ -8,7 +8,7 @@ from unyt import (
 )
 
 from .halo_property import HaloProperty, histogram_unyt
-from register import Zoom, default_output_directory, args
+from register import Zoom, default_output_directory, xlargs
 
 
 class SphericalOverdensities(HaloProperty):
@@ -16,7 +16,7 @@ class SphericalOverdensities(HaloProperty):
     def __init__(self, density_contrast: float):
         super().__init__()
 
-        if args.debug:
+        if xlargs.debug:
             print(f'[{self.__class__.__name__}] Launching spherical overdensity calculation...')
 
         self.density_contrast = density_contrast
@@ -25,7 +25,7 @@ class SphericalOverdensities(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'spherical_overdensities_dc{density_contrast:.0f}_{args.redshift_index:04d}.pkl'
+            f'spherical_overdensities_dc{density_contrast:.0f}_{xlargs.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):
@@ -46,7 +46,7 @@ class SphericalOverdensities(HaloProperty):
             **kwargs
     ):
 
-        if args.debug:
+        if xlargs.debug:
             print((
                 f"[{self.__class__.__name__}] Density contrast: {self.density_contrast:.2f}\n"
                 f"[{self.__class__.__name__}] Snap: {os.path.basename(path_to_snap)}\n"
@@ -61,7 +61,7 @@ class SphericalOverdensities(HaloProperty):
             aperture_search = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') * 3
         except AttributeError as err:
             aperture_search = unyt_quantity(1, Mpc) * 3
-            if args.debug:
+            if xlargs.debug:
                 print(err, f"[{self.__class__.__name__}] Setting aperture_search = 3. Mpc.", sep='\n')
 
         sw_data.gas.radial_distances.convert_to_physical()
@@ -79,13 +79,13 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             sw_data.stars.radial_distances.convert_to_physical()
             radial_distances_collect.append(sw_data.stars.radial_distances)
-        elif args.debug:
+        elif xlargs.debug:
             print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             sw_data.black_holes.radial_distances.convert_to_physical()
             radial_distances_collect.append(sw_data.black_holes.radial_distances)
-        elif args.debug:
+        elif xlargs.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
         radial_distances = np.concatenate(radial_distances_collect)
@@ -99,13 +99,13 @@ class SphericalOverdensities(HaloProperty):
         if sw_data.metadata.n_stars > 0:
             sw_data.stars.masses.convert_to_physical()
             masses_collect.append(sw_data.stars.masses)
-        elif args.debug:
+        elif xlargs.debug:
             print(f"[{self.__class__.__name__}] stars not detected.")
 
         if sw_data.metadata.n_black_holes > 0:
             sw_data.black_holes.subgrid_masses.convert_to_physical()
             masses_collect.append(sw_data.black_holes.subgrid_masses)
-        elif args.debug:
+        elif xlargs.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
         masses = np.concatenate(masses_collect)
@@ -117,12 +117,12 @@ class SphericalOverdensities(HaloProperty):
             ]
             if sw_data.metadata.n_stars > 0:
                 fof_ids_collect.append(sw_data.stars.fofgroup_ids)
-            elif args.debug:
+            elif xlargs.debug:
                 print(f"[{self.__class__.__name__}] stars not detected.")
 
             if sw_data.metadata.n_black_holes > 0:
                 fof_ids_collect.append(sw_data.black_holes.fofgroup_ids)
-            elif args.debug:
+            elif xlargs.debug:
                 print(f"[{self.__class__.__name__}] black_holes not detected.")
 
             fof_ids = np.concatenate(fof_ids_collect)
@@ -177,7 +177,7 @@ class SphericalOverdensities(HaloProperty):
         r_delta = 10 ** density_interpolate(np.log10(self.density_contrast)) * Mpc
         m_delta = 10 ** mass_interpolate(np.log10(r_delta)) * mass_weights.units
 
-        if args.debug:
+        if xlargs.debug:
             print((
                 f"[{self.__class__.__name__}] r_({int(self.density_contrast):d}): {r_delta:.2f}\n"
                 f"[{self.__class__.__name__}] m_({int(self.density_contrast):d}): {m_delta.to(Solar_Mass):.2E}"

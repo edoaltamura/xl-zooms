@@ -99,24 +99,24 @@ parser.add_argument(
 )
 
 # Note: you can still add routine-specific arguments after calling this
-# The final version of the `args` objects will be created when calling
-# `args = parser.parse_args()`
-args = parser.parse_known_args()[0]
+# The final version of the `xlargs` objects will be created when calling
+# `xlargs = parser.parse_args()`
+xlargs = parser.parse_known_args()[0]
 
 
 def find_files():
     s = ''
-    for file in os.listdir(os.path.join(args.run_directory, 'snapshots')):
-        if file.endswith(f"_{args.snapshot_number:04d}.hdf5"):
-            s = os.path.join(args.run_directory, 'snapshots', file)
+    for file in os.listdir(os.path.join(xlargs.run_directory, 'snapshots')):
+        if file.endswith(f"_{xlargs.snapshot_number:04d}.hdf5"):
+            s = os.path.join(xlargs.run_directory, 'snapshots', file)
             break
 
     c = ''
-    for subdir in os.listdir(os.path.join(args.run_directory, 'stf')):
-        if subdir.endswith(f"_{args.snapshot_number:04d}"):
-            for file in os.listdir(os.path.join(args.run_directory, 'stf', subdir)):
-                if file.endswith(f"_{args.snapshot_number:04d}.properties"):
-                    c = os.path.join(args.run_directory, 'stf', subdir, file)
+    for subdir in os.listdir(os.path.join(xlargs.run_directory, 'stf')):
+        if subdir.endswith(f"_{xlargs.snapshot_number:04d}"):
+            for file in os.listdir(os.path.join(xlargs.run_directory, 'stf', subdir)):
+                if file.endswith(f"_{xlargs.snapshot_number:04d}.properties"):
+                    c = os.path.join(xlargs.run_directory, 'stf', subdir, file)
                     break
 
     assert s and c
@@ -124,14 +124,14 @@ def find_files():
     return s, c
 
 
-if not args.quiet:
+if not xlargs.quiet:
 
     print("eagle-xl project ~ zoom-assisted calibration program".upper(), end='\n\n')
 
     print('Git revision:', *get_git_full(), sep='\n', end='\n\n')
 
-    for parsed_argument in vars(args):
-        print(f"[parser] {parsed_argument} = {getattr(args, parsed_argument)}")
+    for parsed_argument in vars(xlargs):
+        print(f"[parser] {parsed_argument} = {getattr(xlargs, parsed_argument)}")
 
 # Set matplotlib backend depending on use
-set_mpl_backend(args.quiet)
+set_mpl_backend(xlargs.quiet)

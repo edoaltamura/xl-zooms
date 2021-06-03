@@ -1,6 +1,7 @@
 import os.path
 import numpy as np
 from warnings import warn
+from matplotlib import pyplot as plt
 from unyt import (
     unyt_array,
     unyt_quantity,
@@ -11,7 +12,8 @@ from .halo_property import HaloProperty, histogram_unyt
 from .spherical_overdensities import SODelta500
 from hydrostatic_estimates import HydrostaticEstimator
 from register import (
-    Zoom, Tcut_halogas, default_output_directory, args,
+    Zoom, Tcut_halogas, default_output_directory, xlargs,
+    set_mnras_stylesheet,
     mean_molecular_weight,
     mean_atomic_weight_per_free_electron,
     primordial_hydrogen_mass_fraction,
@@ -32,7 +34,7 @@ class EntropyProfiles(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'gas_fractions_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
+            f'gas_fractions_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):
@@ -76,7 +78,7 @@ class EntropyProfiles(HaloProperty):
             m500 = spherical_overdensity.get_m500()
             r500 = spherical_overdensity.get_r500()
 
-        if args.mass_estimator == 'hse':
+        if xlargs.mass_estimator == 'hse':
             true_hse = HydrostaticEstimator(
                 path_to_catalogue=path_to_catalogue,
                 path_to_snap=path_to_snap,
@@ -90,7 +92,7 @@ class EntropyProfiles(HaloProperty):
             temperature = sw_data.gas.temperatures
         except AttributeError as err:
             print(f'[{self.__class__.__name__}] {err}')
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
             A = sw_data.gas.entropies * sw_data.units.mass
             temperature = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
@@ -100,7 +102,7 @@ class EntropyProfiles(HaloProperty):
             fof_ids = sw_data.gas.fofgroup_ids
         except AttributeError as err:
             print(f'[{self.__class__.__name__}] {err}')
-            if args.debug:
+            if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
             fof_ids = np.ones_like(sw_data.gas.densities)
 
@@ -140,6 +142,75 @@ class EntropyProfiles(HaloProperty):
         ).to('keV*cm**2')
 
         return radial_bin_centres, entropy_profile, K500
+
+    def display_single_halo(self, *args, **kwargs):
+        radial_bin_centres, entropy_profile, K500 = self.process_single_halo(*args, **kwargs)
+
+        set_mnras_stylesheet()
+        fig = plt.figure(constrained_layout=True)
+        axes = fig.add_subplot()
+
+        axes.plot(
+            radial_bin_centres,
+            entropy_profile / K500,
+            linestyle='-',
+            color='r',
+            linewidth=1,
+            alpha=1,
+        )
+        axes.set_xscale('log')
+        axes.set_yscale('log')
+
+        axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
+        axes.set_ylabel(r'Entropy [keV cm$^2$]')
+        axes.set_xlabel(r'$r/r_{500}$')
+        # axes[1, 2].set_ylim([1, 1e4])
+        axes.set_ylim([1e-2, 5])
+        axes.set_xlim([0.01, self.max_radius_r500])
+
+        # axes[1, 2].axhline(y=K500, color='k', linestyle=':', linewidth=0.5)
+        # axes[1, 2].text(
+        #     axes[1, 2].get_xlim()[0], K500, r'$K_{500}$',
+        #     horizontalalignment='left',
+        #     verticalalignment='bottom',
+        #     color='k',
+        #     bbox=dict(
+        #         boxstyle='square,pad=10',
+        #         fc='none',
+        #         ec='none'
+        #     )
+        # )
+
+        sun_observations = Sun2009()
+        sun_observations.filter_by('M_500', 8e13, 3e14)
+        sun_observations.overlay_entropy_profiles(
+            axes=axes,
+            k_units='K500adi',
+            markersize=1,
+            linewidth=0.5
+        )
+        rexcess = Pratt2010()
+        bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
+            m500_limits=(
+                1e14 * Solar_Mass,
+                5e14 * Solar_Mass
+            ),
+            k500_rescale=True
+        )
+        axes.fill_between(
+            rexcess.radial_bins,
+            bin_perc16,
+            bin_perc84,
+            color='aqua',
+            alpha=0.85,
+            linewidth=0
+        )
+        axes.plot(rexcess.radial_bins, bin_median, c='k')
+
+        if not xlargs.quiet:
+            plt.show()
+
+        plt.close()
 
     def process_catalogue(self):
 

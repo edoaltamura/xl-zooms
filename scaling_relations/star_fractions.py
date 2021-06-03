@@ -3,7 +3,7 @@ import numpy as np
 from warnings import warn
 
 from .halo_property import HaloProperty
-from register import Zoom, default_output_directory, args
+from register import Zoom, default_output_directory, xlargs
 
 
 class StarFractions(HaloProperty):
@@ -16,7 +16,7 @@ class StarFractions(HaloProperty):
         self.filename = os.path.join(
             default_output_directory,
             'intermediate',
-            f'star_fractions_{args.mass_estimator:s}_{args.redshift_index:04d}.pkl'
+            f'star_fractions_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
     def check_value(self, value):
@@ -64,7 +64,7 @@ class StarFractions(HaloProperty):
         catalogue_file = os.path.join(
             default_output_directory,
             'intermediate',
-            f'vrproperties_{args.redshift_index:04d}.pkl'
+            f'vrproperties_{xlargs.redshift_index:04d}.pkl'
         )
         data = self._get_zoom_from_catalogue(catalogue_file, zoom_obj=zoom_obj, zoom_name=zoom_name)
 
