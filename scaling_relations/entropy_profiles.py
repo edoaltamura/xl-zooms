@@ -205,8 +205,8 @@ class EntropyProfiles(HaloProperty):
             )
 
             entropy_profile = normalized_mean(
-                radial_distance.value, entropy.value, emissivities.value, lbins.value
-            ) * entropy.units
+                radial_distance, entropy, emissivities, lbins
+            )
 
         else:
             volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
