@@ -4,6 +4,7 @@ from unyt import mp, unyt_array
 from typing import Optional
 
 from .halo_property import histogram_unyt
+from register import xlargs
 
 element_names = {
     'H': 'hydrogen',
@@ -126,6 +127,10 @@ def get_electron_number_density_shell_average(
         sw_data: SWIFTDataset, bins: unyt_array, weights: Optional[np.ndarray] = None
 ) -> unyt_array:
     normalise_flag = weights is not None and weights.astype(int).all() != 1
+
+    if xlargs.debug:
+        print(f"[Electron number fractions] normalise_flag: {normalise_flag}")
+
     Xe, Xi, mu = get_molecular_weights(sw_data)
 
     electron_number = (Xe / (Xe + Xi)) * sw_data.gas.masses / (mu * mp)
