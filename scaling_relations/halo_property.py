@@ -150,7 +150,7 @@ class HaloProperty(object):
             ))
         elif xlargs.debug:
             print((
-                f"[{self.__class__.__name__}] Particles in snap file:\n\t"
+                f"[{self.__class__.__name__}] Particles in snap file:\n\t| "
                 f"{sw_handle.metadata.n_gas:d} gas | "
                 f"{sw_handle.metadata.n_dark_matter:d} dark_matter | "
                 f"{sw_handle.metadata.n_stars:d} stars | "
