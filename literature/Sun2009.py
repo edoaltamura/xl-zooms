@@ -173,7 +173,7 @@ class Sun2009(Article):
         for i, (m500, z) in enumerate(zip(self.M_500, self.redshift)):
             self.K_500_adi[i] = 342 * unyt.keV * unyt.cm ** 2
             self.K_500_adi[i] *= (m500 / 1e14 / unyt.Msun) ** (2 / 3)
-            self.K_500_adi[i] *= (0.165 / self.fb) ** (2 / 3)
+            self.K_500_adi[i] *= (0.165 / self.get_baryon_fraction(z)) ** (2 / 3)
             self.K_500_adi[i] *= self.ez_function(z) ** (-2 / 3)
             self.K_500_adi[i] *= self.h ** (-4 / 3)
 
