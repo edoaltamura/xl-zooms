@@ -27,7 +27,7 @@ from register import (
 from .halo_property import HaloProperty, histogram_unyt
 from .spherical_overdensities import SODelta500
 from hydrostatic_estimates import HydrostaticEstimator
-from .electron_number_density import get_electron_number_density
+from .electron_number_density import get_electron_number_density, get_electron_number_density_shell_average
 from literature import Cosmology, Sun2009, Pratt2010
 
 sys.path.append("../xray")
@@ -48,11 +48,11 @@ import cloudy_softband as cloudy
 #     return mean_value / normalization
 
 def normalized_mean(r, quantity, normalizer, bins):
-    mean_value, _ = histogram_unyt(
+    mean_value = histogram_unyt(
         r, bins=bins, weights=quantity * normalizer
     )
 
-    normalization, _ = histogram_unyt(
+    normalization = histogram_unyt(
         r, bins=bins, weights=normalizer
     )
     if xlargs.debug:
@@ -68,6 +68,7 @@ class EntropyProfiles(HaloProperty):
             max_radius_r500: float = 4,
             xray_weighting: bool = True,
             simple_electron_number_density: bool = False,
+            shell_average: bool = True
     ):
         super().__init__()
 
@@ -75,6 +76,7 @@ class EntropyProfiles(HaloProperty):
         self.max_radius_r500 = max_radius_r500
         self.xray_weighting = xray_weighting
         self.simple_electron_number_density = simple_electron_number_density
+        self.shell_average = shell_average
 
         self.filename = os.path.join(
             default_output_directory,
@@ -165,22 +167,8 @@ class EntropyProfiles(HaloProperty):
         masses = sw_data.gas.masses[index]
         temperature = temperature[index]
 
-        if self.simple_electron_number_density:
-            n_e = sw_data.gas.densities.to('g/cm**3') / (mp * mean_molecular_weight)
-        else:
-            n_e = get_electron_number_density(sw_data)
-
-        n_e = n_e.to('cm**-3')[index]
-
-        # Define radial bins and shell volumes
-        lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
-        radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
-
+        emissivities = None
         if self.xray_weighting:
-
-            entropy = kb * temperature / (n_e ** (2 / 3))
-            entropy.convert_to_units('keV*cm**2')
-
             # Compute hydrogen number density and the log10
             # of the temperature to provide to the xray interpolator.
             data_nH = np.log10(
@@ -196,28 +184,48 @@ class EntropyProfiles(HaloProperty):
                 )[index], 'erg/s'
             )
 
-            if xlargs.debug:
-                print(f'emissivities.shape: {emissivities.shape}\n{emissivities}')
+        # Define radial bins and shell volumes
+        lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
+        radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
 
-            entropy_profile = normalized_mean(
-                radial_distance, entropy, emissivities, lbins
-            )
-
-        else:
-            volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
-
-            mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=masses)
+        if self.shell_average:
+            mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
             mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
-            density_profile = mass_weights / volume_shell
-            number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
 
             mass_weighted_temperatures = (temperature * kb).to('keV') * masses
-            temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+            temperature_weights = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
             temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
             temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
 
-            entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
-            density_profile /= critical_density
+        if self.simple_electron_number_density:
+            if self.shell_average:
+                volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
+                density_profile = mass_weights / volume_shell
+                n_e = density_profile.to('g/cm**3') / (mp * mean_molecular_weight)
+                n_e.convert_to_units('cm**-3')
+                entropy_profile = kb * temperature_profile / (n_e ** (2 / 3))
+
+            else:
+                n_e = sw_data.gas.densities.to('g/cm**3') / (mp * mean_molecular_weight)[index]
+                n_e.convert_to_units('cm**-3')
+                entropy = kb * temperature / (n_e ** (2 / 3))
+                entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy)
+
+        else:
+            if self.shell_average:
+                n_e = get_electron_number_density_shell_average(
+                    sw_data, bins=lbins * r500, weights=emissivities
+                )
+                n_e.convert_to_units('cm**-3')
+                entropy_profile = kb * temperature_profile / (n_e ** (2 / 3))
+
+            else:
+                n_e = get_electron_number_density(sw_data)[index]
+                n_e.convert_to_units('cm**-3')
+                entropy = kb * temperature / (n_e ** (2 / 3))
+                entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy)
+
+        entropy_profile.convert_to_units('keV*cm**2')
 
         kBT500 = (
                 G * mean_molecular_weight * m500 * mp / r500 / 2
@@ -268,13 +276,23 @@ class EntropyProfiles(HaloProperty):
         # )
 
         sun_observations = Sun2009()
-        sun_observations.filter_by('M_500', 8e13, 3e14)
-        sun_observations.overlay_entropy_profiles(
-            axes=axes,
-            k_units='K500adi',
-            markersize=1,
-            linewidth=0.5
+        # sun_observations.filter_by('M_500', 8e13, 3e14)
+        # sun_observations.overlay_entropy_profiles(
+        #     axes=axes,
+        #     k_units='K500adi',
+        #     markersize=1,
+        #     linewidth=0.5
+        # )
+        r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()
+
+        axes.fill_between(
+            r_r500,
+            S_S500_10,
+            S_S500_90,
+            color='grey', alpha=0.4, linewidth=0
         )
+        axes.plot(r_r500, S_S500_50, c='grey')
+
         rexcess = Pratt2010()
         bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
             m500_limits=(
@@ -288,10 +306,10 @@ class EntropyProfiles(HaloProperty):
             bin_perc16,
             bin_perc84,
             color='aqua',
-            alpha=0.85,
+            alpha=0.4,
             linewidth=0
         )
-        axes.plot(rexcess.radial_bins, bin_median, c='k')
+        axes.plot(rexcess.radial_bins, bin_median, c='blue')
 
         if not xlargs.quiet:
             plt.show()

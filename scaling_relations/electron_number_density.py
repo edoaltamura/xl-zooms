@@ -1,6 +1,9 @@
 from swiftsimio import SWIFTDataset, cosmo_array
 import numpy as np
-from unyt import mp
+from unyt import mp, unyt_array
+from typing import Optional
+
+from .halo_property import histogram_unyt
 
 element_names = {
     'H': 'hydrogen',
@@ -69,7 +72,7 @@ def get_metal_fractions(sw_data: SWIFTDataset, element_symbol: str, normalise_to
     return metal_fraction
 
 
-def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
+def get_molecular_weights(sw_data: SWIFTDataset) -> tuple:
     ne_nH = np.zeros_like(sw_data.gas.element_mass_fractions.hydrogen.value)
     ni_nH = np.zeros_like(sw_data.gas.element_mass_fractions.hydrogen.value)
     mu = np.zeros_like(sw_data.gas.element_mass_fractions.hydrogen.value)
@@ -101,6 +104,12 @@ def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
 
     Xe = ne_nH  # = ne / nH
     Xi = ni_nH  # = ni / nH
+
+    return Xe, Xi, mu
+
+
+def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
+    Xe, Xi, mu = get_molecular_weights(sw_data)
     electron_number_density = (Xe / (Xe + Xi)) * sw_data.gas.densities.to('g*cm**-3') / (mu * mp)
 
     electron_number_density.convert_to_units('cm**-3')
@@ -109,6 +118,33 @@ def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
         units='cm**-3',
         cosmo_factor=sw_data.gas.densities.cosmo_factor
     )
+
+    return electron_number_density
+
+
+def get_electron_number_density_shell_average(
+        sw_data: SWIFTDataset, bins: unyt_array, weights: Optional[np.ndarray] = None
+) -> unyt_array:
+    Xe, Xi, mu = get_molecular_weights(sw_data)
+
+    electron_number = (Xe / (Xe + Xi)) * sw_data.gas.masses / (mu * mp)
+    volume_shell = (4. * np.pi / 3.) * ((bins[1:]) ** 3 - (bins[:-1]) ** 3)
+
+    if weights:
+        electron_number *= weights
+        normalisation = histogram_unyt(
+            sw_data.gas.radial_distances, bins=bins, weights=weights
+        )
+
+    electron_number_weights = histogram_unyt(
+        sw_data.gas.radial_distances, bins=bins, weights=electron_number
+    )
+
+    if weights:
+        electron_number_weights /= normalisation
+
+    electron_number_density = electron_number_weights / volume_shell
+    electron_number_density.convert_to_units('cm**-3')
 
     return electron_number_density
 

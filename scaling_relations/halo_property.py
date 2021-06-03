@@ -23,10 +23,9 @@ from register import (
 
 def histogram_unyt(
         data: unyt_array,
-        bins: Optional[unyt_array],
-        weights: Optional[unyt_array]
-) -> Tuple[unyt_array]:
-
+        bins: unyt_array,
+        weights: unyt_array
+) -> unyt_array:
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
         f"Detected data {data.shape}, weights {weights.shape}."
@@ -41,7 +40,7 @@ def histogram_unyt(
     hist *= weights.units
     bin_edges *= data.units
 
-    return hist, bin_edges
+    return hist
 
 
 def cumsum_unyt(data: unyt_array) -> unyt_array:
