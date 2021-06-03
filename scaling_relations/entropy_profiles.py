@@ -167,7 +167,7 @@ class EntropyProfiles(HaloProperty):
         masses = sw_data.gas.masses[index]
         temperature = temperature[index]
 
-        emissivities = None
+        emissivities = np.ones_like(masses)
         if self.xray_weighting:
             # Compute hydrogen number density and the log10
             # of the temperature to provide to the xray interpolator.
@@ -197,10 +197,14 @@ class EntropyProfiles(HaloProperty):
             temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
             temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
 
+            emissivity_weights = histogram_unyt(radial_distance, bins=lbins, weights=emissivities)
+            emissivity_weights[emissivity_weights == 0] = np.nan  # Replace zeros with Nans
+
         if self.simple_electron_number_density:
             if self.shell_average:
                 volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
-                density_profile = mass_weights / volume_shell
+                mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses * emissivities)
+                density_profile = mass_weights / volume_shell / emissivity_weights
                 n_e = density_profile.to('g/cm**3') / (mp * mean_molecular_weight)
                 n_e.convert_to_units('cm**-3')
                 entropy_profile = kb * temperature_profile / (n_e ** (2 / 3))
