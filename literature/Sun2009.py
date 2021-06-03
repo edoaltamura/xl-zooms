@@ -193,7 +193,7 @@ class Sun2009(Article):
                     setattr(self, field, dataset)
 
     def get_shortcut(self):
-        raw = np.loadtxt(self.data_files[4])
+        raw = np.loadtxt(self.data_files[4], delimiter=',')
         r_r500, S_S500_50, S_S500_10, S_S500_90 = raw.T
         return r_r500, S_S500_50, S_S500_10, S_S500_90
 
