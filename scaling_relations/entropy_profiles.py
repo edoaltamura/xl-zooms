@@ -204,6 +204,9 @@ class EntropyProfiles(HaloProperty):
                 ), 'erg/s'
             )
 
+            if xlargs.debug:
+                print(f'emissivities.shape: {emissivities.shape}\n{emissivities}')
+
             entropy_profile = normalized_mean(
                 radial_distance, entropy, emissivities, lbins
             )

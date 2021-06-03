@@ -3,6 +3,8 @@ import os.path
 import numpy as np
 from numba import jit
 
+from register import xlargs
+
 
 class interpolate:
     def init(self):
@@ -189,7 +191,8 @@ def interpolate_X_Ray(data_n, data_T, element_mass_fractions, fill_value=-50.):
     idx_he = find_idx_he(np.log10(abundances[:, 1]), interp.He_bins)
     dx_he = find_dx_he(np.log10(abundances[:, 1]), interp.He_bins, idx_he[:, 0].astype(int))
 
-    print(f'Start interpolation on {mass_fraction.shape[0]:d} particles.')
+    if xlargs.debug:
+        print(f'[X-ray CLOUDY] Start interpolation on {mass_fraction.shape[0]:d} particles.')
     emissivities[joint_mask] = get_table_interp(interp.dn, interp.dT, dx_T, dx_n, idx_T.astype(int),
                                                 idx_n.astype(int), idx_he.astype(int), dx_he, interp.X_Ray,
                                                 abundance_to_solar[:, 2:])
