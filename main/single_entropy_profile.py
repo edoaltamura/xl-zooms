@@ -7,7 +7,7 @@ from register import find_files
 
 snap, cat = find_files()
 
-gf = EntropyProfiles(max_radius_r500=1.5)
+gf = EntropyProfiles(max_radius_r500=1.5, xray_weighting=False)
 print(
     gf.display_single_halo(
         path_to_snap=snap,
