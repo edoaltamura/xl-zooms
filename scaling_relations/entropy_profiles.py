@@ -195,10 +195,17 @@ class EntropyProfiles(HaloProperty):
         else:
             emissivities = None
 
-        n_e = get_electron_number_density(sw_data)[index]
+        n_e = get_electron_number_density_shell_average(sw_data, bins=lbins)
         n_e.convert_to_units('cm**-3')
-        entropy = kb * temperature / (n_e ** (2 / 3))
-        entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy)
+
+        mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
+        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+        mass_weighted_temperatures = (temperature * kb).to('keV') * masses
+        temperature_weights = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+        temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
+        temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+
+        entropy_profile = kb * temperature_profile / (n_e ** (2 / 3))
 
         # if self.simple_electron_number_density:
         #     if self.shell_average:
@@ -287,7 +294,7 @@ class EntropyProfiles(HaloProperty):
         axes.set_yscale('log')
 
         axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
-        axes.set_ylabel(r'Entropy [keV cm$^2$]')
+        axes.set_ylabel(r'Entropy [$K_{500}$]')
         axes.set_xlabel(r'$r/r_{500}$')
         # axes[1, 2].set_ylim([1, 1e4])
         axes.set_ylim([1e-2, 5])
