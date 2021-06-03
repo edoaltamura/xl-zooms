@@ -69,7 +69,7 @@ def get_metal_fractions(sw_data: SWIFTDataset, element_symbol: str, normalise_to
     return metal_fraction
 
 
-def get_electron_number_density(sw_data: SWIFTDataset):
+def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
     ne_nH = np.zeros_like(sw_data.gas.element_mass_fractions.hydrogen.value)
     ni_nH = np.zeros_like(sw_data.gas.element_mass_fractions.hydrogen.value)
     mu = np.zeros_like(sw_data.gas.element_mass_fractions.hydrogen.value)

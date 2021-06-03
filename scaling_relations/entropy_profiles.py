@@ -151,16 +151,17 @@ class EntropyProfiles(HaloProperty):
         radial_distance = sw_data.gas.radial_distances[index] / r500
         sw_data.gas.masses = sw_data.gas.masses[index]
         temperature = temperature[index]
-        density = sw_data.gas.densities[index]
+
+        if self.simple_electron_number_density:
+            n_e = sw_data.gas.densities.to('g/cm**3') / (mp * mean_molecular_weight)
+        else:
+            n_e = get_electron_number_density(sw_data)
+
+        n_e = n_e.to('cm**-3')[index]
 
         # Define radial bins and shell volumes
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
         radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
-
-        if self.simple_electron_number_density:
-            n_e = (density.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
-        else:
-            n_e = get_electron_number_density(sw_data)[index].to('cm**-3')
 
         if self.xray_weighting:
 
