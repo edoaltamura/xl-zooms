@@ -1,8 +1,11 @@
 import re
 import os
-import unyt
+from unyt import (
+    unyt_quantity, unyt_array,
+    keV, cm, dimensionless, Solar_Mass, erg, s, kpc
+)
 import numpy as np
-from typing import List, Tuple
+from typing import Tuple
 from matplotlib import pyplot as plt
 import itertools
 
@@ -45,6 +48,7 @@ class Pratt2010(Article):
             'kT_0p15_0p75R500 Delta_hi_kT_0p15_0p75R500 Delta_lo_kT_0p15_0p75R500 '
             'YX_R500 Delta_hi_YX_R500 Delta_lo_YX_R500 '
             'R500 Rdet').split()
+
         data = []
 
         with open(f'{repository_dir}/pratt2010_properties.dat') as f:
@@ -70,40 +74,40 @@ class Pratt2010(Article):
         conversion_factors = [
             None,
             1,
-            unyt.keV,
-            unyt.keV,
-            unyt.keV,
-            1.e14 / 0.7 * self.hconv * unyt.Solar_Mass,
-            1.e14 / 0.7 * self.hconv * unyt.Solar_Mass,
-            1.e14 / 0.7 * self.hconv * unyt.Solar_Mass,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV,
-            unyt.keV,
-            unyt.keV,
-            1e44 * self.hconv ** 2 * unyt.erg / unyt.s,
-            1e44 * self.hconv ** 2 * unyt.erg / unyt.s,
-            1e44 * self.hconv ** 2 * unyt.erg / unyt.s,
-            unyt.keV,
-            unyt.keV,
-            unyt.keV,
-            1e44 * self.hconv ** 2 * unyt.erg / unyt.s,
-            1e44 * self.hconv ** 2 * unyt.erg / unyt.s,
-            1e44 * self.hconv ** 2 * unyt.erg / unyt.s,
-            unyt.keV,
-            unyt.keV,
-            unyt.keV,
-            1e13 * self.hconv * unyt.keV,
-            1e13 * self.hconv * unyt.keV,
-            1e13 * self.hconv * unyt.keV,
-            unyt.kpc,
-            unyt.dimensionless
+            keV,
+            keV,
+            keV,
+            1.e14 / 0.7 * self.hconv * Solar_Mass,
+            1.e14 / 0.7 * self.hconv * Solar_Mass,
+            1.e14 / 0.7 * self.hconv * Solar_Mass,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV,
+            keV,
+            keV,
+            1e44 * self.hconv ** 2 * erg / s,
+            1e44 * self.hconv ** 2 * erg / s,
+            1e44 * self.hconv ** 2 * erg / s,
+            keV,
+            keV,
+            keV,
+            1e44 * self.hconv ** 2 * erg / s,
+            1e44 * self.hconv ** 2 * erg / s,
+            1e44 * self.hconv ** 2 * erg / s,
+            keV,
+            keV,
+            keV,
+            1e13 * self.hconv * keV,
+            1e13 * self.hconv * keV,
+            1e13 * self.hconv * keV,
+            kpc,
+            dimensionless
         ]
 
         for i, (field, conversion) in enumerate(zip(field_names, conversion_factors)):
@@ -113,7 +117,7 @@ class Pratt2010(Article):
                 setattr(self, field, data[i] * conversion)
 
         # Compute the characteristic entropy using eq 3 in the paper
-        self.K500 = unyt.unyt_quantity(106, 'keV*cm**2') * \
+        self.K500 = unyt_quantity(106, 'keV*cm**2') * \
                     data[5] ** (2 / 3) * \
                     0.15 ** (-2 / 3) * \
                     self.ez_function(self.z) ** (-2 / 3) * \
@@ -146,10 +150,10 @@ class Pratt2010(Article):
         data = list(map(list, itertools.zip_longest(*data, fillvalue=None)))
         conversion_factors = [
             None,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
-            unyt.keV * unyt.cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
+            keV * cm ** 2,
             1,
             1,
         ]
@@ -177,15 +181,15 @@ class Pratt2010(Article):
                 profiles[i] = K0 + K100 * (radius / 100 / 0.7) ** alpha
                 profiles[i] *= ez ** (4 / 3) * self.hconv ** (-1 / 3)
 
-        self.entropy_profiles = unyt.unyt_array(profiles, unyt.keV * unyt.cm ** 2)
-        self.radial_bins = unyt.unyt_array(radial_range, unyt.dimensionless)
+        self.entropy_profiles = unyt_array(profiles, keV * cm ** 2)
+        self.radial_bins = unyt_array(radial_range, dimensionless)
         self.entropy_profiles_k500_rescaled = False
 
     def combine_entropy_profiles(
             self,
-            m500_limits: Tuple[unyt.unyt_quantity] = (
-                    1e10 * unyt.Solar_Mass,
-                    1e17 * unyt.Solar_Mass
+            m500_limits: Tuple[unyt_quantity] = (
+                    1e10 * Solar_Mass,
+                    1e17 * Solar_Mass
             ),
             k500_rescale: bool = True
     ):

@@ -1,11 +1,14 @@
 import os.path
+import sys
 import numpy as np
 from warnings import warn
 from matplotlib import pyplot as plt
+import scipy.stats as stat
+
 from unyt import (
     unyt_array,
     unyt_quantity,
-    mh, G, mp, K, kb, cm, Solar_Mass
+    mh, G, mp, K, kb, cm, Solar_Mass, Mpc
 )
 
 from .halo_property import HaloProperty, histogram_unyt
@@ -21,15 +24,42 @@ from register import (
     gamma,
 )
 from literature import Cosmology, Sun2009, Pratt2010
+import numba
+from multiprocessing import cpu_count
+
+numba.config.NUMBA_NUM_THREADS = cpu_count()
+sys.path.append("../xray")
+import cloudy_softband as cloudy
+
+
+def normalized_mean(r, quantity, normalizer, bins):
+    mean_value, _, _ = stat.binned_statistic(
+        x=r, values=quantity * normalizer, statistic="sum", bins=bins
+    )
+
+    normalization, _, _ = stat.binned_statistic(
+        x=r, values=normalizer, statistic="sum", bins=bins
+    )
+    if xlargs.debug:
+        print(mean_value, normalization)
+
+    return mean_value / normalization
 
 
 class EntropyProfiles(HaloProperty):
 
-    def __init__(self, max_radius_r500: float = 4):
+    def __init__(
+            self,
+            max_radius_r500: float = 4,
+            xray_weighting: bool = True,
+            simple_electron_number_density: bool = True,
+    ):
         super().__init__()
 
         self.labels = ['radial_bin_centres', 'entropy_profile', 'K500']
         self.max_radius_r500 = max_radius_r500
+        self.xray_weighting = xray_weighting
+        self.simple_electron_number_density = simple_electron_number_density
 
         self.filename = os.path.join(
             default_output_directory,
@@ -114,24 +144,59 @@ class EntropyProfiles(HaloProperty):
         radial_distance = sw_data.gas.radial_distances[index] / r500
         sw_data.gas.masses = sw_data.gas.masses[index]
         temperature = temperature[index]
+        density = sw_data.gas.densities[index]
 
         # Define radial bins and shell volumes
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
         radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
-        volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
 
-        mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=sw_data.gas.masses)
-        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
-        density_profile = mass_weights / volume_shell
-        number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
+        if self.xray_weighting:
 
-        mass_weighted_temperatures = (temperature * kb).to('keV') * sw_data.gas.masses
-        temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
-        temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
-        temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+            entropy = kb * temperature / ((density / mp) ** (2 / 3))
+            entropy.convert_to_units('keV*cm**2')
 
-        entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
-        density_profile /= critical_density
+            # Compute hydrogen number density and the log10
+            # of the temperature to provide to the xray interpolator.
+            data_nH = np.log10(
+                sw_data.gas.element_mass_fractions.hydrogen * sw_data.gas.densities.to('g*cm**-3') / mp)
+            data_T = np.log10(sw_data.gas.temperatures.value)
+
+            # Interpolate the Cloudy table to get emissivities
+            emissivities = cloudy.interpolate_X_Ray(
+                data_nH,
+                data_T,
+                sw_data.gas.element_mass_fractions
+            )
+            log10_Mpc3_to_cm3 = np.log10(Mpc.get_conversion_factor(cm)[0] ** 3)
+            emissivities = unyt_quantity(
+                10 ** (
+                        cloudy.logsumexp(
+                            emissivities[index],
+                            b=(sw_data.gas.masses[index] / sw_data.gas.densities[index]).value,
+                            base=10.
+                        ) + log10_Mpc3_to_cm3
+                ), 'erg/s'
+            )
+
+            entropy_profile = normalized_mean(
+                radial_distance.value, entropy.value, emissivities.value, lbins.value
+            ) * entropy.units
+
+        else:
+            volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
+
+            mass_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=sw_data.gas.masses)
+            mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+            density_profile = mass_weights / volume_shell
+            number_density_profile = (density_profile.to('g/cm**3') / (mp * mean_molecular_weight)).to('cm**-3')
+
+            mass_weighted_temperatures = (temperature * kb).to('keV') * sw_data.gas.masses
+            temperature_weights, _ = histogram_unyt(radial_distance, bins=lbins, weights=mass_weighted_temperatures)
+            temperature_weights[temperature_weights == 0] = np.nan  # Replace zeros with Nans
+            temperature_profile = temperature_weights / mass_weights  # kBT in units of [keV]
+
+            entropy_profile = temperature_profile / number_density_profile ** (2 / 3)
+            density_profile /= critical_density
 
         kBT500 = (
                 G * mean_molecular_weight * m500 * mp / r500 / 2
