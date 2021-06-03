@@ -34,13 +34,26 @@ sys.path.append("../xray")
 import cloudy_softband as cloudy
 
 
+# def normalized_mean(r, quantity, normalizer, bins):
+#     mean_value, _, _ = stat.binned_statistic(
+#         x=r, values=quantity * normalizer, statistic="sum", bins=bins
+#     )
+#
+#     normalization, _, _ = stat.binned_statistic(
+#         x=r, values=normalizer, statistic="sum", bins=bins
+#     )
+#     if xlargs.debug:
+#         print(mean_value, normalization)
+#
+#     return mean_value / normalization
+
 def normalized_mean(r, quantity, normalizer, bins):
-    mean_value, _, _ = stat.binned_statistic(
-        x=r, values=quantity * normalizer, statistic="sum", bins=bins
+    mean_value, _ = histogram_unyt(
+        r, bins=bins, weights=quantity * normalizer
     )
 
-    normalization, _, _ = stat.binned_statistic(
-        x=r, values=normalizer, statistic="sum", bins=bins
+    normalization, _ = histogram_unyt(
+        r, bins=bins, weights=normalizer
     )
     if xlargs.debug:
         print(mean_value, normalization)
