@@ -3,7 +3,6 @@ import sys
 import numpy as np
 from warnings import warn
 from matplotlib import pyplot as plt
-import scipy.stats as stat
 import numba
 from multiprocessing import cpu_count
 
@@ -33,19 +32,6 @@ from literature import Cosmology, Sun2009, Pratt2010
 sys.path.append("../xray")
 import cloudy_softband as cloudy
 
-
-# def normalized_mean(r, quantity, normalizer, bins):
-#     mean_value, _, _ = stat.binned_statistic(
-#         x=r, values=quantity * normalizer, statistic="sum", bins=bins
-#     )
-#
-#     normalization, _, _ = stat.binned_statistic(
-#         x=r, values=normalizer, statistic="sum", bins=bins
-#     )
-#     if xlargs.debug:
-#         print(mean_value, normalization)
-#
-#     return mean_value / normalization
 
 def normalized_mean(r, quantity, normalizer, bins):
     mean_value = histogram_unyt(
