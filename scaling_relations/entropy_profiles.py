@@ -180,13 +180,16 @@ class EntropyProfiles(HaloProperty):
             xray_luminosities = emissivities * sw_data.gas.masses / sw_data.gas.densities
             xray_luminosities_weights = histogram_unyt(radial_distance, bins=lbins, weights=xray_luminosities[index])
             xray_luminosities_weights[xray_luminosities_weights == 0] = np.nan  # Replace zeros with Nans
-        else:
-            xray_luminosities = np.ones_like(radial_distance)
-            xray_luminosities_weights = 1
 
         if not self.simple_electron_number_density and self.shell_average:
-            n_e = get_electron_number_density_shell_average(sw_data, bins=lbins * r500, mask=index, weights=xray_luminosities)
-            n_e.convert_to_units('cm**-3')
+            if self.xray_weighting:
+                n_e = get_electron_number_density_shell_average(
+                    sw_data, bins=lbins * r500, mask=index, weights=xray_luminosities
+                )
+            else:
+                n_e = get_electron_number_density_shell_average(
+                    sw_data, bins=lbins * r500, mask=index
+                )
             mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
             mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
             mass_weighted_temperatures = (temperature * kb).to('keV') * masses
@@ -198,16 +201,23 @@ class EntropyProfiles(HaloProperty):
 
         elif not self.simple_electron_number_density and not self.shell_average:
             n_e = get_electron_number_density(sw_data)[index]
-            n_e.convert_to_units('cm**-3')
             entropy = kb * temperature / (n_e ** (2 / 3))
-            entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * xray_luminosities[index])
-            entropy_profile /= xray_luminosities_weights
+            if self.xray_weighting:
+                entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * xray_luminosities[index])
+                entropy_profile /= xray_luminosities_weights
+            else:
+                entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy)
 
         elif self.simple_electron_number_density and self.shell_average:
             volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
-            mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses * xray_luminosities[index])
-            mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
-            density_profile = mass_weights / volume_shell / xray_luminosities_weights
+            if self.xray_weighting:
+                mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses * xray_luminosities[index])
+                mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+                density_profile = mass_weights / volume_shell / xray_luminosities_weights
+            else:
+                mass_weights = histogram_unyt(radial_distance, bins=lbins, weights=masses)
+                mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
+                density_profile = mass_weights / volume_shell
             n_e = density_profile.to('g/cm**3') / (mp * mean_molecular_weight)
             n_e.convert_to_units('cm**-3')
             mass_weighted_temperatures = (temperature * kb).to('keV') * masses
@@ -221,8 +231,11 @@ class EntropyProfiles(HaloProperty):
             n_e = sw_data.gas.densities[index].to('g/cm**3') / (mp * mean_molecular_weight)
             n_e.convert_to_units('cm**-3')
             entropy = kb * temperature / (n_e ** (2 / 3))
-            entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * xray_luminosities[index])
-            entropy_profile /= xray_luminosities_weights
+            if self.xray_weighting:
+                entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy * xray_luminosities[index])
+                entropy_profile /= xray_luminosities_weights
+            else:
+                entropy_profile = histogram_unyt(radial_distance, bins=lbins, weights=entropy)
 
         entropy_profile.convert_to_units('keV*cm**2')
 
