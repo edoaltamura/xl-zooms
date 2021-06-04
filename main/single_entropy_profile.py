@@ -22,7 +22,7 @@ def make_profile(axes, **kwargs):
         entropy_profile,
         linestyle='-',
         linewidth=1,
-        label=f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}"
+        label=f"xray_weighting: {profile_obj.xray_weighting}, $\mu$-average: {profile_obj.simple_electron_number_density}, shell_average: {profile_obj.shell_average}"
     )
 
 
@@ -33,9 +33,10 @@ fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
 make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
-# make_profile(xray_weighting=True, simple_electron_number_density=False)
-# make_profile(xray_weighting=True, simple_electron_number_density=False)
-# make_profile(xray_weighting=True, simple_electron_number_density=False)
+make_profile(axes, xray_weighting=False, simple_electron_number_density=False)
+# make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
+# make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
+
 
 axes.set_xscale('log')
 axes.set_yscale('log')
