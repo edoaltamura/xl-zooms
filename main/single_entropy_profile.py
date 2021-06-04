@@ -8,67 +8,34 @@ from scaling_relations import EntropyProfiles
 from register import find_files, set_mnras_stylesheet, xlargs
 from literature import Sun2009, Pratt2010
 
+
+def make_profile(axes, **kwargs):
+    profile_obj = EntropyProfiles(max_radius_r500=1.5, **kwargs)
+    print(
+        f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
+    radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
+        path_to_snap=snap, path_to_catalogue=cat
+    )
+    entropy_profile /= K500
+    axes.plot(
+        radial_bin_centres,
+        entropy_profile,
+        linestyle='-',
+        linewidth=1,
+        label=f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}"
+    )
+
+
 snap, cat = find_files()
 
 set_mnras_stylesheet()
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
-profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=False, simple_electron_number_density=True)
-print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
-radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
-    path_to_snap=snap, path_to_catalogue=cat
-)
-entropy_profile /= K500
-axes.plot(
-    radial_bin_centres,
-    entropy_profile,
-    linestyle='-',
-    linewidth=1,
-    label=f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}"
-)
-
-profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=True, simple_electron_number_density=False)
-print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
-radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
-    path_to_snap=snap, path_to_catalogue=cat
-)
-entropy_profile /= K500
-axes.plot(
-    radial_bin_centres,
-    entropy_profile,
-    linestyle='-',
-    linewidth=1,
-    label=f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}"
-)
-
-profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=True, simple_electron_number_density=False)
-print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
-radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
-    path_to_snap=snap, path_to_catalogue=cat
-)
-entropy_profile /= K500
-axes.plot(
-    radial_bin_centres,
-    entropy_profile,
-    linestyle='-',
-    linewidth=1,
-    label=f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}"
-)
-
-profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=False, simple_electron_number_density=False)
-print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
-radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
-    path_to_snap=snap, path_to_catalogue=cat
-)
-entropy_profile /= K500
-axes.plot(
-    radial_bin_centres,
-    entropy_profile,
-    linestyle='-',
-    linewidth=1,
-    label=f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}"
-)
+make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
+# make_profile(xray_weighting=True, simple_electron_number_density=False)
+# make_profile(xray_weighting=True, simple_electron_number_density=False)
+# make_profile(xray_weighting=True, simple_electron_number_density=False)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
@@ -77,7 +44,7 @@ axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'Entropy [$K_{500}$]')
 axes.set_xlabel(r'$r/r_{500}$')
 axes.set_ylim([1e-2, 5])
-axes.set_xlim([0.01, profile_obj.max_radius_r500])
+axes.set_xlim([0.01, 1.5])
 
 sun_observations = Sun2009()
 r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()
