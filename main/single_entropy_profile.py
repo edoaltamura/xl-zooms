@@ -34,7 +34,10 @@ fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
 for a, b, c in [list(i) for i in itertools.product([False, True], repeat=3)]:
-    make_profile(axes, xray_weighting=a, simple_electron_number_density=b, shell_average=c)
+    try:
+        make_profile(axes, xray_weighting=a, simple_electron_number_density=b, shell_average=c)
+    except Exception as e:
+        print(e)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
