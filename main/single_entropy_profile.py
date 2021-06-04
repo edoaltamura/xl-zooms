@@ -15,6 +15,7 @@ fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
 profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=True, simple_electron_number_density=True)
+print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -28,6 +29,7 @@ axes.plot(
 )
 
 profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=True, simple_electron_number_density=False)
+print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -41,6 +43,7 @@ axes.plot(
 )
 
 profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=False, simple_electron_number_density=True)
+print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -54,6 +57,7 @@ axes.plot(
 )
 
 profile_obj = EntropyProfiles(max_radius_r500=1.5, xray_weighting=False, simple_electron_number_density=False)
+print(f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
