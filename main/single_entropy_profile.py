@@ -1,6 +1,7 @@
 import sys
 from matplotlib import pyplot as plt
 from unyt import Solar_Mass
+import itertools
 
 sys.path.append("..")
 
@@ -32,11 +33,8 @@ set_mnras_stylesheet()
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
-# make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
-make_profile(axes, xray_weighting=False, simple_electron_number_density=True)
-# make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
-# make_profile(axes, xray_weighting=True, simple_electron_number_density=False)
-
+for a, b, c in [list(i) for i in itertools.product([0, 1], repeat=3)]:
+    make_profile(axes, xray_weighting=a, simple_electron_number_density=b, shell_average=c)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
