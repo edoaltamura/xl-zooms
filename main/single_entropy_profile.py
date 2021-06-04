@@ -43,7 +43,7 @@ axes.set_yscale('log')
 axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'Entropy [$K_{500}$]')
 axes.set_xlabel(r'$r/r_{500}$')
-axes.set_ylim([1e-2, 5])
+axes.set_ylim([2e-2, 10])
 axes.set_xlim([0.01, 1.5])
 
 sun_observations = Sun2009()
@@ -55,7 +55,7 @@ axes.fill_between(
     S_S500_90,
     color='grey', alpha=0.4, linewidth=0
 )
-axes.plot(r_r500, S_S500_50, c='grey')
+axes.plot(r_r500, S_S500_50, c='grey', label=sun_observations.citation)
 
 rexcess = Pratt2010()
 bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
@@ -73,7 +73,9 @@ axes.fill_between(
     alpha=0.4,
     linewidth=0
 )
-axes.plot(rexcess.radial_bins, bin_median, c='blue')
+axes.plot(rexcess.radial_bins, bin_median, c='blue', label=rexcess.citation)
+
+plt.legend()
 
 if not xlargs.quiet:
     plt.show()
