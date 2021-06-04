@@ -228,7 +228,7 @@ class EntropyProfiles(HaloProperty):
             entropy_profile = temperature_profile / (n_e ** (2 / 3))
 
         elif self.simple_electron_number_density and not self.shell_average:
-            n_e = sw_data.gas.densities[index].to('g/cm**3') / (mp * mean_molecular_weight)
+            n_e = sw_data.gas.densities.to('g/cm**3')[index] / (mp * mean_molecular_weight)
             n_e.convert_to_units('cm**-3')
             entropy = kb * temperature / (n_e ** (2 / 3))
             if self.xray_weighting:

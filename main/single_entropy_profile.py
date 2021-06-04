@@ -33,7 +33,7 @@ set_mnras_stylesheet()
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
-for a, b, c in [list(i) for i in itertools.product([0, 1], repeat=3)]:
+for a, b, c in [list(i) for i in itertools.product([False, True], repeat=3)]:
     make_profile(axes, xray_weighting=a, simple_electron_number_density=b, shell_average=c)
 
 axes.set_xscale('log')
