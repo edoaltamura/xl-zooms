@@ -224,7 +224,7 @@ class EntropyProfiles(HaloProperty):
 
             volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
             density_profile = mass_weights / volume_shell
-            n_e = density_profile.to('g/cm**3') / (mp * mean_molecular_weight)
+            n_e = density_profile.to('g/cm**3') * mean_atomic_weight_per_free_electron / (mp * mean_molecular_weight)
             n_e.convert_to_units('cm**-3')
             temperature_profile.convert_to_units('keV')
             entropy_profile = temperature_profile / (n_e ** (2 / 3))
