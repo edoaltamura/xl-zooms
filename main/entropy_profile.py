@@ -34,6 +34,7 @@ axes = fig.add_subplot()
 
 make_profile(axes, xray_weighting=False, simple_electron_number_density=False, shell_average=True)
 make_profile(axes, xray_weighting=True, simple_electron_number_density=True, shell_average=False)
+make_profile(axes, xray_weighting=False, simple_electron_number_density=True, shell_average=True)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
@@ -79,7 +80,3 @@ if not xlargs.quiet:
     plt.show()
 
 plt.close()
-
-# print(
-#     gf.process_catalogue()
-# )
