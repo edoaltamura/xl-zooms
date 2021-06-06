@@ -277,7 +277,6 @@ class EntropyFgasSpace(HaloProperty):
         axes.set_xscale('log')
         axes.set_yscale('log')
 
-        axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
         axes.set_ylabel(r'Entropy [$K_{500}$]')
         axes.set_xlabel(r'$f_{\rm gas} = M_{\rm gas}(<r) / M_{\rm tot}(<r)$')
         axes.set_ylim([1e-2, 5])
@@ -285,7 +284,7 @@ class EntropyFgasSpace(HaloProperty):
 
         axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
         axes.text(
-            axes.get_xlim()[0], self.fb, r'Baryon fraction',
+            self.fb, axes.get_ylim()[1], r'Baryon fraction',
             horizontalalignment='left',
             verticalalignment='bottom',
             color='k',
