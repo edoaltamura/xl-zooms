@@ -175,7 +175,7 @@ class EntropyProfiles(HaloProperty):
                     radial_distance,
                     bins=lbins,
                     weights=(temperatures * kb).to('keV'),
-                    normalizer=sw_data.gas.masses[index] * xray_luminosities[index]
+                    normalizer=xray_luminosities[index]
                 )
             else:
                 n_e = get_electron_number_density_shell_average(
@@ -206,7 +206,7 @@ class EntropyProfiles(HaloProperty):
                     radial_distance,
                     bins=lbins,
                     weights=(temperatures * kb).to('keV'),
-                    normalizer=sw_data.gas.masses[index] * xray_luminosities[index]
+                    normalizer=xray_luminosities[index]
                 )
 
             else:
