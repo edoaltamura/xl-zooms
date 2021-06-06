@@ -282,18 +282,18 @@ class EntropyFgasSpace(HaloProperty):
         axes.set_ylim([0, 2.5])
         axes.set_xlim([0, 1])
 
-        axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
-        axes.text(
-            self.fb, axes.get_ylim()[1], r'$f_b$',
-            horizontalalignment='right',
-            verticalalignment='top',
-            color='grey',
-            bbox=dict(
-                boxstyle='square,pad=10',
-                fc='none',
-                ec='none'
-            )
-        )
+        # axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
+        # axes.text(
+        #     self.fb, axes.get_ylim()[1], r'$f_b$',
+        #     horizontalalignment='right',
+        #     verticalalignment='top',
+        #     color='grey',
+        #     bbox=dict(
+        #         boxstyle='square,pad=10',
+        #         fc='none',
+        #         ec='none'
+        #     )
+        # )
 
         fig.suptitle(
             (
