@@ -66,9 +66,6 @@ class EntropyProfiles(HaloProperty):
         elif 0.5 < value < 1:
             warn(f"The value for {self.labels[1]} seems too high: {value}", RuntimeWarning)
 
-    def get_simple_ne(self):
-        pass
-
     def process_single_halo(
             self,
             zoom_obj: Zoom = None,

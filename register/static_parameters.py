@@ -21,7 +21,7 @@ matplotlib_stylesheet = os.path.join(
 )
 
 # Constants
-mean_molecular_weight = 0.5954
+mean_molecular_weight = 0.5954  # mean atomic weight for an ionized gas with primordial (X = 0.76, Z = 0) composition
 mean_atomic_weight_per_free_electron = 1.14
 primordial_hydrogen_mass_fraction = 0.76
 solar_metallicity = 0.0133714
