@@ -23,7 +23,7 @@ def make_profile(axes, **kwargs):
             entropy_profile,
             linestyle='-',
             linewidth=1,
-            label=f"xray_weighting: {profile_obj.xray_weighting}, $\mu$-average: {profile_obj.simple_electron_number_density}, shell_average: {profile_obj.shell_average}"
+            label=f"xray: {profile_obj.xray_weighting}, $\mu$-avg: {profile_obj.simple_electron_number_density}, shell_avg: {profile_obj.shell_average}"
         )
     except Exception as e:
         print(e)
@@ -37,6 +37,8 @@ axes = fig.add_subplot()
 
 make_profile(axes, xray_weighting=True, simple_electron_number_density=True, shell_average=True)
 make_profile(axes, xray_weighting=False, simple_electron_number_density=True, shell_average=True)
+make_profile(axes, xray_weighting=True, simple_electron_number_density=False, shell_average=True)
+make_profile(axes, xray_weighting=False, simple_electron_number_density=False, shell_average=True)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
