@@ -295,6 +295,15 @@ class EntropyFgasSpace(HaloProperty):
             )
         )
 
+        fig.suptitle(
+            (
+                f"{os.path.basename(xlargs.run_directory)}\n"
+                f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
+            ),
+            fontsize=4
+
+        )
+
         if not xlargs.quiet:
             plt.show()
 
