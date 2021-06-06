@@ -166,7 +166,10 @@ class EntropyProfiles(HaloProperty):
         if not self.simple_electron_number_density and self.shell_average:
             if self.xray_weighting:
                 n_e = get_electron_number_density_shell_average(
-                    sw_data, bins=lbins * r500, mask=index, normalizer=xray_luminosities
+                    sw_data,
+                    bins=lbins * r500,
+                    mask=index,
+                    normalizer=xray_luminosities
                 )
                 temperature_profile = histogram_unyt(
                     radial_distance,
@@ -176,7 +179,9 @@ class EntropyProfiles(HaloProperty):
                 )
             else:
                 n_e = get_electron_number_density_shell_average(
-                    sw_data, bins=lbins * r500, mask=index
+                    sw_data,
+                    bins=lbins * r500,
+                    mask=index
                 )
                 temperature_profile = histogram_unyt(
                     radial_distance,
