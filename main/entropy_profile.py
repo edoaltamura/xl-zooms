@@ -69,18 +69,18 @@ axes.fill_between(
     rexcess.radial_bins,
     bin_perc16,
     bin_perc84,
-    color='aqua',
+    color='lime',
     alpha=0.4,
     linewidth=0
 )
-axes.plot(rexcess.radial_bins, bin_median, c='aqua', label=rexcess.citation)
+axes.plot(rexcess.radial_bins, bin_median, c='lime', label=rexcess.citation)
 
 fig.suptitle(
     (
         f"{os.path.basename(xlargs.run_directory)}\n"
         f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
     ),
-    fontsize=7
+    fontsize=4
 
 )
 
