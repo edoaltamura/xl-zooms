@@ -1,7 +1,5 @@
 import sys
 from matplotlib import pyplot as plt
-from unyt import Solar_Mass
-import itertools
 
 sys.path.append("..")
 

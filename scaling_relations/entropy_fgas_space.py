@@ -157,7 +157,7 @@ class EntropyFgasSpace(HaloProperty):
                 (temperatures > Tcut_halogas)
             )[0]
 
-        radial_distances = sw_data.gas.radial_distances[mask]
+        radial_distances = sw_data.gas.radial_distances[mask] / r500
         assert (radial_distances >= 0).all()
         masses = unyt_array(masses, sw_data.units.mass)[mask]
         assert (masses >= 0).all()
@@ -187,7 +187,7 @@ class EntropyFgasSpace(HaloProperty):
         elif xlargs.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        radial_distances = np.concatenate(radial_distances_collect)
+        radial_distances = np.concatenate(radial_distances_collect) / r500
 
         sw_data.gas.masses.convert_to_physical()
         sw_data.dark_matter.masses.convert_to_physical()
@@ -228,7 +228,7 @@ class EntropyFgasSpace(HaloProperty):
 
             # Select all particles within sphere
             mask = np.where(
-                (radial_distances <= self.max_radius_r500 * r500) &
+                (radial_distances <= self.max_radius_r500) &
                 (fof_ids == 1)
             )[0]
 
@@ -237,15 +237,9 @@ class EntropyFgasSpace(HaloProperty):
         except AttributeError as err:
             print(err)
             print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
-            mask = np.where(radial_distances <= self.max_radius_r500 * r500)[0]
+            mask = np.where(radial_distances <= self.max_radius_r500)[0]
 
-        radial_distances = unyt_array(radial_distances, Mpc)[mask]
-        assert (radial_distances >= 0).all()
-        masses = unyt_array(masses, sw_data.units.mass)[mask]
-        assert (masses >= 0).all()
-        del mask
-
-        mass_weights = histogram_unyt(radial_distances, bins=lbins, weights=masses)
+        mass_weights = histogram_unyt(radial_distances[mask], bins=lbins, weights=masses[mask])
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_mass_profile = np.nancumsum(mass_weights.value) * masses.units
 
