@@ -1,7 +1,6 @@
 import sys
 from matplotlib import pyplot as plt
 from unyt import Solar_Mass
-import itertools
 
 sys.path.append("..")
 
@@ -11,20 +10,23 @@ from literature import Sun2009, Pratt2010
 
 
 def make_profile(axes, **kwargs):
-    profile_obj = EntropyProfiles(max_radius_r500=1.5, **kwargs)
-    print(
-        f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
-    radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
-        path_to_snap=snap, path_to_catalogue=cat
-    )
-    entropy_profile /= K500
-    axes.plot(
-        radial_bin_centres,
-        entropy_profile,
-        linestyle='-',
-        linewidth=1,
-        label=f"xray_weighting: {profile_obj.xray_weighting}, $\mu$-average: {profile_obj.simple_electron_number_density}, shell_average: {profile_obj.shell_average}"
-    )
+    try:
+        profile_obj = EntropyProfiles(max_radius_r500=1.5, **kwargs)
+        print(
+            f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
+        radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
+            path_to_snap=snap, path_to_catalogue=cat
+        )
+        entropy_profile /= K500
+        axes.plot(
+            radial_bin_centres,
+            entropy_profile,
+            linestyle='-',
+            linewidth=1,
+            label=f"xray_weighting: {profile_obj.xray_weighting}, $\mu$-average: {profile_obj.simple_electron_number_density}, shell_average: {profile_obj.shell_average}"
+        )
+    except Exception as e:
+        print(e)
 
 
 snap, cat = find_files()
@@ -33,11 +35,8 @@ set_mnras_stylesheet()
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
-for a, b, c in [list(i) for i in itertools.product([False, True], repeat=3)]:
-    try:
-        make_profile(axes, xray_weighting=a, simple_electron_number_density=b, shell_average=c)
-    except Exception as e:
-        print(e)
+make_profile(axes, xray_weighting=True, simple_electron_number_density=True, shell_average=True)
+make_profile(axes, xray_weighting=False, simple_electron_number_density=True, shell_average=True)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
