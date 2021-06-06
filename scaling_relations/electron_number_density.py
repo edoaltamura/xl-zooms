@@ -106,6 +106,9 @@ def get_molecular_weights(sw_data: SWIFTDataset) -> tuple:
     Xe = ne_nH  # = ne / nH
     Xi = ni_nH  # = ni / nH
 
+    print(Xe, Xi, mu)
+    print((Xe / (Xe + Xi)) / mu)
+
     return Xe, Xi, mu
 
 
