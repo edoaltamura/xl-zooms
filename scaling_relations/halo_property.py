@@ -82,10 +82,12 @@ def histogram_unyt(
         )
         hist *= weights.units * normalizer.units
 
-        normalization, bin_edges = np.histogram(
+        norm, bin_edges = np.histogram(
             data.value, bins=bins.value, weights=normalizer.value
         )
-        hist /= normalization * normalizer.units
+        norm *= normalizer.units
+
+        hist /= norm
 
     else:
         hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value)
