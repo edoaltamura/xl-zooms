@@ -13,7 +13,7 @@ def make_profile(axes, **kwargs):
     try:
         profile_obj = EntropyProfiles(max_radius_r500=1.5, **kwargs)
         print(
-            f"xray_weighting: {profile_obj.xray_weighting} $\mu$-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
+            f"xray_weighting: {profile_obj.xray_weighting} mu-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
         radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
             path_to_snap=snap, path_to_catalogue=cat
         )
