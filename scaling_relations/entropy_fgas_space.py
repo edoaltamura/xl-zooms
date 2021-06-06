@@ -281,7 +281,7 @@ class EntropyFgasSpace(HaloProperty):
         axes.set_ylabel(r'Entropy [$K_{500}$]')
         axes.set_xlabel(r'$f_{\rm gas} = M_{\rm gas}(<r) / M_{\rm tot}(<r)$')
         axes.set_ylim([1e-2, 5])
-        axes.set_xlim([0.01, self.max_radius_r500])
+        axes.set_xlim([1e-5, 1.1 * self.fb])
 
         axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
         axes.text(
