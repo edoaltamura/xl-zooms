@@ -142,7 +142,7 @@ def get_electron_number_density_shell_average(
 
     Xe, Xi, mu = get_molecular_weights(sw_data)
     mass = sw_data.gas.masses.value.astype(np.float64) * 1e10 * Msun
-    electron_number = (Xe / (Xe + Xi)) * mass / (mu * mp)
+    electron_number = (Xe * Xi / (Xe + Xi)) * mass / (mu * mp)
     volume_shell = (4. * np.pi / 3.) * (bins[1:] ** 3 - bins[:-1] ** 3)
 
     electron_number_weights = histogram_unyt(
