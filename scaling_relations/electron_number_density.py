@@ -126,10 +126,10 @@ def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
 def get_electron_number_density_shell_average(
         sw_data: SWIFTDataset,
         bins: unyt_array,
-        weights: Optional[np.ndarray] = None,
+        normalizer: Optional[np.ndarray] = None,
         mask: Optional[np.ndarray] = None
 ) -> unyt_array:
-    normalise_flag = weights is not None and weights.astype(int).all() != 1
+    normalise_flag = normalizer is not None and normalizer.astype(int).all() != 1
 
     if mask is None:
         mask = ...
@@ -142,19 +142,12 @@ def get_electron_number_density_shell_average(
     electron_number = (Xe / (Xe + Xi)) * mass / (mu * mp)
     volume_shell = (4. * np.pi / 3.) * (bins[1:] ** 3 - bins[:-1] ** 3)
 
-    if normalise_flag:
-        electron_number *= weights
-        normalisation = histogram_unyt(
-            sw_data.gas.radial_distances[mask], bins=bins, weights=weights[mask]
-        )
-
     electron_number_weights = histogram_unyt(
-        sw_data.gas.radial_distances[mask], bins=bins, weights=electron_number[mask]
+        sw_data.gas.radial_distances[mask],
+        bins=bins,
+        weights=electron_number[mask],
+        normalizer=normalizer
     )
-
-    if normalise_flag:
-        electron_number_weights /= normalisation
-
     electron_number_density = electron_number_weights / volume_shell
     electron_number_density.convert_to_units('cm**-3')
 

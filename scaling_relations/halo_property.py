@@ -24,8 +24,43 @@ from register import (
 def histogram_unyt(
         data: unyt_array,
         bins: unyt_array,
-        weights: unyt_array
+        weights: unyt_array,
+        normalizer: Optional[unyt_array] = None,
+        replace_zero_nan: bool = True
 ) -> unyt_array:
+    """
+    Soft wrapper around numpy.histogram to operate with unyt_array objects.
+    It also provides extra functionalities for weighting the dataset  w.r.t.
+    a separate quantity provided by the normaliser. It can optionally replace
+    zeros in the final histogram with Nans.
+    Only supports 1D binning.
+
+    :param data: unyt_array
+        The array to bin, with same units as `bins`.
+        Example: in a radial profile, this would accept the radial distance
+        of particles.
+    :param bins: unyt_array
+        The bin edges with size (number_bins + 1), with same units as `data`.
+        Example: in a radial profile, this would accept the intervals at which
+        to bin radial shells.
+    :param weights: unyt_array
+        The weights to apply to the `data` array.
+        Example: in a radial profile, this could be the mass of particles for
+        a mass-weighted profile. The histogram returned contains the sum of the
+        weights in each bin.
+    :param normalizer: unyt_array
+        An additional dataset to provide extra flexibility for normalisation.
+        Unlike `weights`, the `normaliser` computes the sum of
+        (weights * normaliser) in each bin and divides this result by the sum of
+        `normaliser` in each bin. This measures the average `normaliser`-weighted
+        quantity in each bin. `normaliser` units cancel out in the division.
+    :param replace_zero_nan: bool (default: True)
+        Set to numpy.nan bins with zero counts.
+    :return: unyt_array
+        Returns the binned histogram, weighted and normalised. Note, bin_edges
+        are not returned.
+
+    """
     assert data.shape == weights.shape, (
         "Data and weights arrays must have the same shape. "
         f"Detected data {data.shape}, weights {weights.shape}."
@@ -36,9 +71,32 @@ def histogram_unyt(
         f"Detected data {data.units}, bins {bins.units}."
     )
 
-    hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value)
-    hist *= weights.units
-    bin_edges *= data.units
+    if normalizer is not None:
+        assert data.shape == normalizer.shape, (
+            "Data and normalizer arrays must have the same shape. "
+            f"Detected data {data.shape}, normalizer {normalizer.shape}."
+        )
+
+        hist, bin_edges = np.histogram(
+            data.value, bins=bins.value, weights=weights.value * normalizer.value
+        )
+        hist *= weights.units * normalizer.units
+
+        normalization, bin_edges = np.histogram(
+            data.value, bins=bins.value, weights=normalizer.value
+        )
+        normalization *= normalizer.units
+
+        hist /= normalization
+
+    else:
+        hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value)
+        hist *= weights.units
+
+    if replace_zero_nan:
+        hist[hist == 0] = np.nan
+
+    assert hist.units == weights.units
 
     return hist
 
