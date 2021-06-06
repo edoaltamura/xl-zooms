@@ -261,7 +261,7 @@ class EntropyFgasSpace(HaloProperty):
         entropy_profile /= K500
 
         _, cumulative_gas_mass_profile, cumulative_mass_profile, m500fb = self.process_single_halo(*args, **kwargs)
-        gas_fraction_enclosed = cumulative_gas_mass_profile / m500fb
+        gas_fraction_enclosed = cumulative_gas_mass_profile / cumulative_mass_profile
 
         set_mnras_stylesheet()
         fig, axes = plt.subplots(constrained_layout=True)
@@ -280,20 +280,20 @@ class EntropyFgasSpace(HaloProperty):
         axes.set_ylabel(r'$K/K_{500}$')
         axes.set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
         axes.set_ylim([0, 2.5])
-        axes.set_xlim([0, 1])
+        axes.set_xlim([0, 1.2 * self.fb])
 
-        # axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
-        # axes.text(
-        #     self.fb, axes.get_ylim()[1], r'$f_b$',
-        #     horizontalalignment='right',
-        #     verticalalignment='top',
-        #     color='grey',
-        #     bbox=dict(
-        #         boxstyle='square,pad=10',
-        #         fc='none',
-        #         ec='none'
-        #     )
-        # )
+        axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
+        axes.text(
+            self.fb, axes.get_ylim()[1], r'$f_b$',
+            horizontalalignment='right',
+            verticalalignment='top',
+            color='grey',
+            bbox=dict(
+                boxstyle='square,pad=10',
+                fc='none',
+                ec='none'
+            )
+        )
 
         fig.suptitle(
             (
