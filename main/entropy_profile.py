@@ -40,6 +40,7 @@ make_profile(axes, xray_weighting=False, simple_electron_number_density=True, sh
 make_profile(axes, xray_weighting=True, simple_electron_number_density=False, shell_average=True)
 make_profile(axes, xray_weighting=False, simple_electron_number_density=False, shell_average=True)
 
+
 axes.set_xscale('log')
 axes.set_yscale('log')
 
