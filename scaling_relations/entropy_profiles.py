@@ -169,7 +169,7 @@ class EntropyProfiles(HaloProperty):
                     sw_data,
                     bins=lbins * r500,
                     mask=index,
-                    normalizer=xray_luminosities
+                    normalizer=xray_luminosities[index]
                 )
                 temperature_profile = histogram_unyt(
                     radial_distance,
