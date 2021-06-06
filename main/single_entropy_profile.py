@@ -46,7 +46,7 @@ axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'Entropy [$K_{500}$]')
 axes.set_xlabel(r'$r/r_{500}$')
 axes.set_ylim([5e-3, 20])
-axes.set_xlim([0.005, 2.5])
+axes.set_xlim([5e-3, 2.5])
 
 sun_observations = Sun2009()
 r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()

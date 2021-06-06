@@ -116,7 +116,7 @@ def get_electron_number_density(sw_data: SWIFTDataset) -> cosmo_array:
     electron_number_density.convert_to_units('cm**-3')
     electron_number_density = cosmo_array(
         electron_number_density.value,
-        units='cm**-3',
+        units=electron_number_density.units,
         cosmo_factor=sw_data.gas.densities.cosmo_factor
     )
 
