@@ -261,8 +261,7 @@ class EntropyFgasSpace(HaloProperty):
         gas_fraction_enclosed = cumulative_gas_mass_profile / cumulative_mass_profile
 
         set_mnras_stylesheet()
-        fig = plt.figure(constrained_layout=True)
-        axes = fig.add_subplot()
+        fig, axes = plt.subplots(constrained_layout=True)
 
         axes.plot(
             gas_fraction_enclosed,
@@ -283,9 +282,9 @@ class EntropyFgasSpace(HaloProperty):
         axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
         axes.text(
             self.fb, axes.get_ylim()[1], r'Baryon fraction',
-            horizontalalignment='left',
-            verticalalignment='bottom',
-            color='k',
+            horizontalalignment='right',
+            verticalalignment='top',
+            color='grey',
             bbox=dict(
                 boxstyle='square,pad=10',
                 fc='none',
