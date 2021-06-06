@@ -256,9 +256,11 @@ class EntropyFgasSpace(HaloProperty):
         )
         _, entropy_profile, K500 = entropy_profile_obj.process_single_halo(*args, **kwargs)
         entropy_profile /= K500
+        print(entropy_profile)
 
         _, cumulative_gas_mass_profile, cumulative_mass_profile = self.process_single_halo(*args, **kwargs)
         gas_fraction_enclosed = cumulative_gas_mass_profile / cumulative_mass_profile
+        print(gas_fraction_enclosed)
 
         set_mnras_stylesheet()
         fig = plt.figure(constrained_layout=True)
