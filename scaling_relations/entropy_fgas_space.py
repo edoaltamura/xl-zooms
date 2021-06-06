@@ -241,7 +241,7 @@ class EntropyFgasSpace(HaloProperty):
 
         mass_weights = histogram_unyt(radial_distances[mask], bins=lbins, weights=masses[mask])
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
-        cumulative_mass_profile = np.nancumsum(mass_weights.value) * masses.units
+        cumulative_mass_profile = np.nancumsum(mass_weights.value) * sw_data.units.mass
 
         return radial_bin_centres, cumulative_gas_mass_profile, cumulative_mass_profile
 
