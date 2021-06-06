@@ -98,6 +98,7 @@ class EntropyFgasSpace(HaloProperty):
 
         try:
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+            m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
         except AttributeError as err:
             print(f'[{self.__class__.__name__}] {err}')
 
@@ -106,6 +107,7 @@ class EntropyFgasSpace(HaloProperty):
                 path_to_catalogue=path_to_catalogue,
             )
             r500 = spherical_overdensity.get_r500()
+            m500 = spherical_overdensity.get_m500()
 
         if xlargs.mass_estimator == 'hse':
             true_hse = HydrostaticEstimator(
@@ -116,6 +118,7 @@ class EntropyFgasSpace(HaloProperty):
             )
             true_hse.interpolate_hse(density_contrast=500.)
             r500 = true_hse.r500hse
+            m500 = true_hse.m500hse
 
         # Define radial bins
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * dimensionless
@@ -243,7 +246,7 @@ class EntropyFgasSpace(HaloProperty):
         mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_mass_profile = np.nancumsum(mass_weights.value) * sw_data.units.mass
 
-        return radial_bin_centres, cumulative_gas_mass_profile, cumulative_mass_profile
+        return radial_bin_centres, cumulative_gas_mass_profile, cumulative_mass_profile, m500 * fb
 
     def display_single_halo(self, *args, **kwargs):
 
@@ -257,8 +260,8 @@ class EntropyFgasSpace(HaloProperty):
         _, entropy_profile, K500 = entropy_profile_obj.process_single_halo(*args, **kwargs)
         entropy_profile /= K500
 
-        _, cumulative_gas_mass_profile, cumulative_mass_profile = self.process_single_halo(*args, **kwargs)
-        gas_fraction_enclosed = cumulative_gas_mass_profile / cumulative_mass_profile
+        _, cumulative_gas_mass_profile, cumulative_mass_profile, m500fb = self.process_single_halo(*args, **kwargs)
+        gas_fraction_enclosed = cumulative_gas_mass_profile / m500fb
 
         set_mnras_stylesheet()
         fig, axes = plt.subplots(constrained_layout=True)
@@ -271,17 +274,17 @@ class EntropyFgasSpace(HaloProperty):
             linewidth=1,
             alpha=1,
         )
-        axes.set_xscale('log')
-        axes.set_yscale('log')
+        axes.set_xscale('linear')
+        axes.set_yscale('linear')
 
         axes.set_ylabel(r'$K/K_{500}$')
-        axes.set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / M_{\rm tot}$')
+        axes.set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500} f_b)$')
         axes.set_ylim([1e-2, 5])
         axes.set_xlim([1e-4, 1.5 * self.fb])
 
         axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
         axes.text(
-            self.fb, axes.get_ylim()[1], r'Baryon fraction',
+            self.fb, axes.get_ylim()[1], r'$f_b$',
             horizontalalignment='right',
             verticalalignment='top',
             color='grey',
