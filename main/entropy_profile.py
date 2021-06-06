@@ -1,4 +1,4 @@
-import sys
+import sys, os
 from matplotlib import pyplot as plt
 from unyt import Solar_Mass
 
@@ -64,6 +64,7 @@ bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
     ),
     k500_rescale=True
 )
+
 axes.fill_between(
     rexcess.radial_bins,
     bin_perc16,
@@ -72,7 +73,16 @@ axes.fill_between(
     alpha=0.4,
     linewidth=0
 )
-axes.plot(rexcess.radial_bins, bin_median, c='blue', label=rexcess.citation)
+axes.plot(rexcess.radial_bins, bin_median, c='aqua', label=rexcess.citation)
+
+fig.suptitle(
+    (
+        f"{os.path.basename(xlargs.run_directory)}\n"
+        f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
+    ),
+    fontsize=7
+
+)
 
 plt.legend()
 
