@@ -187,7 +187,7 @@ class EntropyFgasSpace(HaloProperty):
         elif xlargs.debug:
             print(f"[{self.__class__.__name__}] black_holes not detected.")
 
-        radial_distances = np.concatenate(radial_distances_collect) * sw_data.units.lenght / r500
+        radial_distances = np.concatenate(radial_distances_collect) * sw_data.units.length / r500
 
         sw_data.gas.masses.convert_to_physical()
         sw_data.dark_matter.masses.convert_to_physical()
