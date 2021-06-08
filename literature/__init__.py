@@ -1,6 +1,7 @@
 from .Barnes2017 import Barnes2017
 from .Bohringer2007 import Bohringer2007
 from .Budzynski2014 import Budzynski2014
+from .Croston2008 import Croston2008
 from .Eckert2016 import Eckert2016
 from .Gonzalez2013 import Gonzalez2013
 from .Kravtsov2018 import Kravtsov2018
