@@ -12,5 +12,5 @@ def set_mpl_backend(is_quiet: bool):
 def set_mnras_stylesheet():
     try:
         plt.style.use(matplotlib_stylesheet)
-    except (FileNotFoundError, OSError):
+    except (FileNotFoundError, OSError, NotADirectoryError):
         print('Could not find the mnras.mplstyle style-sheet.')

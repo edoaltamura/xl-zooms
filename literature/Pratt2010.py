@@ -119,7 +119,7 @@ class Pratt2010(Article):
         # Compute the characteristic entropy using eq 3 in the paper
         self.K500 = unyt_quantity(106, 'keV*cm**2') * \
                     data[5] ** (2 / 3) * \
-                    0.15 ** (-2 / 3) * \
+                    self.fb0 ** (-2 / 3) * \
                     self.ez_function(self.z) ** (-2 / 3) * \
                     self.hconv ** (-4 / 3)
 
@@ -176,10 +176,8 @@ class Pratt2010(Article):
             if np.isnan(alpha):
                 profiles[i] = np.nan
             else:
-                ez = self.ez_function(redshift)
                 radius = np.logspace(np.log10(0.01 * R500.v), np.log10(R500.v), len(radial_range))
-                profiles[i] = K0 + K100 * (radius / 100 / 0.7) ** alpha
-                profiles[i] *= ez ** (4 / 3) * self.hconv ** (-1 / 3)
+                profiles[i] = K0 + K100 * (radius / 100 / self.hconv) ** alpha
 
         self.entropy_profiles = unyt_array(profiles, keV * cm ** 2)
         self.radial_bins = unyt_array(radial_range, dimensionless)

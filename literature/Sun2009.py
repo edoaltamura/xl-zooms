@@ -24,7 +24,7 @@ class Sun2009(Article):
         os.path.join(repository_dir, 'Sun09_entropy_profiles.txt'),
     ]
 
-    def __init__(self, reduced_table: bool = False, **cosmo_kwargs):
+    def __init__(self, reduced_table: bool = False, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
         super().__init__(
             citation="Sun et al. (2009)",
             comment=comment,
@@ -34,6 +34,8 @@ class Sun2009(Article):
         )
 
         self.hconv = 0.73 / self.h
+        if disable_cosmo_conversion:
+            self.hconv = 1.
 
         if reduced_table:
             self.get_reduced_table()
@@ -44,23 +46,107 @@ class Sun2009(Article):
 
     def get_reduced_table(self):
         raw = np.loadtxt(self.data_files[0])
+        z = raw[:, 0]
         M_500 = unyt.unyt_array((10 ** 13) * self.hconv * raw[:, 1], units="Msun")
         error_M_500_p = unyt.unyt_array((10 ** 13) * self.hconv * raw[:, 2], units="Msun")
         error_M_500_m = unyt.unyt_array((10 ** 13) * self.hconv * raw[:, 3], units="Msun")
+
         fb_500 = unyt.unyt_array(self.hconv ** 1.5 * raw[:, 4], units="dimensionless")
         error_fb_500_p = unyt.unyt_array(self.hconv ** 1.5 * raw[:, 5], units="dimensionless")
         error_fb_500_m = unyt.unyt_array(self.hconv ** 1.5 * raw[:, 6], units="dimensionless")
+
+        fb_2500 = unyt.unyt_array(self.hconv ** 1.5 * raw[:, 7], units="dimensionless")
+        error_fb_2500_p = unyt.unyt_array(self.hconv ** 1.5 * raw[:, 8], units="dimensionless")
+        error_fb_2500_m = unyt.unyt_array(self.hconv ** 1.5 * raw[:, 9], units="dimensionless")
+
+        K_500 = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 10], units="keV*cm**2")
+        error_K_500_p = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 11], units="keV*cm**2")
+        error_K_500_m = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 12], units="keV*cm**2")
+
+        K_1000 = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 13], units="keV*cm**2")
+        error_K_1000_p = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 14], units="keV*cm**2")
+        error_K_1000_m = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 15], units="keV*cm**2")
+
+        K_1500 = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 16], units="keV*cm**2")
+        error_K_1500_p = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 17], units="keV*cm**2")
+        error_K_1500_m = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 18], units="keV*cm**2")
+
+        K_2500 = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 19], units="keV*cm**2")
+        error_K_2500_p = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 20], units="keV*cm**2")
+        error_K_2500_m = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 21], units="keV*cm**2")
+
+        K_0p15r500 = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 22], units="keV*cm**2")
+        error_K_0p15r500_p = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 23], units="keV*cm**2")
+        error_K_0p15r500_m = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 24], units="keV*cm**2")
+
+        K_30kpc = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 25], units="keV*cm**2")
+        error_K_30kpc_p = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 26], units="keV*cm**2")
+        error_K_30kpc_m = unyt.unyt_array(self.hconv ** (1 / 3) * raw[:, 27], units="keV*cm**2")
+
+        R_500 = unyt.unyt_array(self.hconv * raw[:, 28], units="kpc")
+        error_R_500_p = unyt.unyt_array(self.hconv * raw[:, 29], units="kpc")
+        error_R_500_m = unyt.unyt_array(self.hconv * raw[:, 30], units="kpc")
+
+        R_2500 = unyt.unyt_array(self.hconv * raw[:, 31], units="kpc")
+        error_R_2500_p = unyt.unyt_array(self.hconv * raw[:, 32], units="kpc")
+        error_R_2500_m = unyt.unyt_array(self.hconv * raw[:, 33], units="kpc")
 
         # Class parser
         # Define the scatter as offset from the mean value
         self.M_500 = M_500
         self.M_500_error = unyt.unyt_array((error_M_500_m, error_M_500_p))
+
         self.fb_500 = fb_500
         self.fb_500_error = unyt.unyt_array((error_fb_500_m, error_fb_500_p))
+
+        self.fb_2500 = fb_2500
+        self.fb_2500_error = unyt.unyt_array((error_fb_2500_m, error_fb_2500_p))
+
+        self.K_500 = K_500
+        self.K_500_error = unyt.unyt_array((error_K_500_m, error_K_500_p))
+
+        self.K_1000 = K_1000
+        self.K_1000_error = unyt.unyt_array((error_K_1000_m, error_K_1000_p))
+
+        self.K_1500 = K_1500
+        self.K_1500_error = unyt.unyt_array((error_K_1500_m, error_K_1500_p))
+
+        self.K_2500 = K_2500
+        self.K_2500_error = unyt.unyt_array((error_K_2500_m, error_K_2500_p))
+
+        self.K_0p15r500 = K_0p15r500
+        self.K_0p15r500_error = unyt.unyt_array((error_K_0p15r500_m, error_K_0p15r500_p))
+
+        self.K_30kpc = K_30kpc
+        self.K_30kpc_error = unyt.unyt_array((error_K_30kpc_m, error_K_30kpc_p))
+
+        self.R_500 = R_500
+        self.R_500_error = unyt.unyt_array((error_R_500_m, error_R_500_p))
+
+        self.R_2500 = R_2500
+        self.R_2500_error = unyt.unyt_array((error_R_2500_m, error_R_2500_p))
+
         self.M_500gas = M_500 * fb_500
         self.M_500gas_error = unyt.unyt_array((
             self.M_500gas * (error_M_500_m / M_500 + error_fb_500_m / fb_500),
             self.M_500gas * (error_M_500_p / M_500 + error_fb_500_p / fb_500)
+        ))
+
+        self.K_500_adi = unyt.unyt_quantity(342, "keV*cm**2") * \
+                         (M_500 / unyt.unyt_quantity(1e14, "Msun")) ** (2 / 3) * \
+                         self.hconv ** (-4 / 3) * self.ez_function(z) ** (-2 / 3) * \
+                         (0.165 / self.fb0) ** (-2 / 3)
+
+        self.R_1000 = R_500 * 0.741
+        self.R_1000_error = unyt.unyt_array((
+            self.R_1000 * (error_R_500_m / R_500 + 0.013 / 0.741),
+            self.R_1000 * (error_R_500_p / R_500 + 0.013 / 0.741)
+        ))
+
+        self.R_1500 = R_500 * 0.617
+        self.R_1500_error = unyt.unyt_array((
+            self.R_1500 * (error_R_500_m / R_500 + 0.011 / 0.617),
+            self.R_1500 * (error_R_500_p / R_500 + 0.011 / 0.617)
         ))
 
     @staticmethod
@@ -172,11 +258,10 @@ class Sun2009(Article):
         # Reconstruct K_500, adiabatic (eq 7)
         self.K_500_adi = np.ones_like(self.K_500)
         for i, (m500, z) in enumerate(zip(self.M_500, self.redshift)):
-            self.K_500_adi[i] = 342 * unyt.keV * unyt.cm ** 2
-            self.K_500_adi[i] *= (m500 / 1e14 / unyt.Msun) ** (2 / 3)
-            self.K_500_adi[i] *= (0.165 / self.get_baryon_fraction(z)) ** (2 / 3)
+            self.K_500_adi[i] = 342 * unyt.keV * unyt.cm ** 2 * (m500 / 1e14 / unyt.Solar_Mass) ** (2 / 3)
+            self.K_500_adi[i] *= (0.165 / self.fb0) ** (-2 / 3)
             self.K_500_adi[i] *= self.ez_function(z) ** (-2 / 3)
-            self.K_500_adi[i] *= self.h ** (-4 / 3)
+            self.K_500_adi[i] *= self.hconv ** (-4 / 3)
 
     def filter_by(self, selection_field: str, low: float, high: float):
         selection_data = getattr(self, selection_field).value

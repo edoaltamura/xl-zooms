@@ -1,0 +1,2 @@
+$R_{\rm phys}$      $R_{\rm phys}/R_{500}$      $n_{\rm e}$     $\sigma_{\rm ne}$
+kpc                 dimensionless               cm$^{-3}$       cm$^{-3}$
