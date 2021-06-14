@@ -324,7 +324,7 @@ class HydrostaticEstimator:
             self.m2500c = spherical_overdensity.get_m2500()
             self.r2500c = spherical_overdensity.get_r2500()
 
-        vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+        XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
         YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
         ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
