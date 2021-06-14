@@ -3,6 +3,7 @@ import numpy as np
 import swiftsimio
 import velociraptor
 from scipy.spatial import distance
+from scipy import stats
 import pandas as pd
 from tqdm import tqdm
 from unyt import unyt_array, unyt_quantity
@@ -77,6 +78,7 @@ def histogram_unyt(
             f"Detected data {data.shape}, normalizer {normalizer.shape}."
         )
 
+
         hist, bin_edges = np.histogram(
             data.value, bins=bins.value, weights=weights.value * normalizer.value
         )
@@ -90,15 +92,10 @@ def histogram_unyt(
         hist /= norm
 
     else:
-        hist, bin_edges = np.histogram(
-            data.value, bins=bins.value, weights=weights.value
-        )
-        hist /= np.bincount(
-            np.digitize(data.value, bins.value)
-        )[1:]
-        print(np.bincount(
-            np.digitize(data.value, bins.value)
-        )[1:])
+
+        result = stats.binned_statistic(data.value, weights.value, 'sum', bins=bins.value)
+        hist = result.statistic / result.binnumber
+        print(result)
         hist *= weights.units
 
     if replace_zero_nan:
