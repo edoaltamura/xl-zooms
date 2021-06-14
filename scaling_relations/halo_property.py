@@ -96,8 +96,8 @@ def histogram_unyt(
         hist = stats.binned_statistic(data.value, weights.value, 'mean', bins=bins.value).statistic
         # norm = stats.binned_statistic(data.value, weights.value, 'count', bins=bins.value).statistic
         # hist /= norm
-        # print(norm)
         hist *= weights.units
+        print(hist)
 
     if replace_zero_nan:
         hist[hist == 0] = np.nan
