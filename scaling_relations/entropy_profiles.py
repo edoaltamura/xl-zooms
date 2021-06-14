@@ -312,6 +312,10 @@ class EntropyProfiles(HaloProperty):
         fig = plt.figure(constrained_layout=True)
         axes = fig.add_subplot()
 
+        # r = np.array([0.01, 1])
+        # k = 1.40 * r ** 1.1
+        axes.plot(np.array([0.01, 1]), 1.40 * np.array([0.01, 1]) ** 1.1, linestyle='--', color='k', alpha=1)
+
         axes.plot(
             radial_bin_centres,
             entropy_profile / K500,
@@ -379,9 +383,7 @@ class EntropyProfiles(HaloProperty):
         )
         axes.plot(rexcess.radial_bins, bin_median, c='blue')
 
-        r = np.array([0.01, 1])
-        k = 1.40 * r ** 1.1
-        axes.plot(r, k, linestyle='--', color='k', alpha=1)
+
 
         if not xlargs.quiet:
             plt.show()
