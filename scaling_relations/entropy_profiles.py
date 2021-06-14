@@ -125,7 +125,8 @@ class EntropyProfiles(HaloProperty):
             A = sw_data.gas.entropies * sw_data.units.mass
             temperatures = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / kb
-            print(temperatures)
+            temperatures2 = sw_data.gas.internal_energies * (gamma - 1) * mh / kb * mean_molecular_weight
+            print(temperatures, temperatures2, sep='\n')
 
 
 
