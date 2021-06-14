@@ -361,7 +361,6 @@ class HydrostaticEstimator:
         # r500c is already in physical units
         data.gas.coordinates.convert_to_physical()
         data.gas.masses.convert_to_physical()
-        data.gas.temperatures.convert_to_physical()
         data.gas.densities.convert_to_physical()
         data.dark_matter.coordinates.convert_to_physical()
         data.dark_matter.masses.convert_to_physical()
