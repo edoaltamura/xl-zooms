@@ -93,13 +93,10 @@ def histogram_unyt(
         hist, bin_edges = np.histogram(
             data.value, bins=bins.value, weights=weights.value
         )
-        hist *= weights.units
-
-        norm = np.bincount(
+        hist /= np.bincount(
             np.digitize(data.value, bins.value)
         )[1:]
-
-        hist /= norm
+        hist *= weights.units
 
     if replace_zero_nan:
         hist[hist == 0] = np.nan
