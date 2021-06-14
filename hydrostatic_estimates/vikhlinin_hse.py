@@ -2,7 +2,7 @@ import sys
 import os
 from unyt import (
     unyt_array, unyt_quantity,
-    Mpc, mp, dimensionless, G, kb, Solar_Mass, keV, K
+    Mpc, mp, dimensionless, G, kb, Solar_Mass, keV, K, mh
 )
 import numpy as np
 from typing import Tuple
@@ -17,6 +17,7 @@ from register import (
     zooms_register, Zoom, Tcut_halogas, Redshift, xlargs,
     mean_molecular_weight,
     mean_atomic_weight_per_free_electron,
+    gamma
 )
 from .convergence_radius import convergence_radius
 from literature import Cosmology
@@ -341,8 +342,26 @@ class HydrostaticEstimator:
             Tcut_halogas * K,
             1.e12 * K
         )
+
         data = sw.load(self.snapshot_file, mask=mask)
-        self.fbary = Cosmology().get_baryon_fraction(data.metadata.z)
+
+        try:
+            _ = data.gas.temperatures
+        except AttributeError as err:
+            print(f'[{self.__class__.__name__}] {err}')
+            if xlargs.debug:
+                print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
+            data.gas.temperatures = data.gas.internal_energies * (gamma - 1) * mean_molecular_weight * mh / kb
+
+        try:
+            _ = data.gas.fofgroup_ids
+        except AttributeError as err:
+            print(f'[{self.__class__.__name__}] {err}')
+            if xlargs.debug:
+                print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
+            data.gas.fofgroup_ids = np.ones_like(data.gas.densities)
+
+        self.fbary = Cosmology().fb0
 
         # Convert datasets to physical quantities
         # r500c is already in physical units
