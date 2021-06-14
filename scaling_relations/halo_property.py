@@ -96,6 +96,9 @@ def histogram_unyt(
         hist /= np.bincount(
             np.digitize(data.value, bins.value)
         )[1:]
+        print(np.bincount(
+            np.digitize(data.value, bins.value)
+        )[1:])
         hist *= weights.units
 
     if replace_zero_nan:
