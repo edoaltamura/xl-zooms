@@ -122,13 +122,10 @@ class EntropyProfiles(HaloProperty):
             print(f'[{self.__class__.__name__}] {err}')
             if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
-            A = sw_data.gas.entropies * sw_data.units.mass
-            temperatures = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
-                    gamma - 1) * mh / kb
-            temperatures2 = sw_data.gas.internal_energies * (gamma - 1) * mh / kb * mean_molecular_weight
-            print(temperatures, temperatures2, sep='\n')
-
-
+            # A = sw_data.gas.entropies * sw_data.units.mass
+            # temperatures = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
+            #         gamma - 1) * mh / kb
+            temperatures = sw_data.gas.internal_energies * (gamma - 1) * mh / kb * mean_molecular_weight
 
         try:
             fof_ids = sw_data.gas.fofgroup_ids
