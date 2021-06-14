@@ -99,6 +99,8 @@ def histogram_unyt(
             data.value, bins.value
         )
 
+        print(hist.shape, norm.shape)
+
         hist /= norm
 
     if replace_zero_nan:
