@@ -93,10 +93,10 @@ def histogram_unyt(
 
     else:
 
-        hist = stats.binned_statistic(data.value, weights.value, 'sum', bins=bins.value).statistic
-        norm = stats.binned_statistic(data.value, weights.value, 'count', bins=bins.value).statistic
-        hist /= norm
-        print(norm)
+        hist = stats.binned_statistic(data.value, weights.value, 'mean', bins=bins.value).statistic
+        # norm = stats.binned_statistic(data.value, weights.value, 'count', bins=bins.value).statistic
+        # hist /= norm
+        # print(norm)
         hist *= weights.units
 
     if replace_zero_nan:
