@@ -295,8 +295,8 @@ class HydrostaticEstimator:
                 path_to_snap=self.snapshot_file,
                 path_to_catalogue=self.catalog_file,
             )
-            self.m200c = spherical_overdensity.get_m500()
-            self.r200c = spherical_overdensity.get_r500()
+            self.m200c = spherical_overdensity.get_m200()
+            self.r200c = spherical_overdensity.get_r200()
 
         try:
             self.m500c = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
@@ -321,8 +321,8 @@ class HydrostaticEstimator:
                 path_to_snap=self.snapshot_file,
                 path_to_catalogue=self.catalog_file,
             )
-            self.m2500c = spherical_overdensity.get_m500()
-            self.r2500c = spherical_overdensity.get_r500()
+            self.m2500c = spherical_overdensity.get_m2500()
+            self.r2500c = spherical_overdensity.get_r2500()
 
         vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
         YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
