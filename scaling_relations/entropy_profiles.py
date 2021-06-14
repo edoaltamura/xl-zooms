@@ -79,7 +79,7 @@ class EntropyProfiles(HaloProperty):
             path_to_catalogue,
             mask_radius_r500=self.max_radius_r500
         )
-        fb = Cosmology().get_baryon_fraction(sw_data.metadata.z)
+        fb = Cosmology().fb0
         critical_density = unyt_quantity(
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
@@ -125,6 +125,9 @@ class EntropyProfiles(HaloProperty):
             A = sw_data.gas.entropies * sw_data.units.mass
             temperatures = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
                     gamma - 1) * mh / kb
+            print(temperatures)
+
+
 
         try:
             fof_ids = sw_data.gas.fofgroup_ids
