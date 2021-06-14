@@ -1,4 +1,5 @@
 import sys, os
+import numpy as np
 from matplotlib import pyplot as plt
 from unyt import Solar_Mass
 
