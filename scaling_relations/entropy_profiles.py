@@ -314,7 +314,7 @@ class EntropyProfiles(HaloProperty):
 
         # r = np.array([0.01, 1])
         # k = 1.40 * r ** 1.1
-        axes.plot(np.array([0.01, 1]), 1.40 * np.array([0.01, 1]) ** 1.1, linestyle='--', color='k', alpha=1)
+        axes.plot(np.array([0.01, 1]), 1.40 * np.array([0.01, 1]) ** 1.1)
 
         axes.plot(
             radial_bin_centres,
