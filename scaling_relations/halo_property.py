@@ -95,11 +95,9 @@ def histogram_unyt(
         )
         hist *= weights.units
 
-        norm = np.digitize(
-            data.value, bins.value
+        norm = np.bincount(
+            np.digitize(data.value, bins.value)
         )
-
-        print(hist.shape, norm.shape)
 
         hist /= norm
 
