@@ -181,7 +181,7 @@ class EntropyProfiles(HaloProperty):
                 bins=lbins,
                 weights=np.ones_like(entropy) * dimensionless,
                 # normalizer=sw_data.gas.masses[index]
-            )
+            ).value
             entropy_profile /= bin_count
 
 
