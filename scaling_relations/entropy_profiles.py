@@ -114,31 +114,27 @@ class EntropyProfiles(HaloProperty):
             m500 = true_hse.m500hse
 
         try:
-            temperatures = sw_data.gas.temperatures
+            _ = sw_data.gas.temperatures
         except AttributeError as err:
             print(f'[{self.__class__.__name__}] {err}')
             if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
-            # A = sw_data.gas.entropies * sw_data.units.mass
-            # temperatures = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
-            #         gamma - 1) * mh / kb
-            temperatures = sw_data.gas.internal_energies * (gamma - 1) * mh / kb * mean_molecular_weight
+            sw_data.gas.temperatures = sw_data.gas.internal_energies * (gamma - 1) * mean_molecular_weight * mh / kb
 
         try:
-            fof_ids = sw_data.gas.fofgroup_ids
+            _ = sw_data.gas.fofgroup_ids
         except AttributeError as err:
             print(f'[{self.__class__.__name__}] {err}')
             if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
-            fof_ids = np.ones_like(sw_data.gas.densities)
+            sw_data.gas.fofgroup_ids = np.ones_like(sw_data.gas.densities)
 
         index = np.where(
             (sw_data.gas.radial_distances < self.max_radius_r500 * r500) &
-            (fof_ids == 1) &
-            (temperatures > Tcut_halogas)
+            (sw_data.gas.fofgroup_ids == 1) &
+            (sw_data.gas.temperatures > Tcut_halogas)
         )[0]
         radial_distance = sw_data.gas.radial_distances[index] / r500
-        temperatures = temperatures[index]
 
         # Define radial bins and shell volumes
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
@@ -165,14 +161,13 @@ class EntropyProfiles(HaloProperty):
             xray_luminosities = None
 
         if not self.shell_average:
+            # n_e = get_electron_number_density(sw_data)[index]
             sw_data.gas.densities.convert_to_units('g/cm**3')
             n_e = sw_data.gas.densities[index] / (mp * mean_atomic_weight_per_free_electron)
             n_e.convert_to_units('cm**-3')
-            entropy = kb * temperatures / (n_e ** (2 / 3))
+            entropy = kb * sw_data.gas.temperatures[index] / (n_e ** (2 / 3))
             entropy.convert_to_units('keV*cm**2')
 
-            # n_e = get_electron_number_density(sw_data)[index]
-            # entropy = kb * temperatures / (n_e ** (2 / 3))
             entropy_profile = histogram_unyt(
                 radial_distance,
                 bins=lbins,
