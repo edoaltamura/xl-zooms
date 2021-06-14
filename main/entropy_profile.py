@@ -10,7 +10,7 @@ from literature import Sun2009, Pratt2010
 
 
 def make_profile(axes, **kwargs):
-    profile_obj = EntropyProfiles(max_radius_r500=1.5, **kwargs)
+    profile_obj = EntropyProfiles(max_radius_r500=1., **kwargs)
     print(
         f"xray_weighting: {profile_obj.xray_weighting} mu-average: {profile_obj.simple_electron_number_density} shell_average: {profile_obj.shell_average}")
     radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
@@ -24,6 +24,7 @@ def make_profile(axes, **kwargs):
         linewidth=1,
         label=f"xray: {profile_obj.xray_weighting}, $\mu$-avg: {profile_obj.simple_electron_number_density}, shell_avg: {profile_obj.shell_average}"
     )
+    axes.plot(np.array([0.01, 1]), 1.40 * np.array([0.01, 1]) ** 1.1)
 
 
 snap, cat = find_files()

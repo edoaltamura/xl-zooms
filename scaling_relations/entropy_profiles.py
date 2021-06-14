@@ -304,6 +304,7 @@ class EntropyProfiles(HaloProperty):
                 kBT500 / (500 * fb * critical_density / (mean_atomic_weight_per_free_electron * mp)) ** (2 / 3)
         ).to('keV*cm**2')
         print(f"K500 {K500:.2f}")
+        print("Gas fraction", np.sum(sw_data.gas.masses[index])/m500)
         return radial_bin_centres, entropy_profile, K500
 
     def display_single_halo(self, *args, **kwargs):
