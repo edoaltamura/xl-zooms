@@ -11,7 +11,7 @@ numba.config.NUMBA_NUM_THREADS = cpu_count()
 from unyt import (
     unyt_array,
     unyt_quantity,
-    mh, G, mp, K, kb, cm, Solar_Mass, Mpc
+    mh, G, mp, K, kb, cm, Solar_Mass, Mpc, dimensionless
 )
 
 from register import (
@@ -174,8 +174,15 @@ class EntropyProfiles(HaloProperty):
                 radial_distance,
                 bins=lbins,
                 weights=entropy,
-                normalizer=sw_data.gas.masses[index]
+                # normalizer=sw_data.gas.masses[index]
             )
+            bin_count = entropy_profile = histogram_unyt(
+                radial_distance,
+                bins=lbins,
+                weights=np.ones_like(entropy) * dimensionless,
+                # normalizer=sw_data.gas.masses[index]
+            )
+            entropy_profile /= bin_count
 
 
         # if not self.simple_electron_number_density and self.shell_average:
