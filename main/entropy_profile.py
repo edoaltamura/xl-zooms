@@ -32,9 +32,9 @@ set_mnras_stylesheet()
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
-make_profile(axes, xray_weighting=False, simple_electron_number_density=False, shell_average=True)
-make_profile(axes, xray_weighting=True, simple_electron_number_density=True, shell_average=False)
-make_profile(axes, xray_weighting=False, simple_electron_number_density=True, shell_average=True)
+make_profile(axes, xray_weighting=False, simple_electron_number_density=False, shell_average=False)
+# make_profile(axes, xray_weighting=True, simple_electron_number_density=True, shell_average=False)
+make_profile(axes, xray_weighting=False, simple_electron_number_density=True, shell_average=False)
 
 axes.set_xscale('log')
 axes.set_yscale('log')
