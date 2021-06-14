@@ -379,7 +379,7 @@ class EntropyProfiles(HaloProperty):
         )
         axes.plot(rexcess.radial_bins, bin_median, c='blue')
 
-        r = np.linspace(*axes.get_xlim(), 31)
+        r = np.array([0.01, 1])
         k = 1.40 * r ** 1.1
         axes.plot(r, k, linestyle='--', color='k', alpha=1)
 
