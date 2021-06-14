@@ -96,8 +96,8 @@ def histogram_unyt(
         hist *= weights.units
 
         norm = np.bincount(
-            np.digitize(data.value, bins.value)[1:]
-        )
+            np.digitize(data.value, bins.value)
+        )[1:]
 
         hist /= norm
 
