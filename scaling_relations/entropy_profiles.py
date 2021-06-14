@@ -167,6 +167,7 @@ class EntropyProfiles(HaloProperty):
             n_e = sw_data.gas.densities.to('g/cm**3')[index] / (mp * mean_molecular_weight)
             n_e.convert_to_units('cm**-3')
             entropy = kb * temperatures / (n_e ** (2 / 3))
+            entropy.convert_to_units('keV*cm**2')
 
             # n_e = get_electron_number_density(sw_data)[index]
             # entropy = kb * temperatures / (n_e ** (2 / 3))
