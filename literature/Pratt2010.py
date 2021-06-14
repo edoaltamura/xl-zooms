@@ -18,7 +18,7 @@ comment = (
 
 class Pratt2010(Article):
 
-    def __init__(self, **cosmo_kwargs):
+    def __init__(self, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
         super().__init__(
             citation="Pratt et al. (2010)",
             comment=comment,
@@ -28,6 +28,8 @@ class Pratt2010(Article):
         )
 
         self.hconv = 0.70 / self.h
+        if disable_cosmo_conversion:
+            self.hconv = 1.
 
         self.process_properties()
         self.process_entropy_profiles()
@@ -103,9 +105,9 @@ class Pratt2010(Article):
             keV,
             keV,
             keV,
-            1e13 * self.hconv * keV,
-            1e13 * self.hconv * keV,
-            1e13 * self.hconv * keV,
+            1e13 * self.hconv * keV * Solar_Mass,
+            1e13 * self.hconv * keV * Solar_Mass,
+            1e13 * self.hconv * keV * Solar_Mass,
             kpc,
             dimensionless
         ]

@@ -10,6 +10,7 @@ from matplotlib import pyplot as plt
 from scipy.interpolate import interp1d
 
 from .cosmology import Article, repository_dir
+from .Pratt2010 import Pratt2010
 
 mean_molecular_weight = 0.5954
 mean_atomic_weight_per_free_electron = 1.14
@@ -21,7 +22,7 @@ comment = (
 
 class Croston2008(Article):
 
-    def __init__(self, **cosmo_kwargs):
+    def __init__(self, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
         super().__init__(
             citation="Croston et al. (2008)",
             comment=comment,
@@ -31,6 +32,11 @@ class Croston2008(Article):
         )
 
         self.hconv = 0.70 / self.h
+        if disable_cosmo_conversion:
+            self.hconv = 1.
+
+        self.pratt2010 = Pratt2010(disable_cosmo_conversion=disable_cosmo_conversion)
+
         self.cluster_data = []
         self.process_profiles()
 
@@ -48,19 +54,18 @@ class Croston2008(Article):
         return cluster_data
 
     def process_profiles(self):
-        for file_path in os.listdir(
-            os.path.join(repository_dir, 'Croston2008_profiles')
-        ):
-            if file_path.startswith('RXC'):
-                cluster = self.log_cluster_data(
-                    os.path.join(repository_dir, 'Croston2008_profiles', file_path)
-                )
-                self.cluster_data.append(cluster)
+        for file_path in self.pratt2010.Cluster_name:
+            cluster = self.log_cluster_data(
+                os.path.join(repository_dir, 'Croston2008_profiles', f"{file_path}.txt")
+            )
+            self.cluster_data.append(cluster)
 
     def compute_gas_mass(self):
         for cluster in self.cluster_data:
-            radial_bin_centres = 10.0 ** (0.5 * np.log10(cluster['r_kpc'][1:] * cluster['r_kpc'][:-1])) * kpc
+            # radial_bin_centres = 10.0 ** (0.5 * np.log10(cluster['r_kpc'][1:] * cluster['r_kpc'][:-1])) * kpc
+            radial_bin_centres = (cluster['r_kpc'][1:] + cluster['r_kpc'][:-1]) / 2
 
+            # Find value of the electron number density at bin centres by interpolating
             radius_interpolate = interp1d(
                 cluster['r_kpc'].value,
                 cluster['n_e'].value,
@@ -69,23 +74,55 @@ class Croston2008(Article):
             )
             n_e_bin_centres = radius_interpolate(radial_bin_centres) * cluster['n_e'].units
 
-            gas_density_bin_centres = n_e_bin_centres * (mp * mean_molecular_weight) / mean_atomic_weight_per_free_electron
-            gas_density_bin_centres.convert_to_units('Msun/kpc**3')
+            # Convert electron number density to gas density
+            gas_density_bin_centres = n_e_bin_centres * (
+                    mp * mean_molecular_weight) / mean_atomic_weight_per_free_electron
+            gas_density_bin_centres.astype(np.float64).convert_to_units('Msun/kpc**3')
             volume_shells = 4 * np.pi / 3 * (cluster['r_kpc'][1:] ** 3 - cluster['r_kpc'][:-1] ** 3)
-            print(gas_density_bin_centres)
             gas_mass_bin_centres = gas_density_bin_centres * volume_shells
 
+            # Interpolate/extrapolate results back to the bin edges
             radius_interpolate = interp1d(
-                n_e_bin_centres.value,
+                radial_bin_centres.value,
                 gas_mass_bin_centres.value,
                 kind='linear',
                 fill_value='extrapolate'
             )
             gas_mass_bin_edges = radius_interpolate(cluster['r_kpc'])
 
+            # Cumulate mass in shells to find the gas mass enclosed
             gas_mass_bin_edges = np.cumsum(gas_mass_bin_edges) * gas_mass_bin_centres.units
             gas_mass_bin_edges.astype(np.float64).convert_to_units('Msun')
-            cluster['Mgas'] = gas_mass_bin_edges
+            cluster['Mgas'] = gas_mass_bin_edges.to('Msun')
+
+    def estimate_total_mass(self):
+
+        average_concentration = 3.2
+
+        compton_like_yx = self.pratt2010.YX_R500
+
+        M500 = 10 ** 14.567 * Solar_Mass / 0.7 * self.hconv * \
+               (compton_like_yx / unyt_quantity(2e14, 'Msun*keV')) ** 0.561 \
+               * self.ez_function(self.pratt2010.z) ** (-2 / 5)
+
+        for cluster, m500, r500 in zip(self.cluster_data, M500, self.pratt2010.R500):
+            scale_radius = r500 / average_concentration
+
+            nfw_density_normalisation = m500 / (4 * np.pi * scale_radius ** 3 * \
+                                                (np.log(1 + (r500 / scale_radius)) + scale_radius / (
+                                                        r500 + scale_radius) - 1))
+
+            r = cluster['r_kpc']
+            nfw_enclosed_mass = 4 * np.pi * nfw_density_normalisation * scale_radius ** 3 * \
+                                (np.log(1 + (r / scale_radius)) + scale_radius / (r + scale_radius) - 1)
+
+            cluster['Mdm_nfw'] = nfw_enclosed_mass
+
+    def compute_gas_fraction(self):
+        for cluster in self.cluster_data:
+            assert 'Mgas' in cluster
+            assert 'Mdm_nfw' in cluster
+            cluster['f_g'] = cluster['Mgas'] / (cluster['Mgas'] + cluster['Mdm_nfw'])
 
     def interpolate_r_r500(self, r_r500_new: np.ndarray):
 
@@ -102,51 +139,28 @@ class Croston2008(Article):
 
             cluster['r_r500'] = r_r500_new * cluster['r_r500'].units
 
-    # def combine_entropy_profiles(
-    #         self,
-    #         m500_limits: Tuple[unyt_quantity] = (
-    #                 1e10 * Solar_Mass,
-    #                 1e17 * Solar_Mass
-    #         ),
-    #         k500_rescale: bool = True
-    # ):
-    #
-    #     if k500_rescale:
-    #         self.entropy_profiles /= self.K500[:, None]
-    #         self.entropy_profiles_k500_rescaled = True
-    #
-    #     mass_bin = np.where(
-    #         (self.M500.value > m500_limits[0].value) &
-    #         (self.M500.value < m500_limits[1].value)
-    #     )[0]
-    #
-    #     bin_median = np.nanmedian(self.entropy_profiles[mass_bin], axis=0)
-    #     bin_perc16 = np.nanpercentile(self.entropy_profiles[mass_bin], 16, axis=0)
-    #     bin_perc84 = np.nanpercentile(self.entropy_profiles[mass_bin], 84, axis=0)
-    #
-    #     return bin_median, bin_perc16, bin_perc84
-
-    def quick_display(self, **kwargs):
-
-        # bin_median, bin_perc16, bin_perc84 = self.combine_entropy_profiles(**kwargs)
+    def quick_display(self, quantity: str = 'f_g'):
         self.compute_gas_mass()
+        self.estimate_total_mass()
+        self.compute_gas_fraction()
+
         # Display the catalogue data
         for cluster in self.cluster_data:
-            plt.plot(cluster['r_r500'], cluster['Mgas'], c='k', alpha=0.1)
 
-        # plt.fill_between(
-        #     self.radial_bins,
-        #     bin_perc16,
-        #     bin_perc84,
-        #     color='aqua', alpha=0.85, linewidth=0
-        # )
-        # plt.plot(self.radial_bins, bin_median, c='k')
+            for value in cluster['Mgas']:
+                if value < 1.e7:
+                    print(cluster['name'])
 
+            plt.plot(cluster['r_r500'], cluster[quantity], c='k',
+                     alpha=0.7, lw=0.3)
+
+        # plt.axhline(self.fb0)
         plt.xlabel(r'$r/r_{500}$')
-        y_label = r'$E(z)^{4/3} K$ [keV cm$^2$]'
+        y_label = r'$h_{70}^{-3/2}\ f_g (<R)$'
         plt.ylabel(y_label)
         plt.title(f"REXCESS sample - {self.citation}")
         plt.xscale('log')
         plt.yscale('log')
+        # plt.ylim(0, self.fb0 * 1.1)
         plt.show()
         plt.close()
