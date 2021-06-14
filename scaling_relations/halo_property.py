@@ -93,6 +93,7 @@ def histogram_unyt(
         hist, bin_edges = np.histogram(
             data.value, bins=bins.value, weights=weights.value * np.ones_like(weights)
         )
+        hist *= weights.units
 
         norm, bin_edges = np.histogram(
             data.value, bins=bins.value, weights=np.ones_like(weights)
