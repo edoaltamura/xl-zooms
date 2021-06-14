@@ -268,12 +268,13 @@ class HaloProperty(object):
             )
 
         if xlargs.debug:
+
             print((
                 f"[{self.__class__.__name__}] Particles in mask:\n\t| "
                 f"{sw_handle.gas.coordinates.shape[0]:11d} gas | "
                 f"{sw_handle.dark_matter.coordinates.shape[0]:11d} dark_matter | "
-                f"{sw_handle.stars.coordinates.shape[0]:11d} stars | "
-                f"{sw_handle.black_holes.coordinates.shape[0]:11d} black_holes | "
+                f"{sw_handle.stars.coordinates.shape[0] if sw_handle.metadata.n_stars > 0 else 0:11d} stars | "
+                f"{sw_handle.black_holes.coordinates.shape[0] if sw_handle.metadata.n_black_holes > 0 else 0:11d} black_holes | "
             ))
 
         return sw_handle, vr_handle
