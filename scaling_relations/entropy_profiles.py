@@ -176,7 +176,7 @@ class EntropyProfiles(HaloProperty):
                 weights=entropy,
                 # normalizer=sw_data.gas.masses[index]
             )
-            bin_count = entropy_profile = histogram_unyt(
+            bin_count = histogram_unyt(
                 radial_distance,
                 bins=lbins,
                 weights=np.ones_like(entropy) * dimensionless,
