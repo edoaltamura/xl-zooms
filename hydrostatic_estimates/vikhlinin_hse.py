@@ -330,19 +330,13 @@ class HydrostaticEstimator:
         ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
         # Read in gas particles and parse densities and temperatures
-        mask = sw.mask(self.snapshot_file, spatial_only=False)
+        mask = sw.mask(self.snapshot_file, spatial_only=True)
         region = [
             [(XPotMin - 1.5 * self.r500c) / a, (XPotMin + 1.5 * self.r500c) / a],
             [(YPotMin - 1.5 * self.r500c) / a, (YPotMin + 1.5 * self.r500c) / a],
             [(ZPotMin - 1.5 * self.r500c) / a, (ZPotMin + 1.5 * self.r500c) / a]
         ]
         mask.constrain_spatial(region)
-        mask.constrain_mask(
-            "gas", "temperatures",
-            Tcut_halogas * K,
-            1.e12 * K
-        )
-
         data = sw.load(self.snapshot_file, mask=mask)
 
         try:
@@ -371,8 +365,8 @@ class HydrostaticEstimator:
         data.gas.densities.convert_to_physical()
         data.dark_matter.coordinates.convert_to_physical()
         data.dark_matter.masses.convert_to_physical()
-        data.stars.coordinates.convert_to_physical()
-        data.stars.masses.convert_to_physical()
+        # data.stars.coordinates.convert_to_physical()
+        # data.stars.masses.convert_to_physical()
 
         # Calculate the critical density for the density profile
         self.rho_crit = unyt_quantity(
