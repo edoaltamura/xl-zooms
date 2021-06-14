@@ -113,6 +113,9 @@ class EntropyProfiles(HaloProperty):
             r500 = true_hse.r500hse
             m500 = true_hse.m500hse
 
+        print(f"m500 {m500:.2E}")
+        print(f"r500 {r500:.2f}")
+
         try:
             temperatures = sw_data.gas.temperatures
         except AttributeError as err:

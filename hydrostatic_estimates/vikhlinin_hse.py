@@ -20,7 +20,7 @@ from register import (
 )
 from .convergence_radius import convergence_radius
 from literature import Cosmology
-from scaling_relations.spherical_overdensities import SphericalOverdensities
+from scaling_relations.spherical_overdensities import SphericalOverdensities, SODelta200, SODelta500, SODelta2500
 
 try:
     plt.style.use("../mnras.mplstyle")
@@ -284,13 +284,47 @@ class HydrostaticEstimator:
         # Read in halo properties from catalog
         vr_catalogue_handle = vr.load(self.catalog_file)
         a = vr_catalogue_handle.a
-        self.m200c = vr_catalogue_handle.masses.mass_200crit[0].to('Msun')
-        self.r200c = vr_catalogue_handle.radii.r_200crit[0].to('Mpc')
-        self.m500c = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
-        self.r500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
-        self.r2500c = vr_catalogue_handle.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
-        self.m2500c = vr_catalogue_handle.spherical_overdensities.mass_2500_rhocrit[0].to('Msun')
-        XPotMin = vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
+
+        try:
+            self.m200c = vr_catalogue_handle.masses.mass_200crit[0].to('Msun')
+            self.r200c = vr_catalogue_handle.radii.r_200crit[0].to('Mpc')
+        except AttributeError as err:
+            print(f'[{self.__class__.__name__}] {err}')
+
+            spherical_overdensity = SODelta200(
+                path_to_snap=self.snapshot_file,
+                path_to_catalogue=self.catalog_file,
+            )
+            self.m200c = spherical_overdensity.get_m500()
+            self.r200c = spherical_overdensity.get_r500()
+
+        try:
+            self.m500c = vr_catalogue_handle.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
+            self.r500c = vr_catalogue_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
+        except AttributeError as err:
+            print(f'[{self.__class__.__name__}] {err}')
+
+            spherical_overdensity = SODelta500(
+                path_to_snap=self.snapshot_file,
+                path_to_catalogue=self.catalog_file,
+            )
+            self.m500c = spherical_overdensity.get_m500()
+            self.r500c = spherical_overdensity.get_r500()
+
+        try:
+            self.r2500c = vr_catalogue_handle.spherical_overdensities.r_2500_rhocrit[0].to('Mpc')
+            self.m2500c = vr_catalogue_handle.spherical_overdensities.mass_2500_rhocrit[0].to('Msun')
+        except AttributeError as err:
+            print(f'[{self.__class__.__name__}] {err}')
+
+            spherical_overdensity = SODelta2500(
+                path_to_snap=self.snapshot_file,
+                path_to_catalogue=self.catalog_file,
+            )
+            self.m2500c = spherical_overdensity.get_m500()
+            self.r2500c = spherical_overdensity.get_r500()
+
+        vr_catalogue_handle.positions.xcminpot[0].to('Mpc')
         YPotMin = vr_catalogue_handle.positions.ycminpot[0].to('Mpc')
         ZPotMin = vr_catalogue_handle.positions.zcminpot[0].to('Mpc')
 
