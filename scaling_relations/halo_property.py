@@ -90,8 +90,15 @@ def histogram_unyt(
         hist /= norm
 
     else:
-        hist, bin_edges = np.histogram(data.value, bins=bins.value, weights=weights.value)
-        hist *= weights.units
+        hist, bin_edges = np.histogram(
+            data.value, bins=bins.value, weights=weights.value * np.ones_like(weights)
+        )
+
+        norm, bin_edges = np.histogram(
+            data.value, bins=bins.value, weights=np.ones_like(weights)
+        )
+
+        hist /= norm
 
     if replace_zero_nan:
         hist[hist == 0] = np.nan
