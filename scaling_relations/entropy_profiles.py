@@ -174,7 +174,7 @@ class EntropyProfiles(HaloProperty):
                 radial_distance,
                 bins=lbins,
                 weights=entropy,
-                # normalizer=sw_data.gas.masses[index]
+                normalizer=sw_data.gas.masses[index]
             )
 
 
