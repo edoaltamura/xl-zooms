@@ -2,7 +2,7 @@ import sys
 import os
 from unyt import (
     unyt_array, unyt_quantity,
-    Mpc, mp, dimensionless, G, kb, Solar_Mass, keV
+    Mpc, mp, dimensionless, G, kb, Solar_Mass, keV, K
 )
 import numpy as np
 from typing import Tuple
@@ -338,8 +338,8 @@ class HydrostaticEstimator:
         mask.constrain_spatial(region)
         mask.constrain_mask(
             "gas", "temperatures",
-            Tcut_halogas * mask.units.temperature,
-            1.e12 * mask.units.temperature
+            Tcut_halogas * K,
+            1.e12 * K
         )
         data = sw.load(self.snapshot_file, mask=mask)
         self.fbary = Cosmology().get_baryon_fraction(data.metadata.z)
