@@ -67,6 +67,15 @@ class EntropyFgasSpace(HaloProperty):
             f'gas_fractions_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
+
+vr18 with adiabatic
+vr18 full physics
+vr18 with ther dT
+
+vr37
+
+fgas vs entropy
+
     def check_value(self, value):
 
         if value >= 1:

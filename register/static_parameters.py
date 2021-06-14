@@ -7,7 +7,7 @@ routines that call them.
 """
 import os
 
-Tcut_halogas = 1.e5  # Kelvin
+Tcut_halogas = 1.e6  # Kelvin
 default_output_directory: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/analysis"
 
 cooling_table: str = "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro/UV_dust1_CR1_G1_shield1.hdf5"

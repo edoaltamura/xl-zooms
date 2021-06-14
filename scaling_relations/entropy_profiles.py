@@ -113,9 +113,6 @@ class EntropyProfiles(HaloProperty):
             r500 = true_hse.r500hse
             m500 = true_hse.m500hse
 
-        print(f"m500 {m500:.2E}")
-        print(f"r500 {r500:.2f}")
-
         try:
             temperatures = sw_data.gas.temperatures
         except AttributeError as err:
@@ -303,8 +300,7 @@ class EntropyProfiles(HaloProperty):
         K500 = (
                 kBT500 / (500 * fb * critical_density / (mean_atomic_weight_per_free_electron * mp)) ** (2 / 3)
         ).to('keV*cm**2')
-        print(f"K500 {K500:.2f}")
-        print("Gas fraction", np.sum(sw_data.gas.masses[index])/m500)
+
         return radial_bin_centres, entropy_profile, K500
 
     def display_single_halo(self, *args, **kwargs):

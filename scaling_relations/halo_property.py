@@ -157,7 +157,7 @@ class HaloProperty(object):
             self,
             path_to_snap: str,
             path_to_catalogue: str,
-            mask_radius_r500: float = 3
+            mask_radius_r500: float = 6
     ) -> tuple:
         """
         All quantities in the VR file are physical.
