@@ -164,7 +164,8 @@ class EntropyProfiles(HaloProperty):
             xray_luminosities = None
 
         if not self.shell_average:
-            n_e = sw_data.gas.densities.to('g/cm**3')[index] / (mp * mean_molecular_weight)
+            sw_data.gas.densities.convert_to_units('g/cm**3')
+            n_e = sw_data.gas.densities[index] * mean_atomic_weight_per_free_electron / (mp * mean_molecular_weight)
             n_e.convert_to_units('cm**-3')
             entropy = kb * temperatures / (n_e ** (2 / 3))
             entropy.convert_to_units('keV*cm**2')
@@ -175,15 +176,15 @@ class EntropyProfiles(HaloProperty):
                 radial_distance,
                 bins=lbins,
                 weights=entropy,
-                # normalizer=sw_data.gas.masses[index]
+                normalizer=sw_data.gas.masses[index]
             )
-            bin_count = histogram_unyt(
-                radial_distance,
-                bins=lbins,
-                weights=np.ones_like(entropy) * dimensionless,
-                # normalizer=sw_data.gas.masses[index]
-            ).value
-            entropy_profile /= bin_count
+            # bin_count = histogram_unyt(
+            #     radial_distance,
+            #     bins=lbins,
+            #     weights=np.ones_like(entropy) * dimensionless,
+            #     # normalizer=sw_data.gas.masses[index]
+            # ).value
+            # entropy_profile /= bin_count
 
 
         # if not self.simple_electron_number_density and self.shell_average:
