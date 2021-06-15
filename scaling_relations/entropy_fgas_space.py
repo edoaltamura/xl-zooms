@@ -30,27 +30,13 @@ from hydrostatic_estimates import HydrostaticEstimator
 from literature import Cosmology, Sun2009, Pratt2010
 
 
-def normalized_mean(r, quantity, normalizer, bins):
-    mean_value = histogram_unyt(
-        r, bins=bins, weights=quantity * normalizer
-    )
-
-    normalization = histogram_unyt(
-        r, bins=bins, weights=normalizer
-    )
-    if xlargs.debug:
-        print(mean_value, normalization)
-
-    return mean_value / normalization
-
-
 class EntropyFgasSpace(HaloProperty):
 
     def __init__(
             self,
             max_radius_r500: float = 1,
             weighting: str = 'mass',
-            simple_electron_number_density: bool = False,
+            simple_electron_number_density: bool = True,
             shell_average: bool = True
     ):
         super().__init__()
