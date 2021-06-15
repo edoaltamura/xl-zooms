@@ -175,17 +175,17 @@ class EntropyProfiles(HaloProperty):
         else:
             n_e = get_electron_number_density(sw_data)[index]
 
-        if not self.shell_average:
-            entropy = kb * sw_data.gas.temperatures[index] / (n_e ** (2 / 3))
-            entropy.convert_to_units('keV*cm**2')
+        # if not self.shell_average:
+        entropy = kb * sw_data.gas.temperatures[index] / (n_e ** (2 / 3))
+        entropy.convert_to_units('keV*cm**2')
 
-            entropy_profile = histogram_unyt(
-                radial_distance,
-                bins=lbins,
-                weights=entropy,
-                normalizer=weighting
-            )
-            entropy_profile.convert_to_units('keV*cm**2')
+        entropy_profile = histogram_unyt(
+            radial_distance,
+            bins=lbins,
+            weights=entropy,
+            normalizer=weighting
+        )
+        entropy_profile.convert_to_units('keV*cm**2')
 
         kBT500 = (
                 G * mean_molecular_weight * m500 * mp / r500 / 2
