@@ -248,7 +248,7 @@ class EntropyFgasSpace(HaloProperty):
         _, cumulative_gas_mass_profile, cumulative_mass_profile, m500fb = self.process_single_halo(*args, **kwargs)
         gas_fraction_enclosed = cumulative_gas_mass_profile / m500fb
 
-        if not xlargs.debug:
+        if xlargs.debug:
             print('entropy_profile/K500', repr(entropy_profile))
             print('gas_fraction_enclosed', repr(gas_fraction_enclosed))
 
