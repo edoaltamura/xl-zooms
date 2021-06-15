@@ -79,7 +79,7 @@ class EntropyFgasSpace(HaloProperty):
             path_to_catalogue,
             mask_radius_r500=self.max_radius_r500
         )
-        fb = Cosmology().get_baryon_fraction(sw_data.metadata.z)
+        fb = Cosmology().fb0
         setattr(self, 'fb', fb)
 
         try:
@@ -229,7 +229,6 @@ class EntropyFgasSpace(HaloProperty):
             mask = np.where(radial_distances <= self.max_radius_r500)[0]
 
         mass_weights = histogram_unyt(radial_distances[mask], bins=lbins, weights=masses[mask])
-        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_mass_profile = np.nancumsum(mass_weights.value) * sw_data.units.mass
 
         return radial_bin_centres, cumulative_gas_mass_profile, cumulative_mass_profile, m500 * fb
@@ -251,7 +250,6 @@ class EntropyFgasSpace(HaloProperty):
 
         set_mnras_stylesheet()
         fig, axes = plt.subplots(constrained_layout=True)
-
         axes.plot(
             gas_fraction_enclosed,
             entropy_profile,
@@ -260,40 +258,22 @@ class EntropyFgasSpace(HaloProperty):
             linewidth=1,
             alpha=1,
         )
+
         axes.set_xscale('linear')
         axes.set_yscale('linear')
-
         axes.set_ylabel(r'$K/K_{500}$')
-        axes.set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-        # axes.set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / M_{\rm tot}$')
-        axes.set_ylim([0, 2.5])
+        axes.set_xlabel(r'$f_{\rm gas}(<r)/f_b = M_{\rm gas} / (M_{500}\ f_b)$')
+        axes.set_ylim([0, 2])
         axes.set_xlim([0, 1])
-
-        # axes.axvline(x=self.fb, color='k', linestyle=':', linewidth=0.5)
-        # axes.text(
-        #     self.fb, axes.get_ylim()[1], r'$f_b$',
-        #     horizontalalignment='right',
-        #     verticalalignment='top',
-        #     color='grey',
-        #     bbox=dict(
-        #         boxstyle='square,pad=10',
-        #         fc='none',
-        #         ec='none'
-        #     )
-        # )
-
         fig.suptitle(
             (
                 f"{os.path.basename(xlargs.run_directory)}\n"
                 f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
             ),
             fontsize=4
-
         )
-
         if not xlargs.quiet:
             plt.show()
-
         plt.close()
 
     def process_catalogue(self):
