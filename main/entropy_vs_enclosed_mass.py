@@ -12,7 +12,3 @@ snap, cat = find_files()
 # set_mnras_stylesheet()
 profile_obj = EntropyFgasSpace(max_radius_r500=1.)
 profile_obj.display_single_halo(path_to_snap=snap, path_to_catalogue=cat)
-
-# print(
-#     gf.process_catalogue()
-# )

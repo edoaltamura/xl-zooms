@@ -18,7 +18,7 @@ comment = (
 
 class Pratt2010(Article):
 
-    def __init__(self, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
+    def __init__(self, n_radial_bins: int = 51, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
         super().__init__(
             citation="Pratt et al. (2010)",
             comment=comment,
@@ -26,7 +26,7 @@ class Pratt2010(Article):
             hyperlink='https://ui.adsabs.harvard.edu/abs/2010A%26A...511A..85P/abstract',
             **cosmo_kwargs
         )
-
+        self.n_radial_bins = n_radial_bins
         self.hconv = 0.70 / self.h
         if disable_cosmo_conversion:
             self.hconv = 1.
@@ -166,7 +166,7 @@ class Pratt2010(Article):
             else:
                 data[i] = np.array(field) * conversion_factors[i]
 
-        radial_range = np.logspace(-2, 0, 1001)
+        radial_range = np.logspace(-2, 0, self.n_radial_bins)
         profiles = np.zeros((len(data[0]), len(radial_range)))
         for i, (K0, K100, alpha, redshift, R500) in enumerate(zip(
                 data[1],

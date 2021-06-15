@@ -48,8 +48,8 @@ class EntropyFgasSpace(HaloProperty):
 
     def __init__(
             self,
-            max_radius_r500: float = 4,
-            xray_weighting: bool = True,
+            max_radius_r500: float = 1,
+            weighting: str = 'mass',
             simple_electron_number_density: bool = False,
             shell_average: bool = True
     ):
@@ -57,7 +57,7 @@ class EntropyFgasSpace(HaloProperty):
 
         self.labels = ['radial_bin_centres', 'entropy_profile', 'K500']
         self.max_radius_r500 = max_radius_r500
-        self.xray_weighting = xray_weighting
+        self.weighting = weighting
         self.simple_electron_number_density = simple_electron_number_density
         self.shell_average = shell_average
 
@@ -253,9 +253,9 @@ class EntropyFgasSpace(HaloProperty):
         # Get entropy profile
         entropy_profile_obj = EntropyProfiles(
             max_radius_r500=self.max_radius_r500,
-            simple_electron_number_density=True,
-            xray_weighting=False,
-            shell_average=True
+            simple_electron_number_density=self.simple_electron_number_density,
+            weighting=self.weighting,
+            shell_average=self.shell_average
         )
         _, entropy_profile, K500 = entropy_profile_obj.process_single_halo(*args, **kwargs)
         entropy_profile /= K500
