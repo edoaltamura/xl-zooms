@@ -121,10 +121,7 @@ class EntropyFgasSpace(HaloProperty):
             print(f'[{self.__class__.__name__}] {err}')
             if xlargs.debug:
                 print(f"[{self.__class__.__name__}] Computing gas temperature from internal energies.")
-            sw_data.gas.densities.convert_to_physical()
-            A = sw_data.gas.entropies * sw_data.units.mass
-            temperatures = mean_molecular_weight * (gamma - 1) * (A * sw_data.gas.densities ** (5 / 3 - 1)) / (
-                    gamma - 1) * mh / kb
+            temperatures = sw_data.gas.internal_energies * (gamma - 1) * mean_molecular_weight * mh / kb
 
         try:
             fof_ids = sw_data.gas.fofgroup_ids
@@ -135,9 +132,7 @@ class EntropyFgasSpace(HaloProperty):
                 (fof_ids == 1) &
                 (temperatures > Tcut_halogas)
             )[0]
-
             del fof_ids
-
         except AttributeError as err:
             print(err)
             print(f"[{self.__class__.__name__}] Select particles only by radial distance.")
@@ -153,7 +148,6 @@ class EntropyFgasSpace(HaloProperty):
         del mask
 
         mass_weights = histogram_unyt(radial_distances, bins=lbins, weights=masses)
-        mass_weights[mass_weights == 0] = np.nan  # Replace zeros with Nans
         cumulative_gas_mass_profile = np.nancumsum(mass_weights.value) * masses.units
 
         # Compute total mass profile
@@ -249,6 +243,7 @@ class EntropyFgasSpace(HaloProperty):
         gas_fraction_enclosed = cumulative_gas_mass_profile / m500fb
 
         if xlargs.debug:
+            print('fb', self.fb)
             print('radial_bin_centres/r500', repr(radial_bin_centres))
             print('entropy_profile/K500', repr(entropy_profile))
             print('gas_fraction_enclosed', repr(gas_fraction_enclosed))
