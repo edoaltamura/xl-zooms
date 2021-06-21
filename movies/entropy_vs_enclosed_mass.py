@@ -101,11 +101,11 @@ try:
             S_S500_90 - S_S500_50
         ),
         fmt='o',
-        color='black',
+        color='grey',
         ecolor='lightgray',
         elinewidth=0.5,
         capsize=0,
-        markersize=3,
+        markersize=2,
         label=sun_observations.citation
     )
 
@@ -126,11 +126,11 @@ try:
             bin_perc84 - bin_median
         ),
         fmt='s',
-        color='black',
+        color='grey',
         ecolor='lightgray',
         elinewidth=0.5,
         capsize=0,
-        markersize=3,
+        markersize=2,
         label=rexcess.citation
     )
 
@@ -144,7 +144,10 @@ try:
     croston.estimate_total_mass()
     croston.compute_gas_fraction()
     for i, cluster in enumerate(croston.cluster_data):
-        axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / gas_profile_obj.fb, c='grey', alpha=0.7, lw=0.3, label=croston.citation)
+        kwargs = dict(c='grey', alpha=0.7, lw=0.3)
+        if i == 0:
+            kwargs = dict(c='grey', alpha=0.7, lw=0.3, label=croston.citation)
+        axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / gas_profile_obj.fb, **kwargs)
     axes[1, 0].legend()
 
     fig.suptitle(
