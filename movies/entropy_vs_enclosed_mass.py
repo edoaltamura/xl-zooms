@@ -1,12 +1,15 @@
 import sys
 import os.path
 from matplotlib import pyplot as plt
+import numpy as np
+from unyt import Solar_Mass
 import traceback
 
 sys.path.append("..")
 
 from scaling_relations import EntropyFgasSpace, EntropyProfiles
 from register import find_files, set_mnras_stylesheet, xlargs
+from literature import Sun2009, Pratt2010
 
 snap, cat = find_files()
 kwargs = dict(path_to_snap=snap, path_to_catalogue=cat)
@@ -23,7 +26,7 @@ try:
     entropy_profile /= K500
     gas_fraction_enclosed = cumulative_gas_mass_profile / m500fb
 
-    fig = plt.figure(figsize=(5, 5), constrained_layout=True)
+    fig = plt.figure(figsize=(4, 4), constrained_layout=True)
     gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.7)
     axes = gs.subplots()
 
@@ -54,7 +57,7 @@ try:
     axes[0, 1].set_yscale('log')
     axes[0, 1].set_ylabel(r'$K/K_{500}$')
     axes[0, 1].set_xlabel(r'$r/r_{500}$')
-    axes[0, 1].set_ylim([1e-3, 2])
+    axes[0, 1].set_ylim([1e-2, 2])
     axes[0, 1].set_xlim([0.01, 1])
 
     axes[1, 0].plot(
@@ -87,10 +90,57 @@ try:
     axes[1, 1].set_ylim([1e-4, 3])
     axes[1, 1].set_xlim([0.01, 1])
 
+    sun_observations = Sun2009()
+    r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()
+
+    axes[0, 1].errorbar(
+        r_r500,
+        S_S500_50,
+        yerr=(
+            S_S500_50 - S_S500_10,
+            S_S500_90 - S_S500_50
+        ),
+        fmt='o',
+        color='black',
+        ecolor='lightgray',
+        elinewidth=0.5,
+        capsize=0,
+        label=sun_observations.citation
+    )
+
+    rexcess = Pratt2010(n_radial_bins=30)
+    bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
+        m500_limits=(
+            1e14 * Solar_Mass,
+            5e14 * Solar_Mass
+        ),
+        k500_rescale=True
+    )
+
+    axes[0, 1].errorbar(
+        rexcess.radial_bins,
+        S_S500_50,
+        yerr=(
+            bin_median - bin_perc16,
+            bin_perc84 - bin_median
+        ),
+        fmt='s',
+        color='black',
+        ecolor='lightgray',
+        elinewidth=0.5,
+        capsize=0,
+        label=rexcess.citation
+    )
+
+    r = np.array([0.01, 1])
+    k = 1.40 * r ** 1.1
+    axes.plot(r, k, c='grey', ls='--', label='VKB (2005)')
+
     fig.suptitle(
         (
             f"{os.path.basename(xlargs.run_directory)}\n"
-            f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
+            f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}\n"
+            f"Redshift = {gas_profile_obj.z:.3f}"
         ),
         fontsize=4
     )

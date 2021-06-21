@@ -81,6 +81,7 @@ class EntropyFgasSpace(HaloProperty):
         )
         fb = Cosmology().fb0
         setattr(self, 'fb', fb)
+        setattr(self, 'z', sw_data.metadata.z)
 
         try:
             r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc')
