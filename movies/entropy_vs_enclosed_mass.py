@@ -27,11 +27,6 @@ try:
     gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.7)
     axes = gs.subplots()
 
-    axes[0, 0].plot()
-    axes[0, 1].plot()
-    axes[1, 0].plot()
-    axes[1, 1].plot()
-
     axes[0, 0].plot(
         gas_fraction_enclosed,
         entropy_profile,
