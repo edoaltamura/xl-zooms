@@ -118,7 +118,7 @@ class Croston2008(Article):
             rho_0 = m500 / (4 * np.pi * scale_radius ** 3 * self.nfw_factor(scale_radius, r500))
             nfw_enclosed_mass = 4 * np.pi * rho_0 * scale_radius ** 3 * self.nfw_factor(scale_radius, r)
             cluster['Mdm_nfw'] = nfw_enclosed_mass
-            cluster['M500'] = M500
+            cluster['m500'] = m500
 
     def compute_gas_fraction(self):
         for cluster in self.cluster_data:

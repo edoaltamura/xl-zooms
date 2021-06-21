@@ -13,7 +13,7 @@ names = pratt.Cluster_name
 entropies = pratt.entropy_profiles / pratt.K500[:, None]
 radii = pratt.radial_bins
 
-lit = Croston2008(disable_cosmo_conversion=True)
+lit = Croston2008()
 lit.interpolate_r_r500(radii)
 lit.compute_gas_mass()
 lit.estimate_total_mass()
@@ -25,20 +25,20 @@ gas_fractions = np.empty_like(entropies)
 for i, cluster in enumerate(lit.cluster_data):
     for name in names:
         if name == cluster['name']:
-            gas_fractions[i] = cluster['Mgas'] / cluster['M500'] / lit.fb0
+            gas_fractions[i] = cluster['Mgas'] / lit.fb0 / cluster['m500']
 
 print(gas_fractions.shape)
 
 # Display the catalogue data
-plt.plot(radii.T, gas_fractions.T, c='k', alpha=0.7, lw=0.3)
+plt.plot(gas_fractions.T, entropies.T, c='k', alpha=0.7, lw=0.3)
 #
 # # plt.axhline(self.fb0)
 # plt.xlabel(r'$r/r_{500}$')
 # y_label = r'$h_{70}^{-3/2}\ f_g (<R)$'
 # plt.ylabel(y_label)
 # plt.title(f"REXCESS sample - {lit.citation}")
-plt.xscale('log')
-plt.yscale('log')
+# plt.xscale('log')
+# plt.yscale('log')
 plt.ylim(0, 2)
 plt.xlim(0, 1)
 plt.show()
