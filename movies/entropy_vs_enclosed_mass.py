@@ -39,8 +39,8 @@ try:
     axes[0, 0].set_yscale('linear')
     axes[0, 0].set_ylabel(r'$K/K_{500}$')
     axes[0, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-    axes[0, 0].set_ylim([0, 2])
-    axes[0, 0].set_xlim([0, 1])
+    # axes[0, 0].set_ylim([0, 2])
+    # axes[0, 0].set_xlim([0, 1])
 
     axes[0, 1].plot(
         radial_bin_centres,
@@ -54,8 +54,8 @@ try:
     axes[0, 1].set_yscale('log')
     axes[0, 1].set_ylabel(r'$K/K_{500}$')
     axes[0, 1].set_xlabel(r'$r/r_{500}$')
-    axes[0, 1].set_ylim([1e-3, 2])
-    axes[0, 1].set_xlim([0.01, 1])
+    # axes[0, 1].set_ylim([1e-3, 2])
+    # axes[0, 1].set_xlim([0.01, 1])
 
     axes[1, 0].plot(
         radial_bin_centres,
@@ -69,8 +69,8 @@ try:
     axes[1, 0].set_yscale('log')
     axes[1, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
     axes[1, 0].set_xlabel(r'$r/r_{500}$')
-    axes[1, 0].set_ylim([1e-3, 1])
-    axes[1, 0].set_xlim([0.01, 1])
+    # axes[1, 0].set_ylim([1e-3, 1])
+    # axes[1, 0].set_xlim([0.01, 1])
 
     axes[1, 1].plot(
         radial_bin_centres,
@@ -84,8 +84,8 @@ try:
     axes[1, 1].set_yscale('log')
     axes[1, 1].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
     axes[1, 1].set_xlabel(r'$r/r_{500}$')
-    axes[1, 1].set_ylim([1e-4, 3])
-    axes[1, 1].set_xlim([0.01, 1])
+    # axes[1, 1].set_ylim([1e-4, 3])
+    # axes[1, 1].set_xlim([0.01, 1])
 
     fig.suptitle(
         (
