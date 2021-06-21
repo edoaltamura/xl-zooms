@@ -250,7 +250,8 @@ class EntropyProfiles(HaloProperty):
     def process_catalogue(self):
 
         catalogue = self._process_catalogue(self.process_single_halo, labels=self.labels)
-        self.dump_to_pickle(self.filename, catalogue)
+        # self.dump_to_pickle(self.filename, catalogue)
+        return catalogue
 
     def read_catalogue(self):
 

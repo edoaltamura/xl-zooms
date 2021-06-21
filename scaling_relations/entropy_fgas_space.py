@@ -41,7 +41,7 @@ class EntropyFgasSpace(HaloProperty):
     ):
         super().__init__()
 
-        self.labels = ['radial_bin_centres', 'entropy_profile', 'K500']
+        self.labels = ['radial_bin_centres', 'cumulative_gas_mass_profile', 'cumulative_mass_profile', 'm500fb']
         self.max_radius_r500 = max_radius_r500
         self.weighting = weighting
         self.simple_electron_number_density = simple_electron_number_density
@@ -279,7 +279,8 @@ class EntropyFgasSpace(HaloProperty):
     def process_catalogue(self):
 
         catalogue = self._process_catalogue(self.process_single_halo, labels=self.labels)
-        self.dump_to_pickle(self.filename, catalogue)
+        # self.dump_to_pickle(self.filename, catalogue)
+        return catalogue
 
     def read_catalogue(self):
 
