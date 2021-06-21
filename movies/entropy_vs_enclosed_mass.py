@@ -134,7 +134,7 @@ try:
 
     r = np.array([0.01, 1])
     k = 1.40 * r ** 1.1
-    axes.plot(r, k, c='grey', ls='--', label='VKB (2005)')
+    axes[0, 1].plot(r, k, c='grey', ls='--', label='VKB (2005)')
 
     fig.suptitle(
         (
