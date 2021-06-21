@@ -124,7 +124,7 @@ class Croston2008(Article):
         for cluster in self.cluster_data:
             assert 'Mgas' in cluster
             assert 'Mdm_nfw' in cluster
-            cluster['f_g'] = cluster['Mgas'] / cluster['Mdm_nfw']
+            cluster['f_g'] = cluster['Mgas'] / cluster['m500']
 
     def interpolate_r_r500(self, r_r500_new: np.ndarray):
 

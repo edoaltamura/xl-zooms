@@ -9,7 +9,7 @@ sys.path.append("..")
 
 from scaling_relations import EntropyFgasSpace, EntropyProfiles
 from register import find_files, set_mnras_stylesheet, xlargs
-from literature import Sun2009, Pratt2010
+from literature import Sun2009, Pratt2010, Croston2008
 
 snap, cat = find_files()
 kwargs = dict(path_to_snap=snap, path_to_catalogue=cat)
@@ -26,7 +26,7 @@ try:
     entropy_profile /= K500
     gas_fraction_enclosed = cumulative_gas_mass_profile / m500fb
 
-    fig = plt.figure(figsize=(4, 4), constrained_layout=True)
+    fig = plt.figure(figsize=(5, 5), constrained_layout=True)
     gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.7)
     axes = gs.subplots()
 
@@ -105,6 +105,7 @@ try:
         ecolor='lightgray',
         elinewidth=0.5,
         capsize=0,
+        markersize=3,
         label=sun_observations.citation
     )
 
@@ -129,12 +130,22 @@ try:
         ecolor='lightgray',
         elinewidth=0.5,
         capsize=0,
+        markersize=3,
         label=rexcess.citation
     )
 
     r = np.array([0.01, 1])
     k = 1.40 * r ** 1.1
     axes[0, 1].plot(r, k, c='grey', ls='--', label='VKB (2005)')
+    axes[0, 1].legend()
+
+    croston = Croston2008()
+    croston.compute_gas_mass()
+    croston.estimate_total_mass()
+    croston.compute_gas_fraction()
+    for i, cluster in enumerate(croston.cluster_data):
+        axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / gas_profile_obj.fb, c='grey', alpha=0.7, lw=0.3, label=croston.citation)
+    axes[1, 0].legend()
 
     fig.suptitle(
         (
