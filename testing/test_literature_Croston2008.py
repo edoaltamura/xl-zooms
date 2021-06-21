@@ -25,7 +25,9 @@ gas_fractions = np.empty_like(entropies)
 
 # Display the catalogue data
 for i, cluster in enumerate(lit.cluster_data):
-    gas_fractions[i] = cluster['f_g']
+    for name in names:
+        if name == cluster['name']:
+            gas_fractions[i] = cluster['f_g'] / lit.fb0
 
 print(gas_fractions.shape)
 
@@ -40,6 +42,7 @@ for fg, k in zip(gas_fractions, entropies):
 # plt.title(f"REXCESS sample - {lit.citation}")
 # plt.xscale('log')
 # plt.yscale('log')
-# # plt.ylim(0, self.fb0 * 1.1)
+plt.ylim(0, 2)
+plt.xlim(0, 1)
 plt.show()
 plt.close()

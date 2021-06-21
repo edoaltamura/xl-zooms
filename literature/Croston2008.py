@@ -40,6 +40,9 @@ class Croston2008(Article):
         self.cluster_names = []
         self.cluster_data = []
         self.process_profiles()
+        self.compute_gas_mass()
+        self.estimate_total_mass()
+        self.compute_gas_fraction()
 
     @staticmethod
     def log_cluster_data(file_path: str) -> dict:
@@ -124,7 +127,7 @@ class Croston2008(Article):
         for cluster in self.cluster_data:
             assert 'Mgas' in cluster
             assert 'Mdm_nfw' in cluster
-            cluster['f_g'] = cluster['Mgas'] / (cluster['Mgas'] + cluster['Mdm_nfw'])
+            cluster['f_g'] = cluster['Mgas'] * (1 - self.fb0) / cluster['Mdm_nfw']
 
     def interpolate_r_r500(self, r_r500_new: np.ndarray):
 
