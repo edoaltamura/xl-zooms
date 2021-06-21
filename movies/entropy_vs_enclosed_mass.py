@@ -119,7 +119,7 @@ try:
 
     axes[0, 1].errorbar(
         rexcess.radial_bins,
-        S_S500_50,
+        bin_median,
         yerr=(
             bin_median - bin_perc16,
             bin_perc84 - bin_median
