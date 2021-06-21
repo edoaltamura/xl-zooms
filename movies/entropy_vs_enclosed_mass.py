@@ -168,7 +168,7 @@ try:
     fig.savefig(
         os.path.join(
             default_output_directory,
-            f"cooling_times_{os.path.basename(snap)[:-5].replace('.', 'p')}.png"
+            f"entropy_vs_fgas_{os.path.basename(snap)[:-5].replace('.', 'p')}.png"
         ),
         dpi=300
     )
