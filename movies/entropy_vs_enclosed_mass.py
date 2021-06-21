@@ -57,7 +57,7 @@ try:
     axes[0, 1].set_yscale('log')
     axes[0, 1].set_ylabel(r'$K/K_{500}$')
     axes[0, 1].set_xlabel(r'$r/r_{500}$')
-    axes[0, 1].set_ylim([1e-2, 2])
+    axes[0, 1].set_ylim([1e-2, 5])
     axes[0, 1].set_xlim([0.01, 1])
 
     axes[1, 0].plot(
@@ -72,7 +72,7 @@ try:
     axes[1, 0].set_yscale('log')
     axes[1, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
     axes[1, 0].set_xlabel(r'$r/r_{500}$')
-    # axes[1, 0].set_ylim([1e-3, 1])
+    axes[1, 0].set_ylim([1e-4, 1])
     axes[1, 0].set_xlim([0.01, 1])
 
     axes[1, 1].plot(
@@ -87,7 +87,7 @@ try:
     axes[1, 1].set_yscale('log')
     axes[1, 1].set_ylabel(r'$(K/K_{500}) \times f_{\rm gas}(<r) ^ {2/3}$')
     axes[1, 1].set_xlabel(r'$r/r_{500}$')
-    axes[1, 1].set_ylim([1e-4, 3])
+    axes[1, 1].set_ylim([5e-5, 3])
     axes[1, 1].set_xlim([0.01, 1])
 
     sun_observations = Sun2009()
