@@ -9,13 +9,15 @@ sys.path.append("..")
 
 from scaling_relations import EntropyFgasSpace, EntropyProfiles
 from register import find_files, set_mnras_stylesheet, xlargs
-from literature import Sun2009, Pratt2010, Croston2008
+from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 snap, cat = find_files()
 kwargs = dict(path_to_snap=snap, path_to_catalogue=cat)
 set_mnras_stylesheet()
 
 try:
+
+    cosmology = Cosmology()
 
     gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
     radial_bin_centres, cumulative_gas_mass_profile, cumulative_mass_profile, m500fb = gas_profile_obj.process_single_halo(
@@ -72,12 +74,12 @@ try:
     axes[1, 0].set_yscale('log')
     axes[1, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
     axes[1, 0].set_xlabel(r'$r/r_{500}$')
-    axes[1, 0].set_ylim([1e-4, 1])
+    axes[1, 0].set_ylim([1e-5, 1])
     axes[1, 0].set_xlim([0.01, 1])
 
     axes[1, 1].plot(
         radial_bin_centres,
-        entropy_profile * gas_fraction_enclosed ** (2 / 3),
+        entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(gas_profile_obj.z) ** (2 / 3),
         linestyle='-',
         color='r',
         linewidth=1,
@@ -85,7 +87,7 @@ try:
     )
     axes[1, 1].set_xscale('log')
     axes[1, 1].set_yscale('log')
-    axes[1, 1].set_ylabel(r'$(K/K_{500}) \times f_{\rm gas}(<r) ^ {2/3}$')
+    axes[1, 1].set_ylabel(r'$E(z) ^ {2/3}~(K/K_{500})~\times~f_{\rm gas}(<r) ^ {2/3}$')
     axes[1, 1].set_xlabel(r'$r/r_{500}$')
     axes[1, 1].set_ylim([5e-5, 3])
     axes[1, 1].set_xlim([0.01, 1])
@@ -106,7 +108,8 @@ try:
         elinewidth=0.5,
         capsize=0,
         markersize=2,
-        label=sun_observations.citation
+        label=sun_observations.citation,
+        zorder=0
     )
 
     rexcess = Pratt2010(n_radial_bins=30)
@@ -131,13 +134,14 @@ try:
         elinewidth=0.5,
         capsize=0,
         markersize=2,
-        label=rexcess.citation
+        label=rexcess.citation,
+        zorder=0
     )
 
     r = np.array([0.01, 1])
     k = 1.40 * r ** 1.1
-    axes[0, 1].plot(r, k, c='grey', ls='--', label='VKB (2005)')
-    axes[0, 1].legend()
+    axes[0, 1].plot(r, k, c='grey', ls='--', label='VKB (2005)', zorder=0)
+    axes[0, 1].legend(loc="lower right")
 
     croston = Croston2008()
     croston.compute_gas_mass()
@@ -146,9 +150,9 @@ try:
     for i, cluster in enumerate(croston.cluster_data):
         kwargs = dict(c='grey', alpha=0.7, lw=0.3)
         if i == 0:
-            kwargs = dict(c='grey', alpha=0.7, lw=0.3, label=croston.citation)
-        axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / gas_profile_obj.fb, **kwargs)
-    axes[1, 0].legend()
+            kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
+        axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / gas_profile_obj.fb, zorder=0, **kwargs)
+    axes[1, 0].legend(loc="upper left")
 
     fig.suptitle(
         (
