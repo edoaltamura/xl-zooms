@@ -37,7 +37,6 @@ class Croston2008(Article):
 
         self.pratt2010 = Pratt2010(disable_cosmo_conversion=disable_cosmo_conversion)
 
-        self.cluster_names = []
         self.cluster_data = []
         self.process_profiles()
         self.compute_gas_mass()
@@ -63,7 +62,6 @@ class Croston2008(Article):
                 os.path.join(repository_dir, 'Croston2008_profiles', f"{file_path}.txt")
             )
             self.cluster_data.append(cluster)
-            self.cluster_names.append(file_path)
 
     def compute_gas_mass(self):
         for cluster in self.cluster_data:
@@ -80,8 +78,7 @@ class Croston2008(Article):
             n_e_bin_centres = radius_interpolate(radial_bin_centres) * cluster['n_e'].units
 
             # Convert electron number density to gas density
-            gas_density_bin_centres = n_e_bin_centres * (
-                    mp * mean_molecular_weight) / mean_atomic_weight_per_free_electron
+            gas_density_bin_centres = n_e_bin_centres * mp / mean_atomic_weight_per_free_electron
             gas_density_bin_centres.astype(np.float64).convert_to_units('Msun/kpc**3')
             volume_shells = 4 * np.pi / 3 * (cluster['r_kpc'][1:] ** 3 - cluster['r_kpc'][:-1] ** 3)
             gas_mass_bin_centres = gas_density_bin_centres * volume_shells
@@ -100,6 +97,10 @@ class Croston2008(Article):
             gas_mass_bin_edges.astype(np.float64).convert_to_units('Msun')
             cluster['Mgas'] = gas_mass_bin_edges.to('Msun')
 
+    @staticmethod
+    def nfw_factor(scale_radius, r):
+        return np.log((scale_radius + r) / scale_radius) - r / (r + scale_radius)
+
     def estimate_total_mass(self):
 
         average_concentration = 3.2
@@ -112,22 +113,18 @@ class Croston2008(Article):
 
         for cluster, m500, r500 in zip(self.cluster_data, M500, self.pratt2010.R500):
             scale_radius = r500 / average_concentration
-
-            nfw_density_normalisation = m500 / (4 * np.pi * scale_radius ** 3 * \
-                                                (np.log(1 + (r500 / scale_radius)) + scale_radius / (
-                                                        r500 + scale_radius) - 1))
-
             r = cluster['r_kpc']
-            nfw_enclosed_mass = 4 * np.pi * nfw_density_normalisation * scale_radius ** 3 * \
-                                (np.log(1 + (r / scale_radius)) + scale_radius / (r + scale_radius) - 1)
 
+            rho_0 = m500 / (4 * np.pi * scale_radius ** 3 * self.nfw_factor(scale_radius, r500))
+            nfw_enclosed_mass = 4 * np.pi * rho_0 * scale_radius ** 3 * self.nfw_factor(scale_radius, r)
             cluster['Mdm_nfw'] = nfw_enclosed_mass
+            cluster['M500'] = M500
 
     def compute_gas_fraction(self):
         for cluster in self.cluster_data:
             assert 'Mgas' in cluster
             assert 'Mdm_nfw' in cluster
-            cluster['f_g'] = cluster['Mgas'] * (1 - self.fb0) / cluster['Mdm_nfw']
+            cluster['f_g'] = cluster['Mgas'] / cluster['Mdm_nfw']
 
     def interpolate_r_r500(self, r_r500_new: np.ndarray):
 
