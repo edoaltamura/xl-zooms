@@ -291,13 +291,15 @@ class HaloProperty(object):
             path_to_catalogue: str = None,
             **kwargs
     ):
-        assert (
-                zoom_obj is not None or
-                (path_to_snap is not None and path_to_snap is not None)
-        ), (
-            "Either a `Zoom` object must be specified or the absolute "
-            "paths to the snapshot and properties catalogue files."
-        )
+
+        if xlargs.debug:
+            assert (
+                    zoom_obj is not None or
+                    (path_to_snap is not None and path_to_snap is not None)
+            ), (
+                "Either a `Zoom` object must be specified or the absolute "
+                "paths to the snapshot and properties catalogue files."
+            )
 
         snapshot_file = path_to_snap
         catalog_file = path_to_catalogue
