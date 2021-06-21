@@ -37,6 +37,7 @@ class Croston2008(Article):
 
         self.pratt2010 = Pratt2010(disable_cosmo_conversion=disable_cosmo_conversion)
 
+        self.cluster_names = []
         self.cluster_data = []
         self.process_profiles()
 
@@ -59,6 +60,7 @@ class Croston2008(Article):
                 os.path.join(repository_dir, 'Croston2008_profiles', f"{file_path}.txt")
             )
             self.cluster_data.append(cluster)
+            self.cluster_names.append(file_path)
 
     def compute_gas_mass(self):
         for cluster in self.cluster_data:
