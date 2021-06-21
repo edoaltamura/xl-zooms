@@ -156,7 +156,7 @@ try:
             f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}\n"
             f"Redshift = {gas_profile_obj.z:.3f}"
         ),
-        fontsize=4
+        fontsize=6
     )
     if not xlargs.quiet:
         plt.show()
