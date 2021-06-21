@@ -8,7 +8,7 @@ import traceback
 sys.path.append("..")
 
 from scaling_relations import EntropyFgasSpace, EntropyProfiles
-from register import find_files, set_mnras_stylesheet, xlargs
+from register import find_files, set_mnras_stylesheet, xlargs, default_output_directory
 from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 snap, cat = find_files()
@@ -164,6 +164,15 @@ try:
     )
     if not xlargs.quiet:
         plt.show()
+
+    fig.savefig(
+        os.path.join(
+            default_output_directory,
+            f"cooling_times_{os.path.basename(snap)[:-5].replace('.', 'p')}.png"
+        ),
+        dpi=300
+    )
+
     plt.close()
 
 

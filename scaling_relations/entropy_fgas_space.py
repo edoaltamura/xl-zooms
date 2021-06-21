@@ -270,7 +270,7 @@ class EntropyFgasSpace(HaloProperty):
                 f"{os.path.basename(xlargs.run_directory)}\n"
                 f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
             ),
-            fontsize=4
+            fontsize=5
         )
         if not xlargs.quiet:
             plt.show()
