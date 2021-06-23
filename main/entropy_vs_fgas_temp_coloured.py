@@ -14,7 +14,13 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
 
-fig = plt.figure(figsize=(4, 5), constrained_layout=True)
+# Set axes limits
+fgas_bounds = [10 ** (-2.5), 1]
+k_bounds = [1e-2, 7]
+r_bounds = [0.01, 1]
+t_bounds = [0.5, 5]
+
+fig = plt.figure(figsize=(4.5, 5), constrained_layout=True)
 gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7, height_ratios=[0.05, 1, 1], width_ratios=[1, 1])
 axes = gs.subplots()
 
@@ -23,8 +29,8 @@ redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
-data_color = np.log10(np.array([i.v for i in temperatures_dataframe['T500_nocore']]))
-temperatures_dataframe['color'] = (data_color - np.min(data_color)) / (np.max(data_color) - np.min(data_color))
+data_color = np.log10(np.array([(i * kb).to('keV').v for i in temperatures_dataframe['T0p75r500_nocore']]))
+temperatures_dataframe['color'] = (data_color - t_bounds[0]) / (t_bounds[1] - t_bounds[0])
 
 gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
 gas_profiles_dataframe = gas_profile_obj.process_catalogue()
@@ -35,13 +41,7 @@ entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
 # Merge all catalogues into one
 catalogue = temperatures_dataframe
 for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
-    catalogue = pd.concat(
-        [
-            catalogue,
-            datasets
-        ],
-        axis=1
-    )
+    catalogue = pd.concat([catalogue, datasets], axis=1)
 
 # Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
@@ -50,7 +50,7 @@ print(catalogue.info())
 for i in range(len(catalogue)):
     row = catalogue.loc[i]
     name = row["Run_name"]
-    temperature = row['T500_nocore']
+    temperature = row['T0p75r500_nocore']
     color = plt.cm.jet(row['color'])
     radial_bin_centres = row['radial_bin_centres']
     gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
@@ -89,10 +89,6 @@ for i in range(len(catalogue)):
 
     delete_last_line()
 
-norm = mpl.colors.LogNorm(
-    vmin=(temperatures_dataframe['T500_nocore'].min() * kb).to('keV').v,
-    vmax=(temperatures_dataframe['T500_nocore'].max() * kb).to('keV').v
-)
 axes[0, 0].remove()
 axes[0, 1].remove()
 top_row_axes = fig.add_subplot(gs[0, :])
@@ -101,17 +97,12 @@ top_row_axes.axis('off')
 colorbar = mpl.colorbar.ColorbarBase(
     cax,
     cmap=mpl.cm.jet,
-    norm=norm,
+    norm=mpl.colors.LogNorm(vmin=t_bounds[0], vmax=t_bounds[1]),
     orientation='horizontal'
 )
-colorbar.set_label(r'$k_B T_{500}^{\rm core~excised}$ [keV]')
+colorbar.set_label(r'$k_B T_{\rm mw}(0.15-0.75~r_{500})$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
-
-# Set axes limits
-fgas_bounds = [10 ** (-2.5), 1]
-k_bounds = [1e-2, 7]
-r_bounds = [0.01, 1]
 
 axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')

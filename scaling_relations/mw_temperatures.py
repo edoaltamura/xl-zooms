@@ -11,7 +11,7 @@ class MWTemperatures(HaloProperty):
     def __init__(self):
         super().__init__()
 
-        self.labels = ['T500', 'T2500', 'T500_nocore', 'T2500_nocore']
+        self.labels = ['T500', 'T2500', 'T0p75r500_nocore', 'T500_nocore', 'T2500_nocore']
 
         self.filename = os.path.join(
             default_output_directory,
@@ -64,7 +64,18 @@ class MWTemperatures(HaloProperty):
         mhot2500 = np.sum(sw_data.gas.masses[mask])
         T2500 = np.sum(sw_data.gas.mw_temperatures[mask]) / mhot2500
 
+
+
         # Select hot gas within spherical shell (no core)
+        mask = np.where(
+            (sw_data.gas.radial_distances >= 0.15 * r500) &
+            (sw_data.gas.radial_distances <= 0.75 * r500) &
+            (sw_data.gas.temperatures > Tcut_halogas) &
+            (sw_data.gas.fofgroup_ids == 1)
+        )[0]
+        mhot0p75r500_nocore = np.sum(sw_data.gas.masses[mask])
+        T0p75r500_nocore = np.sum(sw_data.gas.mw_temperatures[mask]) / mhot0p75r500_nocore
+
         mask = np.where(
             (sw_data.gas.radial_distances >= 0.15 * r500) &
             (sw_data.gas.radial_distances <= r500) &
@@ -83,7 +94,7 @@ class MWTemperatures(HaloProperty):
         mhot2500_nocore = np.sum(sw_data.gas.masses[mask])
         T2500_nocore = np.sum(sw_data.gas.mw_temperatures[mask]) / mhot2500_nocore
 
-        return T500, T2500, T500_nocore, T2500_nocore
+        return T500, T2500, T0p75r500_nocore, T500_nocore, T2500_nocore
 
     def process_catalogue(self):
 
