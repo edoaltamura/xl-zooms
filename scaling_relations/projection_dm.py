@@ -137,7 +137,8 @@ class MapDM(HaloProperty):
             resolution=self.resolution,
             parallel=self.parallel,
             region=region,
-            backend=self.backend
+            backend=self.backend,
+            boxsize=sw_data.metadata.boxsize
         )
         units = dm_map.units
         dm_map = dm_map.value
