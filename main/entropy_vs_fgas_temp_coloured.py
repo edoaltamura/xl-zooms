@@ -32,7 +32,7 @@ entropy_profile = entropy_profiles_dataframe['entropy_profile'] / entropy_profil
 
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
-T500_nocore = temperatures_dataframe['temperatures']
+temperatures = temperatures_dataframe['T500_nocore']
 
 
 axes[0, 0].plot(
