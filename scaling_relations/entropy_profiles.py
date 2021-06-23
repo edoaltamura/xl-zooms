@@ -194,7 +194,7 @@ class EntropyProfiles(HaloProperty):
         K500 = (
                 kBT500 / (500 * fb * critical_density / (mean_atomic_weight_per_free_electron * mp)) ** (2 / 3)
         ).to('keV*cm**2')
-
+        print(radial_bin_centres, entropy_profile, K500)
         return radial_bin_centres, entropy_profile, K500
 
     def plot_observations(self, axes: plt.Axes):
