@@ -21,6 +21,7 @@ from .cooling_times import CoolingTimes
 
 from .projection_gas import MapGas
 from .slice_gas import SliceGas
+from .projection_dm import MapDM
 
 from .entropy_profiles import EntropyProfiles
 from .entropy_fgas_space import EntropyFgasSpace

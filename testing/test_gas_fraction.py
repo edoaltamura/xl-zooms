@@ -3,7 +3,8 @@ import sys
 sys.path.append("..")
 
 from scaling_relations import GasFractions
-from test_files import cat, snap
+from register import find_files
+snap, cat = find_files()
 
 gf = GasFractions()
 print(
