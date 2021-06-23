@@ -92,44 +92,49 @@ redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 #         linewidth=1,
 #         alpha=1,
 #     )
-cmap = mpl.cm.jet
 norm = mpl.colors.LogNorm(
     vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
     vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
 )
-cb1 = mpl.colorbar.ColorbarBase(fig.add_subplot(gs[2, :]),
-                                cmap=cmap,
-                                norm=norm,
-                                orientation='horizontal')
-cb1.set_label('Some Units')
+axes[0, 0].remove()
+axes[0, 1].remove()
+cb1 = mpl.colorbar.ColorbarBase(
+    fig.add_subplot(gs[0, :]),
+    cmap=mpl.cm.jet,
+    norm=norm,
+    orientation='horizontal'
+)
+cb1.set_label(r'$T_{500}^{\rm core-excised} [K]')
+cb1.xaxis.set_ticks_position('top')
+cb1.xaxis.set_label_position('top')
 
-axes[0, 0].set_xscale('linear')
-axes[0, 0].set_yscale('linear')
-axes[0, 0].set_ylabel(r'$K/K_{500}$')
-axes[0, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-axes[0, 0].set_ylim([0, 2])
-axes[0, 0].set_xlim([0, 1])
-
-axes[0, 1].set_xscale('log')
-axes[0, 1].set_yscale('log')
-axes[0, 1].set_ylabel(r'$K/K_{500}$')
-axes[0, 1].set_xlabel(r'$r/r_{500}$')
-axes[0, 1].set_ylim([1e-2, 5])
-axes[0, 1].set_xlim([0.01, 1])
-
-axes[1, 0].set_xscale('log')
-axes[1, 0].set_yscale('log')
-axes[1, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-axes[1, 0].set_xlabel(r'$r/r_{500}$')
-axes[1, 0].set_ylim([1e-5, 1])
-axes[1, 0].set_xlim([0.01, 1])
+axes[1, 0].set_xscale('linear')
+axes[1, 0].set_yscale('linear')
+axes[1, 0].set_ylabel(r'$K/K_{500}$')
+axes[1, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
+axes[1, 0].set_ylim([0, 2])
+axes[1, 0].set_xlim([0, 1])
 
 axes[1, 1].set_xscale('log')
 axes[1, 1].set_yscale('log')
-axes[1, 1].set_ylabel(r'$E(z) ^ {2/3}~(K/K_{500})~\times~f_{\rm gas}(<r) ^ {2/3}$')
+axes[1, 1].set_ylabel(r'$K/K_{500}$')
 axes[1, 1].set_xlabel(r'$r/r_{500}$')
-axes[1, 1].set_ylim([5e-5, 3])
+axes[1, 1].set_ylim([1e-2, 5])
 axes[1, 1].set_xlim([0.01, 1])
+
+axes[2, 0].set_xscale('log')
+axes[2, 0].set_yscale('log')
+axes[2, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
+axes[2, 0].set_xlabel(r'$r/r_{500}$')
+axes[2, 0].set_ylim([1e-5, 1])
+axes[2, 0].set_xlim([0.01, 1])
+
+axes[2, 1].set_xscale('log')
+axes[2, 1].set_yscale('log')
+axes[2, 1].set_ylabel(r'$E(z) ^ {2/3}~(K/K_{500})~\times~f_{\rm gas}(<r) ^ {2/3}$')
+axes[2, 1].set_xlabel(r'$r/r_{500}$')
+axes[2, 1].set_ylim([5e-5, 3])
+axes[2, 1].set_xlim([0.01, 1])
 
 sun_observations = Sun2009()
 r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()
