@@ -15,7 +15,7 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 set_mnras_stylesheet()
 
 fig = plt.figure(figsize=(5, 5), constrained_layout=True)
-gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7)
+gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7, height_ratios=[0.05, 1, 1], width_ratios=[1, 1])
 axes = gs.subplots()
 
 cosmology = Cosmology()
@@ -94,10 +94,10 @@ redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 #     )
 cmap = mpl.cm.jet
 norm = mpl.colors.LogNorm(
-        vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
-        vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
-    )
-cb1 = mpl.colorbar.ColorbarBase(axes[2, 0],
+    vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
+    vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
+)
+cb1 = mpl.colorbar.ColorbarBase(fig.add_subplot(gs[2, :]),
                                 cmap=cmap,
                                 norm=norm,
                                 orientation='horizontal')
