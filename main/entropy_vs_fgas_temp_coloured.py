@@ -48,8 +48,8 @@ print(catalogue.info())
 
 for i in range(len(catalogue)):
     row = catalogue.loc[i]
+    name = row["Run_name"]
     temperature = row['T500_nocore']
-    name = row["Run name"]
     color = plt.cm.jet(row['color'])
     radial_bin_centres = row['radial_bin_centres']
     gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
