@@ -9,7 +9,7 @@ from scaling_relations import MapDM
 from register import find_files
 snap, cat = find_files()
 
-gf = MapDM()
+gf = MapDM(backend='renormalised')
 map_dm = gf.process_single_halo(
     path_to_snap=snap,
     path_to_catalogue=cat,

@@ -103,8 +103,8 @@ class MapDM(HaloProperty):
             sw_data.dark_matter.coordinates,
             sw_data.metadata.boxsize,
             kernel_gamma=1.8,
-            neighbours=57,
-            speedup_fac=2,
+            neighbours=70,
+            speedup_fac=1,
             dimension=3,
         )
 
@@ -140,7 +140,6 @@ class MapDM(HaloProperty):
             backend=self.backend,
             boxsize=sw_data.metadata.boxsize
         )
-        print(dm_map)
 
         dm_map = np.ma.array(
             dm_map,
