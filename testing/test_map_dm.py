@@ -6,8 +6,12 @@ from matplotlib.colors import LogNorm
 sys.path.append("..")
 
 from scaling_relations import MapDM
-from register import find_files
-snap, cat = find_files()
+from register import find_files, xlargs
+# snap, cat = find_files()
+
+dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
+snap = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{xlargs.snapshot_number:04d}.hdf5"
+cat = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{xlargs.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{xlargs.snapshot_number:04d}.properties"
 
 gf = MapDM(backend='renormalised')
 map_dm = gf.process_single_halo(

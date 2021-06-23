@@ -106,7 +106,7 @@ class MapDM(HaloProperty):
                 sw_data.metadata.boxsize,
                 kernel_gamma=kernel_gamma * 0.7,
                 neighbours=57,
-                speedup_fac=2,
+                speedup_fac=1,
                 dimension=3,
             )
 
