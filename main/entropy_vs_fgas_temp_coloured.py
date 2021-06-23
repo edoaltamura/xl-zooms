@@ -94,26 +94,27 @@ for i in range(len(catalogue)):
     )
 
 norm = mpl.colors.LogNorm(
-    vmin= temperatures_dataframe['T500_nocore'].min().v,
-    vmax= temperatures_dataframe['T500_nocore'].max().v
+    vmin=temperatures_dataframe['T500_nocore'].min().v,
+    vmax=temperatures_dataframe['T500_nocore'].max().v
 )
 axes[0, 0].remove()
 axes[0, 1].remove()
 cb1 = mpl.colorbar.ColorbarBase(
     fig.add_subplot(gs[0, :]),
+    height="50%",  # width = 50% of parent_bbox width
     cmap=mpl.cm.jet,
     norm=norm,
     orientation='horizontal'
 )
-cb1.set_label(r'$T_{500}^{\rm core-excised} [K]')
+cb1.set_label(r'$T_{500}^{\rm core-excised}$ [K]')
 cb1.ax.xaxis.set_ticks_position('top')
 cb1.ax.xaxis.set_label_position('top')
 
-axes[1, 0].set_xscale('linear')
+axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')
 axes[1, 0].set_ylabel(r'$K/K_{500}$')
 axes[1, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-axes[1, 0].set_ylim([0, 2])
+axes[1, 0].set_ylim([0, 5])
 axes[1, 0].set_xlim([0, 1])
 
 axes[1, 1].set_xscale('log')
@@ -140,7 +141,7 @@ axes[2, 1].set_xlim([0.01, 1])
 sun_observations = Sun2009()
 r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()
 
-axes[0, 1].errorbar(
+axes[1, 1].errorbar(
     r_r500,
     S_S500_50,
     yerr=(
@@ -166,7 +167,7 @@ bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
     k500_rescale=True
 )
 
-axes[0, 1].errorbar(
+axes[1, 1].errorbar(
     rexcess.radial_bins,
     bin_median,
     yerr=(
@@ -185,8 +186,8 @@ axes[0, 1].errorbar(
 
 r = np.array([0.01, 1])
 k = 1.40 * r ** 1.1
-axes[0, 1].plot(r, k, c='grey', ls='--', label='VKB (2005)', zorder=0)
-axes[0, 1].legend(loc="lower right")
+axes[1, 1].plot(r, k, c='grey', ls='--', label='VKB (2005)', zorder=0)
+axes[1, 1].legend(loc="lower right")
 
 croston = Croston2008()
 croston.compute_gas_mass()
@@ -196,8 +197,8 @@ for i, cluster in enumerate(croston.cluster_data):
     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
     if i == 0:
         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / cosmology.fb0, zorder=0, **kwargs)
-axes[1, 0].legend(loc="upper left")
+    axes[2, 0].plot(cluster['r_r500'], cluster['f_g'] / cosmology.fb0, zorder=0, **kwargs)
+axes[2, 0].legend(loc="upper left")
 
 fig.suptitle(
     (
