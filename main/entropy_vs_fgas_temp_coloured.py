@@ -22,7 +22,7 @@ cosmology = Cosmology()
 
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
-data_color = np.log10(temperatures_dataframe['T500_nocore']).to_numpy()
+data_color = np.log10(np.array([i.v for i in temperatures_dataframe['T500_nocore']]))
 temperatures_dataframe['color'] = (data_color - np.min(data_color)) / (np.max(data_color) - np.min(data_color))
 
 gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
