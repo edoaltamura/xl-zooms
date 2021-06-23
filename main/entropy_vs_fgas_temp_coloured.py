@@ -118,7 +118,7 @@ axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')
 axes[1, 0].set_ylabel(r'$K/K_{500}$')
 axes[1, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-axes[1, 0].set_ylim([0, 5])
+axes[1, 0].set_ylim([1e-5, 5])
 axes[1, 0].set_xlim([0, 1])
 
 axes[1, 1].set_xscale('log')
