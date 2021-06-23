@@ -107,7 +107,6 @@ class MapDM(HaloProperty):
             speedup_fac=2,
             dimension=3,
         )
-        print(sw_data.dark_matter.smoothing_lengths)
 
         if depth is not None:
 
@@ -133,7 +132,7 @@ class MapDM(HaloProperty):
         # Note here that we pass in the dark matter dataset not the whole
         # data object, to specify what particle type we wish to visualise
         dm_map = project_pixel_grid(
-            project=None,
+            project="masses",
             data=sw_data.dark_matter,
             resolution=self.resolution,
             parallel=self.parallel,
