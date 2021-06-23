@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 import matplotlib as mpl
 import numpy as np
 import pandas as pd
-from unyt import Solar_Mass
+from unyt import Solar_Mass, kb
 
 sys.path.append("..")
 
@@ -46,8 +46,6 @@ for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
 print(catalogue.info())
 
-alpha = 0.5
-
 for i in range(len(catalogue)):
     row = catalogue.loc[i]
     name = row["Run_name"]
@@ -60,44 +58,37 @@ for i in range(len(catalogue)):
     vr_number = name.split('_')[1][2:]
     print(f"Printing halo VR{vr_number}")
 
+    line_style = dict(linestyle='-',
+                      color=color,
+                      linewidth=0.5,
+                      alpha=0.75)
+
     axes[1, 0].plot(
         gas_fraction_enclosed,
         entropy_profile,
-        linestyle='-',
-        color=color,
-        linewidth=1,
-        alpha=alpha,
+        **line_style
     )
 
     axes[1, 1].plot(
         radial_bin_centres,
         entropy_profile,
-        linestyle='-',
-        color=color,
-        linewidth=1,
-        alpha=alpha,
+        **line_style
     )
 
     axes[2, 0].plot(
         radial_bin_centres,
         gas_fraction_enclosed,
-        linestyle='-',
-        color=color,
-        linewidth=1,
-        alpha=alpha,
+        **line_style
     )
     axes[2, 1].plot(
         radial_bin_centres,
         entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
-        linestyle='-',
-        color=color,
-        linewidth=1,
-        alpha=alpha,
+        **line_style
     )
 
 norm = mpl.colors.LogNorm(
-    vmin=temperatures_dataframe['T500_nocore'].min().v,
-    vmax=temperatures_dataframe['T500_nocore'].max().v
+    vmin=(temperatures_dataframe['T500_nocore'].min() * kb).to('keV').v,
+    vmax=(temperatures_dataframe['T500_nocore'].max() * kb).to('keV').v
 )
 axes[0, 0].remove()
 axes[0, 1].remove()
@@ -110,7 +101,7 @@ colorbar = mpl.colorbar.ColorbarBase(
     norm=norm,
     orientation='horizontal'
 )
-colorbar.set_label(r'$T_{500}^{\rm core~excised}$ [K]')
+colorbar.set_label(r'$k_B T_{500}^{\rm core~excised}$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
 
