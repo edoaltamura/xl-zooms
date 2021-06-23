@@ -25,6 +25,7 @@ radial_bin_centres = gas_profiles['radial_bin_centres']
 
 entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
 entropy_profiles = gas_profile_obj.process_catalogue()
+print(entropy_profiles)
 entropy_profile = entropy_profiles['entropy_profile'] / entropy_profiles['K500']
 
 temperature_obj = MWTemperatures()
