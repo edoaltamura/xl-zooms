@@ -97,7 +97,7 @@ norm = mpl.colors.LogNorm(
         vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
         vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
     )
-cb1 = mpl.colorbar.ColorbarBase(axes[2, :],
+cb1 = mpl.colorbar.ColorbarBase(axes[2, 0],
                                 cmap=cmap,
                                 norm=norm,
                                 orientation='horizontal')
