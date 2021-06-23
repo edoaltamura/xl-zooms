@@ -10,12 +10,11 @@ from register import find_files
 snap, cat = find_files()
 
 gf = MapDM()
-map_gas, region = gf.process_single_halo(
+map_dm = gf.process_single_halo(
     path_to_snap=snap,
     path_to_catalogue=cat,
     depth=0.1
 )
-print(map_gas, region)
 
 # Display
 cmap = copy.copy(plt.get_cmap('twilight'))
@@ -25,13 +24,15 @@ fig, axes = plt.subplots()
 
 axes.axis("off")
 axes.set_aspect("equal")
+cmap_bkgr = copy.copy(plt.get_cmap(cmap))
+cmap_bkgr.set_under('black')
 axes.imshow(
-    map_gas.T,
-    norm=LogNorm(),
-    cmap=cmap,
-    origin="lower",
-    extent=region
-)
+        map_dm.map.T,
+        norm=LogNorm(),
+        cmap=cmap_bkgr,
+        origin="lower",
+        extent=map_dm.region
+    )
 axes.text(
     0.025,
     0.025,

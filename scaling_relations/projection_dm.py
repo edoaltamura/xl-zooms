@@ -107,6 +107,7 @@ class MapDM(HaloProperty):
             speedup_fac=2,
             dimension=3,
         )
+        print(sw_data.dark_matter.smoothing_lengths)
 
         if depth is not None:
 
@@ -140,6 +141,7 @@ class MapDM(HaloProperty):
             backend=self.backend,
             boxsize=sw_data.metadata.boxsize
         )
+        print(dm_map)
 
         dm_map = np.ma.array(
             dm_map,
