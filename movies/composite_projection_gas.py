@@ -13,20 +13,10 @@ from matplotlib.colors import LogNorm
 sys.path.append("..")
 
 from scaling_relations import MapGas
-from register import parser, default_output_directory
+from register import default_output_directory, find_files, xlargs
 from literature import Cosmology
 
-parser.add_argument(
-    '-s',
-    '--snapshot-number',
-    type=int,
-    required=True
-)
-args = parser.parse_args()
-
-dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
-s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.hdf5"
-c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.properties"
+snap, cat = find_files()
 
 
 def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
@@ -34,19 +24,19 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
     try:
         slice = gf.process_single_halo(
-            path_to_snap=s,
-            path_to_catalogue=c,
+            path_to_snap=snap,
+            path_to_catalogue=cat,
             temperature_range=(1e5, 1e9),
         )
 
     except Exception as e:
         print(
-            f"Snap number {args.snapshot_number:04d} could not be processed.",
+            f"Snap number {xlargs.snapshot_number:04d} could not be processed.",
             e,
             sep='\n'
         )
 
-    if args.debug:
+    if xlargs.debug:
         print(f"{field.title()} map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
         print(f"Map centre: {[float(f'{i.v:.3f}') for i in slice.centre]} Mpc")
 
@@ -88,10 +78,10 @@ draw_panel(axes[2], 'entropies', cmap='inferno', vmin=1E7, vmax=1E9)
 fig.savefig(
     os.path.join(
         default_output_directory,
-        f"projection_composite_{os.path.basename(s)[:-5].replace('.', 'p')}.png"
+        f"projection_composite_{os.path.basename(snap)[:-5].replace('.', 'p')}.png"
     ),
     dpi=300
 )
 
-if not args.quiet:
+if not xlargs.quiet:
     plt.show()
