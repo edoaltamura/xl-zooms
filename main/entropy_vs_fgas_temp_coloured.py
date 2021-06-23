@@ -103,13 +103,14 @@ axes[0, 0].remove()
 axes[0, 1].remove()
 top_row_axes = fig.add_subplot(gs[0, :])
 cax = top_row_axes.inset_axes([0.25, 0, 0.5, 1], transform=top_row_axes.transAxes)
+top_row_axes.remove()
 colorbar = mpl.colorbar.ColorbarBase(
     cax,
     cmap=mpl.cm.jet,
     norm=norm,
     orientation='horizontal'
 )
-colorbar.set_label(r'$T_{500}^{\rm core-excised}$ [K]')
+colorbar.set_label(r'$T_{500}^{\rm core~excised}$ [K]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
 
