@@ -32,6 +32,7 @@ gas_profiles_dataframe = gas_profile_obj.process_catalogue()
 entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
 entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
 
+# Merge all catalogues into one
 catalogue = temperatures_dataframe
 for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
     catalogue = pd.concat(
