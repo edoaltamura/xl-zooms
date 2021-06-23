@@ -99,9 +99,9 @@ cb = mpl.colorbar.ColorbarBase(
     cmap='jet',
     norm=mpl.colors.LogNorm(
         vmin=temperatures_dataframe['T500_nocore'].min().v,
-        vmax=temperatures_dataframe['T500_nocore'].max.v
+        vmax=temperatures_dataframe['T500_nocore'].max().v
     ),
-    label='T500_nocore',
+    label='T500_nocore [K]',
     # ticks=[0, 3, 6, 9]
 )
 
