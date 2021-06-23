@@ -23,10 +23,10 @@ gas_profiles_dataframe = gas_profile_obj.process_catalogue()
 radial_bin_centres = gas_profiles_dataframe['radial_bin_centres']
 gas_fraction_enclosed = gas_profiles_dataframe['cumulative_gas_mass_profile'] / gas_profiles_dataframe['m500fb']
 
-entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
-entropy_profiles_dataframe = gas_profile_obj.process_catalogue()
-entropy_profile = entropy_profiles_dataframe['k']
-
+# entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
+# entropy_profiles_dataframe = gas_profile_obj.process_catalogue()
+# entropy_profile = entropy_profiles_dataframe['k']
+entropy_profile = 1
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
 temperatures = temperatures_dataframe['T500_nocore']
