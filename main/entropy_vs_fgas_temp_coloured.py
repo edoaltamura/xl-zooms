@@ -46,6 +46,8 @@ for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
 print(catalogue.info())
 
+alpha = 0.5
+
 for i in range(len(catalogue)):
     row = catalogue.loc[i]
     name = row["Run_name"]
@@ -56,7 +58,7 @@ for i in range(len(catalogue)):
     entropy_profile = row['k'] / row['k500']
 
     vr_number = name.split('_')[1][2:]
-    print(vr_number)
+    print(f"Printing halo VR{vr_number}")
 
     axes[1, 0].plot(
         gas_fraction_enclosed,
@@ -64,7 +66,7 @@ for i in range(len(catalogue)):
         linestyle='-',
         color=color,
         linewidth=1,
-        alpha=1,
+        alpha=alpha,
     )
 
     axes[1, 1].plot(
@@ -73,7 +75,7 @@ for i in range(len(catalogue)):
         linestyle='-',
         color=color,
         linewidth=1,
-        alpha=1,
+        alpha=alpha,
     )
 
     axes[2, 0].plot(
@@ -82,7 +84,7 @@ for i in range(len(catalogue)):
         linestyle='-',
         color=color,
         linewidth=1,
-        alpha=1,
+        alpha=alpha,
     )
     axes[2, 1].plot(
         radial_bin_centres,
@@ -90,7 +92,7 @@ for i in range(len(catalogue)):
         linestyle='-',
         color=color,
         linewidth=1,
-        alpha=1,
+        alpha=alpha,
     )
 
 norm = mpl.colors.LogNorm(
