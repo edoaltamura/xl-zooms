@@ -98,15 +98,16 @@ class MapDM(HaloProperty):
             _yCen + mask_radius_r500 / np.sqrt(3) * _r500
         ]
 
-        # Generate smoothing lengths for the dark matter
-        sw_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
-            sw_data.dark_matter.coordinates,
-            sw_data.metadata.boxsize,
-            kernel_gamma=1.8,
-            neighbours=57,
-            speedup_fac=2,
-            dimension=3,
-        ) * 2
+        if not hasattr(sw_data.dark_matter, 'smoothing_lengths'):
+            print('Generate smoothing lengths for the dark matter')
+            sw_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
+                sw_data.dark_matter.coordinates,
+                sw_data.metadata.boxsize,
+                kernel_gamma=1.8,
+                neighbours=57,
+                speedup_fac=2,
+                dimension=3,
+            ) * 2
 
         if depth is not None:
 
