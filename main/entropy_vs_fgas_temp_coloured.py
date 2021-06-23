@@ -106,33 +106,37 @@ colorbar.set_label(r'$k_B T_{500}^{\rm core~excised}$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
 
+fgas_bounds = [10 ** (-2.5), 1]
+k_bounds = [1e-2, 6]
+r_bounds = [0.01, 1]
+
 axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')
 axes[1, 0].set_ylabel(r'$K/K_{500}$')
 axes[1, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
-axes[1, 0].set_ylim([0, 5])
-axes[1, 0].set_xlim([10 ** (-2.5), 1])
+axes[1, 0].set_ylim(k_bounds)
+axes[1, 0].set_xlim(fgas_bounds)
 
 axes[1, 1].set_xscale('log')
 axes[1, 1].set_yscale('log')
 axes[1, 1].set_ylabel(r'$K/K_{500}$')
 axes[1, 1].set_xlabel(r'$r/r_{500}$')
-axes[1, 1].set_ylim([1e-2, 5])
-axes[1, 1].set_xlim([0.01, 1])
+axes[1, 1].set_ylim(fgas_bounds)
+axes[1, 1].set_xlim(r_bounds)
 
 axes[2, 0].set_xscale('log')
 axes[2, 0].set_yscale('log')
 axes[2, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
 axes[2, 0].set_xlabel(r'$r/r_{500}$')
-axes[2, 0].set_ylim([10 ** (-2.5), 1])
-axes[2, 0].set_xlim([0.01, 1])
+axes[2, 0].set_ylim(fgas_bounds)
+axes[2, 0].set_xlim(r_bounds)
 
 axes[2, 1].set_xscale('log')
 axes[2, 1].set_yscale('log')
 axes[2, 1].set_ylabel(r'$E(z) ^ {2/3}~(K/K_{500})~\times~f_{\rm gas}(<r) ^ {2/3}$')
 axes[2, 1].set_xlabel(r'$r/r_{500}$')
-axes[2, 1].set_ylim([0.01 * (10 ** (-2.5)) ** (2 / 3), 5])
-axes[2, 1].set_xlim([0.01, 1])
+axes[2, 1].set_ylim([k_bounds[0] * fgas_bounds[0] ** (2 / 3), k_bounds[1] * fgas_bounds[1] ** (2 / 3)])
+axes[2, 1].set_xlim(r_bounds)
 
 sun_observations = Sun2009()
 r_r500, S_S500_50, S_S500_10, S_S500_90 = sun_observations.get_shortcut()
