@@ -422,7 +422,7 @@ class HaloProperty(object):
         # Recast output into a Pandas dataframe for further manipulation
         results = pd.DataFrame(list(results), columns=labels)
         results.insert(0, 'Run_name', pd.Series(_name_list, dtype=str))
-        if not xlargs.quiet:
+        if xlargs.debug:
             print(
                 f"z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}"
                 "\nOutput dataframe (head only):\n",
