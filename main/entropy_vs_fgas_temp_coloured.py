@@ -19,20 +19,20 @@ axes = gs.subplots()
 cosmology = Cosmology()
 
 gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
-gas_profiles = gas_profile_obj.process_catalogue()
-gas_fraction_enclosed = gas_profiles['cumulative_gas_mass_profile'] / gas_profiles['m500fb']
-radial_bin_centres = gas_profiles['radial_bin_centres']
+gas_profiles_dataframe = gas_profile_obj.process_catalogue()
+gas_fraction_enclosed = gas_profiles_dataframe['cumulative_gas_mass_profile'] / gas_profiles_dataframe['m500fb']
+radial_bin_centres = gas_profiles_dataframe['radial_bin_centres']
 
 print(radial_bin_centres)
 
 # entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
-# entropy_profiles = gas_profile_obj.process_catalogue()
-# print(entropy_profiles)
-# entropy_profile = entropy_profiles['entropy_profile'] / entropy_profiles['K500']
+# entropy_profiles_dataframe = gas_profile_obj.process_catalogue()
+# print(entropy_profiles_dataframe)
+# entropy_profile_dataframe = entropy_profiles_dataframe['entropy_profile'] / entropy_profiles_dataframe['K500']
 entropy_profile = 1
 temperature_obj = MWTemperatures()
-temperatures = temperature_obj.process_catalogue()
-T500_nocore = temperatures['temperatures']
+temperatures_dataframe = temperature_obj.process_catalogue()
+T500_nocore = temperatures_dataframe['temperatures']
 
 
 axes[0, 0].plot(
