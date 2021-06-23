@@ -61,20 +61,20 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         origin="lower",
         extent=slice.region
     )
-    axes.text(
-        0.025,
-        0.025,
-        (
-            f'{field.title()}\n'
-            f'z = {slice.z:.2f}\n'
-            f't = {Cosmology().age(slice.z).value:.3f} Gyr'
-        ),
-        color="w",
-        ha="left",
-        va="bottom",
-        alpha=0.8,
-        transform=axes.transAxes,
-    )
+    # axes.text(
+    #     0.025,
+    #     0.025,
+    #     (
+    #         f'{field.title()}\n'
+    #         f'z = {slice.z:.2f}\n'
+    #         f't = {Cosmology().age(slice.z).value:.3f} Gyr'
+    #     ),
+    #     color="w",
+    #     ha="left",
+    #     va="bottom",
+    #     alpha=0.8,
+    #     transform=axes.transAxes,
+    # )
 
 
 fig = plt.figure(figsize=(9, 3), constrained_layout=True)
