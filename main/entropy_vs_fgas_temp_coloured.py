@@ -195,7 +195,7 @@ axes[1, 0].legend(loc="upper left")
 
 fig.suptitle(
     (
-        f"{os.path.basename(xlargs.keywords)}\n"
+        f"{' '.join(xlargs.keywords)}\n"
         f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}\n"
         f"Redshift = {redshift:.3f}"
     ),
