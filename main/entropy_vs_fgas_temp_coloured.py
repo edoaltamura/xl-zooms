@@ -1,7 +1,7 @@
 import sys
 import os.path
 from matplotlib import pyplot as plt
-from matplotlib import cm
+import matplotlib as mpl
 import numpy as np
 import pandas as pd
 from unyt import Solar_Mass
@@ -45,7 +45,6 @@ for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
 # Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
 print(catalogue.info())
-
 
 for i in range(len(catalogue)):
     row = catalogue.loc[i]
@@ -93,6 +92,18 @@ for i in range(len(catalogue)):
         linewidth=1,
         alpha=1,
     )
+
+cb = mpl.colorbar.ColorbarBase(
+    axes.flat,
+    orientation='horizontal',
+    cmap='jet',
+    norm=mpl.colors.LogNorm(
+        vmin=temperatures_dataframe['T500_nocore'].min().v,
+        vmax=temperatures_dataframe['T500_nocore'].max.v
+    ),
+    label='T500_nocore',
+    # ticks=[0, 3, 6, 9]
+)
 
 axes[0, 0].set_xscale('linear')
 axes[0, 0].set_yscale('linear')
@@ -186,7 +197,7 @@ axes[1, 0].legend(loc="upper left")
 
 fig.suptitle(
     (
-        f"{os.path.basename(xlargs.run_directory)}\n"
+        f"{os.path.basename(xlargs.keywords)}\n"
         f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}\n"
         f"Redshift = {redshift:.3f}"
     ),
@@ -204,4 +215,3 @@ fig.savefig(
 )
 
 plt.close()
-
