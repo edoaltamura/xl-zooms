@@ -139,7 +139,7 @@ axes[2, 1].set_xscale('log')
 axes[2, 1].set_yscale('log')
 axes[2, 1].set_ylabel(r'$E(z) ^ {2/3}~(K/K_{500})~\times~f_{\rm gas}(<r) ^ {2/3}$')
 axes[2, 1].set_xlabel(r'$r/r_{500}$')
-axes[2, 1].set_ylim([5e-5, 3])
+axes[2, 1].set_ylim([0.01 * (10 ** (-2.5)) ** (2 / 3), 5])
 axes[2, 1].set_xlim([0.01, 1])
 
 sun_observations = Sun2009()
