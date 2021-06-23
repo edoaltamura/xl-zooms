@@ -14,7 +14,7 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
 
-fig = plt.figure(figsize=(5, 5), constrained_layout=True)
+fig = plt.figure(figsize=(5, 4), constrained_layout=True)
 gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7, height_ratios=[0.05, 1, 1], width_ratios=[1, 1])
 axes = gs.subplots()
 
@@ -106,6 +106,7 @@ colorbar.set_label(r'$k_B T_{500}^{\rm core~excised}$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
 
+# Set axes limits
 fgas_bounds = [10 ** (-2.5), 1]
 k_bounds = [1e-2, 6]
 r_bounds = [0.01, 1]
@@ -121,7 +122,7 @@ axes[1, 1].set_xscale('log')
 axes[1, 1].set_yscale('log')
 axes[1, 1].set_ylabel(r'$K/K_{500}$')
 axes[1, 1].set_xlabel(r'$r/r_{500}$')
-axes[1, 1].set_ylim(fgas_bounds)
+axes[1, 1].set_ylim(k_bounds)
 axes[1, 1].set_xlim(r_bounds)
 
 axes[2, 0].set_xscale('log')
