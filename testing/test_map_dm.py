@@ -17,7 +17,7 @@ gf = MapDM(backend='renormalised')
 map_dm = gf.process_single_halo(
     path_to_snap=snap,
     path_to_catalogue=cat,
-    depth=1
+    depth=4
 )
 
 # Display
