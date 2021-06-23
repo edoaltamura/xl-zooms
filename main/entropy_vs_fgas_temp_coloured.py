@@ -110,7 +110,7 @@ colorbar.ax.xaxis.set_label_position('top')
 
 # Set axes limits
 fgas_bounds = [10 ** (-2.5), 1]
-k_bounds = [1e-2, 6]
+k_bounds = [1e-2, 7]
 r_bounds = [0.01, 1]
 
 axes[1, 0].set_xscale('log')
