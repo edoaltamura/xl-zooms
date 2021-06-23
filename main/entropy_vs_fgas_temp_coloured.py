@@ -55,7 +55,8 @@ for i in range(len(catalogue)):
     gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
     entropy_profile = row['k'] / row['k500']
 
-    vr_number =
+    vr_number = name.split('_')[1][2:]
+    print(vr_number)
 
     axes[0, 0].plot(
         gas_fraction_enclosed,
