@@ -37,14 +37,14 @@ axes.imshow(
         origin="lower",
         extent=map_dm.region
     )
-axes.text(
-    0.025,
-    0.025,
-    'Masses',
-    color="w",
-    ha="left",
-    va="bottom",
-    alpha=0.8,
-    transform=axes.transAxes,
-)
+# axes.text(
+#     0.025,
+#     0.025,
+#     'Masses',
+#     color="w",
+#     ha="left",
+#     va="bottom",
+#     alpha=0.8,
+#     transform=axes.transAxes,
+# )
 plt.show()
