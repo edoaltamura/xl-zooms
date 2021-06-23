@@ -1,7 +1,8 @@
 from .auto_parser import (
     xlargs,
     parser,
-    find_files
+    find_files,
+    delete_last_line
 )
 
 from .static_parameters import *

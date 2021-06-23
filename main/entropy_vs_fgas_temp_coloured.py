@@ -9,7 +9,7 @@ from unyt import Solar_Mass, kb
 sys.path.append("..")
 
 from scaling_relations import EntropyFgasSpace, EntropyProfiles, MWTemperatures
-from register import set_mnras_stylesheet, xlargs, default_output_directory, calibration_zooms
+from register import set_mnras_stylesheet, xlargs, default_output_directory, calibration_zooms, delete_last_line
 from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
@@ -86,6 +86,8 @@ for i in range(len(catalogue)):
         entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
         **line_style
     )
+
+    delete_last_line()
 
 norm = mpl.colors.LogNorm(
     vmin=(temperatures_dataframe['T500_nocore'].min() * kb).to('keV').v,
