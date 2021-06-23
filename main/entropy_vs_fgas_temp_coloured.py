@@ -103,7 +103,6 @@ top_row_axes = fig.add_subplot(gs[0, :])
 cax = top_row_axes.inset_axes([0.25, 0, 0.5, 1], transform=top_row_axes.transAxes)
 colorbar = mpl.colorbar.ColorbarBase(
     cax,
-    shrink=0.,
     cmap=mpl.cm.jet,
     norm=norm,
     orientation='horizontal'
