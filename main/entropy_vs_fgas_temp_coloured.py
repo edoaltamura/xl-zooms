@@ -19,6 +19,7 @@ gs = fig.add_gridspec(2, 2, hspace=0.35, wspace=0.7)
 axes = gs.subplots()
 
 cosmology = Cosmology()
+redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
@@ -86,7 +87,7 @@ for i in range(len(catalogue)):
     )
     axes[1, 1].plot(
         radial_bin_centres,
-        entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(gas_profile_obj.z) ** (2 / 3),
+        entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
         linestyle='-',
         color=color,
         linewidth=1,
@@ -187,7 +188,7 @@ fig.suptitle(
     (
         f"{os.path.basename(xlargs.run_directory)}\n"
         f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}\n"
-        f"Redshift = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.3f}"
+        f"Redshift = {redshift:.3f}"
     ),
     fontsize=6
 )
