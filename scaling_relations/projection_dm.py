@@ -5,6 +5,7 @@ from unyt import kb, mh, Mpc, dimensionless
 from collections import namedtuple
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
+from swiftsimio.visualisation.slice import kernel_gamma
 
 
 from .halo_property import HaloProperty
@@ -103,7 +104,7 @@ class MapDM(HaloProperty):
             sw_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
                 sw_data.dark_matter.coordinates,
                 sw_data.metadata.boxsize,
-                kernel_gamma=1.8,
+                kernel_gamma=kernel_gamma,
                 neighbours=57,
                 speedup_fac=2,
                 dimension=3,
