@@ -104,7 +104,7 @@ class MapDM(HaloProperty):
             sw_data.dark_matter.smoothing_lengths = generate_smoothing_lengths(
                 sw_data.dark_matter.coordinates,
                 sw_data.metadata.boxsize,
-                kernel_gamma=kernel_gamma,
+                kernel_gamma=kernel_gamma * 1.2,
                 neighbours=57,
                 speedup_fac=2,
                 dimension=3,
