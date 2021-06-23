@@ -1,7 +1,7 @@
 import os.path
 import numpy as np
 from typing import Union, Optional
-from unyt import kb, mh, Mpc
+from unyt import kb, mh, Mpc, dimensionless
 from collections import namedtuple
 from swiftsimio.visualisation.projection import project_pixel_grid
 from swiftsimio.visualisation.smoothing_length_generation import generate_smoothing_lengths
@@ -140,8 +140,6 @@ class MapDM(HaloProperty):
             backend=self.backend,
             boxsize=sw_data.metadata.boxsize
         )
-        units = dm_map.units
-        dm_map = dm_map.value
 
         dm_map = np.ma.array(
             dm_map,
@@ -154,7 +152,7 @@ class MapDM(HaloProperty):
         output_values = [
             dm_map,
             region,
-            units,
+            dimensionless / Mpc ** 2,
             [_xCen, _yCen, _zCen],
             _r500,
             sw_data.metadata.z
