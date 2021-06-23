@@ -21,80 +21,81 @@ axes = gs.subplots()
 cosmology = Cosmology()
 redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 
-# temperature_obj = MWTemperatures()
-# temperatures_dataframe = temperature_obj.process_catalogue()
-# data_color = np.log10(np.array([i.v for i in temperatures_dataframe['T500_nocore']]))
-# temperatures_dataframe['color'] = (data_color - np.min(data_color)) / (np.max(data_color) - np.min(data_color))
-#
-# gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
-# gas_profiles_dataframe = gas_profile_obj.process_catalogue()
-#
-# entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
-# entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
-#
-# catalogue = temperatures_dataframe
-# for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
-#     catalogue = pd.concat(
-#         [
-#             catalogue,
-#             datasets
-#         ],
-#         axis=1
-#     )
-#
-# # Remove duplicate columns
-# catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
-# print(catalogue.info())
-#
-# for i in range(len(catalogue)):
-#     row = catalogue.loc[i]
-#     name = row["Run_name"]
-#     temperature = row['T500_nocore']
-#     color = plt.cm.jet(row['color'])
-#     radial_bin_centres = row['radial_bin_centres']
-#     gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
-#     entropy_profile = row['k'] / row['k500']
-#
-#     vr_number = name.split('_')[1][2:]
-#     print(vr_number)
-#
-#     axes[0, 0].plot(
-#         gas_fraction_enclosed,
-#         entropy_profile,
-#         linestyle='-',
-#         color=color,
-#         linewidth=1,
-#         alpha=1,
-#     )
-#
-#     axes[0, 1].plot(
-#         radial_bin_centres,
-#         entropy_profile,
-#         linestyle='-',
-#         color=color,
-#         linewidth=1,
-#         alpha=1,
-#     )
-#
-#     axes[1, 0].plot(
-#         radial_bin_centres,
-#         gas_fraction_enclosed,
-#         linestyle='-',
-#         color=color,
-#         linewidth=1,
-#         alpha=1,
-#     )
-#     axes[1, 1].plot(
-#         radial_bin_centres,
-#         entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
-#         linestyle='-',
-#         color=color,
-#         linewidth=1,
-#         alpha=1,
-#     )
+temperature_obj = MWTemperatures()
+temperatures_dataframe = temperature_obj.process_catalogue()
+data_color = np.log10(np.array([i.v for i in temperatures_dataframe['T500_nocore']]))
+temperatures_dataframe['color'] = (data_color - np.min(data_color)) / (np.max(data_color) - np.min(data_color))
+
+gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
+gas_profiles_dataframe = gas_profile_obj.process_catalogue()
+
+entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
+entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
+
+catalogue = temperatures_dataframe
+for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
+    catalogue = pd.concat(
+        [
+            catalogue,
+            datasets
+        ],
+        axis=1
+    )
+
+# Remove duplicate columns
+catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
+print(catalogue.info())
+
+for i in range(len(catalogue)):
+    row = catalogue.loc[i]
+    name = row["Run_name"]
+    temperature = row['T500_nocore']
+    color = plt.cm.jet(row['color'])
+    radial_bin_centres = row['radial_bin_centres']
+    gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
+    entropy_profile = row['k'] / row['k500']
+
+    vr_number = name.split('_')[1][2:]
+    print(vr_number)
+
+    axes[1, 0].plot(
+        gas_fraction_enclosed,
+        entropy_profile,
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+
+    axes[1, 1].plot(
+        radial_bin_centres,
+        entropy_profile,
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+
+    axes[2, 0].plot(
+        radial_bin_centres,
+        gas_fraction_enclosed,
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+    axes[2, 1].plot(
+        radial_bin_centres,
+        entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+
 norm = mpl.colors.LogNorm(
-    vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
-    vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
+    vmin= temperatures_dataframe['T500_nocore'].min().v,
+    vmax= temperatures_dataframe['T500_nocore'].max().v
 )
 axes[0, 0].remove()
 axes[0, 1].remove()
@@ -105,8 +106,8 @@ cb1 = mpl.colorbar.ColorbarBase(
     orientation='horizontal'
 )
 cb1.set_label(r'$T_{500}^{\rm core-excised} [K]')
-cb1.xaxis.set_ticks_position('top')
-cb1.xaxis.set_label_position('top')
+cb1.ax.xaxis.set_ticks_position('top')
+cb1.ax.xaxis.set_label_position('top')
 
 axes[1, 0].set_xscale('linear')
 axes[1, 0].set_yscale('linear')
