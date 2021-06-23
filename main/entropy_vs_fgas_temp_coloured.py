@@ -62,7 +62,7 @@ for i in range(len(catalogue)):
     line_style = dict(linestyle='-',
                       color=color,
                       linewidth=0.5,
-                      alpha=0.75)
+                      alpha=0.6)
 
     axes[1, 0].plot(
         gas_fraction_enclosed,
