@@ -28,9 +28,8 @@ radial_bin_centres = gas_profiles_dataframe['radial_bin_centres']
 gas_fraction_enclosed = gas_profiles_dataframe['cumulative_gas_mass_profile'] / gas_profiles_dataframe['m500fb']
 
 entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
-entropy_profiles_dataframe = gas_profile_obj.process_catalogue()
-# entropy_profile = entropy_profiles_dataframe['k']
-entropy_profile = 1
+entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
+entropy_profile = entropy_profiles_dataframe['k'] / entropy_profiles_dataframe['k500']
 
 axes[0, 0].plot(
     gas_fraction_enclosed,
@@ -165,13 +164,13 @@ fig.suptitle(
 if not xlargs.quiet:
     plt.show()
 
-# fig.savefig(
-#     os.path.join(
-#         default_output_directory,
-#         f"entropy_vs_fgas.png"
-#     ),
-#     dpi=300
-# )
+fig.savefig(
+    os.path.join(
+        default_output_directory,
+        f"entropy_vs_fgas.png"
+    ),
+    dpi=300
+)
 
 plt.close()
 

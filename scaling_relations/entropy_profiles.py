@@ -56,16 +56,6 @@ class EntropyProfiles(HaloProperty):
             f'gas_fractions_{xlargs.mass_estimator:s}_{xlargs.redshift_index:04d}.pkl'
         )
 
-    def check_value(self, value):
-
-        if value >= 1:
-            raise RuntimeError((
-                f"The value for {self.labels[1]} must be between 0 and 1. "
-                f"Got {value} instead."
-            ))
-        elif 0.5 < value < 1:
-            warn(f"The value for {self.labels[1]} seems too high: {value}", RuntimeWarning)
-
     def process_single_halo(
             self,
             zoom_obj: Zoom = None,
