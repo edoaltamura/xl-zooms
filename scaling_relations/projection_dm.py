@@ -107,7 +107,7 @@ class MapDM(HaloProperty):
                 neighbours=57,
                 speedup_fac=2,
                 dimension=3,
-            ) * 2
+            )
 
         if depth is not None:
 
