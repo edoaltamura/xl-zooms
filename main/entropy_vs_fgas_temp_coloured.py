@@ -20,15 +20,12 @@ cosmology = Cosmology()
 
 gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
 gas_profiles_dataframe = gas_profile_obj.process_catalogue()
-gas_fraction_enclosed = gas_profiles_dataframe['cumulative_gas_mass_profile'] / gas_profiles_dataframe['m500fb']
 radial_bin_centres = gas_profiles_dataframe['radial_bin_centres']
-
-print(radial_bin_centres)
+gas_fraction_enclosed = gas_profiles_dataframe['cumulative_gas_mass_profile'] / gas_profiles_dataframe['m500fb']
 
 entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
 entropy_profiles_dataframe = gas_profile_obj.process_catalogue()
-print(entropy_profiles_dataframe)
-entropy_profile = entropy_profiles_dataframe['entropy_profile']
+entropy_profile = entropy_profiles_dataframe['k']
 
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()

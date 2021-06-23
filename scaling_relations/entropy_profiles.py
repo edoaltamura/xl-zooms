@@ -44,7 +44,7 @@ class EntropyProfiles(HaloProperty):
     ):
         super().__init__()
 
-        self.labels = ['radial_bin_centres', 'entropy_profile', 'K500']
+        self.labels = ['r', 'k', 'k500']
         self.max_radius_r500 = max_radius_r500
         self.weighting = weighting
         self.simple_electron_number_density = simple_electron_number_density
