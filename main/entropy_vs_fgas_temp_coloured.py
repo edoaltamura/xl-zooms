@@ -9,7 +9,7 @@ from unyt import Solar_Mass
 sys.path.append("..")
 
 from scaling_relations import EntropyFgasSpace, EntropyProfiles, MWTemperatures
-from register import set_mnras_stylesheet, xlargs, default_output_directory
+from register import set_mnras_stylesheet, xlargs, default_output_directory, calibration_zooms
 from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
@@ -54,6 +54,8 @@ for i in range(len(catalogue)):
     radial_bin_centres = row['radial_bin_centres']
     gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
     entropy_profile = row['k'] / row['k500']
+
+    vr_number =
 
     axes[0, 0].plot(
         gas_fraction_enclosed,
@@ -177,14 +179,14 @@ for i, cluster in enumerate(croston.cluster_data):
     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
     if i == 0:
         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / gas_profile_obj.fb, zorder=0, **kwargs)
+    axes[1, 0].plot(cluster['r_r500'], cluster['f_g'] / cosmology.fb0, zorder=0, **kwargs)
 axes[1, 0].legend(loc="upper left")
 
 fig.suptitle(
     (
         f"{os.path.basename(xlargs.run_directory)}\n"
         f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}\n"
-        f"Redshift = {gas_profile_obj.z:.3f}"
+        f"Redshift = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.3f}"
     ),
     fontsize=6
 )
