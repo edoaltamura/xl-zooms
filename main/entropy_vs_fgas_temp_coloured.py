@@ -14,7 +14,7 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
 
-fig = plt.figure(figsize=(5, 4), constrained_layout=True)
+fig = plt.figure(figsize=(4, 5), constrained_layout=True)
 gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7, height_ratios=[0.05, 1, 1], width_ratios=[1, 1])
 axes = gs.subplots()
 
@@ -215,7 +215,7 @@ if not xlargs.quiet:
 fig.savefig(
     os.path.join(
         default_output_directory,
-        f"entropy_vs_fgas.png"
+        f"entropy_vs_fgas_temp_coloured_{xlargs.redshift_index:04d}.png"
     ),
     dpi=300
 )
