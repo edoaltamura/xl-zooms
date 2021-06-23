@@ -96,7 +96,7 @@ redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 cb = mpl.colorbar.ColorbarBase(
     axes.flat,
     orientation='horizontal',
-    cmap='jet',
+    cmap=plt.cm.jet,
     norm=mpl.colors.LogNorm(
         vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
         vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
