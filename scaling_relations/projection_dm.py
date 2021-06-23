@@ -103,10 +103,10 @@ class MapDM(HaloProperty):
             sw_data.dark_matter.coordinates,
             sw_data.metadata.boxsize,
             kernel_gamma=1.8,
-            neighbours=70,
-            speedup_fac=1,
+            neighbours=57,
+            speedup_fac=2,
             dimension=3,
-        )
+        ) * 2
 
         if depth is not None:
 
