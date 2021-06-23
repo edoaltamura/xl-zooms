@@ -103,7 +103,7 @@ axes[0, 0].remove()
 axes[0, 1].remove()
 top_row_axes = fig.add_subplot(gs[0, :])
 cax = top_row_axes.inset_axes([0.25, 0, 0.5, 1], transform=top_row_axes.transAxes)
-top_row_axes.remove()
+top_row_axes.axis('off')
 colorbar = mpl.colorbar.ColorbarBase(
     cax,
     cmap=mpl.cm.jet,
