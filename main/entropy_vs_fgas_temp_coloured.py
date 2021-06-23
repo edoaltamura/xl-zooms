@@ -1,7 +1,9 @@
 import sys
 import os.path
 from matplotlib import pyplot as plt
+from matplotlib import cm
 import numpy as np
+import pandas as pd
 from unyt import Solar_Mass
 
 sys.path.append("..")
@@ -20,25 +22,74 @@ cosmology = Cosmology()
 
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
-temperatures = temperatures_dataframe['T500_nocore']
+data_color = np.log10(temperatures_dataframe['T500_nocore']).to_numpy()
+temperatures_dataframe['color'] = (data_color - np.min(data_color)) / (np.max(data_color) - np.min(data_color))
 
 gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
 gas_profiles_dataframe = gas_profile_obj.process_catalogue()
-radial_bin_centres = gas_profiles_dataframe['radial_bin_centres']
-gas_fraction_enclosed = gas_profiles_dataframe['cumulative_gas_mass_profile'] / gas_profiles_dataframe['m500fb']
 
 entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
 entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
-entropy_profile = entropy_profiles_dataframe['k'] / entropy_profiles_dataframe['k500']
 
-axes[0, 0].plot(
-    gas_fraction_enclosed,
-    entropy_profile,
-    linestyle='-',
-    color='r',
-    linewidth=1,
-    alpha=1,
-)
+catalogue = temperatures_dataframe
+for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
+    catalogue = pd.concat(
+        [
+            catalogue,
+            datasets
+        ],
+        axis=1
+    )
+
+# Remove duplicate columns
+catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
+print(catalogue.info())
+
+
+for i in range(len(catalogue)):
+    row = catalogue.loc[i]
+    temperature = row['T500_nocore']
+    name = row["Run name"]
+    color = plt.cm.jet(row['color'])
+    radial_bin_centres = row['radial_bin_centres']
+    gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
+    entropy_profile = row['k'] / row['k500']
+
+    axes[0, 0].plot(
+        gas_fraction_enclosed,
+        entropy_profile,
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+
+    axes[0, 1].plot(
+        radial_bin_centres,
+        entropy_profile,
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+
+    axes[1, 0].plot(
+        radial_bin_centres,
+        gas_fraction_enclosed,
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+    axes[1, 1].plot(
+        radial_bin_centres,
+        entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(gas_profile_obj.z) ** (2 / 3),
+        linestyle='-',
+        color=color,
+        linewidth=1,
+        alpha=1,
+    )
+
 axes[0, 0].set_xscale('linear')
 axes[0, 0].set_yscale('linear')
 axes[0, 0].set_ylabel(r'$K/K_{500}$')
@@ -46,14 +97,6 @@ axes[0, 0].set_xlabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
 axes[0, 0].set_ylim([0, 2])
 axes[0, 0].set_xlim([0, 1])
 
-axes[0, 1].plot(
-    radial_bin_centres,
-    entropy_profile,
-    linestyle='-',
-    color='r',
-    linewidth=1,
-    alpha=1,
-)
 axes[0, 1].set_xscale('log')
 axes[0, 1].set_yscale('log')
 axes[0, 1].set_ylabel(r'$K/K_{500}$')
@@ -61,14 +104,6 @@ axes[0, 1].set_xlabel(r'$r/r_{500}$')
 axes[0, 1].set_ylim([1e-2, 5])
 axes[0, 1].set_xlim([0.01, 1])
 
-axes[1, 0].plot(
-    radial_bin_centres,
-    gas_fraction_enclosed,
-    linestyle='-',
-    color='r',
-    linewidth=1,
-    alpha=1,
-)
 axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('log')
 axes[1, 0].set_ylabel(r'$f_{\rm gas}(<r) = M_{\rm gas} / (M_{500}\ f_b)$')
@@ -76,14 +111,6 @@ axes[1, 0].set_xlabel(r'$r/r_{500}$')
 axes[1, 0].set_ylim([1e-5, 1])
 axes[1, 0].set_xlim([0.01, 1])
 
-axes[1, 1].plot(
-    radial_bin_centres,
-    entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(gas_profile_obj.z) ** (2 / 3),
-    linestyle='-',
-    color='r',
-    linewidth=1,
-    alpha=1,
-)
 axes[1, 1].set_xscale('log')
 axes[1, 1].set_yscale('log')
 axes[1, 1].set_ylabel(r'$E(z) ^ {2/3}~(K/K_{500})~\times~f_{\rm gas}(<r) ^ {2/3}$')
