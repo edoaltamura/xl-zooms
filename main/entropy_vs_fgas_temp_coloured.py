@@ -21,8 +21,8 @@ axes = gs.subplots()
 cosmology = Cosmology()
 redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 
-temperature_obj = MWTemperatures()
-temperatures_dataframe = temperature_obj.process_catalogue()
+# temperature_obj = MWTemperatures()
+# temperatures_dataframe = temperature_obj.process_catalogue()
 # data_color = np.log10(np.array([i.v for i in temperatures_dataframe['T500_nocore']]))
 # temperatures_dataframe['color'] = (data_color - np.min(data_color)) / (np.max(data_color) - np.min(data_color))
 #
@@ -98,8 +98,8 @@ cb = mpl.colorbar.ColorbarBase(
     orientation='horizontal',
     cmap='jet',
     norm=mpl.colors.LogNorm(
-        vmin=temperatures_dataframe['T500_nocore'].min().v,
-        vmax=temperatures_dataframe['T500_nocore'].max().v
+        vmin=1e5,  # temperatures_dataframe['T500_nocore'].min().v,
+        vmax=1e7,  # temperatures_dataframe['T500_nocore'].max().v
     ),
     label='T500_nocore [K]',
     # ticks=[0, 3, 6, 9]
