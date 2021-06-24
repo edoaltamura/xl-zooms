@@ -18,9 +18,14 @@ set_mnras_stylesheet()
 
 def myLogFormat(y, pos):
     # Find the number of decimal places required
-    decimalplaces = int(np.maximum(-np.log10(y), 0))  # =0 for numbers >=1
-    # Insert that number into a format string
-    formatstring = '{{:.{:1d}f}}'.format(decimalplaces)
+    if y >= 1:
+        decimalplaces = int(np.maximum(-np.log10(y), 0))  # =0 for numbers >=1
+        # Insert that number into a format string
+        formatstring = '{{:.{:1d}f}}'.format(decimalplaces)
+    elif y >= 0.1 or y < 1:
+        decimalplaces = int(np.maximum(-np.log10(y), 0))  # =0 for numbers >=1
+        # Insert that number into a format string
+        formatstring = '{{:.{:1d}f}}'.format(decimalplaces)
     # Return the formatted tick label
     return formatstring.format(y)
 
@@ -114,8 +119,8 @@ colorbar = mpl.colorbar.ColorbarBase(
 colorbar.set_label(r'$k_B T_{\rm mw}(0.15-0.75~r_{500})$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
-colorbar.ax.xaxis.set_major_formatter(ticker.FuncFormatter(myLogFormat))
-colorbar.ax.xaxis.set_minor_formatter(ticker.FuncFormatter(myLogFormat))
+colorbar.ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
+colorbar.ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
 
 axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')
