@@ -119,8 +119,9 @@ colorbar = mpl.colorbar.ColorbarBase(
 colorbar.set_label(r'$k_B T_{\rm mw}(0.15-0.75~r_{500})$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
-colorbar.ax.xaxis.set_major_formatter(ticker.ScalarFormatter())
-colorbar.ax.xaxis.set_minor_formatter(ticker.ScalarFormatter())
+colorbar.ax.xaxis.set_major_locator(ticker.MultipleLocator(1))
+colorbar.ax.xaxis.set_major_formatter('{x:.0f}')
+colorbar.ax.xaxis.set_minor_formatter(ticker.NullFormatter)
 
 axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')
