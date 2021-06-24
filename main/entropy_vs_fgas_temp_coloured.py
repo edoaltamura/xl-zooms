@@ -61,7 +61,9 @@ for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
 
 # Remove duplicate columns
 catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
-print(catalogue.info())
+
+if xlargs.debug:
+    print(catalogue.info())
 
 for i in range(len(catalogue)):
     row = catalogue.loc[i]
