@@ -15,21 +15,6 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
 
-
-def myLogFormat(y, pos):
-    # Find the number of decimal places required
-    if y >= 1:
-        decimalplaces = int(np.maximum(-np.log10(y), 0))  # =0 for numbers >=1
-        # Insert that number into a format string
-        formatstring = '{{:.{:1d}f}}'.format(decimalplaces)
-    elif y >= 0.1 or y < 1:
-        decimalplaces = int(np.maximum(-np.log10(y), 0))  # =0 for numbers >=1
-        # Insert that number into a format string
-        formatstring = '{{:.{:1d}f}}'.format(decimalplaces)
-    # Return the formatted tick label
-    return formatstring.format(y)
-
-
 # Set axes limits
 fgas_bounds = [10 ** (-2.5), 1]  # dimensionless
 k_bounds = [1e-2, 7]  # K500 units
