@@ -43,67 +43,67 @@ axes = gs.subplots()
 cosmology = Cosmology()
 redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 
-temperature_obj = MWTemperatures()
-temperatures_dataframe = temperature_obj.process_catalogue()
-data_color = np.log10(np.array([(i * kb).to('keV').v for i in temperatures_dataframe['T0p75r500_nocore']]))
-temperatures_dataframe['color'] = (data_color - np.log10(t_bounds[0])) / (np.log10(t_bounds[1]) - np.log10(t_bounds[0]))
-
-gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
-gas_profiles_dataframe = gas_profile_obj.process_catalogue()
-
-entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
-entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
-
-# Merge all catalogues into one
-catalogue = temperatures_dataframe
-for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
-    catalogue = pd.concat([catalogue, datasets], axis=1)
-
-# Remove duplicate columns
-catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
-print(catalogue.info())
-
-for i in range(len(catalogue)):
-    row = catalogue.loc[i]
-    name = row["Run_name"]
-    temperature = row['T0p75r500_nocore']
-    color = plt.cm.jet(row['color'])
-    radial_bin_centres = row['radial_bin_centres']
-    gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
-    entropy_profile = row['k'] / row['k500']
-
-    vr_number = name.split('_')[1][2:]
-    print(f"Printing halo VR{vr_number}")
-
-    line_style = dict(linestyle='-',
-                      color=color,
-                      linewidth=0.5,
-                      alpha=0.6)
-
-    axes[1, 0].plot(
-        gas_fraction_enclosed,
-        entropy_profile,
-        **line_style
-    )
-
-    axes[1, 1].plot(
-        radial_bin_centres,
-        entropy_profile,
-        **line_style
-    )
-
-    axes[2, 0].plot(
-        radial_bin_centres,
-        gas_fraction_enclosed,
-        **line_style
-    )
-    axes[2, 1].plot(
-        radial_bin_centres,
-        entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
-        **line_style
-    )
-
-    delete_last_line()
+# temperature_obj = MWTemperatures()
+# temperatures_dataframe = temperature_obj.process_catalogue()
+# data_color = np.log10(np.array([(i * kb).to('keV').v for i in temperatures_dataframe['T0p75r500_nocore']]))
+# temperatures_dataframe['color'] = (data_color - np.log10(t_bounds[0])) / (np.log10(t_bounds[1]) - np.log10(t_bounds[0]))
+#
+# gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
+# gas_profiles_dataframe = gas_profile_obj.process_catalogue()
+#
+# entropy_profile_obj = EntropyProfiles(max_radius_r500=1)
+# entropy_profiles_dataframe = entropy_profile_obj.process_catalogue()
+#
+# # Merge all catalogues into one
+# catalogue = temperatures_dataframe
+# for datasets in [gas_profiles_dataframe, entropy_profiles_dataframe]:
+#     catalogue = pd.concat([catalogue, datasets], axis=1)
+#
+# # Remove duplicate columns
+# catalogue = catalogue.loc[:, ~catalogue.columns.duplicated()]
+# print(catalogue.info())
+#
+# for i in range(len(catalogue)):
+#     row = catalogue.loc[i]
+#     name = row["Run_name"]
+#     temperature = row['T0p75r500_nocore']
+#     color = plt.cm.jet(row['color'])
+#     radial_bin_centres = row['radial_bin_centres']
+#     gas_fraction_enclosed = row['cumulative_gas_mass_profile'] / row['m500fb']
+#     entropy_profile = row['k'] / row['k500']
+#
+#     vr_number = name.split('_')[1][2:]
+#     print(f"Printing halo VR{vr_number}")
+#
+#     line_style = dict(linestyle='-',
+#                       color=color,
+#                       linewidth=0.5,
+#                       alpha=0.6)
+#
+#     axes[1, 0].plot(
+#         gas_fraction_enclosed,
+#         entropy_profile,
+#         **line_style
+#     )
+#
+#     axes[1, 1].plot(
+#         radial_bin_centres,
+#         entropy_profile,
+#         **line_style
+#     )
+#
+#     axes[2, 0].plot(
+#         radial_bin_centres,
+#         gas_fraction_enclosed,
+#         **line_style
+#     )
+#     axes[2, 1].plot(
+#         radial_bin_centres,
+#         entropy_profile * gas_fraction_enclosed ** (2 / 3) * cosmology.ez_function(redshift) ** (2 / 3),
+#         **line_style
+#     )
+#
+#     delete_last_line()
 
 axes[0, 0].remove()
 axes[0, 1].remove()
