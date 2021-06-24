@@ -34,7 +34,7 @@ def myLogFormat(y, pos):
 fgas_bounds = [10 ** (-2.5), 1]  # dimensionless
 k_bounds = [1e-2, 7]  # K500 units
 r_bounds = [0.01, 1]  # R500 units
-t_bounds = [0.5, 5]  # keV units
+t_bounds = [0.1, 5]  # keV units
 
 fig = plt.figure(figsize=(4.5, 5), constrained_layout=True)
 gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7, height_ratios=[0.05, 1, 1], width_ratios=[1, 1])
