@@ -2,6 +2,7 @@ import sys
 import os.path
 from matplotlib import pyplot as plt
 import matplotlib as mpl
+import matplotlib.ticker as ticker
 import numpy as np
 import pandas as pd
 from unyt import Solar_Mass, kb
@@ -14,11 +15,21 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 set_mnras_stylesheet()
 
+
+def myLogFormat(y, pos):
+    # Find the number of decimal places required
+    decimalplaces = int(np.maximum(-np.log10(y), 0))  # =0 for numbers >=1
+    # Insert that number into a format string
+    formatstring = '{{:.{:1d}f}}'.format(decimalplaces)
+    # Return the formatted tick label
+    return formatstring.format(y)
+
+
 # Set axes limits
-fgas_bounds = [10 ** (-2.5), 1]
-k_bounds = [1e-2, 7]
-r_bounds = [0.01, 1]
-t_bounds = [0.5, 5]
+fgas_bounds = [10 ** (-2.5), 1]  # dimensionless
+k_bounds = [1e-2, 7]  # K500 units
+r_bounds = [0.01, 1]  # R500 units
+t_bounds = [0.5, 5]  # keV units
 
 fig = plt.figure(figsize=(4.5, 5), constrained_layout=True)
 gs = fig.add_gridspec(3, 2, hspace=0.35, wspace=0.7, height_ratios=[0.05, 1, 1], width_ratios=[1, 1])
@@ -103,6 +114,7 @@ colorbar = mpl.colorbar.ColorbarBase(
 colorbar.set_label(r'$k_B T_{\rm mw}(0.15-0.75~r_{500})$ [keV]')
 colorbar.ax.xaxis.set_ticks_position('top')
 colorbar.ax.xaxis.set_label_position('top')
+colorbar.ax.xaxis.set_major_formatter(ticker.FuncFormatter(myLogFormat))
 
 axes[1, 0].set_xscale('log')
 axes[1, 0].set_yscale('linear')
