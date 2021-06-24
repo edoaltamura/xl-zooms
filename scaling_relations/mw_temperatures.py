@@ -64,8 +64,6 @@ class MWTemperatures(HaloProperty):
         mhot2500 = np.sum(sw_data.gas.masses[mask])
         T2500 = np.sum(sw_data.gas.mw_temperatures[mask]) / mhot2500
 
-
-
         # Select hot gas within spherical shell (no core)
         mask = np.where(
             (sw_data.gas.radial_distances >= 0.15 * r500) &

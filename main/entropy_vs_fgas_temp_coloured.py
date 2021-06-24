@@ -30,7 +30,7 @@ redshift = calibration_zooms.redshift_from_index(xlargs.redshift_index)
 temperature_obj = MWTemperatures()
 temperatures_dataframe = temperature_obj.process_catalogue()
 data_color = np.log10(np.array([(i * kb).to('keV').v for i in temperatures_dataframe['T0p75r500_nocore']]))
-temperatures_dataframe['color'] = (data_color - t_bounds[0]) / (t_bounds[1] - t_bounds[0])
+temperatures_dataframe['color'] = (data_color - np.log10(t_bounds[0])) / (np.log10(t_bounds[1]) - np.log10(t_bounds[0]))
 
 gas_profile_obj = EntropyFgasSpace(max_radius_r500=1.)
 gas_profiles_dataframe = gas_profile_obj.process_catalogue()
