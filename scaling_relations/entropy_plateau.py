@@ -143,7 +143,7 @@ class EntropyPlateau(HaloProperty):
         intersect_ids = np.ones_like(radial_distance, dtype=np.bool)
         if particle_ids is not None:
             _, match_indices, _ = np.intersect1d(
-                self.sw_data.gas.particle_ids, particle_ids, assume_unique=True, return_indices=True
+                self.sw_data.gas.particle_ids.value, particle_ids, assume_unique=True, return_indices=True
             )
             intersect_ids[~match_indices] = False
 
