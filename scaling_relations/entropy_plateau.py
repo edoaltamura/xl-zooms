@@ -151,7 +151,7 @@ class EntropyPlateau(HaloProperty):
             (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
             (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
             (self.sw_data.gas.fofgroup_ids == 1) &
-            intersect_ids
+            np.nonzero(intersect_ids)
         )[0]
 
         if apply_mask:
