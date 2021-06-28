@@ -25,3 +25,4 @@ from .projection_dm import MapDM
 
 from .entropy_profiles import EntropyProfiles
 from .entropy_fgas_space import EntropyFgasSpace
+from .entropy_plateau import EntropyPlateau

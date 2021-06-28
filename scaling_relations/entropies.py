@@ -139,7 +139,7 @@ class Entropies(HaloProperty):
         lbins = np.linspace(
             radial_distances_scaled.min().value,
             radial_distances_scaled.max().value,
-            300
+            100
         ) * radial_distances_scaled.units
         radial_bin_centres = 10.0 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distances_scaled.units
         volume_shell = (4. * np.pi / 3.) * (r500 ** 3) * ((lbins[1:]) ** 3 - (lbins[:-1]) ** 3)
