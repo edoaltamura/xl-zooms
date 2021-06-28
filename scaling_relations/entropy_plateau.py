@@ -204,6 +204,7 @@ class EntropyPlateau(HaloProperty):
         else:
             self.shell_mask = shell_mask
 
+        self.number_particles = len(shell_mask)
         del shell_mask
 
     def get_particle_ids(self):
@@ -373,7 +374,6 @@ class EntropyPlateau(HaloProperty):
             bins=self.density_bin_edges
         )
 
-        self.number_particles = len(self.particle_entropies)
         self.number_agn_heated = agn_flag.sum()
         self.number_snii_heated = snii_flag.sum()
         self.number_not_heated = self.number_particles - self.number_agn_heated - self.number_snii_heated
