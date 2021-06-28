@@ -42,7 +42,7 @@ del plateau
 
 
 def single_halo_method(new_snap_number):
-    i = snaps_collection[::-1].index(new_snap_number)
+    i = snaps_collection[::-1].tolist().index(new_snap_number)
     # Move to high redshift and track the same particle IDs
     _snap, _cat = set_snap_number(snap, cat, new_snap_number)
     plateau = EntropyPlateau()
