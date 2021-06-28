@@ -28,7 +28,7 @@ del plateau
 
 # Move to redshift 3 and track the same particle IDs
 plateau = EntropyPlateau()
-snap, cat = set_snap_number(snap, cat, 195)
+snap, cat = set_snap_number(snap, cat, 987)
 plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
 print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
