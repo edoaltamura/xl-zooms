@@ -15,7 +15,6 @@ def set_snap_number(snap: str, cat: str, snap_number: int):
 
 snap, cat = find_files()
 set_mnras_stylesheet()
-
 plateau = EntropyPlateau()
 
 # Start from redshift 0.5 to select particles in the plateau
