@@ -4,7 +4,7 @@ from matplotlib import pyplot as plt
 sys.path.append("..")
 
 from scaling_relations import EntropyPlateau
-from register import find_files, set_mnras_stylesheet, xlargs, Tcut_halogas
+from register import find_files, set_mnras_stylesheet, xlargs
 
 snap, cat = find_files()
 kwargs = dict(path_to_snap=snap, path_to_catalogue=cat)
@@ -12,9 +12,9 @@ set_mnras_stylesheet()
 
 plateau = EntropyPlateau()
 plateau.setup_data(**kwargs)
-plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=False)
+plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
 plateau.shell_properties()
-plateau.heating_fractions()
+plateau.heating_fractions(nbins=50)
 
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()

@@ -200,6 +200,24 @@ class EntropyPlateau(HaloProperty):
 
         del shell_mask
 
+    def get_particle_ids(self):
+        return self.sw_data.gas.particle_ids.value
+
+    def get_temperatures(self):
+        return self.sw_data.gas.temperatures
+
+    def get_densities(self):
+        return self.sw_data.gas.densities
+
+    def get_entropies(self):
+        return self.sw_data.gas.particle_entropies
+
+    def get_hydrogen_number_density(self):
+        return self.sw_data.gas.nH
+
+    def get_electron_number_density(self):
+        return self.sw_data.gas.ne
+
     def shell_properties(self):
 
         if self.simple_electron_number_density:
