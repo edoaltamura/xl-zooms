@@ -35,8 +35,9 @@ temperatures = np.empty((num_snaps, plateau.number_particles))
 entropies = np.empty((num_snaps, plateau.number_particles))
 hydrogen_number_densities = np.empty((num_snaps, plateau.number_particles))
 
-for i, new_snap_number in enumerate(snaps_collection):
+for i, new_snap_number in enumerate(snaps_collection[::-1]):
     # Move to high redshift and track the same particle IDs
+    print(i, new_snap_number)
     snap, cat = set_snap_number(snap, cat, new_snap_number)
     plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
     plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
@@ -48,6 +49,7 @@ for i, new_snap_number in enumerate(snaps_collection):
     sort_id = np.argsort(plateau.get_particle_ids())
 
     # Allocate data into arrays
+    redshifts[i] = plateau.z
     particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
     temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
     entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
@@ -71,7 +73,7 @@ axes.text(
     0.025,
     0.975,
     (
-        f'z = {plateau.z:.2f}\n'
+        f'z = {redshifts.max():.2f} - {redshifts.min():.2f}\n'
     ),
     color="k",
     ha="left",
