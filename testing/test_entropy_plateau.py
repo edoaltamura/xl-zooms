@@ -12,7 +12,7 @@ set_mnras_stylesheet()
 
 plateau = EntropyPlateau()
 plateau.setup_data(**kwargs)
-plateau.select_particles_on_plateau(shell_thickness_r500=0.01, temperature_cut=False)
+plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=False)
 plateau.shell_properties()
 plateau.heating_fractions()
 
@@ -24,7 +24,7 @@ axes.text(
     0.025,
     0.975,
     (
-        f'Shell thickness: {0.01:.3f} $r_{{500}}$\n'
+        f'Shell thickness: {0.02:.3f} $r_{{500}}$\n'
         f'z = {plateau.z:.2f}\n'
     ),
     color="k",

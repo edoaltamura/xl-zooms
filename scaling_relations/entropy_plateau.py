@@ -391,6 +391,6 @@ class EntropyPlateau(HaloProperty):
                   label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.density_bin_edges[:-1], self.density_hist_agn,
                   label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
-        axes.axvline(self.density_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell electron number density (mass-weighted)')
+        axes.axvline(self.density_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell $n_e$ density (mass-weighted)')
         axes.set_xlabel(r"$n_e$ [cm$^{-3}$]")
         axes.set_ylabel(f"Number of particles")
