@@ -12,7 +12,7 @@ set_mnras_stylesheet()
 
 plateau = EntropyPlateau()
 plateau.setup_data(**kwargs)
-plateau.select_particles_on_plateau()
+plateau.select_particles_on_plateau(shell_thickness_r500=0.05)
 plateau.shell_properties()
 plateau.heating_fractions()
 
