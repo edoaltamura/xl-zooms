@@ -150,7 +150,7 @@ class EntropyPlateau(HaloProperty):
             # match_indices = np.asarray(
             #     [np.where(self.sw_data.gas.particle_ids.value == i)[0] for i in particle_ids]
             # )
-            intersect_ids[:] = False
+            intersect_ids = np.logical_not(intersect_ids)
             intersect_ids[np.sort(match_indices)] = True
 
         if only_particle_ids:
