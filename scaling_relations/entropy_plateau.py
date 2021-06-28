@@ -142,15 +142,14 @@ class EntropyPlateau(HaloProperty):
 
         intersect_ids = np.ones_like(self.sw_data.gas.radial_distances, dtype=np.bool)
         if particle_ids is not None:
-            # match_indices = np.intersect1d(
-            #     self.sw_data.gas.particle_ids.value, particle_ids, assume_unique=True, return_indices=True
-            # )[1]
+            match_indices = np.intersect1d(
+                self.sw_data.gas.particle_ids.value, particle_ids, assume_unique=True, return_indices=True
+            )[1]
             print('particle_ids', particle_ids)
             print('self.sw_data.gas.particle_ids.value', self.sw_data.gas.particle_ids.value)
-            print('np.where(self.sw_data.gas.particle_ids.value == i)[0][0]', np.where(self.sw_data.gas.particle_ids.value == particle_ids[0])[0])
-            match_indices = np.asarray(
-                [np.where(self.sw_data.gas.particle_ids.value == i)[0] for i in particle_ids]
-            )
+            # match_indices = np.asarray(
+            #     [np.where(self.sw_data.gas.particle_ids.value == i)[0] for i in particle_ids]
+            # )
             intersect_ids[:] = False
             intersect_ids[np.sort(match_indices)] = True
 
@@ -169,7 +168,7 @@ class EntropyPlateau(HaloProperty):
             shell_mask = np.where(
                 (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
                 (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
-                # (self.sw_data.gas.fofgroup_ids == 1) &
+                (self.sw_data.gas.fofgroup_ids == 1) &
                 (intersect_ids == 1) &
                 (high_temperature_match == 1)
             )[0]
