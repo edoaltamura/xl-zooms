@@ -172,7 +172,8 @@ class EntropyPlateau(HaloProperty):
                         d = cosmo_array(
                             d[shell_mask].value,
                             units=d.units,
-                            cosmo_factor=d.cosmo_factor
+                            cosmo_factor=d.cosmo_factor,
+                            comoving=d.comoving
                         )
                         setattr(self.sw_data.gas.element_mass_fractions, element, d)
 
@@ -182,7 +183,8 @@ class EntropyPlateau(HaloProperty):
                     d = cosmo_array(
                         d[shell_mask].value,
                         units=d.units,
-                        cosmo_factor=d.cosmo_factor
+                        cosmo_factor=d.cosmo_factor,
+                        comoving=d.comoving
                     )
                     setattr(self.sw_data.gas, dataset, d)
 
@@ -245,7 +247,7 @@ class EntropyPlateau(HaloProperty):
 
         K500 = (
                 kBT500 / (500 * self.fb * self.critical_density / (mean_atomic_weight_per_free_electron * mp)) ** (
-                    2 / 3)
+                2 / 3)
         ).to('keV*cm**2')
 
         self.particle_entropies = entropy
