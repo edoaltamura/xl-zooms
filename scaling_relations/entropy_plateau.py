@@ -139,6 +139,7 @@ class EntropyPlateau(HaloProperty):
     ):
 
         radial_distance = self.sw_data.gas.radial_distances / self.r500
+        radial_distance = radial_distance.to('dimensionless').value
 
         intersect_ids = np.ones_like(radial_distance, dtype=np.bool)
         if particle_ids is not None:
