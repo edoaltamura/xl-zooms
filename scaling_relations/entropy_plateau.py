@@ -156,11 +156,12 @@ class EntropyPlateau(HaloProperty):
 
         if apply_mask:
             datasets_to_mask = []
-            for a in dir(self.sw_data.gas):
-                if not a.startswith('__') and not callable(getattr(self.sw_data.gas, a)):
-                    datasets_to_mask.append(a)
+            for dataset_name in dir(self.sw_data.gas):
+                if not dataset_name.startswith('__') and not callable(getattr(self.sw_data.gas, dataset_name)):
+                    datasets_to_mask.append(dataset_name)
 
             for dataset in datasets_to_mask:
+                print(dataset)
                 if dataset == 'element_mass_fractions':
                     for element in self.sw_data.gas.element_mass_fractions.named_columns:
                         d = getattr(self.sw_data.gas.element_mass_fractions, element)
