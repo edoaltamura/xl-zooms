@@ -10,8 +10,8 @@ from register import find_files, set_mnras_stylesheet, xlargs
 def set_snap_number(snap: str, cat: str, snap_number: int):
     old_snap_number = f"_{xlargs.snapshot_number:04d}"
     new_snap_number = f"_{snap_number:04d}"
-    snap.replace(old_snap_number, new_snap_number)
-    cat.replace(old_snap_number, new_snap_number)
+    snap = snap.replace(old_snap_number, new_snap_number)
+    cat = cat.replace(old_snap_number, new_snap_number)
     return snap, cat
 
 
