@@ -18,7 +18,7 @@ plateau.heating_fractions()
 
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
-plateau.plot_observations(axes)
+plateau.plot_densities(axes)
 
 axes.text(
     0.025,
@@ -33,6 +33,7 @@ axes.text(
     alpha=0.8,
     transform=axes.transAxes,
 )
+axes.legend(loc="upper right")
 
 if not xlargs.quiet:
     plt.show()

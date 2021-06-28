@@ -209,15 +209,16 @@ class EntropyPlateau(HaloProperty):
         else:
             n_e = get_electron_number_density(self.sw_data)
 
+        self.sw_data.gas.ne = n_e
+
         # if not self.shell_average:
         entropy = kb * self.sw_data.gas.temperatures / (n_e ** (2 / 3))
         entropy.convert_to_units('keV*cm**2')
 
         # Compute hydrogen number density and the log10
         # of the temperature to provide to the xray interpolator.
-        data_nH = np.log10(
-            self.sw_data.gas.element_mass_fractions.hydrogen * self.sw_data.gas.densities.to('g*cm**-3') / mp
-        )
+        self.sw_data.gas.nH = self.sw_data.gas.element_mass_fractions.hydrogen * self.sw_data.gas.densities.to('g*cm**-3') / mp
+        data_nH = np.log10(self.sw_data.gas.nH.value)
         data_T = np.log10(self.sw_data.gas.temperatures.value)
 
         # Interpolate the Cloudy table to get emissivities
@@ -232,17 +233,17 @@ class EntropyPlateau(HaloProperty):
         xray_luminosities = emissivities * self.sw_data.gas.masses / self.sw_data.gas.densities
         entropy_weighted_xray = np.average(entropy, weights=xray_luminosities)
         temperature_weighted_xray = np.average(self.sw_data.gas.temperatures, weights=xray_luminosities)
-        density_weighted_xray = np.average(self.sw_data.gas.densities, weights=xray_luminosities)
+        density_weighted_xray = np.average(self.sw_data.gas.ne, weights=xray_luminosities)
         del data_nH, data_T, emissivities, xray_luminosities
 
         entropy_weighted_mass = np.average(entropy, weights=self.sw_data.gas.masses)
         temperature_weighted_mass = np.average(self.sw_data.gas.temperatures, weights=self.sw_data.gas.masses)
-        density_weighted_mass = np.average(self.sw_data.gas.densities, weights=self.sw_data.gas.masses)
+        density_weighted_mass = np.average(self.sw_data.gas.ne, weights=self.sw_data.gas.masses)
 
         volume_proxy = self.sw_data.gas.masses / self.sw_data.gas.densities
         entropy_weighted_volume = np.average(entropy, weights=volume_proxy)
         temperature_weighted_volume = np.average(self.sw_data.gas.temperatures, weights=volume_proxy)
-        density_weighted_volume = np.average(self.sw_data.gas.densities, weights=volume_proxy)
+        density_weighted_volume = np.average(self.sw_data.gas.ne, weights=volume_proxy)
         del volume_proxy
 
         kBT500 = (
@@ -260,9 +261,9 @@ class EntropyPlateau(HaloProperty):
         self.entropy_weighted_mass = entropy_weighted_mass
         self.entropy_weighted_volume = entropy_weighted_volume
 
-        self.temperature_weighted_xray = (temperature_weighted_xray * kb).to('keV')
-        self.temperature_weighted_mass = (temperature_weighted_mass * kb).to('keV')
-        self.temperature_weighted_volume = (temperature_weighted_volume * kb).to('keV')
+        self.temperature_weighted_xray = temperature_weighted_xray
+        self.temperature_weighted_mass = temperature_weighted_mass
+        self.temperature_weighted_volume = temperature_weighted_volume
 
         self.density_weighted_xray = density_weighted_xray
         self.density_weighted_mass = density_weighted_mass
@@ -321,24 +322,24 @@ class EntropyPlateau(HaloProperty):
         )
 
         self.density_bin_edges = np.logspace(
-            np.log10(self.sw_data.gas.densities.min().value),
-            np.log10(self.sw_data.gas.densities.max().value),
+            np.log10(self.sw_data.gas.ne.min().value),
+            np.log10(self.sw_data.gas.ne.max().value),
             nbins + 1
         )
         self.density_hist, _ = np.histogram(
-            self.sw_data.gas.densities,
+            self.sw_data.gas.ne,
             bins=self.density_bin_edges
         )
         self.density_hist_agn, _ = np.histogram(
-            self.sw_data.gas.densities[agn_flag],
+            self.sw_data.gas.ne[agn_flag],
             bins=self.density_bin_edges
         )
         self.density_hist_snii, _ = np.histogram(
-            self.sw_data.gas.densities[snii_flag],
+            self.sw_data.gas.ne[snii_flag],
             bins=self.density_bin_edges
         )
         self.density_hist_null, _ = np.histogram(
-            self.sw_data.gas.densities[(~agn_flag & ~snii_flag)],
+            self.sw_data.gas.ne[(~agn_flag & ~snii_flag)],
             bins=self.density_bin_edges
         )
 
@@ -347,7 +348,7 @@ class EntropyPlateau(HaloProperty):
         self.number_snii_heated = snii_flag.sum()
         self.number_not_heated = self.number_particles - self.number_agn_heated - self.number_snii_heated
 
-    def plot_observations(self, axes: plt.Axes):
+    def plot_entropies(self, axes: plt.Axes):
 
         axes.set_xscale('log')
         axes.set_yscale('log')
@@ -362,4 +363,34 @@ class EntropyPlateau(HaloProperty):
         axes.axvline(self.K500, linestyle='--', linewidth=0.5, color='k', label=r'$K_{500}$')
         axes.set_xlabel(r"$K$ [keV cm$^2$]")
         axes.set_ylabel(f"Number of particles")
-        axes.legend(loc="upper right")
+
+    def plot_temperatures(self, axes: plt.Axes):
+
+        axes.set_xscale('log')
+        axes.set_yscale('log')
+        axes.step(self.temperature_bin_edges[:-1], self.temperature_hist, label=f'All ({self.number_particles:d} particles)')
+        axes.step(self.temperature_bin_edges[:-1], self.temperature_hist_null,
+                  label=f'Not heated ({self.number_not_heated / self.number_particles * 100:.1f} %)')
+        axes.step(self.temperature_bin_edges[:-1], self.temperature_hist_snii,
+                  label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
+        axes.step(self.temperature_bin_edges[:-1], self.temperature_hist_agn,
+                  label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
+        axes.axvline(self.temperature_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell temperature (mass-weighted)')
+        axes.axvline((self.kBT500 / kb).to('K'), linestyle='--', linewidth=0.5, color='k', label=r'$T_{500}$')
+        axes.set_xlabel(r"$T$ [K]")
+        axes.set_ylabel(f"Number of particles")
+
+    def plot_densities(self, axes: plt.Axes):
+
+        axes.set_xscale('log')
+        axes.set_yscale('log')
+        axes.step(self.density_bin_edges[:-1], self.density_hist, label=f'All ({self.number_particles:d} particles)')
+        axes.step(self.density_bin_edges[:-1], self.density_hist_null,
+                  label=f'Not heated ({self.number_not_heated / self.number_particles * 100:.1f} %)')
+        axes.step(self.density_bin_edges[:-1], self.density_hist_snii,
+                  label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
+        axes.step(self.density_bin_edges[:-1], self.density_hist_agn,
+                  label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
+        axes.axvline(self.density_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell electron number density (mass-weighted)')
+        axes.set_xlabel(r"$n_e$ [cm$^{-3}$]")
+        axes.set_ylabel(f"Number of particles")
