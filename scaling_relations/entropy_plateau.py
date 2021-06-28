@@ -38,7 +38,7 @@ class EntropyPlateau(HaloProperty):
 
     def __init__(
             self,
-            max_radius_r500: float = 10,
+            max_radius_r500: float = 5,
             simple_electron_number_density: bool = False,
     ):
         super().__init__()
