@@ -164,10 +164,10 @@ class EntropyPlateau(HaloProperty):
                 if dataset == 'element_mass_fractions':
                     for element in self.sw_data.gas.element_mass_fractions.named_columns:
                         d = getattr(self.sw_data.gas.element_mass_fractions, element)
-                        setattr(self.sw_data.gas.element_mass_fractions, element, d[self.shell_mask])
+                        setattr(self.sw_data.gas.element_mass_fractions, element, d[shell_mask])
                 else:
                     d = getattr(self.sw_data.gas, dataset)
-                    setattr(self.sw_data.gas, dataset, d[self.shell_mask])
+                    setattr(self.sw_data.gas, dataset, d[shell_mask])
 
             del d, datasets_to_mask
             self.auto_masked = True
