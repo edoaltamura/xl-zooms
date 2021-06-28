@@ -214,7 +214,7 @@ class EntropyPlateau(HaloProperty):
         return self.sw_data.gas.densities
 
     def get_entropies(self):
-        return self.sw_data.gas.particle_entropies
+        return self.particle_entropies
 
     def get_hydrogen_number_density(self):
         return self.sw_data.gas.nH
