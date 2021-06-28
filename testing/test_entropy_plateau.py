@@ -1,6 +1,8 @@
 import sys
 import numpy as np
 from matplotlib import pyplot as plt
+from multiprocessing import Pool, cpu_count
+from tqdm import tqdm
 
 sys.path.append("..")
 
@@ -25,11 +27,12 @@ plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=
 particle_ids_z0p5 = plateau.get_particle_ids()
 agn_flag_z0p5 = plateau.get_heated_by_agnfeedback()
 snii_flag_z0p5 = plateau.get_heated_by_sniifeedback()
+number_particles_z0p5 = plateau.number_particles
 print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
 
-num_snaps = 50
+snaps_collection = np.arange(400, 1842, 10)
+num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
-snaps_collection = np.linspace(500, 1482, num_snaps, dtype=np.int)
 particle_ids = np.empty((num_snaps, plateau.number_particles), dtype=np.int)
 temperatures = np.empty((num_snaps, plateau.number_particles))
 entropies = np.empty((num_snaps, plateau.number_particles))
@@ -37,7 +40,9 @@ hydrogen_number_densities = np.empty((num_snaps, plateau.number_particles))
 
 del plateau
 
-for i, new_snap_number in enumerate(snaps_collection[::-1]):
+
+def single_halo_method(new_snap_number):
+    i = snaps_collection[::-1].index(new_snap_number)
     # Move to high redshift and track the same particle IDs
     _snap, _cat = set_snap_number(snap, cat, new_snap_number)
     plateau = EntropyPlateau()
@@ -59,19 +64,53 @@ for i, new_snap_number in enumerate(snaps_collection[::-1]):
 
     del plateau
 
+
+# The results of the multiprocessing Pool are returned in the same order as inputs
+with Pool(cpu_count()) as pool:
+    results = list(tqdm(
+        pool.imap(single_halo_method, iter(snaps_collection[::-1])),
+        total=num_snaps,
+        disable=xlargs.quiet
+    ))
+
+# for i, new_snap_number in enumerate(snaps_collection[::-1]):
+#     # Move to high redshift and track the same particle IDs
+#     _snap, _cat = set_snap_number(snap, cat, new_snap_number)
+#     plateau = EntropyPlateau()
+#     plateau.setup_data(path_to_snap=_snap, path_to_catalogue=_cat)
+#     plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
+#     print(i, new_snap_number, f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
+#     plateau.shell_properties()
+#     # plateau.heating_fractions(nbins=70)
+#
+#     # Sort particles by ID
+#     sort_id = np.argsort(plateau.get_particle_ids())
+#
+#     # Allocate data into arrays
+#     redshifts[i] = plateau.z
+#     particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
+#     temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
+#     entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
+#     hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
+#
+#     del plateau
+
 hydrogen_number_densities_max = np.amax(hydrogen_number_densities, axis=0)
 
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 # plateau.plot_densities(axes)
 
-bins = np.logspace(-4, 4, 64)
-plt.yscale('log')
-plt.xscale('log')
-plt.hist(hydrogen_number_densities_max, bins=bins, label='All')
-plt.hist(hydrogen_number_densities_max[snii_flag_z0p5], bins=bins, label='SN heated')
-plt.hist(hydrogen_number_densities_max[agn_flag_z0p5], bins=bins, label='AGN heated')
-plt.xlabel(r'$\log(n_{\rm H,max}/{\rm cm}^{-3})$')
+bins = np.logspace(-4, 4, 32)
+axes.set_yscale('log')
+axes.set_xscale('log')
+axes.hist(hydrogen_number_densities_max, bins=bins, label=f'All ({number_particles_z0p5:d} particles)')
+axes.hist(hydrogen_number_densities_max[snii_flag_z0p5], bins=bins,
+          label=f'SNe heated ({snii_flag_z0p5.sum() / number_particles_z0p5 * 100:.1f} %)')
+axes.hist(hydrogen_number_densities_max[agn_flag_z0p5], bins=bins,
+          label=f'AGN heated ({agn_flag_z0p5.sum() / number_particles_z0p5 * 100:.1f} %)')
+axes.set_xlabel(r'$n_{\rm H,max}$ [cm$^{-3}$]')
+axes.set_ylabel(f"Number of particles")
 axes.text(
     0.025,
     0.975,
