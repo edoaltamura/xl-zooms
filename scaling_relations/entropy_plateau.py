@@ -1,7 +1,7 @@
 import os.path
 import sys
 import numpy as np
-from warnings import warn
+from swiftsimio import cosmo_array
 from typing import Optional
 from matplotlib import pyplot as plt
 import numba
@@ -162,13 +162,27 @@ class EntropyPlateau(HaloProperty):
 
             for dataset in datasets_to_mask:
                 print(dataset)
+
+                # Named columns treated in a separate loop
                 if dataset == 'element_mass_fractions':
                     for element in self.sw_data.gas.element_mass_fractions.named_columns:
                         d = getattr(self.sw_data.gas.element_mass_fractions, element)
-                        setattr(self.sw_data.gas.element_mass_fractions, element, d[shell_mask])
+                        d = cosmo_array(
+                            d[shell_mask].value,
+                            units=d.units,
+                            cosmo_factor=d.cosmo_factor
+                        )
+                        setattr(self.sw_data.gas.element_mass_fractions, element, d)
+
+                # Test whether the attribute contains particle data
                 elif hasattr(getattr(self.sw_data.gas, dataset), 'value'):
                     d = getattr(self.sw_data.gas, dataset)
-                    setattr(self.sw_data.gas, dataset, d[shell_mask])
+                    d = cosmo_array(
+                        d[shell_mask].value,
+                        units=d.units,
+                        cosmo_factor=d.cosmo_factor
+                    )
+                    setattr(self.sw_data.gas, dataset, d)
                 else:
                     print('not filtered!')
 
