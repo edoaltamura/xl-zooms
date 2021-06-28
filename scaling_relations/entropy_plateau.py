@@ -147,6 +147,7 @@ class EntropyPlateau(HaloProperty):
             )
             intersect_ids[~match_indices] = False
 
+        print('intersect_ids', intersect_ids)
         shell_mask = np.where(
             (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
             (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
@@ -154,7 +155,7 @@ class EntropyPlateau(HaloProperty):
             (intersect_ids == True)
         )[0]
 
-        print(shell_mask)
+        print('shell_mask', shell_mask)
 
         if apply_mask:
             datasets_to_mask = []
@@ -344,7 +345,7 @@ class EntropyPlateau(HaloProperty):
 
         axes.set_xscale('log')
         axes.set_yscale('log')
-        axes.step(self.entropy_bin_edges[:-1], self.entropy_hist, label='All')
+        axes.step(self.entropy_bin_edges[:-1], self.entropy_hist, label=f'All ({self.number_particles:d} particles)')
         axes.step(self.entropy_bin_edges[:-1], self.entropy_hist_null,
                   label=f'Not heated ({self.number_not_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.entropy_bin_edges[:-1], self.entropy_hist_snii,
