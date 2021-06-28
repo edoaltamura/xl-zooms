@@ -154,6 +154,8 @@ class EntropyPlateau(HaloProperty):
             np.nonzero(intersect_ids)
         )[0]
 
+        print(shell_mask)
+
         if apply_mask:
             datasets_to_mask = []
             for dataset_name in dir(self.sw_data.gas):
@@ -161,7 +163,6 @@ class EntropyPlateau(HaloProperty):
                     datasets_to_mask.append(dataset_name)
 
             for dataset in datasets_to_mask:
-                print(dataset)
 
                 # Named columns treated in a separate loop
                 if dataset == 'element_mass_fractions':
@@ -183,8 +184,6 @@ class EntropyPlateau(HaloProperty):
                         cosmo_factor=d.cosmo_factor
                     )
                     setattr(self.sw_data.gas, dataset, d)
-                else:
-                    print('not filtered!')
 
             del d, datasets_to_mask
             self.auto_masked = True
