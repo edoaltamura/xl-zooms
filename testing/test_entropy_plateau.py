@@ -6,12 +6,22 @@ sys.path.append("..")
 from scaling_relations import EntropyPlateau
 from register import find_files, set_mnras_stylesheet, xlargs
 
+
+def set_snap_number(snap: str, cat: str, snap_number: int):
+    old_snap_number = f"_{xlargs.snapshot_number:04d}"
+    new_snap_number = f"_{snap_number:04d}"
+    snap.replace(old_snap_number, new_snap_number)
+    cat.replace(old_snap_number, new_snap_number)
+    return snap, cat
+
+
 snap, cat = find_files()
-kwargs = dict(path_to_snap=snap, path_to_catalogue=cat)
 set_mnras_stylesheet()
 
 plateau = EntropyPlateau()
-plateau.setup_data(**kwargs)
+
+snap, cat = set_snap_number(snap, cat, 100)
+plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
 plateau.shell_properties()
 plateau.heating_fractions(nbins=50)
@@ -24,7 +34,6 @@ axes.text(
     0.025,
     0.975,
     (
-        f'Shell thickness: {0.02:.3f} $r_{{500}}$\n'
         f'z = {plateau.z:.2f}\n'
     ),
     color="k",

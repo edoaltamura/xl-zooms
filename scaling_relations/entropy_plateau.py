@@ -218,6 +218,12 @@ class EntropyPlateau(HaloProperty):
     def get_electron_number_density(self):
         return self.sw_data.gas.ne
 
+    def get_heated_by_agnfeedback(self):
+        return self.sw_data.gas.heated_by_agnfeedback > 0
+
+    def get_heated_by_sniifeedback(self):
+        return self.sw_data.gas.heated_by_sniifeedback > 0
+
     def shell_properties(self):
 
         if self.simple_electron_number_density:
