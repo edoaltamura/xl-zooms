@@ -17,8 +17,9 @@ snap, cat = find_files()
 set_mnras_stylesheet()
 
 plateau = EntropyPlateau()
-
-snap, cat = set_snap_number(snap, cat, 100)
+print(snap, cat)
+snap, cat = set_snap_number(snap, cat, 200)
+print(snap, cat)
 plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
 plateau.shell_properties()
