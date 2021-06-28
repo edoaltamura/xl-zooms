@@ -135,6 +135,7 @@ class EntropyPlateau(HaloProperty):
             shell_radius_r500: float = 0.1,
             shell_thickness_r500: float = 0.01,
             particle_ids: Optional[np.ndarray] = None,
+            temperature_cut: bool = False,
             apply_mask: bool = True
     ):
 
@@ -148,12 +149,16 @@ class EntropyPlateau(HaloProperty):
             )
             intersect_ids[~match_indices] = False
 
-        print('intersect_ids', intersect_ids)
+        high_temperature_match = np.ones_like(radial_distance, dtype=np.bool)
+        if temperature_cut:
+            high_temperature_match[self.sw_data.gas.temperatures.value < Tcut_halogas] = False
+
         shell_mask = np.where(
             (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
             (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
             (self.sw_data.gas.fofgroup_ids == 1) &
-            (intersect_ids == True)
+            (intersect_ids == 1) &
+            (high_temperature_match == 1)
         )[0]
 
         print('shell_mask', shell_mask)
@@ -355,8 +360,8 @@ class EntropyPlateau(HaloProperty):
                   label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.entropy_bin_edges[:-1], self.entropy_hist_agn,
                   label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
-        axes.axvline(self.entropy_weighted_mass, linestyle=':')
-        axes.axvline(self.K500, linestyle='--')
+        axes.axvline(self.entropy_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell entropy (mass-weighted)')
+        axes.axvline(self.K500, linestyle='--', linewidth=0.5, color='k', label=r'$K_{500}$')
         axes.set_xlabel(r"$K$ [keV cm$^2$]")
         axes.set_ylabel(f"Number of particles")
         axes.legend(loc="upper right")
