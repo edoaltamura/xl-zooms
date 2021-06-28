@@ -40,40 +40,9 @@ hydrogen_number_densities = np.empty((num_snaps, plateau.number_particles))
 
 del plateau
 
-
-def single_halo_method(new_snap_number):
-    i = snaps_collection[::-1].tolist().index(new_snap_number)
-    # Move to high redshift and track the same particle IDs
-    _snap, _cat = set_snap_number(snap, cat, new_snap_number)
-    plateau = EntropyPlateau()
-    plateau.setup_data(path_to_snap=_snap, path_to_catalogue=_cat)
-    plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
-    print(i, new_snap_number, f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
-    plateau.shell_properties()
-    # plateau.heating_fractions(nbins=70)
-
-    # Sort particles by ID
-    sort_id = np.argsort(plateau.get_particle_ids())
-
-    # Allocate data into arrays
-    redshifts[i] = plateau.z
-    particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
-    temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
-    entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
-    hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
-
-    del plateau
-
-
-# The results of the multiprocessing Pool are returned in the same order as inputs
-with Pool(cpu_count()) as pool:
-    results = list(tqdm(
-        pool.imap(single_halo_method, iter(snaps_collection[::-1])),
-        total=num_snaps,
-        disable=xlargs.quiet
-    ))
-
-# for i, new_snap_number in enumerate(snaps_collection[::-1]):
+#
+# def single_halo_method(new_snap_number):
+#     i = snaps_collection[::-1].tolist().index(new_snap_number)
 #     # Move to high redshift and track the same particle IDs
 #     _snap, _cat = set_snap_number(snap, cat, new_snap_number)
 #     plateau = EntropyPlateau()
@@ -94,6 +63,37 @@ with Pool(cpu_count()) as pool:
 #     hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
 #
 #     del plateau
+#
+#
+# # The results of the multiprocessing Pool are returned in the same order as inputs
+# with Pool(cpu_count()) as pool:
+#     results = list(tqdm(
+#         pool.imap(single_halo_method, iter(snaps_collection[::-1])),
+#         total=num_snaps,
+#         disable=xlargs.quiet
+#     ))
+
+for i, new_snap_number in enumerate(snaps_collection[::-1]):
+    # Move to high redshift and track the same particle IDs
+    _snap, _cat = set_snap_number(snap, cat, new_snap_number)
+    plateau = EntropyPlateau()
+    plateau.setup_data(path_to_snap=_snap, path_to_catalogue=_cat)
+    plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
+    print(i, new_snap_number, f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
+    plateau.shell_properties()
+    # plateau.heating_fractions(nbins=70)
+
+    # Sort particles by ID
+    sort_id = np.argsort(plateau.get_particle_ids())
+
+    # Allocate data into arrays
+    redshifts[i] = plateau.z
+    particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
+    temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
+    entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
+    hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
+
+    del plateau
 
 hydrogen_number_densities_max = np.amax(hydrogen_number_densities, axis=0)
 
@@ -127,5 +127,7 @@ axes.legend(loc="upper right")
 
 if not xlargs.quiet:
     plt.show()
+
+plt.savefig('max_density_track.pdf')
 
 plt.close()
