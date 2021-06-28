@@ -16,10 +16,10 @@ def set_snap_number(snap: str, cat: str, snap_number: int):
 
 snap, cat = find_files()
 set_mnras_stylesheet()
-plateau = EntropyPlateau()
 
 # Start from redshift 0.5 to select particles in the plateau
 snap, cat = set_snap_number(snap, cat, 1482)
+plateau = EntropyPlateau()
 plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
 particle_ids_z0p5 = plateau.get_particle_ids()
@@ -27,7 +27,7 @@ agn_flag_z0p5 = plateau.get_heated_by_agnfeedback()
 snii_flag_z0p5 = plateau.get_heated_by_sniifeedback()
 print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
 
-num_snaps = 5
+num_snaps = 50
 redshifts = np.empty(num_snaps)
 snaps_collection = np.linspace(500, 1482, num_snaps, dtype=np.int)
 particle_ids = np.empty((num_snaps, plateau.number_particles), dtype=np.int)
@@ -35,13 +35,15 @@ temperatures = np.empty((num_snaps, plateau.number_particles))
 entropies = np.empty((num_snaps, plateau.number_particles))
 hydrogen_number_densities = np.empty((num_snaps, plateau.number_particles))
 
+del plateau
+
 for i, new_snap_number in enumerate(snaps_collection[::-1]):
     # Move to high redshift and track the same particle IDs
-    print(i, new_snap_number)
     snap, cat = set_snap_number(snap, cat, new_snap_number)
+    plateau = EntropyPlateau()
     plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
     plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
-    print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
+    print(i, new_snap_number, f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
     plateau.shell_properties()
     # plateau.heating_fractions(nbins=70)
 
@@ -55,6 +57,8 @@ for i, new_snap_number in enumerate(snaps_collection[::-1]):
     entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
     hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
 
+    del plateau
+
 hydrogen_number_densities_max = np.amax(hydrogen_number_densities, axis=0)
 
 fig = plt.figure(constrained_layout=True)
@@ -62,7 +66,6 @@ axes = fig.add_subplot()
 # plateau.plot_densities(axes)
 
 bins = np.logspace(-4, 4, 64)
-plt.ylim([0.9, 1500])
 plt.yscale('log')
 plt.xscale('log')
 plt.hist(hydrogen_number_densities_max, bins=bins, label='All')
