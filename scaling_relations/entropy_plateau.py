@@ -166,7 +166,7 @@ class EntropyPlateau(HaloProperty):
                     for element in self.sw_data.gas.element_mass_fractions.named_columns:
                         d = getattr(self.sw_data.gas.element_mass_fractions, element)
                         setattr(self.sw_data.gas.element_mass_fractions, element, d[shell_mask])
-                elif type(getattr(self.sw_data.gas, dataset)) is unyt_array:
+                elif hasattr(getattr(self.sw_data.gas, dataset), 'value'):
                     d = getattr(self.sw_data.gas, dataset)
                     setattr(self.sw_data.gas, dataset, d[shell_mask])
                 else:
