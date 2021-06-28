@@ -18,9 +18,9 @@ snap, cat = find_files()
 set_mnras_stylesheet()
 
 # Start from redshift 0.5 to select particles in the plateau
-snap, cat = set_snap_number(snap, cat, 1482)
+_snap, _cat = set_snap_number(snap, cat, 1482)
 plateau = EntropyPlateau()
-plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
+plateau.setup_data(path_to_snap=_snap, path_to_catalogue=_cat)
 plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
 particle_ids_z0p5 = plateau.get_particle_ids()
 agn_flag_z0p5 = plateau.get_heated_by_agnfeedback()
@@ -39,9 +39,9 @@ del plateau
 
 for i, new_snap_number in enumerate(snaps_collection[::-1]):
     # Move to high redshift and track the same particle IDs
-    snap, cat = set_snap_number(snap, cat, new_snap_number)
+    _snap, _cat = set_snap_number(snap, cat, new_snap_number)
     plateau = EntropyPlateau()
-    plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
+    plateau.setup_data(path_to_snap=_snap, path_to_catalogue=_cat)
     plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
     print(i, new_snap_number, f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
     plateau.shell_properties()
