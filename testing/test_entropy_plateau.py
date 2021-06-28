@@ -17,11 +17,13 @@ snap, cat = find_files()
 set_mnras_stylesheet()
 
 plateau = EntropyPlateau()
-print(snap, cat)
-snap, cat = set_snap_number(snap, cat, 200)
-print(snap, cat)
+
 plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
+particle_ids_z0p5 = plateau.get_particle_ids()
+
+snap, cat = set_snap_number(snap, cat, 200)
+plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
 plateau.shell_properties()
 plateau.heating_fractions(nbins=50)
 

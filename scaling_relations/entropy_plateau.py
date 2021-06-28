@@ -136,7 +136,8 @@ class EntropyPlateau(HaloProperty):
             shell_thickness_r500: float = 0.01,
             particle_ids: Optional[np.ndarray] = None,
             temperature_cut: bool = False,
-            apply_mask: bool = True
+            apply_mask: bool = True,
+            only_particle_ids: bool = False
     ):
 
         radial_distance = self.sw_data.gas.radial_distances / self.r500
@@ -153,13 +154,18 @@ class EntropyPlateau(HaloProperty):
         if temperature_cut:
             high_temperature_match[self.sw_data.gas.temperatures.value < Tcut_halogas] = False
 
-        shell_mask = np.where(
-            (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
-            (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
-            (self.sw_data.gas.fofgroup_ids == 1) &
-            (intersect_ids == 1) &
-            (high_temperature_match == 1)
-        )[0]
+        if only_particle_ids:
+            assert particle_ids is not None
+            shell_mask = np.where(intersect_ids == 1)[0]
+
+        else:
+            shell_mask = np.where(
+                (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
+                (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
+                (self.sw_data.gas.fofgroup_ids == 1) &
+                (intersect_ids == 1) &
+                (high_temperature_match == 1)
+            )[0]
 
         if apply_mask:
             datasets_to_mask = []
