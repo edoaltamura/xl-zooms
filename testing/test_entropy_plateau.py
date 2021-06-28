@@ -15,9 +15,9 @@ def set_snap_number(snap: str, cat: str, snap_number: int):
 
 snap, cat = find_files()
 set_mnras_stylesheet()
-plateau = EntropyPlateau()
 
 # Start from redshift 0.5 to select particles in the plateau
+plateau = EntropyPlateau()
 snap, cat = set_snap_number(snap, cat, 1482)
 plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(shell_radius_r500=0.1, shell_thickness_r500=0.02, temperature_cut=True)
@@ -25,6 +25,7 @@ particle_ids_z0p5 = plateau.get_particle_ids()
 print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
 
 # Move to redshift 3 and track the same particle IDs
+plateau = EntropyPlateau()
 snap, cat = set_snap_number(snap, cat, 195)
 plateau.setup_data(path_to_snap=snap, path_to_catalogue=cat)
 plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
