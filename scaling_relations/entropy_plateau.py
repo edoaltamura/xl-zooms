@@ -140,29 +140,32 @@ class EntropyPlateau(HaloProperty):
             only_particle_ids: bool = False
     ):
 
-        radial_distance = self.sw_data.gas.radial_distances / self.r500
-        radial_distance = radial_distance.to('dimensionless').value
-
-        intersect_ids = np.ones_like(radial_distance, dtype=np.bool)
+        intersect_ids = np.ones_like(self.sw_data.gas.radial_distances, dtype=np.bool)
         if particle_ids is not None:
             # match_indices = np.intersect1d(
             #     self.sw_data.gas.particle_ids.value, particle_ids, assume_unique=True, return_indices=True
             # )[1]
+            print('particle_ids', particle_ids)
+            print('self.sw_data.gas.particle_ids.value', self.sw_data.gas.particle_ids.value)
+            print('np.where(self.sw_data.gas.particle_ids.value == i)[0][0]', np.where(self.sw_data.gas.particle_ids.value == particle_ids[0])[0][0])
             match_indices = np.asarray(
                 [np.where(self.sw_data.gas.particle_ids.value == i)[0][0] for i in particle_ids]
             )
             intersect_ids[:] = False
             intersect_ids[np.sort(match_indices)] = True
 
-        high_temperature_match = np.ones_like(radial_distance, dtype=np.bool)
-        if temperature_cut:
-            high_temperature_match[self.sw_data.gas.temperatures.value < Tcut_halogas] = False
-
         if only_particle_ids:
             assert particle_ids is not None
             shell_mask = np.where(intersect_ids == 1)[0]
 
         else:
+            radial_distance = self.sw_data.gas.radial_distances / self.r500
+            radial_distance = radial_distance.to('dimensionless').value
+
+            high_temperature_match = np.ones_like(self.sw_data.gas.radial_distances, dtype=np.bool)
+            if temperature_cut:
+                high_temperature_match[self.sw_data.gas.temperatures.value < Tcut_halogas] = False
+
             shell_mask = np.where(
                 (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
                 (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
@@ -252,7 +255,8 @@ class EntropyPlateau(HaloProperty):
 
         # Compute hydrogen number density and the log10
         # of the temperature to provide to the xray interpolator.
-        self.sw_data.gas.nH = self.sw_data.gas.element_mass_fractions.hydrogen * self.sw_data.gas.densities.to('g*cm**-3') / mp
+        self.sw_data.gas.nH = self.sw_data.gas.element_mass_fractions.hydrogen * self.sw_data.gas.densities.to(
+            'g*cm**-3') / mp
         data_nH = np.log10(self.sw_data.gas.nH.value)
         data_T = np.log10(self.sw_data.gas.temperatures.value)
 
@@ -393,7 +397,8 @@ class EntropyPlateau(HaloProperty):
                   label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.entropy_bin_edges[:-1], self.entropy_hist_agn,
                   label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
-        axes.axvline(self.entropy_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell entropy (mass-weighted)')
+        axes.axvline(self.entropy_weighted_mass, linestyle=':', linewidth=0.5, color='k',
+                     label='Shell entropy (mass-weighted)')
         axes.axvline(self.K500, linestyle='--', linewidth=0.5, color='k', label=r'$K_{500}$')
         axes.set_xlabel(r"$K$ [keV cm$^2$]")
         axes.set_ylabel(f"Number of particles")
@@ -402,14 +407,16 @@ class EntropyPlateau(HaloProperty):
 
         axes.set_xscale('log')
         axes.set_yscale('log')
-        axes.step(self.temperature_bin_edges[:-1], self.temperature_hist, label=f'All ({self.number_particles:d} particles)')
+        axes.step(self.temperature_bin_edges[:-1], self.temperature_hist,
+                  label=f'All ({self.number_particles:d} particles)')
         axes.step(self.temperature_bin_edges[:-1], self.temperature_hist_null,
                   label=f'Not heated ({self.number_not_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.temperature_bin_edges[:-1], self.temperature_hist_snii,
                   label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.temperature_bin_edges[:-1], self.temperature_hist_agn,
                   label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
-        axes.axvline(self.temperature_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell temperature (mass-weighted)')
+        axes.axvline(self.temperature_weighted_mass, linestyle=':', linewidth=0.5, color='k',
+                     label='Shell temperature (mass-weighted)')
         axes.axvline((self.kBT500 / kb).to('K'), linestyle='--', linewidth=0.5, color='k', label=r'$T_{500}$')
         axes.set_xlabel(r"$T$ [K]")
         axes.set_ylabel(f"Number of particles")
@@ -425,6 +432,7 @@ class EntropyPlateau(HaloProperty):
                   label=f'SN ({self.number_snii_heated / self.number_particles * 100:.1f} %)')
         axes.step(self.density_bin_edges[:-1], self.density_hist_agn,
                   label=f'AGN ({self.number_agn_heated / self.number_particles * 100:.1f} %)')
-        axes.axvline(self.density_weighted_mass, linestyle=':', linewidth=0.5, color='k', label='Shell $n_e$ density (mass-weighted)')
+        axes.axvline(self.density_weighted_mass, linestyle=':', linewidth=0.5, color='k',
+                     label='Shell $n_e$ density (mass-weighted)')
         axes.set_xlabel(r"$n_e$ [cm$^{-3}$]")
         axes.set_ylabel(f"Number of particles")
