@@ -22,14 +22,14 @@ plateau.plot_observations(axes)
 
 axes.text(
     0.025,
-    0.025,
+    0.975,
     (
         f'Shell thickness: {0.01:.3f} $r_{{500}}$\n'
         f'z = {plateau.z:.2f}\n'
     ),
-    color="w",
+    color="k",
     ha="left",
-    va="bottom",
+    va="top",
     alpha=0.8,
     transform=axes.transAxes,
 )

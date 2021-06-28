@@ -161,8 +161,6 @@ class EntropyPlateau(HaloProperty):
             (high_temperature_match == 1)
         )[0]
 
-        print('shell_mask', shell_mask)
-
         if apply_mask:
             datasets_to_mask = []
             for dataset_name in dir(self.sw_data.gas):
