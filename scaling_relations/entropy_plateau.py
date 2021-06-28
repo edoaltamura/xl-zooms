@@ -169,7 +169,7 @@ class EntropyPlateau(HaloProperty):
             shell_mask = np.where(
                 (radial_distance > shell_radius_r500 - shell_thickness_r500 / 2) &
                 (radial_distance < shell_radius_r500 + shell_thickness_r500 / 2) &
-                (self.sw_data.gas.fofgroup_ids == 1) &
+                # (self.sw_data.gas.fofgroup_ids == 1) &
                 (intersect_ids == 1) &
                 (high_temperature_match == 1)
             )[0]
@@ -211,6 +211,7 @@ class EntropyPlateau(HaloProperty):
         else:
             self.shell_mask = shell_mask
 
+        print('particle_ids len', len(self.sw_data.gas.particle_ids))
         self.number_particles = len(shell_mask)
         del shell_mask
 
