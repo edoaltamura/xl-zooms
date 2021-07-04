@@ -2,6 +2,7 @@ import os.path
 import sys
 import numpy as np
 from swiftsimio import cosmo_array
+from velociraptor import load as vrload
 from typing import Optional
 from matplotlib import pyplot as plt
 import numba
@@ -40,9 +41,5 @@ class BHEnergyInjection(HaloProperty):
             path_to_snap: str = None,
             path_to_catalogue: str = None
     ):
-        sw_data, vr_data = self.get_handles_from_zoom(
-            zoom_obj,
-            path_to_snap,
-            path_to_catalogue,
-            mask_radius_r500=0.5
-        )
+        vr_data = vrload(path_to_catalogue)
+        return.star_formation_rate.sfr_gas
