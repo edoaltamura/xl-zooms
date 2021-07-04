@@ -31,7 +31,7 @@ snii_flag_z0p5 = plateau.get_heated_by_sniifeedback()
 number_particles_z0p5 = plateau.number_particles
 print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
 
-snaps_collection = np.arange(400, 1842, 20)
+snaps_collection = np.arange(400, 1842, 200)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 particle_ids = np.empty((num_snaps, plateau.number_particles), dtype=np.int)
