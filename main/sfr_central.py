@@ -3,6 +3,8 @@ from velociraptor import load as vrload
 from matplotlib import pyplot as plt
 import unyt
 
+sys.path.append("..")
+
 from register import xlargs, find_files
 
 snap, cat = find_files()
