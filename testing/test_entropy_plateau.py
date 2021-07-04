@@ -31,7 +31,7 @@ snii_flag_z0p5 = plateau.get_heated_by_sniifeedback()
 number_particles_z0p5 = plateau.number_particles
 print(f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
 
-snaps_collection = np.arange(400, 1842, 10)
+snaps_collection = np.arange(400, 1842, 100)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 particle_ids = np.empty((num_snaps, plateau.number_particles), dtype=np.int)
@@ -56,11 +56,10 @@ for i, new_snap_number in enumerate(snaps_collection[::-1]):
 
     # Allocate data into arrays
     redshifts[i] = plateau.z
-    particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
-    temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
-    entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
+    # particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
+    # temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
+    # entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
     hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
-
 
     process = psutil.Process(os.getpid())
     print(f"Memory used: {process.memory_info().rss / 1024 / 1024:.3f} MB")
@@ -76,11 +75,18 @@ axes = fig.add_subplot()
 bins = np.logspace(-4, 4, 32)
 axes.set_yscale('log')
 axes.set_xscale('log')
-axes.hist(hydrogen_number_densities_max, bins=bins, label=f'All ({number_particles_z0p5:d} particles)')
-axes.hist(hydrogen_number_densities_max[snii_flag_z0p5], bins=bins,
-          label=f'SNe heated ({snii_flag_z0p5.sum() / number_particles_z0p5 * 100:.1f} %)')
-axes.hist(hydrogen_number_densities_max[agn_flag_z0p5], bins=bins,
-          label=f'AGN heated ({agn_flag_z0p5.sum() / number_particles_z0p5 * 100:.1f} %)')
+axes.hist(
+    hydrogen_number_densities_max, bins=bins,
+    label=f'All ({number_particles_z0p5:d} particles)'
+)
+axes.hist(
+    hydrogen_number_densities_max[snii_flag_z0p5], bins=bins,
+    label=f'SNe heated ({snii_flag_z0p5.sum() / number_particles_z0p5 * 100:.1f} %)'
+)
+axes.hist(
+    hydrogen_number_densities_max[agn_flag_z0p5], bins=bins,
+    label=f'AGN heated ({agn_flag_z0p5.sum() / number_particles_z0p5 * 100:.1f} %)'
+)
 axes.set_xlabel(r'$n_{\rm H,max}$ [cm$^{-3}$]')
 axes.set_ylabel(f"Number of particles")
 axes.text(
