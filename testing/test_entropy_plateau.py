@@ -49,7 +49,6 @@ for i, new_snap_number in enumerate(snaps_collection[::-1]):
     plateau.select_particles_on_plateau(particle_ids=particle_ids_z0p5, only_particle_ids=True)
     print(i, new_snap_number, f"Redshift {plateau.z:.3f}: {plateau.number_particles:d} particles selected")
     plateau.shell_properties()
-    # plateau.heating_fractions(nbins=70)
 
     # Sort particles by ID
     sort_id = np.argsort(plateau.get_particle_ids())
@@ -57,8 +56,8 @@ for i, new_snap_number in enumerate(snaps_collection[::-1]):
     # Allocate data into arrays
     redshifts[i] = plateau.z
     # particle_ids[i, :plateau.number_particles] = plateau.get_particle_ids()[sort_id]
-    # temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
-    # entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
+    temperatures[i, :plateau.number_particles] = plateau.get_temperatures()[sort_id]
+    entropies[i, :plateau.number_particles] = plateau.get_entropies()[sort_id]
     hydrogen_number_densities[i, :plateau.number_particles] = plateau.get_hydrogen_number_density()[sort_id]
 
     process = psutil.Process(os.getpid())
@@ -70,8 +69,6 @@ hydrogen_number_densities_max = np.amax(hydrogen_number_densities, axis=0)
 
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
-# plateau.plot_densities(axes)
-
 bins = np.logspace(-4, 4, 64)
 axes.set_yscale('log')
 axes.set_xscale('log')
@@ -107,5 +104,19 @@ if not xlargs.quiet:
     plt.show()
 
 plt.savefig('max_density_track.pdf')
+
+plt.close()
+
+fig = plt.figure(constrained_layout=True)
+axes = fig.add_subplot()
+axes.set_yscale('log')
+axes.set_xlabel('Redshift')
+axes.set_ylabel(f"Temperature")
+axes.plot(temperatures.T, linewidth=0.1, alpha=0.2)
+
+if not xlargs.quiet:
+    plt.show()
+
+plt.savefig('temperature_track.pdf')
 
 plt.close()
