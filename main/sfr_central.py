@@ -1,16 +1,11 @@
-import os.path
-import sys
 import numpy as np
 from velociraptor import load as vrload
-from typing import Optional
 from matplotlib import pyplot as plt
-
-
 import unyt
 
 from register import xlargs, find_files
-snap, cat = find_files()
 
+snap, cat = find_files()
 sfr_output_units = unyt.msun / (unyt.year * unyt.Mpc ** 3)
 
 def set_snap_number(snap_number: int):
@@ -19,7 +14,7 @@ def set_snap_number(snap_number: int):
     return snap.replace(old_snap_number, new_snap_number), cat.replace(old_snap_number, new_snap_number)
 
 
-snaps_collection = np.arange(400, 1842, 200)
+snaps_collection = np.arange(400, 1842, 20)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 sfr = np.empty(num_snaps)
@@ -36,8 +31,7 @@ fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 axes.set_yscale('log')
 axes.set_xlabel('Redshift')
-axes.set_ylabel(f"Temperature")
-axes.set_ylim(1e3, 1e10)
+axes.set_ylabel(vr_data.star_formation_rate.sfr_gas.name)
 axes.plot(redshifts, sfr, color='g', linewidth=0.5, alpha=1)
 
 if not xlargs.quiet:
