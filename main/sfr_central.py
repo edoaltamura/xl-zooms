@@ -67,8 +67,8 @@ a_ticks = 1.0 / (redshift_ticks + 1.0)
 axes.set_xticks(a_ticks)
 axes.set_xticklabels(redshift_labels)
 axes.tick_params(axis="x", which="minor", bottom=False)
-axes.set_xlim(1.02, 0.07)
-axes.set_ylim(1.8e-4, 1.7)
+# axes.set_xlim(1.02, 0.07)
+# axes.set_ylim(1.8e-4, 1.7)
 
 if not xlargs.quiet:
     plt.show()
