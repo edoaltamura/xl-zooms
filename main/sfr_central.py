@@ -41,9 +41,12 @@ for i, snap_number in enumerate(snaps_collection[::-1]):
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 axes.set_yscale('log')
+axes.set_xscale('log')
 axes.set_xlabel('Redshift')
 axes.set_ylabel(r"SFR $\dot{\rho}_*$ [M$_\odot$ yr$^{-1}$]")
-axes.plot(1 / (redshifts + 1), sfr, color='g', linewidth=0.5, alpha=1)
+
+scale_factors = 1 / (redshifts + 1)
+axes.plot(scale_factors, sfr, color='g', linewidth=0.5, alpha=1)
 
 redshift_ticks = np.array([0.0, 0.2, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0])
 redshift_labels = [
