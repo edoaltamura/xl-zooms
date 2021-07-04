@@ -113,8 +113,8 @@ axes.set_yscale('log')
 axes.set_xlabel('Redshift')
 axes.set_ylabel(f"Temperature")
 axes.set_ylim(1e3, 1e10)
-axes.plot(temperatures[snii_flag_z0p5], color='g', linewidth=0.1, alpha=0.2)
-axes.plot(temperatures[agn_flag_z0p5], color='r', linewidth=0.1, alpha=0.2)
+axes.plot(temperatures[snii_flag_z0p5].T, color='g', linewidth=0.1, alpha=0.2)
+axes.plot(temperatures[agn_flag_z0p5].T, color='r', linewidth=0.1, alpha=0.2)
 
 if not xlargs.quiet:
     plt.show()
