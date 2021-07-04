@@ -32,3 +32,10 @@ for i, snap_number in enumerate(snaps_collection[::-1]):
     redshifts[i] = vr_data.z
     sfr[i] = vr_data.star_formation_rate.sfr_gas[0]
 
+fig = plt.figure(constrained_layout=True)
+axes = fig.add_subplot()
+axes.set_yscale('log')
+axes.set_xlabel('Redshift')
+axes.set_ylabel(f"Temperature")
+axes.set_ylim(1e3, 1e10)
+axes.plot(temperatures[snii_flag_z0p5].T, color='g', linewidth=0.1, alpha=0.2)
