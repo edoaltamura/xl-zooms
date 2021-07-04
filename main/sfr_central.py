@@ -4,12 +4,15 @@ from matplotlib import pyplot as plt
 import unyt
 
 import sys
+
 sys.path.append("..")
 
 from register import xlargs, find_files, set_mnras_stylesheet
+
 set_mnras_stylesheet()
 snap, cat = find_files()
-sfr_output_units = unyt.msun / (unyt.year)# * unyt.Mpc ** 3)
+sfr_output_units = unyt.msun / (unyt.year)  # * unyt.Mpc ** 3)
+
 
 def set_snap_number(snap_number: int):
     old_snap_number = f"_{xlargs.snapshot_number:04d}"
@@ -17,7 +20,7 @@ def set_snap_number(snap_number: int):
     return snap.replace(old_snap_number, new_snap_number), cat.replace(old_snap_number, new_snap_number)
 
 
-snaps_collection = np.arange(200, 2500, 5)
+snaps_collection = np.arange(200, 2500, 50)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 sfr = np.empty(num_snaps)
@@ -40,7 +43,29 @@ axes = fig.add_subplot()
 axes.set_yscale('log')
 axes.set_xlabel('Redshift')
 axes.set_ylabel(r"SFR $\dot{\rho}_*$ [M$_\odot$ yr$^{-1}$]")
-axes.plot(redshifts, sfr, color='g', linewidth=0.5, alpha=1)
+axes.plot(1 / (redshifts + 1), sfr, color='g', linewidth=0.5, alpha=1)
+
+redshift_ticks = np.array([0.0, 0.2, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0])
+redshift_labels = [
+    "$0$",
+    "$0.2$",
+    "$0.5$",
+    "$1$",
+    "$2$",
+    "$3$",
+    "$5$",
+    "$10$",
+    "$20$",
+    "$50$",
+    "$100$",
+]
+a_ticks = 1.0 / (redshift_ticks + 1.0)
+
+axes.set_xticks(a_ticks)
+axes.set_xticklabels(redshift_labels)
+axes.tick_params(axis="x", which="minor", bottom=False)
+axes.set_xlim(1.02, 0.07)
+axes.set_ylim(1.8e-4, 1.7)
 
 if not xlargs.quiet:
     plt.show()
