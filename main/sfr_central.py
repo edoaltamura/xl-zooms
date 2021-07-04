@@ -7,7 +7,7 @@ import sys
 
 sys.path.append("..")
 
-from register import xlargs, find_files, set_mnras_stylesheet
+from register import xlargs, find_files, set_mnras_stylesheet, delete_last_line
 
 set_mnras_stylesheet()
 snap, cat = find_files()
@@ -34,6 +34,7 @@ for i, snap_number in enumerate(snaps_collection[::-1]):
         # volume = 4 / 3 * np.pi * r200 ** 3
         redshifts[i] = vr_data.z
         sfr[i] = (vr_data.star_formation_rate.sfr_gas[0]).to(sfr_output_units)
+        delete_last_line()
     except:
         redshifts[i] = np.nan
         sfr[i] = np.nan
@@ -67,7 +68,7 @@ a_ticks = 1.0 / (redshift_ticks + 1.0)
 axes.set_xticks(a_ticks)
 axes.set_xticklabels(redshift_labels)
 axes.tick_params(axis="x", which="minor", bottom=False)
-# axes.set_xlim(1.02, 0.07)
+axes.set_xlim(1.02, 0.07)
 # axes.set_ylim(1.8e-4, 1.7)
 
 if not xlargs.quiet:
