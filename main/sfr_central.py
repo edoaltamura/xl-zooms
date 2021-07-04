@@ -3,6 +3,7 @@ from velociraptor import load as vrload
 from matplotlib import pyplot as plt
 import unyt
 
+import sys
 sys.path.append("..")
 
 from register import xlargs, find_files
