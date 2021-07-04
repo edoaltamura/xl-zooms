@@ -20,7 +20,7 @@ def set_snap_number(snap_number: int):
     return snap.replace(old_snap_number, new_snap_number), cat.replace(old_snap_number, new_snap_number)
 
 
-snaps_collection = np.arange(200, 2500, 50)
+snaps_collection = np.arange(1, 2522, 5)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 sfr = np.empty(num_snaps)
