@@ -9,7 +9,10 @@ class VRProperties(HaloProperty):
     def __init__(self):
         super().__init__()
 
-        self.labels = ['r2500', 'r1000', 'r500', 'r200', 'm2500', 'm1000', 'm500', 'm200', 'm_star500c', 'm_star30kpc']
+        self.labels = [
+            'r2500', 'r1000', 'r500', 'r200', 'm2500', 'm1000', 'm500', 'm200', 'm_star500c', 'm_star30kpc',
+            'm_star100kpc', 'sfr_100kpc', 'm_bh100kpc'
+        ]
 
         self.filename = os.path.join(
             default_output_directory,
@@ -37,13 +40,23 @@ class VRProperties(HaloProperty):
 
         m_star500c = vr_data.spherical_overdensities.mass_star_500_rhocrit[0].to('Msun')
         m_star30kpc = vr_data.apertures.mass_star_50_kpc[0].to('Msun')
+        m_star100kpc = vr_data.apertures.mass_star_100_kpc[0].to('Msun')
+        sfr_100kpc = vr_data.apertures.sfr_gas_100_kpc[0].to('Msun/Gyr')
+        m_bh100kpc = vr_data.apertures.mass_bh_100_kpc[0].to('Msun')
 
-        return r2500, r1000, r500, r200, m2500, m1000, m500, m200, m_star500c, m_star30kpc
+        return (
+            r2500, r1000, r500, r200, m2500, m1000, m500, m200, m_star500c, m_star30kpc, m_star100kpc,
+            sfr_100kpc, m_bh100kpc
+        )
 
-    def process_catalogue(self):
+    def process_catalogue(self, save_to_file: bool = False):
 
         catalogue = self._process_catalogue(self.process_single_halo, labels=self.labels)
-        self.dump_to_pickle(self.filename, catalogue)
+
+        if save_to_file:
+            self.dump_to_pickle(self.filename, catalogue)
+
+        return catalogue
 
     def read_catalogue(self):
 

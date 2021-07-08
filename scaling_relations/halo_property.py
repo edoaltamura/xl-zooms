@@ -173,22 +173,20 @@ class HaloProperty(object):
 
         """
         # Read in halo properties
-        vr_handle = velociraptor.load(path_to_catalogue)
-        a = vr_handle.a
+        vr_handle = velociraptor.load(path_to_catalogue, disregard_units=True)
 
         # Try to import r500 from the catalogue.
         # If not there (and needs to be computed), assume 1 Mpc for the spatial mask.
         try:
-            r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / a
+            r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_handle.a
         except Exception as err:
-            r500 = unyt_quantity(3, 'Mpc') / a
+            r500 = unyt_quantity(3, 'Mpc') / vr_handle.a
             if xlargs.debug:
                 print(err, "Setting r500 = 3. Mpc. / scale_factor", sep='\n')
 
-        xcminpot = vr_handle.positions.xcminpot[0].to('Mpc') / a
-        ycminpot = vr_handle.positions.ycminpot[0].to('Mpc') / a
-        zcminpot = vr_handle.positions.zcminpot[0].to('Mpc') / a
-        del a
+        xcminpot = vr_handle.positions.xcminpot[0].to('Mpc') / vr_handle.a
+        ycminpot = vr_handle.positions.ycminpot[0].to('Mpc') / vr_handle.a
+        zcminpot = vr_handle.positions.zcminpot[0].to('Mpc') / vr_handle.a
 
         # Apply spatial mask to particles. SWIFTsimIO needs comoving coordinates
         # to filter particle coordinates, while VR outputs are in physical units.
