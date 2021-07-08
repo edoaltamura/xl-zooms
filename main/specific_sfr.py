@@ -12,7 +12,7 @@ catalogue = VRProperties().process_catalogue()
 
 catalogue['specific_sfr'] = catalogue['sfr_100kpc'] / catalogue['m_star100kpc']
 
-matplotlib_stylesheet()
+# matplotlib_stylesheet()
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 axes.loglog()
