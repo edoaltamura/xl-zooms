@@ -11,7 +11,7 @@ from register import xlargs, find_files, set_mnras_stylesheet, delete_last_line
 
 set_mnras_stylesheet()
 snap, cat = find_files()
-sfr_output_units = unyt.msun / unyt.Gyr
+sfr_output_units = unyt.msun / unyt.year
 
 
 def set_snap_number(snap_number: int):
@@ -47,7 +47,7 @@ axes.set_yscale('log')
 axes.set_xscale('log')
 axes.set_xlabel('Redshift')
 # axes.set_ylabel(r"Specific SFR = $\dot{M}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
-axes.set_ylabel(r"Specific SFR = $\dot{M}_* [M$_\odot$ Gyr$^{-1}$]")
+axes.set_ylabel(r"Specific SFR = $\dot{M}_*$ [M$_\odot$ yr$^{-1}$]")
 
 scale_factors = 1 / (redshifts + 1)
 axes.plot(scale_factors, sfr, color='g', linewidth=0.5, alpha=1)
