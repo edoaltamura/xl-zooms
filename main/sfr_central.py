@@ -33,7 +33,8 @@ for i, snap_number in enumerate(snaps_collection[::-1]):
         # r200 = vr_data.radii.r_200crit[0]
         # volume = 4 / 3 * np.pi * r200 ** 3
         redshifts[i] = vr_data.z
-        sfr[i] = (vr_data.star_formation_rate.sfr_gas[0]).to(sfr_output_units)
+        mass_bcg = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
+        sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units) / mass_bcg
         delete_last_line()
     except:
         redshifts[i] = np.nan
@@ -44,7 +45,7 @@ axes = fig.add_subplot()
 axes.set_yscale('log')
 axes.set_xscale('log')
 axes.set_xlabel('Redshift')
-axes.set_ylabel(r"SFR $\dot{\rho}_*$ [M$_\odot$ yr$^{-1}$]")
+axes.set_ylabel(r"Specific SFR $\dot{\rho}_*$ [yr$^{-1}$]")
 
 scale_factors = 1 / (redshifts + 1)
 axes.plot(scale_factors, sfr, color='g', linewidth=0.5, alpha=1)
