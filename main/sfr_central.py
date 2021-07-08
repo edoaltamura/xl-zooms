@@ -24,6 +24,7 @@ snaps_collection = np.arange(1, 2522, 20)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 sfr = np.empty(num_snaps)
+mass_bcg = np.empty(num_snaps)
 
 for i, snap_number in enumerate(snaps_collection[::-1]):
 
@@ -33,8 +34,8 @@ for i, snap_number in enumerate(snaps_collection[::-1]):
         # r200 = vr_data.radii.r_200crit[0]
         # volume = 4 / 3 * np.pi * r200 ** 3
         redshifts[i] = vr_data.z
-        mass_bcg = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
-        sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units) / mass_bcg
+        mass_bcg[i] = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
+        sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units)
         delete_last_line()
     except:
         redshifts[i] = np.nan
@@ -45,7 +46,8 @@ axes = fig.add_subplot()
 axes.set_yscale('log')
 axes.set_xscale('log')
 axes.set_xlabel('Redshift')
-axes.set_ylabel(r"Specific SFR = $\dot{\rho}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
+# axes.set_ylabel(r"Specific SFR = $\dot{M}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
+axes.set_ylabel(r"Specific SFR = $\dot{M}_* [M$_\odot$ Gyr$^{-1}$]")
 
 scale_factors = 1 / (redshifts + 1)
 axes.plot(scale_factors, sfr, color='g', linewidth=0.5, alpha=1)
