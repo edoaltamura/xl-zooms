@@ -30,7 +30,7 @@ mass_bcg = np.empty(num_snaps)
 for i, snap_number in enumerate(snaps_collection[::-1]):
 
     try:
-        vr_data = vrload(set_snap_number(snap_number)[1])
+        vr_data = vrload(set_snap_number(snap_number)[1], disregard_units=True)
         print(i, snap_number, f"Redshift {vr_data.z:.3f}")
         # r200 = vr_data.radii.r_200crit[0]
         # volume = 4 / 3 * np.pi * r200 ** 3
