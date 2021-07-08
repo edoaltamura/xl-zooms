@@ -45,7 +45,7 @@ axes = fig.add_subplot()
 axes.set_yscale('log')
 axes.set_xscale('log')
 axes.set_xlabel('Redshift')
-axes.set_ylabel(r"Specific SFR = $\dot{\rho}_* / M_*$(100 kpc) [yr$^{-1}$]")
+axes.set_ylabel(r"Specific SFR = $\dot{\rho}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
 
 scale_factors = 1 / (redshifts + 1)
 axes.plot(scale_factors, sfr, color='g', linewidth=0.5, alpha=1)
