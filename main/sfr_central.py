@@ -21,7 +21,7 @@ def set_snap_number(snap_number: int):
 
 
 # snaps_collection = np.arange(1, 2522, 20)
-snaps_collection = np.arange(22)
+snaps_collection = np.arange(36)
 num_snaps = len(snaps_collection)
 redshifts = np.empty(num_snaps)
 sfr = np.empty(num_snaps)
