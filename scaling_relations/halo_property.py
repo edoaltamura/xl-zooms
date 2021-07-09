@@ -153,6 +153,9 @@ class HaloProperty(object):
 
         return result
 
+    def get_vr_handle(self, path_to_catalogue: str):
+        return velociraptor.load(path_to_catalogue, disregard_units=True)
+
     def get_handles_from_paths(
             self,
             path_to_snap: str,
