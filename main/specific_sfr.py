@@ -6,8 +6,8 @@ from matplotlib.lines import Line2D
 sys.path.append("..")
 
 from scaling_relations import VRProperties
-from register import matplotlib_stylesheet, xlargs
-matplotlib_stylesheet()
+from register import set_mnras_stylesheet, xlargs
+set_mnras_stylesheet()
 
 catalogue = VRProperties().process_catalogue()
 
