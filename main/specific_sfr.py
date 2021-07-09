@@ -33,8 +33,7 @@ for model in ['_-8res_', '_+1res_']:
 # axes.set_xlim(1.02, 0.07)
 # axes.set_ylim(1.8e-4, 1.7)
 
-axes.legend(frameon=True, facecolor='w', edgecolor='none', bbox_to_anchor=(0., 1.02, 1., .102),
-           loc='lower left', mode="expand", borderaxespad=0.)
+axes.legend()
 
 if not xlargs.quiet:
     plt.show()
@@ -51,23 +50,18 @@ axes.set_ylabel(r"Specific SFR (100 kpc) [Gyr$^{-1}$]")
 
 colors = list('rgbkc')
 counter = 0
-handles = []
 
 for model in ['_-8res_', '_+1res_']:
     df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
-    kwargs = dict(s=5, color=colors[counter], edgecolors='none')
+    kwargs = dict(s=5, color=colors[counter], edgecolors='none', label=f"{model.strip('_')}")
     axes.scatter(df['m200'], df['specific_sfr'], **kwargs)
-    handles.append(Line2D(
-        [], [], color=colors[counter], marker='.', markeredgecolor='none', linestyle='None', markersize=4, label=model
-    ))
     counter += 1
 
 
 # axes.set_xlim(1.02, 0.07)
 # axes.set_ylim(1.8e-4, 1.7)
 
-axes.legend(handles=handles, frameon=True, facecolor='w', edgecolor='none', bbox_to_anchor=(0., 1.02, 1., .102),
-           loc='lower left', mode="expand", borderaxespad=0.)
+axes.legend()
 
 if not xlargs.quiet:
     plt.show()
