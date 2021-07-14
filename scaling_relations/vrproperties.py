@@ -25,8 +25,7 @@ class VRProperties(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_catalogue: str = None,
     ):
-        if zoom_obj is not None:
-            vr_data = self.get_vr_handle(zoom_obj.path_to_catalogue)
+        vr_data = self.get_vr_handle(zoom_obj, path_to_catalogue)
 
         try:
             m500 = vr_data.spherical_overdensities.mass_500_rhocrit[0].to('Msun')
