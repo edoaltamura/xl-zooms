@@ -149,10 +149,16 @@ class EXLZooms(object):
             else:
                 number_catalogues = 0
 
+            # Check that there are as many outputs as in the output_list
+            output_list_file = os.path.join(run_directory, 'snap_redshifts.txt')
+            output_list = pd.read_csv(output_list_file)
+            number_redshifts_in_outputlist = len(output_list["# Redshift"].values)
+
             if (
                     (number_snapshots > 0) and
                     (number_catalogues > 0) and
-                    (number_snapshots == number_catalogues)
+                    (number_snapshots == number_catalogues) and
+                    (number_snapshots == number_redshifts_in_outputlist)
             ):
                 self.complete_runs[i] = True
 
@@ -488,16 +494,16 @@ class Zoom(object):
             )
 
         if xlargs.debug:
-            print(self.snapshot_paths, self.catalogue_properties_paths)
-            # assert len(self.redshifts) == len(self.scale_factors), (
-            #     f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.scale_factors)}"
-            # )
-            # assert len(self.redshifts[self.index_snaps]) == len(self.snapshot_paths), (
-            #     f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.snapshot_paths)}"
-            # )
-            # assert len(self.redshifts[self.index_snaps]) == len(self.catalogue_properties_paths), (
-            #     f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.catalogue_properties_paths)}"
-            # )
+
+            assert len(self.redshifts) == len(self.scale_factors), (
+                f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.scale_factors)}"
+            )
+            assert len(self.redshifts[self.index_snaps]) == len(self.snapshot_paths), (
+                f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.snapshot_paths)}"
+            )
+            assert len(self.redshifts[self.index_snaps]) == len(self.catalogue_properties_paths), (
+                f"[Halo {self.run_name}] {len(self.redshifts[self.index_snaps])} != {len(self.catalogue_properties_paths)}"
+            )
 
     def filter_snaps_by_redshift(self, z_min: float = 0., z_max: float = 5., hard_check: bool = False):
 
