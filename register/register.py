@@ -488,6 +488,8 @@ class Zoom(object):
             )
 
         if xlargs.debug:
+            print(self.snapshot_paths, self.catalogue_properties_paths)
+
             assert len(self.redshifts) == len(self.scale_factors), (
                 f"[Halo {self.run_name}] {len(self.redshifts)} != {len(self.scale_factors)}"
             )
