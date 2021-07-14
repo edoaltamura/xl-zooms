@@ -112,7 +112,7 @@ class EXLZooms(object):
     cosma_repositories: List[str] = [
         "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
-        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
+        # "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
     def __init__(self) -> None:
