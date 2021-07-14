@@ -22,6 +22,20 @@ axes.set_ylabel(r"Specific SFR (100 kpc) [Gyr$^{-1}$]")
 colors = list('rgbkc')
 counter = 0
 
+for run_name_highres in catalogue['Run_name']:
+    if '_+1res_' in run_name_highres:
+        for run_name_lowres in catalogue['Run_name']:
+            if '_-8res_' in run_name_highres:
+                if run_name_highres.remove('-8') == run_name_highres.remove('+1'):
+                    df_highres = catalogue[catalogue['Run_name'].str.contains(run_name_highres, regex=False)]
+                    df_lowres = catalogue[catalogue['Run_name'].str.contains(run_name_lowres, regex=False)]
+
+                    axes.plot(
+                        [df_lowres['m_star100kpc'], df_highres['m_star100kpc']],
+                        [df_lowres['specific_sfr'], df_highres['specific_sfr']],
+                        linewidth=0.5, color='k')
+
+
 for model in ['_-8res_', '_+1res_']:
 
     df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
