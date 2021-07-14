@@ -153,8 +153,24 @@ class HaloProperty(object):
 
         return result
 
-    def get_vr_handle(self, path_to_catalogue: str):
-        return velociraptor.load(path_to_catalogue, disregard_units=True)
+    def get_vr_handle(self, zoom_obj: Zoom = None, path_to_catalogue: str = None):
+
+        if xlargs.debug:
+            assert (
+                    zoom_obj is not None or
+                    (path_to_catalogue is not None and path_to_catalogue is not None)
+            ), (
+                "Either a `Zoom` object must be specified or the absolute "
+                "paths to the snapshot and properties catalogue files."
+            )
+
+        catalog_file = path_to_catalogue
+
+        if zoom_obj is not None:
+            zoom_at_redshift = zoom_obj.get_redshift(xlargs.redshift_index)
+            catalog_file = zoom_at_redshift.catalogue_properties_path
+
+        return velociraptor.load(catalog_file, disregard_units=True)
 
     def get_handles_from_paths(
             self,
