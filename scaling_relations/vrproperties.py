@@ -27,6 +27,7 @@ class VRProperties(HaloProperty):
             path_to_catalogue: str = None,
             **kwargs
     ):
+        print('path_to_catalogue: ', path_to_catalogue)
         vr_data = self.get_vr_handle(path_to_catalogue)
 
         try:
