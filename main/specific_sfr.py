@@ -24,6 +24,7 @@ counter = 0
 
 for run_name_highres in catalogue['Run_name']:
     if '_+1res_' in run_name_highres:
+        print(run_name_highres)
         for run_name_lowres in catalogue['Run_name']:
             if '_-8res_' in run_name_highres:
                 if run_name_highres.remove('-8') == run_name_highres.remove('+1'):
