@@ -99,7 +99,7 @@ pairs = [[catalogue[catalogue['Run_name'] == 'L0300N0564_VR37_+1res_MinimumDista
 
 for pair in pairs:
     axes.plot(
-        [pair[0]['m_star100kpc'], pair[1]['m_star100kpc']],
+        [pair[0]['m200'], pair[1]['m200']],
         [pair[0]['specific_sfr'], pair[1]['specific_sfr']],
         linewidth=0.5, color='k')
 
@@ -114,11 +114,17 @@ for model in ['_-8res_', '_+1res_']:
 
 axes.legend()
 
-fig.suptitle(
+axes.text(
+    0.025,
+    0.025,
     (
-        f"z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}\t\t (snap {xlargs.redshift_index:04d})"
+        f"z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}\n(snap {xlargs.redshift_index:04d})"
     ),
-    fontsize=7
+    color="w",
+    ha="left",
+    va="bottom",
+    alpha=0.8,
+    transform=axes.transAxes,
 )
 
 if not xlargs.quiet:
