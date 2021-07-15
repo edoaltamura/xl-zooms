@@ -7,6 +7,7 @@ sys.path.append("..")
 
 from scaling_relations import VRProperties
 from register import set_mnras_stylesheet, xlargs
+
 set_mnras_stylesheet()
 
 catalogue = VRProperties().process_catalogue()
@@ -22,28 +23,34 @@ axes.set_ylabel(r"Specific SFR (100 kpc) [Gyr$^{-1}$]")
 colors = list('rgbkc')
 counter = 0
 
-for run_name_highres in catalogue['Run_name']:
-    if '_+1res_' in run_name_highres:
-        print(run_name_highres)
-        for run_name_lowres in catalogue['Run_name']:
-            if '_-8res_' in run_name_highres:
-                if run_name_highres.remove('-8') == run_name_highres.remove('+1'):
-                    df_highres = catalogue[catalogue['Run_name'].str.contains(run_name_highres, regex=False)]
-                    df_lowres = catalogue[catalogue['Run_name'].str.contains(run_name_lowres, regex=False)]
+pairs = [[catalogue[catalogue['Run_name'] == 'L0300N0564_VR37_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR37_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR139_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR139_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR485_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR485_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR680_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR680_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR813_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR813_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR1236_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR1236_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR2414_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR2414_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']],
+         [catalogue[catalogue['Run_name'] == 'L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'],
+          catalogue[catalogue['Run_name'] == 'L0300N0564_VR2915_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth']], ]
 
-                    axes.plot(
-                        [df_lowres['m_star100kpc'], df_highres['m_star100kpc']],
-                        [df_lowres['specific_sfr'], df_highres['specific_sfr']],
-                        linewidth=0.5, color='k')
-
+for pair in pairs:
+    axes.plot(
+        [pair[0]['m_star100kpc'], pair[1]['m_star100kpc']],
+        [pair[0]['specific_sfr'], pair[1]['specific_sfr']],
+        linewidth=0.5, color='k')
 
 for model in ['_-8res_', '_+1res_']:
-
     df = catalogue[catalogue['Run_name'].str.contains(model, regex=False)]
     kwargs = dict(s=5, color=colors[counter], edgecolors='none', label=f"{model.strip('_')}")
     axes.scatter(df['m_star100kpc'], df['specific_sfr'], **kwargs)
     counter += 1
-
 
 # axes.set_xlim(1.02, 0.07)
 # axes.set_ylim(1.8e-4, 1.7)
@@ -71,7 +78,6 @@ for model in ['_-8res_', '_+1res_']:
     kwargs = dict(s=5, color=colors[counter], edgecolors='none', label=f"{model.strip('_')}")
     axes.scatter(df['m200'], df['specific_sfr'], **kwargs)
     counter += 1
-
 
 # axes.set_xlim(1.02, 0.07)
 # axes.set_ylim(1.8e-4, 1.7)
