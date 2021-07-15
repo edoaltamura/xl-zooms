@@ -63,7 +63,7 @@ axes.text(
     (
         f"z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}\n(snap {xlargs.redshift_index:04d})"
     ),
-    color="w",
+    color="k",
     ha="left",
     va="bottom",
     alpha=0.8,
@@ -126,7 +126,7 @@ axes.text(
     (
         f"z = {calibration_zooms.redshift_from_index(xlargs.redshift_index):.2f}\n(snap {xlargs.redshift_index:04d})"
     ),
-    color="w",
+    color="k",
     ha="left",
     va="bottom",
     alpha=0.8,
