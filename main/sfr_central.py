@@ -37,7 +37,8 @@ axes.set_xscale('log')
 axes.set_xlabel('Redshift')
 # axes.set_ylabel(r"Specific SFR = $\dot{M}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
 # axes.set_ylabel(r"SFR = $\dot{M}_*$ [M$_\odot$ yr$^{-1}$]")
-axes.set_ylabel(r"M$_*$(100 kpc) [M$_\odot$]")
+# axes.set_ylabel(r"M$_*$(100 kpc) [M$_\odot$]")
+axes.set_ylabel(r"M$_{\rm BH}$(10 kpc) [M$_\odot$]")
 
 
 for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
@@ -49,6 +50,8 @@ for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
         redshifts = np.empty(num_snaps)
         sfr = np.empty(num_snaps)
         mass_bcg = np.empty(num_snaps)
+        mass_bh = np.empty(num_snaps)
+
 
         for i, snap_number in enumerate(snaps_collection[::-1]):
 
@@ -66,6 +69,7 @@ for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
 
                 redshifts[i] = vr_data.z
                 mass_bcg[i] = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
+                mass_bh[i] = vr_data.apertures.mass_bh_10_kpc[0].to(unyt.msun)
                 sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units)
 
                 delete_last_line()
@@ -74,7 +78,7 @@ for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
                 sfr[i] = np.nan
 
         scale_factors = 1 / (redshifts + 1)
-        axes.plot(scale_factors, mass_bcg, color='g' if resolution is '-8res' else 'r', linewidth=0.5, alpha=1)
+        axes.plot(scale_factors, mass_bh, color='g' if resolution is '-8res' else 'r', linewidth=0.5, alpha=1)
 
 
 redshift_ticks = np.array([0.0, 0.2, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0])
@@ -102,8 +106,8 @@ axes.set_xlim(1.02, 0.07)
 import matplotlib.patches as mpatches
 axes.legend(
     handles=[
-        mpatches.Patch(color='red', label='-8res'),
-        mpatches.Patch(color='green', label='EAGLE res')
+        mpatches.Patch(color='g', label='-8res'),
+        mpatches.Patch(color='r', label='EAGLE res')
     ]
 )
 
