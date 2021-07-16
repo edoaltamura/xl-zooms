@@ -99,6 +99,14 @@ axes.tick_params(axis="x", which="minor", bottom=False)
 axes.set_xlim(1.02, 0.07)
 # axes.set_ylim(1.8e-4, 1.7)
 
+import matplotlib.patches as mpatches
+axes.legend(
+    handles=[
+        mpatches.Patch(color='red', label='-8res'),
+        mpatches.Patch(color='green', label='EAGLE res')
+    ]
+)
+
 if not xlargs.quiet:
     plt.show()
 
