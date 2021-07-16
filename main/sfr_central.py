@@ -20,31 +20,15 @@ def set_snap_number(snap_number: int):
     return snap.replace(old_snap_number, new_snap_number), cat.replace(old_snap_number, new_snap_number)
 
 
-# snaps_collection = np.arange(1, 2522, 20)
-snaps_collection = np.arange(36)
-num_snaps = len(snaps_collection)
-redshifts = np.empty(num_snaps)
-sfr = np.empty(num_snaps)
-mass_bcg = np.empty(num_snaps)
+def set_resolution(old_path: str, resolution: str):
+    old_resolution = '+1res' if '+1res' in old_path else '-8res'
+    return old_path.replace(old_resolution, resolution)
 
-for i, snap_number in enumerate(snaps_collection[::-1]):
 
-    try:
-        vr_data = vrload(set_snap_number(snap_number)[1], disregard_units=True)
+def set_vr_number(old_path: str, vr_number: str):
+    old_vr_number = old_path.split('_')[1][2:]
+    return old_path.replace(old_vr_number, vr_number)
 
-        if snap_number == snaps_collection[-1]:
-            print('m500', vr_data.spherical_overdensities.mass_500_rhocrit[0])
-
-        print(i, snap_number, f"Redshift {vr_data.z:.3f}")
-        # r200 = vr_data.radii.r_200crit[0]
-        # volume = 4 / 3 * np.pi * r200 ** 3
-        redshifts[i] = vr_data.z
-        mass_bcg[i] = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
-        sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units)
-        delete_last_line()
-    except:
-        redshifts[i] = np.nan
-        sfr[i] = np.nan
 
 fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
@@ -55,8 +39,43 @@ axes.set_ylabel(r"Specific SFR = $\dot{M}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
 # axes.set_ylabel(r"SFR = $\dot{M}_*$ [M$_\odot$ yr$^{-1}$]")
 # axes.set_ylabel(r"M$_*$(100 kpc) [M$_\odot$]")
 
-scale_factors = 1 / (redshifts + 1)
-axes.plot(scale_factors, sfr / mass_bcg, color='g', linewidth=0.5, alpha=1)
+
+for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
+    for resolution in ['-8res', '+1res']:
+
+        # snaps_collection = np.arange(1, 2522, 20)
+        snaps_collection = np.arange(36)
+        num_snaps = len(snaps_collection)
+        redshifts = np.empty(num_snaps)
+        sfr = np.empty(num_snaps)
+        mass_bcg = np.empty(num_snaps)
+
+        for i, snap_number in enumerate(snaps_collection[::-1]):
+
+            catalog_path = set_snap_number(snap_number)[1]
+            catalog_path = set_vr_number(catalog_path, vr_number)
+            catalog_path = set_resolution(catalog_path, resolution)
+
+            try:
+                vr_data = vrload(catalog_path, disregard_units=True)
+
+                if snap_number == snaps_collection[-1]:
+                    print('m500', vr_data.spherical_overdensities.mass_500_rhocrit[0])
+
+                print(f"Snap number {snap_number} Redshift {vr_data.z:.3f} VR number {vr_number} Resolution {resolution}")
+
+                redshifts[i] = vr_data.z
+                mass_bcg[i] = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
+                sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units)
+
+                delete_last_line()
+            except:
+                redshifts[i] = np.nan
+                sfr[i] = np.nan
+
+        scale_factors = 1 / (redshifts + 1)
+        axes.plot(scale_factors, sfr / mass_bcg, color='g' if resolution is '-8res' else 'r', linewidth=0.5, alpha=1)
+
 
 redshift_ticks = np.array([0.0, 0.2, 0.5, 1.0, 2.0, 3.0, 5.0, 10.0, 20.0, 50.0, 100.0])
 redshift_labels = [
