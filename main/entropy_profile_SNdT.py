@@ -87,26 +87,26 @@ axes.errorbar(
 rexcess = Pratt2010(n_radial_bins=30)
 bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
     m500_limits=(
-        1e14 * Solar_Mass,
+        5e13 * Solar_Mass,
         5e14 * Solar_Mass
     ),
     k500_rescale=True
 )
 
-axes.errorbar(
-    rexcess.radial_bins,
-    S_S500_50,
-    yerr=(
-        bin_median - bin_perc16,
-        bin_perc84 - bin_median
-    ),
-    fmt='s',
-    color='black',
-    ecolor='lightgray',
-    elinewidth=0.5,
-    capsize=0,
-    label=rexcess.citation
-)
+# axes.errorbar(
+#     rexcess.radial_bins,
+#     S_S500_50,
+#     yerr=(
+#         bin_median - bin_perc16,
+#         bin_perc84 - bin_median
+#     ),
+#     fmt='s',
+#     color='black',
+#     ecolor='lightgray',
+#     elinewidth=0.5,
+#     capsize=0,
+#     label=rexcess.citation
+# )
 #
 # axes.fill_between(
 #     rexcess.radial_bins,
