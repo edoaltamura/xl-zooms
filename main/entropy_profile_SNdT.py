@@ -112,7 +112,7 @@ axes.text(
     0.025,
     0.025,
     (
-        f"{' '.join(name.split('_')[1:5])}\n"
+        f"{' '.join(name.split('_')[1:3])}\n"
         f"z = {calibration_zooms.redshift_from_index(snap_number):.2f}"
     ),
     color="k",
