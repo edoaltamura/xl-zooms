@@ -12,6 +12,7 @@ from literature import Sun2009, Pratt2010
 
 dir = '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro'
 name = '/L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'
+snap_number = 30
 
 
 set_mnras_stylesheet()
@@ -19,8 +20,8 @@ fig = plt.figure(constrained_layout=True)
 axes = fig.add_subplot()
 
 for sn_model in ['_SNdT7', '', '_SNdT8']:
-    snap = dir + name + sn_model + '/snapshots' + name + '_0030.hdf5'
-    cat = dir + name + sn_model + '/stf/' + name + '_0030/' + name + '_0030.properties'
+    snap = dir + name + sn_model + '/snapshots' + name + f'_{snap_number:04d}.hdf5'
+    cat = dir + name + sn_model + '/stf/' + name + f'_{snap_number:04d}/' + name + f'_{snap_number:04d}.properties'
 
     profile_obj = EntropyProfiles(
         max_radius_r500=2.5,
@@ -112,7 +113,7 @@ axes.text(
     0.025,
     (
         f"{' '.join(name.split('_')[1:5])}\n"
-        f"z = {calibration_zooms.redshift_from_index(30):.2f}"
+        f"z = {calibration_zooms.redshift_from_index(snap_number):.2f}"
     ),
     color="k",
     ha="left",
