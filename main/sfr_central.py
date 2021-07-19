@@ -38,7 +38,7 @@ axes.set_xlabel('Redshift')
 # axes.set_ylabel(r"Specific SFR = $\dot{M}_* / M_*$(100 kpc) [Gyr$^{-1}$]")
 # axes.set_ylabel(r"SFR = $\dot{M}_*$ [M$_\odot$ yr$^{-1}$]")
 # axes.set_ylabel(r"M$_*$(100 kpc) [M$_\odot$]")
-axes.set_ylabel(r"M$_{\rm BH}$(10 kpc) [M$_\odot$]")
+axes.set_ylabel(r"M$_{\rm BH}$(100 kpc) [M$_\odot$]")
 
 
 for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
@@ -69,7 +69,7 @@ for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
 
                 redshifts[i] = vr_data.z
                 mass_bcg[i] = vr_data.apertures.mass_star_100_kpc[0].to(unyt.msun)
-                mass_bh[i] = vr_data.apertures.mass_bh_10_kpc[0].to(unyt.msun)
+                mass_bh[i] = vr_data.apertures.mass_bh_100_kpc[0].to(unyt.msun)
                 sfr[i] = (vr_data.apertures.sfr_gas_100_kpc[0]).to(sfr_output_units)
 
                 delete_last_line()

@@ -34,9 +34,6 @@ for sn_model in ['_SNdT7', '', '_SNdT8']:
         path_to_snap=snap, path_to_catalogue=cat
     )
     entropy_profile /= K500
-    print(sn_model)
-    # print(repr(radial_bin_centres))
-    # print(repr(entropy_profile))
 
     if not sn_model:
         sn_model = '_SNdT7.5'
