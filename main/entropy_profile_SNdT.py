@@ -12,7 +12,7 @@ from literature import Sun2009, Pratt2010
 
 dir = '/cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro'
 name = '/L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth'
-snap_number = 36
+snap_number = 20
 
 
 set_mnras_stylesheet()
