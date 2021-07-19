@@ -880,9 +880,21 @@ h5dump -d Zcminpot -s 0 -c 1  stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGN
 
 
 
+declare -a arr=(
+"L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_noSN"
+"L0300N0564_VR2915_+1res_MinimumDistance_SNnobirth_noAGN"
+"L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_noMetalCooling"
+"L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat8_SNnobirth"
+"L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat64_SNnobirth"
+)
 
-
-
+for i in "${arr[@]}"
+do
+    cd $i
+    mkdir out_files
+    cp /cosma/home/dp004/dc-alta2/data6/xl-zooms/hydro/L0300N0564_VR2915_+1res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth/* .
+    cd ../
+done
 
 
 

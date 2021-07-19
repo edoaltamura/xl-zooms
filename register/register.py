@@ -112,7 +112,7 @@ class EXLZooms(object):
     cosma_repositories: List[str] = [
         "/cosma6/data/dp004/dc-alta2/xl-zooms/hydro",
         "/cosma7/data/dp004/dc-alta2/xl-zooms/hydro",
-        # "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
+        "/snap7/scratch/dp004/dc-alta2/xl-zooms/hydro",
     ]
 
     def __init__(self) -> None:
@@ -318,9 +318,13 @@ class EXLZooms(object):
 
             if snapshot_dir_found:
                 number_snapshots = len([file for file in os.listdir(snaps_path) if file.endswith('.hdf5')])
+            else:
+                number_snapshots = 0
 
             if stf_dir_found:
                 number_catalogues = len([subdir for subdir in os.listdir(catalogues_path)])
+            else:
+                number_catalogues = 0
 
             redshifts = self.get_snap_redshifts(directory=run_directory)
             number_snapshots_target = len(redshifts)
