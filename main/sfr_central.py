@@ -52,7 +52,6 @@ for vr_number in ['37', '139', '485', '680', '813', '1236', '2414', '2915']:
         mass_bcg = np.empty(num_snaps)
         mass_bh = np.empty(num_snaps)
 
-
         for i, snap_number in enumerate(snaps_collection[::-1]):
 
             catalog_path = set_snap_number(snap_number)[1]
