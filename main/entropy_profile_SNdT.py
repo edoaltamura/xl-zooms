@@ -6,7 +6,7 @@ from unyt import Solar_Mass
 sys.path.append("..")
 
 from scaling_relations import EntropyProfiles
-from register import find_files, set_mnras_stylesheet, xlargs
+from register import set_mnras_stylesheet, xlargs, calibration_zooms
 from literature import Sun2009, Pratt2010
 
 
@@ -33,9 +33,9 @@ for sn_model in ['_SNdT7', '', '_SNdT8']:
         path_to_snap=snap, path_to_catalogue=cat
     )
     entropy_profile /= K500
-
-    print(repr(radial_bin_centres))
-    print(repr(entropy_profile))
+    print(sn_model)
+    # print(repr(radial_bin_centres))
+    # print(repr(entropy_profile))
 
     if not sn_model:
         sn_model = '_SNdT7.5'
@@ -68,67 +68,57 @@ axes.errorbar(
         S_S500_90 - S_S500_50
     ),
     fmt='o',
-    color='black',
+    color='grey',
     ecolor='lightgray',
     elinewidth=0.5,
     capsize=0,
-    label=sun_observations.citation
+    markersize=2,
+    label=sun_observations.citation,
+    zorder=0
 )
-# axes.plot(r_r500, S_S500_50, c='grey', )
-#
-# axes.fill_between(
-#     r_r500,
-#     S_S500_10,
-#     S_S500_90,
-#     color='grey', alpha=0.4, linewidth=0
-# )
-
 
 rexcess = Pratt2010(n_radial_bins=30)
 bin_median, bin_perc16, bin_perc84 = rexcess.combine_entropy_profiles(
     m500_limits=(
-        5e13 * Solar_Mass,
+        1e14 * Solar_Mass,
         5e14 * Solar_Mass
     ),
     k500_rescale=True
 )
 
-# axes.errorbar(
-#     rexcess.radial_bins,
-#     S_S500_50,
-#     yerr=(
-#         bin_median - bin_perc16,
-#         bin_perc84 - bin_median
-#     ),
-#     fmt='s',
-#     color='black',
-#     ecolor='lightgray',
-#     elinewidth=0.5,
-#     capsize=0,
-#     label=rexcess.citation
-# )
-#
-# axes.fill_between(
-#     rexcess.radial_bins,
-#     bin_perc16,
-#     bin_perc84,
-#     color='lime',
-#     alpha=0.4,
-#     linewidth=0
-# )
-# axes.plot(rexcess.radial_bins, bin_median, c='lime', label=rexcess.citation)
+axes.errorbar(
+    rexcess.radial_bins,
+    bin_median,
+    yerr=(
+        bin_median - bin_perc16,
+        bin_perc84 - bin_median
+    ),
+    fmt='s',
+    color='grey',
+    ecolor='lightgray',
+    elinewidth=0.5,
+    capsize=0,
+    markersize=2,
+    label=rexcess.citation,
+    zorder=0
+)
 
 r = np.array([0.01, 1])
 k = 1.40 * r ** 1.1
-axes.plot(r, k, c='grey', ls='--', label='VKB (2005)')
+axes.plot(r, k, c='grey', ls='--', label='VKB (2005)', zorder=0)
 
-fig.suptitle(
+axes.text(
+    0.025,
+    0.025,
     (
-        f"{os.path.basename(xlargs.run_directory)}\n"
-        f"Central FoF group only\t\tEstimator: {xlargs.mass_estimator}"
+        f"{' '.join(name.split('_')[1:5])}\n"
+        f"z = {calibration_zooms.redshift_from_index(30):.2f}"
     ),
-    fontsize=4
-
+    color="k",
+    ha="left",
+    va="bottom",
+    alpha=0.8,
+    transform=axes.transAxes,
 )
 
 plt.legend()
