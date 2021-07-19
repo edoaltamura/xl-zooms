@@ -152,14 +152,13 @@ class EXLZooms(object):
             # Check that there are as many outputs as in the output_list
             output_list_file = os.path.join(run_directory, 'snap_redshifts.txt')
             output_list = pd.read_csv(output_list_file)
-            redshifts = len(output_list["# Redshift"].values)
 
             if " Select Output" in output_list.columns:
                 number_snapshots_in_outputlist = np.logical_or.reduce(
                         [output_list[" Select Output"] == f" Snapshot"]
                     ).sum()
             else:
-                number_snapshots_in_outputlist = len(redshifts)
+                number_snapshots_in_outputlist = len(output_list["# Redshift"].values)
 
             if (
                     (number_snapshots > 0) and
