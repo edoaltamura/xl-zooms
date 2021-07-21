@@ -24,5 +24,10 @@ from .slice_gas import SliceGas
 from .projection_dm import MapDM
 
 from .entropy_profiles import EntropyProfiles
+from .temperature_profiles import TemperatureProfiles
+from .pressure_profiles import PressureProfiles
+from .density_profiles import DensityProfiles
+from .iron_profiles import IronProfiles
+
 from .entropy_fgas_space import EntropyFgasSpace
 from .entropy_plateau import EntropyPlateau
