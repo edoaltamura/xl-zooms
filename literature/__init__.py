@@ -1,3 +1,4 @@
+from .Arnaud2010 import Arnaud2010
 from .Barnes2017 import Barnes2017
 from .Bohringer2007 import Bohringer2007
 from .Budzynski2014 import Budzynski2014

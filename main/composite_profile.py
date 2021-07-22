@@ -14,7 +14,7 @@ from scaling_relations import (
     GasFractionProfiles
 )
 from register import find_files, set_mnras_stylesheet, xlargs, mean_atomic_weight_per_free_electron
-from literature import Sun2009, Pratt2010, Croston2008, Cosmology
+from literature import Sun2009, Pratt2010, Croston2008, Cosmology, Arnaud2010
 
 snap, cat = find_files()
 
@@ -146,6 +146,29 @@ axes.plot(
 axes.set_ylabel(r'Pressure $P/P_{500}$ $(r/r_{500})^3$')
 axes.set_xlabel(r'$r/r_{500}$')
 
+arnaud = Arnaud2010()
+median = arnaud.dimensionless_pressure_profiles_median * arnaud.scaled_radius ** 3
+perc16 = arnaud.dimensionless_pressure_profiles_perc16 * arnaud.scaled_radius ** 3
+perc84 = arnaud.dimensionless_pressure_profiles_perc84 * arnaud.scaled_radius ** 3
+axes.errorbar(
+    arnaud.scaled_radius,
+    median,
+    yerr=(
+        median - perc16,
+        perc84 - median
+    ),
+    fmt='s',
+    color='grey',
+    ecolor='lightgray',
+    elinewidth=0.5,
+    capsize=0,
+    markersize=1,
+    label=arnaud.citation,
+    zorder=0
+)
+axes.legend()
+
+
 # ===================== Density
 axes = axes_all[1, 0]
 print('Density')
@@ -212,7 +235,7 @@ Mer17_Fe_high = np.array([1.045, 0.938, 0.903, 0.841, 0.721, 0.579, 0.468, 0.42]
 axes.plot(Mer17_rad_ave, Mer17_Fe_ave, linestyle='-', color=Palette_Blue, label='Mernier et al. (2017)')
 # axes.plot(Mer17_rad_ave, Mer17_Fe_low, linestyle=':', color=Palette_Blue)
 # axes.plot(Mer17_rad_ave, Mer17_Fe_high, linestyle=':', color=Palette_Blue)
-axes.fill_between(Mer17_rad_ave, Mer17_Fe_low, Mer17_Fe_high, alpha=0.2, color=Palette_Blue)
+axes.fill_between(Mer17_rad_ave, Mer17_Fe_low, Mer17_Fe_high, alpha=0.2, edgecolor='none', color=Palette_Blue)
 
 # Lovisari and Reiprich 2019
 Lov19_rad_ave = np.array([0.007, 0.022, 0.043, 0.072, 0.112, 0.168, 0.25, 0.425, 1.025])
@@ -223,7 +246,7 @@ Lov19_Fe_high = np.array([0.879, 0.84, 0.761, 0.667, 0.529, 0.406, 0.299, 0.298,
 axes.plot(Lov19_rad_ave, Lov19_Fe_ave, linestyle='-', color=Palette_Green, label='Lovisari et al. (2019)')
 # axes.plot(Lov19_rad_ave, Lov19_Fe_low, linestyle=':', color=Palette_Green)
 # axes.plot(Lov19_rad_ave, Lov19_Fe_high, linestyle=':', color=Palette_Green)
-axes.fill_between(Lov19_rad_ave, Lov19_Fe_low, Lov19_Fe_high, alpha=0.2, color=Palette_Green)
+axes.fill_between(Lov19_rad_ave, Lov19_Fe_low, Lov19_Fe_high, alpha=0.2, edgecolor='none', color=Palette_Green)
 
 # Ghizzardi et al. 2021
 Ghi21_rad_ave = np.array([0.012, 0.038, 0.062, 0.112, 0.188, 0.262, 0.338, 0.412, 0.488, 0.60, 0.775, 0.998])
@@ -234,7 +257,7 @@ Ghi21_Fe_high = np.array([1.142, 0.791, 0.646, 0.546, 0.47, 0.429, 0.411, 0.444,
 axes.plot(Ghi21_rad_ave, Ghi21_Fe_ave, linestyle='-', color=Palette_Amber, label='Ghizzardi et al. (2021)')
 # axes.plot(Ghi21_rad_ave, Ghi21_Fe_low, linestyle=':', color=Palette_Amber)
 # axes.plot(Ghi21_rad_ave, Ghi21_Fe_high, linestyle=':', color=Palette_Amber)
-axes.fill_between(Ghi21_rad_ave, Ghi21_Fe_low, Ghi21_Fe_high, alpha=0.2, color=Palette_Amber)
+axes.fill_between(Ghi21_rad_ave, Ghi21_Fe_low, Ghi21_Fe_high, alpha=0.2, edgecolor='none', color=Palette_Amber)
 
 axes.legend()
 
