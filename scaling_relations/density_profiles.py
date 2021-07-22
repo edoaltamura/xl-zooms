@@ -128,6 +128,7 @@ class DensityProfiles(HaloProperty):
 
         # Define radial bins and shell volumes
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
+        shell_volumes = (4 / 3 * np.pi) * r500 ** 3 * (lbins[1:] ** 3 - lbins[:-1] ** 3)
         radial_bin_centres = 10 ** (0.5 * np.log10(lbins[1:] * lbins[:-1])) * radial_distance.units
 
         if self.weighting == 'xray':
@@ -158,14 +159,14 @@ class DensityProfiles(HaloProperty):
             weighting = volume_proxy
             del volume_proxy
 
-        density = sw_data.gas.densities[index]
-        density.convert_to_units(0.759 * mh / (cm ** 3))
+        mass = sw_data.gas.masses[index]
 
-        density_profile = histogram_unyt(
+        mass_profile = histogram_unyt(
             radial_distance,
             bins=lbins,
-            weights=density,
+            weights=mass,
         )
+        density_profile = mass_profile / shell_volumes
         density_profile.convert_to_units(critical_density.units)
 
         return radial_bin_centres, density_profile, critical_density
