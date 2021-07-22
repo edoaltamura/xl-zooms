@@ -140,7 +140,7 @@ axes.set_xlabel(r'$r/r_{500}$')
 axes = axes_all[1, 0]
 print('Density')
 
-profile_obj = DensityProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False, shell_average=False)
+profile_obj = DensityProfiles(max_radius_r500=2.5)
 radial_bin_centres, density_profile, rho_crit = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -160,7 +160,7 @@ axes.set_xlabel(r'$r/r_{500}$')
 axes = axes_all[1, 1]
 print('Iron')
 
-profile_obj = IronProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False, shell_average=False)
+profile_obj = IronProfiles(max_radius_r500=2.5)
 radial_bin_centres, iron_profile, Zsun = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
