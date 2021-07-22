@@ -14,7 +14,7 @@ from scaling_relations import (
     GasFractionProfiles
 )
 from register import find_files, set_mnras_stylesheet, xlargs
-from literature import Sun2009, Pratt2010
+from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 snap, cat = find_files()
 
@@ -22,8 +22,10 @@ label = ' '.join(os.path.basename(snap).split('_')[1:3])
 
 set_mnras_stylesheet()
 
+cosmology = Cosmology()
+
 fig = plt.figure(figsize=(6, 6), constrained_layout=True)
-gs = fig.add_gridspec(2, 3, hspace=0.2, wspace=0.)
+gs = fig.add_gridspec(2, 3, hspace=0., wspace=0.)
 axes_all = gs.subplots(sharex=True, sharey=False)
 
 for ax in axes_all.flat:
@@ -48,7 +50,7 @@ axes.plot(
 )
 
 axes.set_ylabel(r'$K/K_{500}$')
-axes.set_xlabel(r'$r/r_{500}$')
+# axes.set_xlabel(r'$r/r_{500}$')
 axes.set_ylim([5e-3, 20])
 axes.set_xlim([5e-3, 2.5])
 
@@ -121,7 +123,7 @@ axes.plot(
     label=f'{label} z = {redshift:.2f}'
 )
 axes.set_ylabel(r'MW-Temperature $T/T_{500}$')
-axes.set_xlabel(r'$r/r_{500}$')
+# axes.set_xlabel(r'$r/r_{500}$')
 axes.legend()
 
 # ===================== Pressure
@@ -163,6 +165,18 @@ axes.plot(
 axes.set_ylabel(r'Density $\rho/\rho_{\rm crit}$ $(r/r_{500})^2$')
 axes.set_xlabel(r'$r/r_{500}$')
 
+croston = Croston2008()
+croston.compute_gas_mass()
+croston.estimate_total_mass()
+croston.compute_gas_fraction()
+for i, cluster in enumerate(croston.cluster_data):
+    kwargs = dict(c='grey', alpha=0.7, lw=0.3)
+    if i == 0:
+        kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
+    axes.plot(cluster['r_r500'], cluster['rho_g'], zorder=0, **kwargs)
+
+axes.legend()
+
 # ===================== Iron
 axes = axes_all[1, 1]
 print('Iron')
@@ -178,30 +192,50 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.set_ylabel(r'$Metallicity Z_{\rm Fe}/Z_{\odot}$')
+axes.set_ylabel(r'Metallicity $Z_{\rm Fe}/Z_{\odot}$')
 axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
 
-# Ghizzardi et al. 2021 (X-COP)
-ghizzardi_r_r500 = np.array([0.0125, 0.0375, 0.0625, 0.1125, 0.1875, 0.2625, 0.3375, 0.4125, 0.4875, 0.6, 0.775, 0.9975])
-ghizzardi_Fe_mean = np.array([0.578, 0.432, 0.371, 0.317, 0.276, 0.243, 0.236, 0.245, 0.252, 0.250, 0.240, 0.200])
-ghizzardi_Fe_sigma = np.array([0.193, 0.103, 0.066, 0.052, 0.042, 0.046, 0.042, 0.054, 0.064, 0.053, 0.047, 0.076])
+# Observational data taken from compilation by Gastaldello et al. 2021 (Fig.4)
+Palette_Blue = '#2CBDFE'
+Palette_Green = '#47DBCD'
+Palette_Pink = '#F3A0F2'
+Palette_Purple = '#9D2EC5'
+Palette_Violet = '#661D98'
+Palette_Amber = '#F5B14C'
 
-axes.errorbar(
-    ghizzardi_r_r500,
-    ghizzardi_Fe_mean,
-    yerr=(
-        ghizzardi_Fe_sigma,
-        ghizzardi_Fe_sigma
-    ),
-    fmt='o',
-    color='grey',
-    ecolor='lightgray',
-    elinewidth=0.5,
-    capsize=0,
-    markersize=1,
-    label='Ghizzardi et al. (2021)',
-    zorder=0
-)
+# Mernier et al. 2017 data
+Mer17_rad_ave = np.array([0.004, 0.016, 0.033, 0.053, 0.082, 0.125, 0.205, 0.615])
+Mer17_Fe_ave = np.array([0.839, 0.804, 0.708, 0.661, 0.541, 0.445, 0.341, 0.276])
+Mer17_Fe_low = np.array([0.633, 0.67, 0.512, 0.48, 0.361, 0.311, 0.214, 0.133])
+Mer17_Fe_high = np.array([1.045, 0.938, 0.903, 0.841, 0.721, 0.579, 0.468, 0.42])
+
+axes.plot(Mer17_rad_ave, Mer17_Fe_ave, linestyle='-', color=Palette_Blue, label='Mernier et al. (2017)')
+axes.plot(Mer17_rad_ave, Mer17_Fe_low, linestyle=':', color=Palette_Blue)
+axes.plot(Mer17_rad_ave, Mer17_Fe_high, linestyle=':', color=Palette_Blue)
+axes.fill_between(Mer17_rad_ave, Mer17_Fe_low, Mer17_Fe_high, alpha=0.2, color=Palette_Blue)
+
+# Lovisari and Reiprich 2019
+Lov19_rad_ave = np.array([0.007, 0.022, 0.043, 0.072, 0.112, 0.168, 0.25, 0.425, 1.025])
+Lov19_Fe_ave = np.array([0.624, 0.578, 0.534, 0.472, 0.392, 0.309, 0.211, 0.226, 0.256])
+Lov19_Fe_low = np.array([0.37, 0.316, 0.307, 0.278, 0.256, 0.212, 0.124, 0.154, 0.191])
+Lov19_Fe_high = np.array([0.879, 0.84, 0.761, 0.667, 0.529, 0.406, 0.299, 0.298, 0.32])
+
+axes.plot(Lov19_rad_ave, Lov19_Fe_ave, linestyle='-', color=Palette_Green, label='Lovisari et al. (2019)')
+axes.plot(Lov19_rad_ave, Lov19_Fe_low, linestyle=':', color=Palette_Green)
+axes.plot(Lov19_rad_ave, Lov19_Fe_high, linestyle=':', color=Palette_Green)
+axes.fill_between(Lov19_rad_ave, Lov19_Fe_low, Lov19_Fe_high, alpha=0.2, color=Palette_Green)
+
+# Ghizzardi et al. 2021
+Ghi21_rad_ave = np.array([0.012, 0.038, 0.062, 0.112, 0.188, 0.262, 0.338, 0.412, 0.488, 0.60, 0.775, 0.998])
+Ghi21_Fe_ave = np.array([0.855, 0.639, 0.549, 0.469, 0.408, 0.359, 0.349, 0.362, 0.373, 0.37, 0.355, 0.296])
+Ghi21_Fe_low = np.array([0.569, 0.487, 0.453, 0.392, 0.346, 0.291, 0.287, 0.283, 0.278, 0.293, 0.284, 0.183])
+Ghi21_Fe_high = np.array([1.142, 0.791, 0.646, 0.546, 0.47, 0.429, 0.411, 0.444, 0.467, 0.448, 0.425, 0.41])
+
+axes.plot(Ghi21_rad_ave, Ghi21_Fe_ave, linestyle='-', color=Palette_Amber, label='Ghizzardi et al. (2021)')
+axes.plot(Ghi21_rad_ave, Ghi21_Fe_low, linestyle=':', color=Palette_Amber)
+axes.plot(Ghi21_rad_ave, Ghi21_Fe_high, linestyle=':', color=Palette_Amber)
+axes.fill_between(Ghi21_rad_ave, Ghi21_Fe_low, Ghi21_Fe_high, alpha=0.2, color=Palette_Amber)
+
 axes.legend()
 
 # ===================== Gas Fraction
@@ -219,8 +253,21 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
+axes.axhline(cosmology.fb0, color='k', linestyle='--', lw=0.5, zorder=0, label='$f_b$ Universal baryon fraction')
 axes.set_ylabel(r'Hot gas fraction $M_{\rm gas}(<r)/M_{500}$')
 axes.set_xlabel(r'$r/r_{500}$')
+
+croston = Croston2008()
+croston.compute_gas_mass()
+croston.estimate_total_mass()
+croston.compute_gas_fraction()
+for i, cluster in enumerate(croston.cluster_data):
+    kwargs = dict(c='grey', alpha=0.7, lw=0.3)
+    if i == 0:
+        kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
+    axes[2, 0].plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
+
+axes.legend()
 
 if not xlargs.quiet:
     plt.show()

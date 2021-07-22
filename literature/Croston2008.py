@@ -96,6 +96,7 @@ class Croston2008(Article):
             gas_mass_bin_edges = np.cumsum(gas_mass_bin_edges) * gas_mass_bin_centres.units
             gas_mass_bin_edges.astype(np.float64).convert_to_units('Msun')
             cluster['Mgas'] = gas_mass_bin_edges.to('Msun')
+            cluster['rho_g'] = gas_density_bin_centres.to('Msun/Mpc**3')
 
     @staticmethod
     def nfw_factor(scale_radius, r):
