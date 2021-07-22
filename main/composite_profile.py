@@ -179,7 +179,7 @@ axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'$Z_{\rm Fe}/Z_{\odot}$')
 axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
 
-del axes_all[1, 2]
+axes_all[1, 2].remove()
 
 if not xlargs.quiet:
     plt.show()
