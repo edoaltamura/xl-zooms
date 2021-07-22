@@ -165,7 +165,6 @@ class DensityProfiles(HaloProperty):
             radial_distance,
             bins=lbins,
             weights=density,
-            normalizer=weighting
         )
         density_profile.convert_to_units(critical_density.units)
 
