@@ -1,7 +1,7 @@
 import sys, os
 import numpy as np
 from matplotlib import pyplot as plt
-from unyt import Solar_Mass
+from unyt import Solar_Mass, mp
 
 sys.path.append("..")
 
@@ -13,7 +13,7 @@ from scaling_relations import (
     IronProfiles,
     GasFractionProfiles
 )
-from register import find_files, set_mnras_stylesheet, xlargs
+from register import find_files, set_mnras_stylesheet, xlargs, mean_atomic_weight_per_free_electron
 from literature import Sun2009, Pratt2010, Croston2008, Cosmology
 
 snap, cat = find_files()
@@ -173,7 +173,7 @@ for i, cluster in enumerate(croston.cluster_data):
     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
     if i == 0:
         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes.plot(cluster['r_r500'], cluster['rho_g'], zorder=0, **kwargs)
+    axes.plot(cluster['r_r500'], cluster['n_e'] * mp / mean_atomic_weight_per_free_electron, zorder=0, **kwargs)
 
 axes.legend()
 
