@@ -28,6 +28,7 @@ from .temperature_profiles import TemperatureProfiles
 from .pressure_profiles import PressureProfiles
 from .density_profiles import DensityProfiles
 from .iron_profiles import IronProfiles
+from .gas_fraction_profiles import GasFractionProfiles
 
 from .entropy_fgas_space import EntropyFgasSpace
 from .entropy_plateau import EntropyPlateau

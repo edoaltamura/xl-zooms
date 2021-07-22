@@ -10,7 +10,8 @@ from scaling_relations import (
     TemperatureProfiles,
     PressureProfiles,
     DensityProfiles,
-    IronProfiles
+    IronProfiles,
+    GasFractionProfiles
 )
 from register import find_files, set_mnras_stylesheet, xlargs
 from literature import Sun2009, Pratt2010
@@ -27,6 +28,7 @@ axes_all = gs.subplots(sharex=True, sharey=False)
 
 for ax in axes_all.flat:
     ax.loglog()
+    ax.axvline(1, color='k', linestyle='--', lw=0.5, zorder=0)
 
 # ===================== Entropy
 axes = axes_all[0, 0]
@@ -44,7 +46,7 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
+
 axes.set_ylabel(r'$K/K_{500}$')
 axes.set_xlabel(r'$r/r_{500}$')
 axes.set_ylim([5e-3, 20])
@@ -118,8 +120,7 @@ axes.plot(
     linewidth=1,
     label=f'{label} z = {redshift:.2f}'
 )
-axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
-axes.set_ylabel(r'$T/T_{500}$')
+axes.set_ylabel(r'MW-Temperature $T/T_{500}$')
 axes.set_xlabel(r'$r/r_{500}$')
 axes.legend()
 
@@ -140,8 +141,7 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
-axes.set_ylabel(r'$P/P_{500}$ $(r/r_{500})^3$')
+axes.set_ylabel(r'Pressure $P/P_{500}$ $(r/r_{500})^3$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 # ===================== Density
@@ -160,8 +160,7 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
-axes.set_ylabel(r'$\rho/\rho_{\rm crit}$ $(r/r_{500})^2$')
+axes.set_ylabel(r'Density $\rho/\rho_{\rm crit}$ $(r/r_{500})^2$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 # ===================== Iron
@@ -179,8 +178,7 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
-axes.set_ylabel(r'$Z_{\rm Fe}/Z_{\odot}$')
+axes.set_ylabel(r'$Metallicity Z_{\rm Fe}/Z_{\odot}$')
 axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
 
 # Ghizzardi et al. 2021 (X-COP)
@@ -206,7 +204,23 @@ axes.errorbar(
 )
 axes.legend()
 
-axes_all[1, 2].remove()
+# ===================== Gas Fraction
+axes = axes_all[1, 2]
+print('Gas Fraction')
+
+profile_obj = GasFractionProfiles(max_radius_r500=2.5)
+radial_bin_centres, gas_fraaction_profile, m500 = profile_obj.process_single_halo(
+    path_to_snap=snap, path_to_catalogue=cat
+)
+gas_fraaction_profile /= m500
+axes.plot(
+    radial_bin_centres,
+    gas_fraaction_profile,
+    linestyle='-',
+    linewidth=1,
+)
+axes.set_ylabel(r'Hot gas fraction $M_{\rm gas}(<r)/M_{500}$')
+axes.set_xlabel(r'$r/r_{500}$')
 
 if not xlargs.quiet:
     plt.show()
