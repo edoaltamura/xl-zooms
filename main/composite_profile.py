@@ -173,7 +173,7 @@ axes.plot(
 )
 axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'$Z_{\rm Fe}/Z_{\odot}$')
-axes.set_xlabel(r'$r/r_{500}$')
+axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
 
 if not xlargs.quiet:
     plt.show()
