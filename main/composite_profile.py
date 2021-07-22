@@ -32,6 +32,7 @@ for ax in axes_all.flat:
 axes = axes_all[0, 0]
 print('Entropy')
 profile_obj = EntropyProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False, shell_average=False)
+redshift = profile_obj.z
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -113,7 +114,7 @@ axes.plot(
     temperature_profile,
     linestyle='-',
     linewidth=1,
-    label=label
+    label=f'{label} z = {redshift:.2f}'
 )
 axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'$T/T_{500}$')

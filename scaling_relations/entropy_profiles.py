@@ -73,6 +73,7 @@ class EntropyProfiles(HaloProperty):
         critical_density = unyt_quantity(
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
+        self.z = sw_data.metadata.z
 
         sw_data.gas.radial_distances.convert_to_physical()
         sw_data.gas.masses.convert_to_physical()
