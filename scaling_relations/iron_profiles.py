@@ -130,7 +130,7 @@ class IronProfiles(HaloProperty):
         xcminpot = vr_data.positions.xcminpot[0].to('Mpc')
         ycminpot = vr_data.positions.ycminpot[0].to('Mpc')
         position = sw_data.gas.coordinates
-        radial_distance = np.sqrt((position[index, 0] - xcminpot) ** 2 + (position[:index, 1] - ycminpot) ** 2) / r500
+        radial_distance = np.sqrt((position[index, 0] - xcminpot) ** 2 + (position[index, 1] - ycminpot) ** 2) / r500
 
         # Define radial bins and shell volumes
         lbins = np.logspace(-2, np.log10(self.max_radius_r500), 51) * radial_distance.units
