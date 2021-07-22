@@ -33,10 +33,10 @@ axes = axes_all[0, 0]
 print('Entropy')
 profile_obj = EntropyProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
                               shell_average=False)
-redshift = profile_obj.z
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
+redshift = profile_obj.z
 entropy_profile /= K500
 axes.plot(
     radial_bin_centres,
