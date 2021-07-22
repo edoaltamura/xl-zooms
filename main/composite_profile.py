@@ -17,6 +17,8 @@ from literature import Sun2009, Pratt2010
 
 snap, cat = find_files()
 
+label = ' '.join(os.path.basename(snap).split('_')[1:3])
+
 set_mnras_stylesheet()
 
 fig = plt.figure(figsize=(6, 6), constrained_layout=True)
@@ -61,7 +63,7 @@ axes.errorbar(
     ecolor='lightgray',
     elinewidth=0.5,
     capsize=0,
-    markersize=2,
+    markersize=1,
     label=sun_observations.citation,
     zorder=0
 )
@@ -87,7 +89,7 @@ axes.errorbar(
     ecolor='lightgray',
     elinewidth=0.5,
     capsize=0,
-    markersize=2,
+    markersize=1,
     label=rexcess.citation,
     zorder=0
 )
@@ -111,10 +113,12 @@ axes.plot(
     temperature_profile,
     linestyle='-',
     linewidth=1,
+    label=label
 )
 axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'$T/T_{500}$')
 axes.set_xlabel(r'$r/r_{500}$')
+axes.legend()
 
 # ===================== Pressure
 axes = axes_all[0, 2]
@@ -174,6 +178,8 @@ axes.plot(
 axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'$Z_{\rm Fe}/Z_{\odot}$')
 axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
+
+del axes_all[1, 2]
 
 if not xlargs.quiet:
     plt.show()
