@@ -31,7 +31,8 @@ for ax in axes_all.flat:
 # ===================== Entropy
 axes = axes_all[0, 0]
 print('Entropy')
-profile_obj = EntropyProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False, shell_average=False)
+profile_obj = EntropyProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
+                              shell_average=False)
 redshift = profile_obj.z
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
@@ -104,7 +105,8 @@ axes.legend()
 axes = axes_all[0, 1]
 print('Temperature')
 
-profile_obj = TemperatureProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False, shell_average=False)
+profile_obj = TemperatureProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
+                                  shell_average=False)
 radial_bin_centres, temperature_profile, kBT500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -125,7 +127,8 @@ axes.legend()
 axes = axes_all[0, 2]
 print('Pressure')
 
-profile_obj = PressureProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False, shell_average=False)
+profile_obj = PressureProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
+                               shell_average=False)
 radial_bin_centres, pressure_profile, P500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
@@ -179,6 +182,29 @@ axes.plot(
 axes.axvline(0.15, color='k', linestyle='--', lw=0.5, zorder=0)
 axes.set_ylabel(r'$Z_{\rm Fe}/Z_{\odot}$')
 axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
+
+# Ghizzardi et al. 2021 (X-COP)
+ghizzardi_r_r500 = np.array([0.0125, 0.0375, 0.0625, 0.1125, 0.1875, 0.2625, 0.3375, 0.4125, 0.4875, 0.6, 0.775, 0.9975])
+ghizzardi_Fe_mean = np.array([0.578, 0.432, 0.371, 0.317, 0.276, 0.243, 0.236, 0.245, 0.252, 0.250, 0.240, 0.200])
+ghizzardi_Fe_sigma = np.array([0.193, 0.103, 0.066, 0.052, 0.042, 0.046, 0.042, 0.054, 0.064, 0.053, 0.047, 0.076])
+
+axes.errorbar(
+    ghizzardi_r_r500,
+    ghizzardi_Fe_mean,
+    yerr=(
+        ghizzardi_Fe_sigma,
+        ghizzardi_Fe_sigma
+    ),
+    fmt='o',
+    color='grey',
+    ecolor='lightgray',
+    elinewidth=0.5,
+    capsize=0,
+    markersize=1,
+    label='Ghizzardi et al. (2021)',
+    zorder=0
+)
+axes.legend()
 
 axes_all[1, 2].remove()
 
