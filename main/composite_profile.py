@@ -30,7 +30,7 @@ axes_all = gs.subplots(sharex=True, sharey=False)
 
 for ax in axes_all.flat:
     ax.loglog()
-    ax.axvline(1, color='k', linestyle='--', lw=0.5, zorder=0)
+    ax.axvline(1, color='k', linestyle='--', lw=0.5, zorder=0, alpha=0.3)
 
 # ===================== Entropy
 axes = axes_all[0, 0]
