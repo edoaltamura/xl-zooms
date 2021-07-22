@@ -25,7 +25,7 @@ set_mnras_stylesheet()
 cosmology = Cosmology()
 
 fig = plt.figure(figsize=(6, 6), constrained_layout=True)
-gs = fig.add_gridspec(2, 3, hspace=0., wspace=0.)
+gs = fig.add_gridspec(2, 3, hspace=0., wspace=0.2)
 axes_all = gs.subplots(sharex=True, sharey=False)
 
 for ax in axes_all.flat:
@@ -173,7 +173,7 @@ for i, cluster in enumerate(croston.cluster_data):
     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
     if i == 0:
         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes.plot(cluster['r_r500'], cluster['n_e'] * mp / mean_atomic_weight_per_free_electron, zorder=0, **kwargs)
+    axes.plot(cluster['r_r500'], cluster['n_e'] * mp / mean_atomic_weight_per_free_electron / rho_crit, zorder=0, **kwargs)
 
 axes.legend()
 
@@ -210,8 +210,8 @@ Mer17_Fe_low = np.array([0.633, 0.67, 0.512, 0.48, 0.361, 0.311, 0.214, 0.133])
 Mer17_Fe_high = np.array([1.045, 0.938, 0.903, 0.841, 0.721, 0.579, 0.468, 0.42])
 
 axes.plot(Mer17_rad_ave, Mer17_Fe_ave, linestyle='-', color=Palette_Blue, label='Mernier et al. (2017)')
-axes.plot(Mer17_rad_ave, Mer17_Fe_low, linestyle=':', color=Palette_Blue)
-axes.plot(Mer17_rad_ave, Mer17_Fe_high, linestyle=':', color=Palette_Blue)
+# axes.plot(Mer17_rad_ave, Mer17_Fe_low, linestyle=':', color=Palette_Blue)
+# axes.plot(Mer17_rad_ave, Mer17_Fe_high, linestyle=':', color=Palette_Blue)
 axes.fill_between(Mer17_rad_ave, Mer17_Fe_low, Mer17_Fe_high, alpha=0.2, color=Palette_Blue)
 
 # Lovisari and Reiprich 2019
@@ -221,8 +221,8 @@ Lov19_Fe_low = np.array([0.37, 0.316, 0.307, 0.278, 0.256, 0.212, 0.124, 0.154, 
 Lov19_Fe_high = np.array([0.879, 0.84, 0.761, 0.667, 0.529, 0.406, 0.299, 0.298, 0.32])
 
 axes.plot(Lov19_rad_ave, Lov19_Fe_ave, linestyle='-', color=Palette_Green, label='Lovisari et al. (2019)')
-axes.plot(Lov19_rad_ave, Lov19_Fe_low, linestyle=':', color=Palette_Green)
-axes.plot(Lov19_rad_ave, Lov19_Fe_high, linestyle=':', color=Palette_Green)
+# axes.plot(Lov19_rad_ave, Lov19_Fe_low, linestyle=':', color=Palette_Green)
+# axes.plot(Lov19_rad_ave, Lov19_Fe_high, linestyle=':', color=Palette_Green)
 axes.fill_between(Lov19_rad_ave, Lov19_Fe_low, Lov19_Fe_high, alpha=0.2, color=Palette_Green)
 
 # Ghizzardi et al. 2021
@@ -232,8 +232,8 @@ Ghi21_Fe_low = np.array([0.569, 0.487, 0.453, 0.392, 0.346, 0.291, 0.287, 0.283,
 Ghi21_Fe_high = np.array([1.142, 0.791, 0.646, 0.546, 0.47, 0.429, 0.411, 0.444, 0.467, 0.448, 0.425, 0.41])
 
 axes.plot(Ghi21_rad_ave, Ghi21_Fe_ave, linestyle='-', color=Palette_Amber, label='Ghizzardi et al. (2021)')
-axes.plot(Ghi21_rad_ave, Ghi21_Fe_low, linestyle=':', color=Palette_Amber)
-axes.plot(Ghi21_rad_ave, Ghi21_Fe_high, linestyle=':', color=Palette_Amber)
+# axes.plot(Ghi21_rad_ave, Ghi21_Fe_low, linestyle=':', color=Palette_Amber)
+# axes.plot(Ghi21_rad_ave, Ghi21_Fe_high, linestyle=':', color=Palette_Amber)
 axes.fill_between(Ghi21_rad_ave, Ghi21_Fe_low, Ghi21_Fe_high, alpha=0.2, color=Palette_Amber)
 
 axes.legend()
