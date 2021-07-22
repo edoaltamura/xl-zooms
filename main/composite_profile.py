@@ -265,7 +265,7 @@ for i, cluster in enumerate(croston.cluster_data):
     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
     if i == 0:
         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes[2, 0].plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
+    axes.plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
 
 axes.legend()
 
