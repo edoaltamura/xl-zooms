@@ -307,6 +307,7 @@ croston.interpolate_r_r500(radial_bin_centres.value)
 
 scaled_radius = croston.cluster_data[0]['r_r500']
 profiles = np.zeros((len(croston.cluster_data), len(scaled_radius)), dtype=np.float)
+print(profiles.shape)
 for i, cluster in enumerate(croston.cluster_data):
     profiles[i] = cluster['f_g']
 
