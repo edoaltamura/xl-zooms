@@ -131,7 +131,7 @@ class Croston2008(Article):
 
         for cluster in self.cluster_data:
 
-            for field in ['r_kpc', 'n_e', 'n_e_sigma']:
+            for field in ['r_kpc', 'n_e', 'n_e_sigma', 'f_g', 'Mgas', 'Mdm_nfw']:
                 radius_interpolate = interp1d(
                     cluster['r_r500'],
                     cluster[field],
