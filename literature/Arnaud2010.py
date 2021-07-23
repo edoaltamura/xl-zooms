@@ -37,6 +37,7 @@ class Arnaud2010(Article):
             self.dimensionless_pressure_profiles = self.gnfw(
                 r_r500, P0[i], c500[i], alpha=alpha[i], beta=5.49, gamma=gamma[i]
             )
+        print(self.dimensionless_pressure_profiles)
 
         self.dimensionless_pressure_profiles_median = np.median(self.dimensionless_pressure_profiles, axis=1)
         self.dimensionless_pressure_profiles_perc84 = np.percentile(self.dimensionless_pressure_profiles, 84, axis=1)
