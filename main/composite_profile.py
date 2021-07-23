@@ -192,12 +192,30 @@ croston = Croston2008()
 croston.compute_gas_mass()
 croston.estimate_total_mass()
 croston.compute_gas_fraction()
+scaled_radius = croston.cluster_data[0]['r_r500']
+profiles = np.zeros((len(croston.cluster_data), len(scaled_radius)), dtype=np.float)
 for i, cluster in enumerate(croston.cluster_data):
-    kwargs = dict(c='grey', alpha=0.7, lw=0.3)
-    if i == 0:
-        kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes.plot(cluster['r_r500'], cluster['n_e'] * mp / mean_atomic_weight_per_free_electron / rho_crit * cluster['r_r500'] ** 2, zorder=0, **kwargs)
+    profiles[i] = cluster['n_e'] * mp / mean_atomic_weight_per_free_electron / rho_crit
 
+dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * scaled_radius ** 2
+dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * scaled_radius ** 2
+dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * scaled_radius ** 2
+axes.errorbar(
+    scaled_radius,
+    dimensionless_density_profiles_median,
+    yerr=(
+        dimensionless_density_profiles_median - dimensionless_density_profiles_perc16,
+        dimensionless_density_profiles_perc84 - dimensionless_density_profiles_median
+    ),
+    fmt='s',
+    color='grey',
+    ecolor='lightgray',
+    elinewidth=0.5,
+    capsize=0,
+    markersize=1,
+    label=croston.citation,
+    zorder=0
+)
 axes.legend()
 
 # ===================== Iron
@@ -284,12 +302,37 @@ croston = Croston2008()
 croston.compute_gas_mass()
 croston.estimate_total_mass()
 croston.compute_gas_fraction()
-for i, cluster in enumerate(croston.cluster_data):
-    kwargs = dict(c='grey', alpha=0.7, lw=0.3)
-    if i == 0:
-        kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
-    axes.plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
 
+# for i, cluster in enumerate(croston.cluster_data):
+#     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
+#     if i == 0:
+#         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
+#     axes.plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
+
+scaled_radius = croston.cluster_data[0]['r_r500']
+profiles = np.zeros((len(croston.cluster_data), len(scaled_radius)), dtype=np.float)
+for i, cluster in enumerate(croston.cluster_data):
+    profiles[i] = cluster['f_g']
+
+dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * scaled_radius ** 2
+dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * scaled_radius ** 2
+dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * scaled_radius ** 2
+axes.errorbar(
+    scaled_radius,
+    dimensionless_density_profiles_median,
+    yerr=(
+        dimensionless_density_profiles_median - dimensionless_density_profiles_perc16,
+        dimensionless_density_profiles_perc84 - dimensionless_density_profiles_median
+    ),
+    fmt='s',
+    color='grey',
+    ecolor='lightgray',
+    elinewidth=0.5,
+    capsize=0,
+    markersize=1,
+    label=croston.citation,
+    zorder=0
+)
 axes.legend()
 
 if not xlargs.quiet:

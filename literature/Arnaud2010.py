@@ -29,7 +29,7 @@ class Arnaud2010(Article):
         P500, P0, c500, alpha, gamma = np.loadtxt(f'{repository_dir}/Arnaud2010.dat').T
         P500 *= 1e-3
         number_objects = len(P0)
-        number_radial_bins = 30
+        number_radial_bins = 20
 
         # Build profiles from fit parameters
         r_r500 = np.logspace(np.log10(0.03), 0, number_radial_bins)
