@@ -29,19 +29,22 @@ class Arnaud2010(Article):
         P500, P0, c500, alpha, gamma = np.loadtxt(f'{repository_dir}/Arnaud2010.dat').T
         P500 *= 1e-3
         number_objects = len(P0)
+        number_radial_bins = 30
 
         # Build profiles from fit parameters
-        r_r500 = np.logspace(np.log10(0.03), 0, 30)
-        self.dimensionless_pressure_profiles = np.zeros((number_objects, len(r_r500)), dtype=np.float64)
+        r_r500 = np.logspace(np.log10(0.03), 0, number_radial_bins)
+        self.dimensionless_pressure_profiles = np.zeros((number_objects, number_radial_bins), dtype=np.float)
         for i in range(number_objects):
-            self.dimensionless_pressure_profiles = self.gnfw(
+            self.dimensionless_pressure_profiles[i] = self.gnfw(
                 r_r500, P0[i], c500[i], alpha=alpha[i], beta=5.49, gamma=gamma[i]
             )
-        print(self.dimensionless_pressure_profiles)
 
-        self.dimensionless_pressure_profiles_median = np.median(self.dimensionless_pressure_profiles, axis=1)
-        self.dimensionless_pressure_profiles_perc84 = np.percentile(self.dimensionless_pressure_profiles, 84, axis=1)
-        self.dimensionless_pressure_profiles_perc16 = np.percentile(self.dimensionless_pressure_profiles, 16, axis=1)
+        print(self.dimensionless_pressure_profiles.shape)
+        print(r_r500.shape)
+
+        self.dimensionless_pressure_profiles_median = np.percentile(self.dimensionless_pressure_profiles, 50, axis=0)
+        self.dimensionless_pressure_profiles_perc84 = np.percentile(self.dimensionless_pressure_profiles, 84, axis=0)
+        self.dimensionless_pressure_profiles_perc16 = np.percentile(self.dimensionless_pressure_profiles, 16, axis=0)
 
         # Assign units
         self.P500 = unyt.unyt_array(P500, 'keV/cm**3')
@@ -51,7 +54,7 @@ class Arnaud2010(Article):
         self.dimensionless_pressure_profiles_perc16 = unyt.unyt_array(self.dimensionless_pressure_profiles_perc16)
 
     @staticmethod
-    def gnfw(x, p0: float, c500: float, alpha: float, beta: float, gamma: float):
+    def gnfw(x: np.ndarray, p0: float, c500: float, alpha: float, beta: float, gamma: float) -> np.ndarray:
         """
         In this paper, beta is fixed at = 5.49
         :param x: np.array
