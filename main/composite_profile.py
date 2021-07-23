@@ -190,16 +190,15 @@ axes.set_xlabel(r'$r/r_{500}$')
 
 croston = Croston2008()
 croston.interpolate_r_r500(radial_bin_centres.value)
-scaled_radius = croston.cluster_data[0]['r_r500']
-profiles = np.zeros((len(croston.cluster_data), len(scaled_radius)), dtype=np.float)
+profiles = np.zeros((len(croston.cluster_data), len(radial_bin_centres)), dtype=np.float)
 for i, cluster in enumerate(croston.cluster_data):
     profiles[i] = cluster['n_e'] * mp / mean_atomic_weight_per_free_electron / rho_crit
 
-dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * scaled_radius ** 2
-dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * scaled_radius ** 2
-dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * scaled_radius ** 2
+dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * radial_bin_centres ** 2
+dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * radial_bin_centres ** 2
+dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * radial_bin_centres ** 2
 axes.errorbar(
-    scaled_radius,
+    radial_bin_centres,
     dimensionless_density_profiles_median,
     yerr=(
         dimensionless_density_profiles_median - dimensionless_density_profiles_perc16,
@@ -305,17 +304,15 @@ croston.interpolate_r_r500(radial_bin_centres.value)
 #         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
 #     axes.plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
 
-scaled_radius = croston.cluster_data[0]['r_r500']
-profiles = np.zeros((len(croston.cluster_data), len(scaled_radius)), dtype=np.float)
-print(profiles.shape)
+profiles = np.zeros((len(croston.cluster_data), len(radial_bin_centres)), dtype=np.float)
 for i, cluster in enumerate(croston.cluster_data):
     profiles[i] = cluster['f_g']
 
-dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * scaled_radius ** 2
-dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * scaled_radius ** 2
-dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * scaled_radius ** 2
+dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0)
+dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0)
+dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0)
 axes.errorbar(
-    scaled_radius,
+    radial_bin_centres,
     dimensionless_density_profiles_median,
     yerr=(
         dimensionless_density_profiles_median - dimensionless_density_profiles_perc16,
