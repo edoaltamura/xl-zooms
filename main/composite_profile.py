@@ -189,9 +189,7 @@ axes.set_ylabel(r'Density $\rho/\rho_{\rm crit}$ $(r/r_{500})^2$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 croston = Croston2008()
-croston.compute_gas_mass()
-croston.estimate_total_mass()
-croston.compute_gas_fraction()
+croston.interpolate_r_r500(radial_bin_centres.value)
 scaled_radius = croston.cluster_data[0]['r_r500']
 profiles = np.zeros((len(croston.cluster_data), len(scaled_radius)), dtype=np.float)
 for i, cluster in enumerate(croston.cluster_data):
@@ -299,9 +297,7 @@ axes.set_ylabel(r'Hot gas fraction $M_{\rm gas}(<r)/M_{500}$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 croston = Croston2008()
-croston.compute_gas_mass()
-croston.estimate_total_mass()
-croston.compute_gas_fraction()
+croston.interpolate_r_r500(radial_bin_centres.value)
 
 # for i, cluster in enumerate(croston.cluster_data):
 #     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
