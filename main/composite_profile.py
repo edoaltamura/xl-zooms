@@ -16,9 +16,22 @@ from scaling_relations import (
 from register import find_files, set_mnras_stylesheet, xlargs, mean_atomic_weight_per_free_electron
 from literature import Sun2009, Pratt2010, Croston2008, Cosmology, Arnaud2010
 
+def make_title(axes, title: str):
+    axes.text(
+        0.975,
+        0.975,
+        title,
+        color="k",
+        ha="right",
+        va="top",
+        alpha=0.8,
+        transform=axes.transAxes,
+    )
+
 snap, cat = find_files()
 
 label = ' '.join(os.path.basename(snap).split('_')[1:3])
+
 
 set_mnras_stylesheet()
 
@@ -35,6 +48,7 @@ for ax in axes_all.flat:
 # ===================== Entropy
 axes = axes_all[0, 0]
 print('Entropy')
+make_title(axes, 'Entropy')
 profile_obj = EntropyProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
                               shell_average=False)
 radial_bin_centres, entropy_profile, K500 = profile_obj.process_single_halo(
@@ -108,6 +122,7 @@ axes.legend()
 # ===================== Temperature
 axes = axes_all[0, 1]
 print('Temperature')
+make_title(axes, 'MW-Temperature')
 
 profile_obj = TemperatureProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
                                   shell_average=False)
@@ -122,13 +137,14 @@ axes.plot(
     linewidth=1,
     label=f'{label} z = {redshift:.2f}'
 )
-axes.set_ylabel(r'MW-Temperature $T/T_{500}$')
+axes.set_ylabel(r'$T/T_{500}$')
 # axes.set_xlabel(r'$r/r_{500}$')
 axes.legend()
 
 # ===================== Pressure
 axes = axes_all[0, 2]
 print('Pressure')
+make_title(axes, 'Pressure')
 
 profile_obj = PressureProfiles(max_radius_r500=2.5, weighting='mass', simple_electron_number_density=False,
                                shell_average=False)
@@ -143,8 +159,8 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.set_ylabel(r'Pressure $P/P_{500}$ $(r/r_{500})^3$')
-axes.set_xlabel(r'$r/r_{500}$')
+axes.set_ylabel(r'$P/P_{500}$ $(r/r_{500})^3$')
+# axes.set_xlabel(r'$r/r_{500}$')
 
 arnaud = Arnaud2010()
 median = arnaud.dimensionless_pressure_profiles_median * arnaud.scaled_radius ** 3
@@ -172,6 +188,7 @@ axes.legend()
 # ===================== Density
 axes = axes_all[1, 0]
 print('Density')
+make_title(axes, 'Density')
 
 profile_obj = DensityProfiles(max_radius_r500=2.5)
 radial_bin_centres, density_profile, rho_crit = profile_obj.process_single_halo(
@@ -185,20 +202,20 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.set_ylabel(r'Density $\rho/\rho_{\rm crit}$ $(r/r_{500})^2$')
+axes.set_ylabel(r'$\rho/\rho_{\rm crit}$ $(r/r_{500})^2$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 croston = Croston2008()
-croston.interpolate_r_r500(radial_bin_centres.value)
-profiles = np.zeros((len(croston.cluster_data), len(radial_bin_centres)), dtype=np.float)
+croston.interpolate_r_r500(croston.pratt2010.radial_bins.value)
+profiles = np.zeros((len(croston.cluster_data), len(croston.pratt2010.radial_bins.value)), dtype=np.float)
 for i, cluster in enumerate(croston.cluster_data):
     profiles[i] = cluster['n_e'] * mp / mean_atomic_weight_per_free_electron / rho_crit
 
-dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * radial_bin_centres ** 2
-dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * radial_bin_centres ** 2
-dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * radial_bin_centres ** 2
+dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0) * croston.pratt2010.radial_bins.value ** 2
+dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0) * croston.pratt2010.radial_bins.value ** 2
+dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0) * croston.pratt2010.radial_bins.value ** 2
 axes.errorbar(
-    radial_bin_centres,
+    croston.pratt2010.radial_bins.value,
     dimensionless_density_profiles_median,
     yerr=(
         dimensionless_density_profiles_median - dimensionless_density_profiles_perc16,
@@ -218,6 +235,7 @@ axes.legend()
 # ===================== Iron
 axes = axes_all[1, 1]
 print('Iron')
+make_title(axes, 'Metallicity')
 
 profile_obj = IronProfiles(max_radius_r500=2.5)
 radial_bin_centres, iron_profile, Zsun = profile_obj.process_single_halo(
@@ -230,7 +248,7 @@ axes.plot(
     linestyle='-',
     linewidth=1,
 )
-axes.set_ylabel(r'Metallicity $Z_{\rm Fe}/Z_{\odot}$')
+axes.set_ylabel(r'$Z_{\rm Fe}/Z_{\odot}$')
 axes.set_xlabel(r'$r_{2Dproj}/r_{500}$')
 
 # Observational data taken from compilation by Gastaldello et al. 2021 (Fig.4)
@@ -279,24 +297,25 @@ axes.legend()
 # ===================== Gas Fraction
 axes = axes_all[1, 2]
 print('Gas Fraction')
+make_title(axes, 'Hot gas fraction')
 
 profile_obj = GasFractionProfiles(max_radius_r500=2.5)
 radial_bin_centres, gas_fraaction_profile, m500 = profile_obj.process_single_halo(
     path_to_snap=snap, path_to_catalogue=cat
 )
-gas_fraaction_profile /= m500
+gas_fraaction_profile /= m500 * cosmology.fb0
 axes.plot(
     radial_bin_centres,
     gas_fraaction_profile,
     linestyle='-',
     linewidth=1,
 )
-axes.axhline(cosmology.fb0, color='k', linestyle='--', lw=0.5, zorder=0, label='$f_b$ Universal baryon fraction')
-axes.set_ylabel(r'Hot gas fraction $M_{\rm gas}(<r)/M_{500}$')
+axes.axhline(1, color='k', linestyle='--', lw=0.5, zorder=0, label='$f_b$ Planck 2018')
+axes.set_ylabel(r'$M_{\rm gas}(<r)~/~(M_{500} $f_b$)$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 croston = Croston2008()
-croston.interpolate_r_r500(radial_bin_centres.value)
+croston.interpolate_r_r500(croston.pratt2010.radial_bins.value)
 
 # for i, cluster in enumerate(croston.cluster_data):
 #     kwargs = dict(c='grey', alpha=0.7, lw=0.3)
@@ -304,15 +323,15 @@ croston.interpolate_r_r500(radial_bin_centres.value)
 #         kwargs = dict(c='grey', alpha=0.4, lw=0.3, label=croston.citation)
 #     axes.plot(cluster['r_r500'], cluster['f_g'], zorder=0, **kwargs)
 
-profiles = np.zeros((len(croston.cluster_data), len(radial_bin_centres)), dtype=np.float)
+profiles = np.zeros((len(croston.cluster_data), len(croston.pratt2010.radial_bins.value)), dtype=np.float)
 for i, cluster in enumerate(croston.cluster_data):
-    profiles[i] = cluster['f_g']
+    profiles[i] = cluster['f_g'] / cosmology.fb0
 
 dimensionless_density_profiles_median = np.percentile(profiles, 50, axis=0)
 dimensionless_density_profiles_perc84 = np.percentile(profiles, 84, axis=0)
 dimensionless_density_profiles_perc16 = np.percentile(profiles, 16, axis=0)
 axes.errorbar(
-    radial_bin_centres,
+    croston.pratt2010.radial_bins.value,
     dimensionless_density_profiles_median,
     yerr=(
         dimensionless_density_profiles_median - dimensionless_density_profiles_perc16,
