@@ -18,11 +18,11 @@ from literature import Sun2009, Pratt2010, Croston2008, Cosmology, Arnaud2010
 
 def make_title(axes, title: str):
     axes.text(
-        0.975,
+        0.5,
         0.975,
         title,
         color="k",
-        ha="right",
+        ha="center",
         va="top",
         alpha=0.8,
         transform=axes.transAxes,
@@ -311,7 +311,7 @@ axes.plot(
     linewidth=1,
 )
 axes.axhline(1, color='k', linestyle='--', lw=0.5, zorder=0, label='$f_b$ Planck 2018')
-axes.set_ylabel(r'$M_{\rm gas}(<r)~/~(M_{500} $f_b$)$')
+axes.set_ylabel(r'$M_{\rm gas}(<r)~/~(M_{500} f_b)$')
 axes.set_xlabel(r'$r/r_{500}$')
 
 croston = Croston2008()

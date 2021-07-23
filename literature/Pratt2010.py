@@ -18,7 +18,7 @@ comment = (
 
 class Pratt2010(Article):
 
-    def __init__(self, n_radial_bins: int = 51, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
+    def __init__(self, n_radial_bins: int = 30, disable_cosmo_conversion: bool = False, **cosmo_kwargs):
         super().__init__(
             citation="Pratt et al. (2010)",
             comment=comment,
