@@ -39,9 +39,6 @@ class Arnaud2010(Article):
                 r_r500, P0[i], c500[i], alpha=alpha[i], beta=5.49, gamma=gamma[i]
             )
 
-        print(self.dimensionless_pressure_profiles.shape)
-        print(r_r500.shape)
-
         self.dimensionless_pressure_profiles_median = np.percentile(self.dimensionless_pressure_profiles, 50, axis=0)
         self.dimensionless_pressure_profiles_perc84 = np.percentile(self.dimensionless_pressure_profiles, 84, axis=0)
         self.dimensionless_pressure_profiles_perc16 = np.percentile(self.dimensionless_pressure_profiles, 16, axis=0)
