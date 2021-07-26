@@ -23,7 +23,7 @@ centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.
 
 
 def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
-    gf = SliceGas(field)
+    gf = SliceGas(field, resolution=1024)
 
     try:
         slice = gf.process_single_halo(
@@ -31,6 +31,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
+            mask_radius_r500=20
             # map_centre=centres[xlargs.snapshot_number, :-1]
         )
 
