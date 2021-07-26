@@ -13,20 +13,11 @@ from matplotlib.colors import LogNorm
 sys.path.append("..")
 
 from scaling_relations import SliceGas
-from register import parser, default_output_directory
+from register import default_output_directory, find_files
 from literature import Cosmology
 
-parser.add_argument(
-    '-s',
-    '--snapshot-number',
-    type=int,
-    required=True
-)
-args = parser.parse_args()
+s, c = find_files()
 
-dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0/'
-s = dir + f"snapshots/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.hdf5"
-c = dir + f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{args.snapshot_number:04d}.properties"
 
 centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy')
 
