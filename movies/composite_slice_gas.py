@@ -13,7 +13,7 @@ from matplotlib.colors import LogNorm
 sys.path.append("..")
 
 from scaling_relations import SliceGas
-from register import default_output_directory, find_files
+from register import default_output_directory, find_files, xlargs
 from literature import Cosmology
 
 s, c = find_files()
@@ -31,17 +31,17 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
-            map_centre=centres[args.snapshot_number, :-1]
+            map_centre=centres[xlargs.snapshot_number, :-1]
         )
 
     except Exception as e:
         print(
-            f"Snap number {args.snapshot_number:04d} could not be processed.",
+            f"Snap number {xlargs.snapshot_number:04d} could not be processed.",
             e,
             sep='\n'
         )
 
-    if args.debug:
+    if xlargs.debug:
         print(f"{field.title()} map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
         print(f"Map centre: {[float(f'{i.v:.3f}') for i in slice.centre]} Mpc")
 
@@ -88,5 +88,5 @@ fig.savefig(
     dpi=300
 )
 
-if not args.quiet:
+if not xlargs.quiet:
     plt.show()
