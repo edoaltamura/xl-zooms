@@ -46,7 +46,7 @@ def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=Tru
     if use_labels:
         _units = r'$r_{500}$' if r500_units else 'Mpc'
         # fmt = {level: f'${value:.1f}$ {_units:s}' for value, level in zip(_levels, levels)}
-        fmt = {level: f'${value:.1f}$' for value, level in zip(_levels, levels)}
+        fmt = {level: f'{value}' for value, level in zip(_levels, levels)}
 
         # work with logarithms for loglog scale
         # middle of the figure:
@@ -127,7 +127,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         alpha=0.8,
         transform=axes.transAxes,
     )
-    draw_radius_contours(axes, slice, levels=[1.])
+    draw_radius_contours(axes, slice, levels=[1.], color='w')
 
 
 fig = plt.figure(figsize=(9, 3), constrained_layout=True)
