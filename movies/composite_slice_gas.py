@@ -22,16 +22,15 @@ set_mnras_stylesheet()
 
 centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy')
 
-def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=True, use_labels=True):
+def draw_radius_contours(axes, resolution, region, r500, levels=[1.], color='green', r500_units=True, use_labels=True):
     # Make the norm object to define the image stretch
     x_bins, y_bins = np.meshgrid(
-        np.linspace(slice.region[0], slice.region[1], slice.map.shape[0]),
-        np.linspace(slice.region[2], slice.region[3], slice.map.shape[1])
+        np.linspace(region[0], region[1], resolution),
+        np.linspace(region[2], region[3], resolution)
     )
     cylinder_function = np.sqrt(x_bins.flatten() ** 2 + y_bins.flatten() ** 2)
-    print(cylinder_function)
-    cylinder_function = cylinder_function.reshape(slice.map.shape)
-    _levels = [radius * slice.r500 for radius in levels] if r500_units else levels
+    cylinder_function = cylinder_function.reshape((resolution, resolution))
+    _levels = [radius * r500 for radius in levels] if r500_units else levels
     _units = r'$r_{500}$' if r500_units else 'Mpc'
 
     contours = axes.contour(
@@ -78,55 +77,55 @@ def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=Tru
 
 
 def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
-    gf = SliceGas(field, resolution=1024)
-
-    try:
-        slice = gf.process_single_halo(
-            path_to_snap=s,
-            path_to_catalogue=c,
-            temperature_range=(1e5, 1e9),
-            depth_offset=None,  # Goes through the centre of potential
-            mask_radius_r500=4
-            # map_centre=centres[xlargs.snapshot_number, :-1]
-        )
-
-    except Exception as e:
-        print(
-            f"Snap number {xlargs.snapshot_number:04d} could not be processed.",
-            e,
-            sep='\n'
-        )
-
-    if xlargs.debug:
-        print(f"{field.title()} map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
-        print(f"Map centre: {[float(f'{i.v:.3f}') for i in slice.centre]} Mpc")
-
-    cmap_bkgr = copy.copy(plt.get_cmap(cmap))
-    cmap_bkgr.set_under('black')
-    axes.axis("off")
-    axes.set_aspect("equal")
-    axes.imshow(
-        slice.map.T,
-        norm=LogNorm(vmin=vmin, vmax=vmax),
-        cmap=cmap_bkgr,
-        origin="lower",
-        extent=slice.region
-    )
-    axes.text(
-        0.025,
-        0.025,
-        (
-            f'{field.title()}\n'
-            f'z = {slice.z:.2f}\n'
-            f't = {Cosmology().age(slice.z).value:.3f} Gyr'
-        ),
-        color="w",
-        ha="left",
-        va="bottom",
-        alpha=0.8,
-        transform=axes.transAxes,
-    )
-    draw_radius_contours(axes, slice, levels=[1])
+    # gf = SliceGas(field, resolution=1024)
+    #
+    # try:
+    #     slice = gf.process_single_halo(
+    #         path_to_snap=s,
+    #         path_to_catalogue=c,
+    #         temperature_range=(1e5, 1e9),
+    #         depth_offset=None,  # Goes through the centre of potential
+    #         mask_radius_r500=4
+    #         # map_centre=centres[xlargs.snapshot_number, :-1]
+    #     )
+    #
+    # except Exception as e:
+    #     print(
+    #         f"Snap number {xlargs.snapshot_number:04d} could not be processed.",
+    #         e,
+    #         sep='\n'
+    #     )
+    #
+    # if xlargs.debug:
+    #     print(f"{field.title()} map: min = {np.nanmin(slice.map):.2E}, max = {np.nanmax(slice.map):.2E}")
+    #     print(f"Map centre: {[float(f'{i.v:.3f}') for i in slice.centre]} Mpc")
+    #
+    # cmap_bkgr = copy.copy(plt.get_cmap(cmap))
+    # cmap_bkgr.set_under('black')
+    # axes.axis("off")
+    # axes.set_aspect("equal")
+    # axes.imshow(
+    #     slice.map.T,
+    #     norm=LogNorm(vmin=vmin, vmax=vmax),
+    #     cmap=cmap_bkgr,
+    #     origin="lower",
+    #     extent=slice.region
+    # )
+    # axes.text(
+    #     0.025,
+    #     0.025,
+    #     (
+    #         f'{field.title()}\n'
+    #         f'z = {slice.z:.2f}\n'
+    #         f't = {Cosmology().age(slice.z).value:.3f} Gyr'
+    #     ),
+    #     color="w",
+    #     ha="left",
+    #     va="bottom",
+    #     alpha=0.8,
+    #     transform=axes.transAxes,
+    # )
+    draw_radius_contours(axes, resolution=1024, region=[-10, 10, -10, 10], r500=5, levels=[1.])
 
 
 fig = plt.figure(figsize=(9, 3), constrained_layout=True)
