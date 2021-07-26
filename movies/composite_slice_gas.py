@@ -26,8 +26,8 @@ def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=Tru
     # Make the norm object to define the image stretch
     x_bins, y_bins = np.meshgrid(*slice.map.shape)
     cylinder_function = np.sqrt(x_bins.flatten() ** 2 + y_bins.flatten() ** 2)
-    cylinder_function = cylinder_function.reshape(slice.map.shape)
     print(cylinder_function)
+    cylinder_function = cylinder_function.reshape(slice.map.shape)
     _levels = [radius * slice.r500 for radius in levels] if r500_units else levels
     _units = r'$r_{500}$' if r500_units else 'Mpc'
 
