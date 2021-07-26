@@ -22,6 +22,57 @@ set_mnras_stylesheet()
 
 centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy')
 
+def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=True, use_labels=True):
+    # Make the norm object to define the image stretch
+    x_bins = np.linspace(slice.region[0], slice.region[1], slice.map.T.shape[0])
+    y_bins = np.linspace(slice.region[2], slice.region[3], slice.map.T.shape[1])
+
+    cylinder_function = np.sqrt(x_bins ** 2 + y_bins ** 2)
+    _levels = [radius * slice.r500 for radius in levels] if r500_units else levels
+    _units = r'$r_{500}$' if r500_units else 'Mpc'
+
+    contours = axes.contour(
+        x_bins,
+        y_bins,
+        cylinder_function,
+        _levels,
+        colors=color,
+        linewidths=0.3,
+        alpha=0.5
+    )
+
+    if use_labels:
+        fmt = {value: f'${value:.1f}$ {_units}' for value in levels}
+
+        # work with logarithms for loglog scale
+        # middle of the figure:
+        xmin, xmax, ymin, ymax = axes.axis()
+        mid = (xmin + xmax) / 2, (ymin + ymax) / 2
+
+        label_pos = []
+        i = 0
+        for line in contours.collections:
+            for path in line.get_paths():
+                logvert = path.vertices
+                i += 1
+
+                # find closest point
+                logdist = np.linalg.norm(logvert - mid, ord=2, axis=1)
+                min_ind = np.argmin(logdist)
+                label_pos.append(logvert[min_ind, :])
+
+        # Draw contour labels
+        axes.clabel(
+            contours,
+            inline=True,
+            inline_spacing=3,
+            rightside_up=True,
+            colors=color,
+            fontsize=5,
+            fmt=fmt,
+            manual=label_pos,
+        )
+
 
 def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     gf = SliceGas(field, resolution=1024)
@@ -32,7 +83,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
-            mask_radius_r500=20
+            mask_radius_r500=50
             # map_centre=centres[xlargs.snapshot_number, :-1]
         )
 
@@ -72,6 +123,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         alpha=0.8,
         transform=axes.transAxes,
     )
+    draw_radius_contours(axes, slice)
 
 
 fig = plt.figure(figsize=(9, 3), constrained_layout=True)
