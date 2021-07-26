@@ -25,10 +25,10 @@ centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.
 def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=True, use_labels=True):
     # Make the norm object to define the image stretch
     x_bins, y_bins = np.meshgrid(
-        np.linspace(slice.region[0] - slice.centre[0], slice.region[1] - slice.centre[0], len(slice.map)),
-        np.linspace(slice.region[2] - slice.centre[1], slice.region[3] - slice.centre[1], len(slice.map))
+        np.linspace(slice.region[0], slice.region[1], len(slice.map)),
+        np.linspace(slice.region[2], slice.region[3], len(slice.map))
     )
-    cylinder_function = np.sqrt(x_bins.flatten() ** 2 + y_bins.flatten() ** 2)
+    cylinder_function = np.sqrt((x_bins.flatten() - slice.centre[0]) ** 2 + (y_bins.flatten() - slice.centre[1]) ** 2)
     cylinder_function = cylinder_function.reshape(slice.map.shape)
     _levels = [radius * slice.r500 for radius in levels] if r500_units else levels
     _units = r'$r_{500}$' if r500_units else 'Mpc'
