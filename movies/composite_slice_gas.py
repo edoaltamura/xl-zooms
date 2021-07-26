@@ -86,7 +86,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
-            mask_radius_r500=50
+            mask_radius_r500=4
             # map_centre=centres[xlargs.snapshot_number, :-1]
         )
 
@@ -126,7 +126,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         alpha=0.8,
         transform=axes.transAxes,
     )
-    draw_radius_contours(axes, slice)
+    draw_radius_contours(axes, slice, levels=[1])
 
 
 fig = plt.figure(figsize=(9, 3), constrained_layout=True)
