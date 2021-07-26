@@ -39,11 +39,11 @@ class AnchoredHScaleBar(matplotlib.offsetbox.AnchoredOffsetbox):
         trans = ax.get_xaxis_transform()
         size_bar = matplotlib.offsetbox.AuxTransformBox(trans)
         line = Line2D([0, size], [0, 0], **linekw)
-        vline1 = Line2D([0, 0], [-extent / 2., extent / 2.], **linekw)
-        vline2 = Line2D([size, size], [-extent / 2., extent / 2.], **linekw)
+        # vline1 = Line2D([0, 0], [-extent / 2., extent / 2.], **linekw)
+        # vline2 = Line2D([size, size], [-extent / 2., extent / 2.], **linekw)
         size_bar.add_artist(line)
-        size_bar.add_artist(vline1)
-        size_bar.add_artist(vline2)
+        # size_bar.add_artist(vline1)
+        # size_bar.add_artist(vline2)
         txt = matplotlib.offsetbox.TextArea(label, minimumdescent=False)
         self.vpac = matplotlib.offsetbox.VPacker(children=[size_bar, txt], align="center", pad=ppad, sep=sep)
         matplotlib.offsetbox.AnchoredOffsetbox.__init__(self, loc, pad=pad,
@@ -160,7 +160,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     draw_radius_contours(axes, slice, levels=[1.], color='w')
 
     ob = AnchoredHScaleBar(size=1, label="1 Mpc", loc=4, frameon=False,
-                           pad=0.6, sep=4, linekw=dict(color="white"), )
+                           pad=0.6, sep=4, linekw=dict(color="white", linewidth=0.5), color='white')
     axes.add_artist(ob)
 
 
