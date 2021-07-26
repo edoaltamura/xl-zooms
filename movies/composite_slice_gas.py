@@ -45,7 +45,7 @@ def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=Tru
     )
 
     if use_labels:
-        fmt = {value: f'${value:.1f}$ {_units}' for value in levels}
+        fmt = {level: f'${value:.1f}$ {_units}' for value, level in zip(_levels, levels)}
 
         # work with logarithms for loglog scale
         # middle of the figure:
@@ -103,15 +103,15 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
     cmap_bkgr = copy.copy(plt.get_cmap(cmap))
     cmap_bkgr.set_under('black')
-    # axes.axis("off")
+    axes.axis("off")
     axes.set_aspect("equal")
-    # axes.imshow(
-    #     slice.map.T,
-    #     norm=LogNorm(vmin=vmin, vmax=vmax),
-    #     cmap=cmap_bkgr,
-    #     origin="lower",
-    #     extent=slice.region
-    # )
+    axes.imshow(
+        slice.map.T,
+        norm=LogNorm(vmin=vmin, vmax=vmax),
+        cmap=cmap_bkgr,
+        origin="lower",
+        extent=slice.region
+    )
     axes.text(
         0.025,
         0.025,
