@@ -60,7 +60,7 @@ def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=Tru
     )
     cylinder_function = np.sqrt((x_bins.flatten() - slice.centre[0]) ** 2 + (y_bins.flatten() - slice.centre[1]) ** 2)
     cylinder_function = cylinder_function.reshape(slice.map.shape)
-    _levels = [radius * slice.r500 for radius in levels] if r500_units else levels
+    _levels = [radius * slice.r500.v for radius in levels] if r500_units else levels
 
     contours = axes.contour(
         x_bins,
