@@ -161,7 +161,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
     ob = AnchoredHScaleBar(size=1, label="1 Mpc", loc=4, frameon=False,
                            pad=0.6, sep=4, linekw=dict(color="white", linewidth=0.5),
-                           textkw=dict(color='white'))
+                           textkw=dict(color='white'), extent=0)
     axes.add_artist(ob)
 
 
