@@ -44,8 +44,8 @@ def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=Tru
     )
 
     if use_labels:
-        _units = r'$r_{500}$' if r500_units else 'Mpc'
-        fmt = {level: f'${value:.1f}$ {_units:s}' for value, level in zip(_levels, levels)}
+        _units = '$r_{{500}}$' if r500_units else 'Mpc'
+        fmt = {level: f'{value:.1f} {_units:s}' for value, level in zip(_levels, levels)}
         print(fmt)
 
         # work with logarithms for loglog scale
