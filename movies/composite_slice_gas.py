@@ -40,7 +40,7 @@ def draw_radius_contours(axes, resolution, region, r500, levels=[1.], color='gre
         _levels,
         colors=color,
         linewidths=0.3,
-        alpha=0.5
+        alpha=0.5,
     )
 
     if use_labels:
@@ -125,6 +125,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         alpha=0.8,
         transform=axes.transAxes,
     )
+    print(slice.region, slice.r500, slice.map.shape)
     draw_radius_contours(axes, resolution=len(slice.map), region=slice.region, r500=slice.r500, levels=[1.])
 
 
