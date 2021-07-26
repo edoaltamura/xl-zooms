@@ -24,7 +24,8 @@ centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.
 
 def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=True, use_labels=True):
     # Make the norm object to define the image stretch
-    x_bins, y_bins = np.meshgrid(*slice.map.shape)
+    x_bins, y_bins = np.meshgrid(len(slice.map), len(slice.map))
+    print(x_bins, y_bins)
     cylinder_function = np.sqrt(x_bins.flatten() ** 2 + y_bins.flatten() ** 2)
     print(cylinder_function)
     cylinder_function = cylinder_function.reshape(slice.map.shape)
