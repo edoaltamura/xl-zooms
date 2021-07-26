@@ -22,15 +22,15 @@ set_mnras_stylesheet()
 
 centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy')
 
-def draw_radius_contours(axes, resolution, region, r500, levels=[1.], color='green', r500_units=True, use_labels=True):
+def draw_radius_contours(axes, slice, levels=[1.], color='green', r500_units=True, use_labels=True):
     # Make the norm object to define the image stretch
     x_bins, y_bins = np.meshgrid(
-        np.linspace(region[0], region[1], resolution),
-        np.linspace(region[2], region[3], resolution)
+        np.linspace(slice.region[0] - slice.centre[0], slice.region[1] - slice.centre[0], len(slice.map)),
+        np.linspace(slice.region[2] - slice.centre[1], slice.region[3] - slice.centre[1], len(slice.map))
     )
     cylinder_function = np.sqrt(x_bins.flatten() ** 2 + y_bins.flatten() ** 2)
-    cylinder_function = cylinder_function.reshape((resolution, resolution))
-    _levels = [radius * r500 for radius in levels] if r500_units else levels
+    cylinder_function = cylinder_function.reshape(slice.map.shape)
+    _levels = [radius * slice.r500 for radius in levels] if r500_units else levels
     _units = r'$r_{500}$' if r500_units else 'Mpc'
 
     contours = axes.contour(
@@ -126,7 +126,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
         alpha=0.8,
         transform=axes.transAxes,
     )
-    draw_radius_contours(axes, resolution=len(slice.map), region=[i.v for i in slice.region], r500=slice.r500.v, levels=[1.])
+    draw_radius_contours(axes, slice, levels=[1.])
 
 
 fig = plt.figure(figsize=(9, 3), constrained_layout=True)
