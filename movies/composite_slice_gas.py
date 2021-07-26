@@ -13,10 +13,11 @@ from matplotlib.colors import LogNorm
 sys.path.append("..")
 
 from scaling_relations import SliceGas
-from register import default_output_directory, find_files, xlargs
+from register import default_output_directory, find_files, xlargs, set_mnras_stylesheet
 from literature import Cosmology
 
 s, c = find_files()
+set_mnras_stylesheet()
 
 
 centres = np.load('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha1p0.npy')
