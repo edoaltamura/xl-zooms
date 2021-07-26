@@ -6,6 +6,7 @@ from typing import List
 from matplotlib import pyplot as plt
 
 from .cosmology import Article, repository_dir
+from .Pratt2010 import Pratt2010
 
 comment = (
     "Pressure and temperature profiles for the REXCESS sample "
@@ -29,7 +30,7 @@ class Arnaud2010(Article):
         P500, P0, c500, alpha, gamma = np.loadtxt(f'{repository_dir}/Arnaud2010.dat').T
         P500 *= 1e-3
         number_objects = len(P0)
-        number_radial_bins = 20
+        number_radial_bins = 30
 
         # Build profiles from fit parameters
         r_r500 = np.logspace(np.log10(0.03), 0, number_radial_bins)
@@ -50,6 +51,8 @@ class Arnaud2010(Article):
         self.dimensionless_pressure_profiles_perc84 = unyt.unyt_array(self.dimensionless_pressure_profiles_perc84)
         self.dimensionless_pressure_profiles_perc16 = unyt.unyt_array(self.dimensionless_pressure_profiles_perc16)
 
+        self.attach_temperature_profiles()
+
     @staticmethod
     def gnfw(x: np.ndarray, p0: float, c500: float, alpha: float, beta: float, gamma: float) -> np.ndarray:
         """
@@ -66,3 +69,22 @@ class Arnaud2010(Article):
         c500x = x * c500
         exponent = (beta - gamma) / alpha
         return p0 / (c500x ** gamma * (1 + c500x ** alpha) ** exponent)
+
+    def attach_temperature_profiles(self):
+        pratt = Pratt2010(n_radial_bins=30)
+        entropy_profiles = pratt.entropy_profiles / pratt.K500[:, None]
+
+        assert entropy_profiles.shape == self.dimensionless_pressure_profiles.shape
+
+        self.temperature_profiles = np.zeros((len(entropy_profiles), 30), dtype=np.float)
+        for i, (k, P) in enumerate(zip(entropy_profiles, self.dimensionless_pressure_profiles)):
+            self.temperature_profiles[i] = P ** (2 / 5) * k ** (3 / 5)
+
+        self.dimensionless_temperature_profiles_median = np.nanpercentile(self.temperature_profiles, 50, axis=0)
+        self.dimensionless_temperature_profiles_perc84 = np.nanpercentile(self.temperature_profiles, 84, axis=0)
+        self.dimensionless_temperature_profiles_perc16 = np.nanpercentile(self.temperature_profiles, 16, axis=0)
+
+        self.dimensionless_temperature_profiles_median = unyt.unyt_array(self.dimensionless_temperature_profiles_median)
+        self.dimensionless_temperature_profiles_perc84 = unyt.unyt_array(self.dimensionless_temperature_profiles_perc84)
+        self.dimensionless_temperature_profiles_perc16 = unyt.unyt_array(self.dimensionless_temperature_profiles_perc16)
+

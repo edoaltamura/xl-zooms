@@ -12,9 +12,9 @@ plt.ylabel(r'Pressure $P/P_{500}$ $(r/r_{500})^3$')
 plt.xlabel(r'$r/r_{500}$')
 
 arnaud = Arnaud2010()
-median = arnaud.dimensionless_pressure_profiles_median * arnaud.scaled_radius ** 3
-perc16 = arnaud.dimensionless_pressure_profiles_perc16 * arnaud.scaled_radius ** 3
-perc84 = arnaud.dimensionless_pressure_profiles_perc84 * arnaud.scaled_radius ** 3
+median = arnaud.dimensionless_temperature_profiles_median
+perc16 = arnaud.dimensionless_temperature_profiles_perc16
+perc84 = arnaud.dimensionless_temperature_profiles_perc84
 plt.errorbar(
     arnaud.scaled_radius,
     median,
@@ -34,7 +34,7 @@ plt.errorbar(
 plt.legend()
 
 plt.xscale('log')
-plt.yscale('log')
-
+# plt.yscale('log')
+plt.ylim(0, 3)
 plt.show()
 plt.close()

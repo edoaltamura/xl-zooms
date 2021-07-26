@@ -137,8 +137,31 @@ axes.plot(
     linewidth=1,
     label=f'{label} z = {redshift:.2f}'
 )
+axes.set_yscale('linear')
 axes.set_ylabel(r'$T/T_{500}$')
 # axes.set_xlabel(r'$r/r_{500}$')
+
+arnaud = Arnaud2010()
+median = arnaud.dimensionless_temperature_profiles_median
+perc16 = arnaud.dimensionless_temperature_profiles_perc16
+perc84 = arnaud.dimensionless_temperature_profiles_perc84
+axes.errorbar(
+    arnaud.scaled_radius,
+    median,
+    yerr=(
+        median - perc16,
+        perc84 - median
+    ),
+    fmt='s',
+    color='grey',
+    ecolor='lightgray',
+    elinewidth=0.5,
+    capsize=0,
+    markersize=1,
+    label=arnaud.citation,
+    zorder=0
+)
+
 axes.legend()
 
 # ===================== Pressure
