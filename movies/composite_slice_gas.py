@@ -159,7 +159,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     )
     draw_radius_contours(axes, slice, levels=[1.], color='w')
 
-    ob = AnchoredHScaleBar(size=1, label="1 Mpc", loc=4, frameon=False,
+    ob = AnchoredHScaleBar(size=0.1, label="100 kpc", loc=4, frameon=False,
                            pad=0.6, sep=4, linekw=dict(color="white", linewidth=0.5),
                            textkw=dict(color='white'), extent=0)
     axes.add_artist(ob)
