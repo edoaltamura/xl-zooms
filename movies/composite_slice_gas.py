@@ -134,7 +134,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
 
     cmap_bkgr = copy.copy(plt.get_cmap(cmap))
     cmap_bkgr.set_under('black')
-    # axes.axis("off")
+    axes.axis("off")
     axes.set_aspect("equal")
     axes.imshow(
         slice.map.T,
