@@ -4,6 +4,7 @@ from typing import Union, Optional
 from unyt import kb, mh, Mpc
 from collections import namedtuple
 from swiftsimio.visualisation.slice import slice_gas
+from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
 
 from .halo_property import HaloProperty
 from register import Zoom, default_output_directory, xlargs
@@ -140,39 +141,33 @@ class SliceGas(HaloProperty):
             sw_data.gas.densities = sw_data.gas.densities[temp_filter]
             sw_data.gas.temperatures = sw_data.gas.temperatures[temp_filter]
 
+        # Rotate about CoP if required
+        center = [_xCen, _yCen, _zCen]
+        rotate_vec = [0, 0, 0]
+        matrix = rotation_matrix_from_vector(rotate_vec, axis='x')
+
+        common_kwargs = dict(
+            rotation_matrix=matrix,
+            rotation_center=center,
+            data=sw_data,
+            resolution=self.resolution,
+            parallel=self.parallel,
+            region=region,
+            slice=self.depth
+        )
+
         if self._project_quantity == 'entropies':
             number_density = (sw_data.gas.densities / mh).to('cm**-3') / mean_molecular_weight
             entropy = kb * sw_data.gas.temperatures / number_density ** (2 / 3)
             sw_data.gas.entropies_physical = entropy.to('keV*cm**2')
 
-            gas_map = slice_gas(
-                project='entropies_physical',
-                data=sw_data,
-                resolution=self.resolution,
-                parallel=self.parallel,
-                region=region,
-                slice=self.depth
-            ).to('keV*cm**2/Mpc**3')
+            gas_map = slice_gas(project='entropies_physical', **common_kwargs).to('keV*cm**2/Mpc**3')
 
         elif self._project_quantity == 'temperatures':
             sw_data.gas.mwtemps = sw_data.gas.masses * sw_data.gas.temperatures
 
-            mass_weighted_temp_map = slice_gas(
-                project='mwtemps',
-                data=sw_data,
-                resolution=self.resolution,
-                parallel=self.parallel,
-                region=region,
-                slice=self.depth
-            )
-            mass_map = slice_gas(
-                project='masses',
-                data=sw_data,
-                resolution=self.resolution,
-                parallel=self.parallel,
-                region=region,
-                slice=self.depth
-            )
+            mass_weighted_temp_map = slice_gas(project='mwtemps', **common_kwargs)
+            mass_map = slice_gas(project='masses', **common_kwargs)
 
             with np.errstate(divide='ignore', invalid='ignore'):
                 gas_map = mass_weighted_temp_map / mass_map
@@ -180,14 +175,7 @@ class SliceGas(HaloProperty):
             gas_map = gas_map.to('K')
 
         else:
-            gas_map = slice_gas(
-                project=self._project_quantity,
-                data=sw_data,
-                resolution=self.resolution,
-                parallel=self.parallel,
-                region=region,
-                slice=self.depth
-            )
+            gas_map = slice_gas(project=self._project_quantity, **common_kwargs)
 
         units = gas_map.units
         gas_map = gas_map.value

@@ -117,7 +117,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
-            mask_radius_r500=30
+            mask_radius_r500=10
             # map_centre=centres[xlargs.snapshot_number, :-1]
         )
 
@@ -159,8 +159,9 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
     )
     draw_radius_contours(axes, slice, levels=[5.], color='w')
 
-    ob = AnchoredHScaleBar(size=1, label="1 Mpc", loc=4, frameon=False,
-                           pad=0.6, sep=4, linekw=dict(color="white", linewidth=0.5),
+    ob = AnchoredHScaleBar(size=1, label="1 Mpc",
+                           loc=4, frameon=False, pad=0.6, sep=4,
+                           linekw=dict(color="white", linewidth=0.5),
                            textkw=dict(color='white'), extent=0)
     axes.add_artist(ob)
 
