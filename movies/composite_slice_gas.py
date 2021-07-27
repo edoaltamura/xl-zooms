@@ -117,7 +117,7 @@ def draw_panel(axes, field, cmap: str = 'Greys_r', vmin=None, vmax=None):
             path_to_catalogue=c,
             temperature_range=(1e5, 1e9),
             depth_offset=None,  # Goes through the centre of potential
-            mask_radius_r500=(10, 'Mpc')
+            mask_radius=(10, 'Mpc')
             # map_centre=centres[xlargs.snapshot_number, :-1]
         )
 
