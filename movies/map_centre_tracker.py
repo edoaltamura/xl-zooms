@@ -41,17 +41,16 @@ def read(snapshot_number):
 # Find all snapshot numbers in the directory
 snaps_path = os.path.join(xlargs.run_directory, 'snapshots')
 snap_numbers_from_outputs = []
-for file in snaps_path:
-    print(file)
+for file in os.listdir(snaps_path):
     if file.endswith('.hdf5'):
         snap_numbers_from_outputs.append(int(file[-9:-5]))
 
 catalogues_path = os.path.join(xlargs.run_directory, 'stf')
 snap_numbers_from_catalogues = []
-for file in catalogues_path:
+for file in os.listdir(catalogues_path):
     if file[0].isalpha():
         print(file[-5:-1])
-        # snap_numbers_from_catalogues.append(int(file[-5:-1]))
+        snap_numbers_from_catalogues.append(int(file[-5:-1]))
 
 snap_numbers_from_outputs.sort()
 snap_numbers_from_catalogues.sort()
