@@ -578,7 +578,7 @@ class CoolingTimes(HaloProperty):
         rho_crit = unyt_quantity(
             sw_data.metadata.cosmology.critical_density(sw_data.metadata.z).value, 'g/cm**3'
         ).to('Msun/Mpc**3')
-        nH_500 = (primordial_hydrogen_mass_fraction * Cosmology().fb * rho_crit * 500 / mh).to('cm**-3')
+        nH_500 = (primordial_hydrogen_mass_fraction * Cosmology().fb0 * rho_crit * 500 / mh).to('cm**-3')
 
         # Entropy
         electron_number_density = (sw_data.gas.densities[index] / mh).to('cm**-3') / mean_molecular_weight
@@ -614,7 +614,7 @@ class CoolingTimes(HaloProperty):
         )
 
         T500 = (G * mean_molecular_weight * m500 * mp / r500 / 2 / kb).to('K').value
-        K500 = (T500 * K * kb / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (
+        K500 = (T500 * K * kb / (3 * m500 * Cosmology().fb0 / (4 * np.pi * r500 ** 3 * mp)) ** (
                 2 / 3)).to('keV*cm**2')
 
         # Make the norm object to define the image stretch
@@ -839,7 +839,7 @@ class CoolingTimes(HaloProperty):
                 G * mean_molecular_weight * m500 * mp / r500 / 2
         ).to('keV')
         K500 = (
-                kBT500 / (3 * m500 * Cosmology().fb / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)
+                kBT500 / (3 * m500 * Cosmology().fb0 / (4 * np.pi * r500 ** 3 * mp)) ** (2 / 3)
         ).to('keV*cm**2')
 
         axes[1, 2].plot(
