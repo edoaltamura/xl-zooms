@@ -49,8 +49,8 @@ catalogues_path = os.path.join(xlargs.run_directory, 'stf')
 snap_numbers_from_catalogues = []
 for file in os.listdir(catalogues_path):
     if file[0].isalpha():
-        print(file[-5:-1])
-        snap_numbers_from_catalogues.append(int(file[-5:-1]))
+        print(file[-4:])
+        snap_numbers_from_catalogues.append(int(file[-4:]))
 
 snap_numbers_from_outputs.sort()
 snap_numbers_from_catalogues.sort()
