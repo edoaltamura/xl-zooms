@@ -88,6 +88,7 @@ output = np.c_[
 np.save(f'{os.path.basename(xlargs.run_directory)}_centre_trace.npy', output)
 
 if not xlargs.quiet:
+    print('Generating plot...')
     set_mnras_stylesheet()
     plt.plot((r500_smoothed - r500) / r500, label='$r_{500}$')
     plt.plot((xcminpot_smoothed - xcminpot) / xcminpot, label=r'$x_{\rm CoP}$')
