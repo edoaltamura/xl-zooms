@@ -42,6 +42,7 @@ def read(snapshot_number):
 snaps_path = os.path.join(xlargs.run_directory, 'snapshots')
 snap_numbers_from_outputs = []
 for file in snaps_path:
+    print(file)
     if file.endswith('.hdf5'):
         snap_numbers_from_outputs.append(int(file[-9:-5]))
 
