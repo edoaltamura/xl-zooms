@@ -143,7 +143,7 @@ class SliceGas(HaloProperty):
 
         # Rotate about CoP if required
         center = [_xCen, _yCen, _zCen]
-        rotate_vec = [0, 0, 0]
+        rotate_vec = [0, 0, 1]
         matrix = rotation_matrix_from_vector(rotate_vec, axis='x')
 
         common_kwargs = dict(
