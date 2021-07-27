@@ -5,6 +5,13 @@ import matplotlib.pyplot as plt
 from tqdm import tqdm
 from multiprocessing import Pool
 
+import sys
+import os
+
+sys.path.append("..")
+
+from register import default_output_directory, find_files, xlargs, set_mnras_stylesheet
+
 
 def smooth(data, window_width, order: int = 5):
     cumsum_vec = np.cumsum(np.insert(data, 0, 0))
@@ -19,10 +26,9 @@ def smooth(data, window_width, order: int = 5):
 
 
 def read(snapshot_number):
-    path_to_catalogue = dir + (
-        f"stf/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}/"
-        f"L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_SNnobirth_{snapshot_number:04d}.properties"
-    )
+    _, path_to_catalogue = find_files()
+
+    path_to_catalogue.replace(f'{xlargs.snapshot_number:04d}', f'{snapshot_number:04d}')
 
     vr_handle = velociraptor.load(path_to_catalogue)
     r500 = vr_handle.spherical_overdensities.r_500_rhocrit[0].to('Mpc').value
@@ -32,13 +38,32 @@ def read(snapshot_number):
     return r500, xcminpot, ycminpot, zcminpot
 
 
-dir = '/cosma/home/dp004/dc-alta2/snap7/xl-zooms/hydro/L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0/'
+# Find all snapshot numbers in the directory
+snaps_path = os.path.join(xlargs.run_directory, 'snapshots')
+snap_numbers_from_outputs = []
+for file in snaps_path:
+    if file.endswith('.hdf5'):
+        snap_numbers_from_outputs.append(int(file[-9:-5]))
 
+catalogues_path = os.path.join(xlargs.run_directory, 'stf')
+snap_numbers_from_catalogues = []
+for file in catalogues_path:
+    snap_numbers_from_catalogues.append(int(file[-4:]))
+
+snap_numbers_from_outputs.sort()
+snap_numbers_from_catalogues.sort()
+
+assert snap_numbers_from_catalogues == snap_numbers_from_outputs
+
+snap_numbers = snap_numbers_from_outputs
+del snap_numbers_from_outputs, snap_numbers_from_catalogues
+
+# Read data in parallel
 with Pool() as pool:
     results = list(
         tqdm(
-            pool.imap(read, range(2523)),
-            total=2523
+            pool.imap(read, snap_numbers),
+            total=len(snap_numbers)
         )
     )
     r500 = np.asarray(list(results)).T[0]
@@ -59,12 +84,13 @@ output = np.c_[
     zcminpot_smoothed,
     r500_smoothed
 ]
-np.save('map_centre_L0300N0564_VR18_-8res_MinimumDistance_fixedAGNdT8.5_Nheat1_alpha0p0.npy', output)
+np.save(f'{os.path.basename(xlargs.run_directory)}_centre_trace.npy', output)
 
-plt.plot(r500 - r500_smoothed, label='r500')
-plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
-plt.plot(ycminpot - ycminpot_smoothed, label='ycminpot')
-plt.plot(zcminpot - zcminpot_smoothed, label='zcminpot')
-
-plt.legend()
-plt.show()
+if not xlargs.quiet:
+    set_mnras_stylesheet()
+    plt.plot(r500 - r500_smoothed, label='r500')
+    plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
+    plt.plot(ycminpot - ycminpot_smoothed, label='ycminpot')
+    plt.plot(zcminpot - zcminpot_smoothed, label='zcminpot')
+    plt.legend()
+    plt.show()
