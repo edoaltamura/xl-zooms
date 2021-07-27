@@ -49,7 +49,6 @@ catalogues_path = os.path.join(xlargs.run_directory, 'stf')
 snap_numbers_from_catalogues = []
 for file in os.listdir(catalogues_path):
     if file[0].isalpha():
-        print(file[-4:])
         snap_numbers_from_catalogues.append(int(file[-4:]))
 
 snap_numbers_from_outputs.sort()
@@ -90,9 +89,11 @@ np.save(f'{os.path.basename(xlargs.run_directory)}_centre_trace.npy', output)
 
 if not xlargs.quiet:
     set_mnras_stylesheet()
-    plt.plot(r500 - r500_smoothed, label='r500')
-    plt.plot(xcminpot - xcminpot_smoothed, label='xcminpot')
-    plt.plot(ycminpot - ycminpot_smoothed, label='ycminpot')
-    plt.plot(zcminpot - zcminpot_smoothed, label='zcminpot')
+    plt.plot((r500_smoothed - r500) / r500, label='$r_{500}$')
+    plt.plot((xcminpot_smoothed - xcminpot) / xcminpot, label=r'$x_{\rm CoP}$')
+    plt.plot((ycminpot_smoothed - ycminpot) / ycminpot, label=r'$y_{\rm CoP}$')
+    plt.plot((zcminpot_smoothed - zcminpot) / zcminpot, label=r'$z_{\rm CoP}$')
+    plt.xlabel('Snapshot number')
+    plt.ylabel('Fractional offset = (smoothed - true) / true')
     plt.legend()
     plt.show()
