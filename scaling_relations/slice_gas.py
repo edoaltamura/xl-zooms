@@ -1,7 +1,7 @@
 import os.path
 import numpy as np
-from typing import Union, Optional
-from unyt import kb, mh, Mpc
+from typing import Union, Optional, Tuple
+from unyt import kb, mh, Mpc, unyt_quantity
 from collections import namedtuple
 from swiftsimio.visualisation.slice import slice_gas
 from swiftsimio.visualisation.rotation import rotation_matrix_from_vector
@@ -49,17 +49,18 @@ class SliceGas(HaloProperty):
             zoom_obj: Zoom = None,
             path_to_snap: str = None,
             path_to_catalogue: str = None,
-            mask_radius_r500: float = 6,
+            mask_radius: Tuple[float, str] = (6, 'r500'),
             map_centre: Union[str, list, np.ndarray] = 'vr_centre_of_potential',
             temperature_range: Optional[tuple] = None,
             depth_offset: Optional[float] = None,
-            return_type: Union[type, str] = 'class'
+            return_type: Union[type, str] = 'class',
+            inscribe_mask: bool = False,
     ):
         sw_data, vr_data = self.get_handles_from_zoom(
             zoom_obj,
             path_to_snap,
             path_to_catalogue,
-            mask_radius_r500=mask_radius_r500,
+            mask_radius_r500=15,
         )
 
         map_centres_allowed = [
@@ -113,11 +114,20 @@ class SliceGas(HaloProperty):
                 ))
 
         _r500 = vr_data.spherical_overdensities.r_500_rhocrit[0].to('Mpc') / vr_data.a
+
+        if mask_radius[1] == 'r500':
+            mask_radius_r500 = mask_radius[0] * _r500
+        else:
+            mask_radius_r500 = unyt_quantity(mask_radius[0], units=mask_radius[1])
+
+        if inscribe_mask:
+            mask_radius_r500 /= np.sqrt(3)
+
         region = [
-            _xCen - mask_radius_r500 / np.sqrt(3) * _r500,
-            _xCen + mask_radius_r500 / np.sqrt(3) * _r500,
-            _yCen - mask_radius_r500 / np.sqrt(3) * _r500,
-            _yCen + mask_radius_r500 / np.sqrt(3) * _r500
+            _xCen - mask_radius_r500,
+            _xCen + mask_radius_r500,
+            _yCen - mask_radius_r500,
+            _yCen + mask_radius_r500
         ]
 
         if temperature_range is not None:
@@ -144,7 +154,7 @@ class SliceGas(HaloProperty):
         # Rotate about CoP if required
         center = [_xCen, _yCen, _zCen]
         rotate_vec = [0, 0, 1]
-        matrix = rotation_matrix_from_vector(rotate_vec, axis='x')
+        matrix = rotation_matrix_from_vector(rotate_vec, axis='z')
 
         common_kwargs = dict(
             rotation_matrix=matrix,
